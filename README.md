@@ -1,5 +1,5 @@
 <a href="https://nextcrm.app/">
-  <h1 align="center">NextCRM</h1>
+  <h1 align="center">Ledger1CRM</h1>
 </a>
 
 <p align="center">
@@ -7,7 +7,7 @@
 </p>
 
 <!-- <p align="center">
-NextCRM is a CRM build on top of the Next.JS 14 using TypeScript, great UI library shadcn, Prisma and MongoDB as a database. Upload things as a S3 blob for document storage.
+Ledger1CRM is a CRM build on top of the Next.JS 14 using TypeScript, great UI library shadcn, Prisma and MongoDB as a database. Upload things as a S3 blob for document storage.
 </p> -->
 
 <p align="center">
@@ -74,7 +74,7 @@ You can try it here [demo.nextcrm.io](https://demo.nextcrm.io), login via Google
 
 1. More AI powered - daily summary of tasks and project (OpenAI integration) - in progress
 2. Email campaigns management - integration with MailChimp and Listmonk - in planning
-3. ~~Docker version - in planning (There will be complete bundle to run NextCRM on-premise)~~
+3. ~~Docker version - in planning (There will be complete bundle to run Ledger1CRM on-premise)~~
 4. Testing - Jest + Cypress (if anyone want to help I will be very happy) - in planning
 5. Fix all Types issue (no more "any") - in progress
 6. i18n - localization - in progress (if anyone want to help I will be very happy)
@@ -88,7 +88,7 @@ We use [resend.com](https://resend.com) + [react.email](https://react.email) as 
 
 ## Reports
 
-We use Tremor charts as a tool for creating charts in NextCRM
+We use Tremor charts as a tool for creating charts in Ledger1CRM
 
 ![hero](/public/reports.png)
 
@@ -202,13 +202,13 @@ Available soon at: http://docs.nextcrm.io
 
 ## Contributing
 
-We are open to the NextCRM community contributions. Every contribution is welcome.
+We are open to the Ledger1CRM community contributions. Every contribution is welcome.
 
 ### Issues
 
 - [Open an issue](https://github.com/pdovhomilja/nextcrm-app/issues) if you find a bug or have a suggestion for improvements.
 
-### NextCRM Super heroes
+### Ledger1CRM Super heroes
 
 <a href="https://github.com/pdovhomilja/nextcrm-app/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=pdovhomilja/nextcrm-app" />

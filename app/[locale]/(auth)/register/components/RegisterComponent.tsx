@@ -110,7 +110,7 @@ export function RegisterComponent() {
   const t = useTranslations("RegisterComponent");
 
   return (
-    <Card className="shadow-lg ">
+    <Card className="shadow-lg my-5 w-full max-w-lg sm:max-w-xl mx-auto">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">{t("cardTitle")}</CardTitle>
         <CardDescription>{t("cardDescription")}</CardDescription>

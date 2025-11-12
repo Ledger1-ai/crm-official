@@ -34,6 +34,10 @@ export function PasswordChangeForm({ userId }: { userId: string }) {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      password: "",
+      cpassword: "",
+    },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {

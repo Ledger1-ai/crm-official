@@ -25,6 +25,19 @@ export async function POST(req: Request) {
     });
 
     if (checkexisting) {
+      // If the account exists without a password (OAuth-only), allow setting a password
+      if (!checkexisting.password) {
+        const updated = await prismadb.users.update({
+          where: { id: checkexisting.id },
+          data: {
+            name,
+            username,
+            userLanguage: language,
+            password: await hash(password, 12),
+          },
+        });
+        return NextResponse.json(updated);
+      }
       return new NextResponse("User already exist", { status: 401 });
     }
 

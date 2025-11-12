@@ -54,6 +54,7 @@ model crm_Accounts {
   contracts            crm_Contracts[]
   watchers             String[]             @db.ObjectId
   watching_users       Users[]              @relation(name: "watching_accounts", fields: [watchers], references: [id])
+  lead_candidates     crm_Lead_Candidates[] @relation(name: "LeadCandidatesAssignedAccounts")
 }
 
 model crm_Leads {
@@ -82,6 +83,21 @@ model crm_Leads {
   assigned_accounts  crm_Accounts? @relation(fields: [accountsIDs], references: [id])
   documentsIDs       String[]      @db.ObjectId
   assigned_documents Documents[]   @relation(fields: [documentsIDs], references: [id])
+
+  // Outreach tracking fields
+  outreach_status             OutreachStatus? @default(IDLE)
+  outreach_sent_at            DateTime?       @db.Date
+  outreach_opened_at          DateTime?       @db.Date
+  outreach_followup_sent_at   DateTime?       @db.Date
+  outreach_meeting_link       String?
+  outreach_meeting_booked_at  DateTime?       @db.Date
+  outreach_first_message_id   String?
+  outreach_open_token         String?
+  outreach_notes              String?
+
+  lead_pool_maps     crm_Lead_Pools_Leads[]
+  contact_candidate_maps crm_Contact_Candidate_Leads[]
+  lead_activities    crm_Lead_Activities[] @relation(name: "LeadActivitiesToLead")
 }
 
 enum crm_Lead_Status {
@@ -181,6 +197,7 @@ model crm_Contacts {
   last_activity_by       String?             @db.ObjectId
   description            String?
   email                  String?
+  email_unsubscribed     Boolean?            @default(false)
   personal_email         String?
   first_name             String?
   last_name              String
@@ -599,6 +616,20 @@ model Users {
   watching_boards      Boards[]              @relation(name: "watching_users", fields: [watching_boardsIDs], references: [id])
   watching_accountsIDs String[]              @db.ObjectId
   watching_accounts    crm_Accounts[]        @relation(name: "watching_accounts", fields: [watching_accountsIDs], references: [id])
+  chat_sessions        chat_Sessions[]
+  lead_pools           crm_Lead_Pools[] @relation(name: "LeadPoolsAssignedUser")
+  lead_gen_jobs        crm_Lead_Gen_Jobs[] @relation(name: "LeadGenJobsAssignedUser")
+  lead_activities      crm_Lead_Activities[] @relation(name: "LeadActivitiesToUser")
+
+  // Outreach, signature, resources, and prompt settings
+  meeting_link               String?
+  signature_html             String?
+  signature_updated_at       DateTime? @db.Date
+  signature_meta             Json?
+  resource_links             Json?
+  outreach_prompt_default    String?
+  outreach_prompt_updated_at DateTime? @db.Date
+  outreach_prompt_meta       Json?
 }
 
 enum Language {
@@ -658,4 +689,243 @@ model gpt_models {
 enum gptStatus {
   ACTIVE
   INACTIVE
+}
+
+model chat_Sessions {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int      @default(0) @map("__v")
+  user        String   @db.ObjectId
+  title       String?
+  isTemporary Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime? @updatedAt @db.Date
+
+  messages      chat_Messages[]
+  assigned_user Users?  @relation(fields: [user], references: [id])
+}
+
+model chat_Messages {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int             @default(0) @map("__v")
+  session         String          @db.ObjectId
+  parent          String?         @db.ObjectId
+  role            String
+  content         String
+  createdAt       DateTime        @default(now()) @db.Date
+  model           String?
+  deployment      String?
+  tokenUsage      Json?
+
+  assigned_session chat_Sessions?  @relation(fields: [session], references: [id])
+  parent_message   chat_Messages?  @relation("ChatMessageChildren", fields: [parent], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children         chat_Messages[] @relation("ChatMessageChildren")
+}
+
+enum LeadGenJobStatus {
+  QUEUED
+  RUNNING
+  PAUSED
+  STOPPED
+  SUCCESS
+  FAILED
+}
+
+enum LeadCandidateStatus {
+  NEW
+  APPROVED
+  REJECTED
+  CONVERTED
+}
+
+enum EmailVerificationStatus {
+  VALID
+  RISKY
+  INVALID
+  CATCH_ALL
+  UNKNOWN
+}
+
+model crm_Lead_Pools {
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  v             Int?              @map("__v")
+  name          String
+  description   String?
+  user         String             @db.ObjectId
+  createdAt     DateTime?         @default(now()) @db.Date
+  updatedAt     DateTime?         @updatedAt @db.Date
+  status        String?           @default("ACTIVE")
+  icpConfig     Json?
+
+  // Relations
+  jobs          crm_Lead_Gen_Jobs[]
+  candidates    crm_Lead_Candidates[]
+  lead_maps     crm_Lead_Pools_Leads[]
+  assigned_user Users?            @relation(name: "LeadPoolsAssignedUser", fields: [user], references: [id])
+}
+
+model crm_Lead_Gen_Jobs {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  v              Int?               @map("__v")
+  user           String             @db.ObjectId
+  pool           String             @db.ObjectId
+  status         LeadGenJobStatus?  @default(QUEUED)
+  startedAt      DateTime?          @db.Date
+  finishedAt     DateTime?          @db.Date
+  providers      Json?
+  queryTemplates Json?
+  counters       Json?
+  logs           Json?
+
+  // Relations
+  sourceEvents   crm_Lead_Source_Events[]
+  assigned_user  Users?             @relation(name: "LeadGenJobsAssignedUser", fields: [user], references: [id])
+  assigned_pool  crm_Lead_Pools?    @relation(fields: [pool], references: [id])
+}
+
+model crm_Lead_Source_Events {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int?              @map("__v")
+  job         String            @db.ObjectId
+  type        String?
+  query       String?
+  url         String?
+  fetchedAt   DateTime?         @default(now()) @db.Date
+  metadata    Json?
+
+  // Relations
+  assigned_job crm_Lead_Gen_Jobs? @relation(fields: [job], references: [id])
+}
+
+model crm_Lead_Candidates {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  v              Int?               @map("__v")
+  pool           String             @db.ObjectId
+  domain         String?
+  companyName    String?
+  homepageUrl    String?
+  description    String?
+  industry       String?
+  techStack      Json?
+  score          Int?               @default(0)
+  freshnessAt    DateTime?          @db.Date
+  status         LeadCandidateStatus? @default(NEW)
+  dedupeKey      String?
+  provenance     Json?
+
+  // Optional linkage to an Account if matched
+  accountsIDs    String?            @db.ObjectId
+
+  // Relations
+  contacts       crm_Contact_Candidates[]
+  assigned_pool  crm_Lead_Pools?    @relation(fields: [pool], references: [id])
+  assigned_accounts crm_Accounts?   @relation(name: "LeadCandidatesAssignedAccounts", fields: [accountsIDs], references: [id])
+}
+
+model crm_Contact_Candidates {
+  id             String                  @id @default(auto()) @map("_id") @db.ObjectId
+  v              Int?                    @map("__v")
+  leadCandidate  String                  @db.ObjectId
+  fullName       String?
+  title          String?
+  email          String?
+  emailStatus    EmailVerificationStatus? @default(UNKNOWN)
+  phone          String?
+  linkedinUrl    String?
+  confidence     Int?
+  provenance     Json?
+  status         String?                 @default("NEW")
+  dedupeKey      String?
+
+  // Conversion linkage to Leads
+  lead_maps     crm_Contact_Candidate_Leads[]
+
+  // Relations
+  candidate      crm_Lead_Candidates?    @relation(fields: [leadCandidate], references: [id])
+}
+
+model crm_Lead_Pools_Leads {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int?              @map("__v")
+  pool        String            @db.ObjectId
+  lead        String            @db.ObjectId
+  createdAt   DateTime?         @default(now()) @db.Date
+
+  assigned_pool crm_Lead_Pools? @relation(fields: [pool], references: [id])
+  assigned_lead crm_Leads?      @relation(fields: [lead], references: [id])
+}
+
+model crm_Contact_Candidate_Leads {
+  id                String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v                 Int?                     @map("__v")
+  candidate         String                   @db.ObjectId
+  lead              String                   @db.ObjectId
+  createdAt         DateTime?                @default(now()) @db.Date
+
+  assigned_candidate crm_Contact_Candidates? @relation(fields: [candidate], references: [id])
+  assigned_lead      crm_Leads?              @relation(fields: [lead], references: [id])
+}
+
+model crm_Global_Companies {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int?     @map("__v")
+  domain      String?  @unique
+  companyName String?
+  description String?
+  homepageUrl String?
+  industry    String?
+  techStack   Json?
+  dedupeKey   String?  @unique
+  firstSeen   DateTime? @default(now()) @db.Date
+  lastSeen    DateTime? @db.Date
+  provenance  Json?
+  status      String?  @default("ACTIVE")
+
+  // Persons back-relation for referential consistency
+  persons     crm_Global_Persons[] @relation("GlobalCompanyPersons")
+}
+
+model crm_Global_Persons {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  v             Int?     @map("__v")
+  email         String?  @unique
+  fullName      String?
+  title         String?
+  linkedinUrl   String?
+  phone         String?
+  companyDomain String?
+  companyId     String?  @db.ObjectId
+  dedupeKey     String?  @unique
+  emailStatus   EmailVerificationStatus?
+  confidence    Int?
+  firstSeen     DateTime? @default(now()) @db.Date
+  lastSeen      DateTime? @db.Date
+  provenance    Json?
+  status        String?  @default("ACTIVE")
+
+  assigned_company crm_Global_Companies? @relation(name: "GlobalCompanyPersons", fields: [companyId], references: [id])
+
+  @@index([companyDomain])
+}
+
+enum OutreachStatus {
+  IDLE
+  PENDING
+  SENT
+  OPENED
+  MEETING_LINK_CLICKED
+  MEETING_BOOKED
+  CLOSED
+}
+
+model crm_Lead_Activities {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  v             Int      @default(0) @map("__v")
+  lead          String   @db.ObjectId
+  user          String?  @db.ObjectId
+  type          String
+  metadata      Json?
+  createdAt     DateTime @default(now()) @db.Date
+
+  assigned_lead crm_Leads? @relation(name: "LeadActivitiesToLead", fields: [lead], references: [id])
+  assigned_user Users?     @relation(name: "LeadActivitiesToUser", fields: [user], references: [id])
 }

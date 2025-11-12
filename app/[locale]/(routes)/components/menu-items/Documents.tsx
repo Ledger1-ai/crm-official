@@ -14,11 +14,8 @@ const DocumentsModuleMenu = ({ open, title }: Props) => {
   const isPath = pathname.includes("documents");
   return (
     <div className="flex flex-row items-center mx-auto p-2">
-      <Link
-        href={"/documents"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
-      >
-        <FileText className="w-6" />
+      <Link href={"/documents"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
+        <FileText className="w-6 icon" />
         <span className={open ? "" : "hidden"}>{title}</span>
       </Link>
     </div>

@@ -158,7 +158,7 @@ export function NewLeadForm({ users, accounts }: NewTaskFormProps) {
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="NextCRM Inc."
+                      placeholder="Ledger1CRM Inc."
                       {...field}
                     />
                   </FormControl>
@@ -223,7 +223,7 @@ export function NewLeadForm({ users, accounts }: NewTaskFormProps) {
                   <FormControl>
                     <Textarea
                       disabled={isLoading}
-                      placeholder="New NextCRM functionality"
+                      placeholder="New Ledger1CRM functionality"
                       {...field}
                     />
                   </FormControl>

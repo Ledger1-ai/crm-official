@@ -114,7 +114,7 @@ export function NewAccountForm({ industries, users, onFinish }: Props) {
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="NextCRM Inc."
+                      placeholder="Ledger1CRM Inc."
                       {...field}
                     />
                   </FormControl>

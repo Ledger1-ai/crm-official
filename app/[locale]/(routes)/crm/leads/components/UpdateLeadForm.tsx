@@ -144,6 +144,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="Johny"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -176,8 +177,9 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="NextCRM Inc."
+                      placeholder="Ledger1CRM Inc."
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -191,7 +193,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                 <FormItem>
                   <FormLabel>Job Title</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} placeholder="CTO" {...field} />
+                    <Input disabled={isLoading} placeholder="CTO" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -208,6 +210,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="johny@domain.com"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -225,6 +228,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="+11 123 456 789"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -241,8 +245,9 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                   <FormControl>
                     <Textarea
                       disabled={isLoading}
-                      placeholder="New NextCRM functionality"
+                      placeholder="New Ledger1CRM functionality"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -260,6 +265,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="Website"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -277,6 +283,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="Johny Walker"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -294,6 +301,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                       disabled={isLoading}
                       placeholder="Social networks"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -396,6 +404,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                           disabled={isLoading}
                           placeholder="Social networks"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />

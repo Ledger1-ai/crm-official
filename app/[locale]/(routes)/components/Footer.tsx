@@ -6,13 +6,13 @@ const Footer = async () => {
   const nextVersion = await getNextVersion();
   //console.log(nextVersion, "nextVersion");
   return (
-    <footer className="flex flex-row h-8 justify-end items-center w-full text-xs text-gray-500 p-5">
+    <footer className="glass rounded-lg flex flex-row h-8 justify-end items-center w-full text-xs text-gray-500 p-5">
       <div className="hidden md:flex pr-5">
         <Link href="/">
-          <h1 className="text-gray-600">
-            {" "}
-            {process.env.NEXT_PUBLIC_APP_NAME} - {process.env.NEXT_PUBLIC_APP_V}
-          </h1>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="App logo" className="h-6 w-auto" />
+            <span className="text-gray-500">- {process.env.NEXT_PUBLIC_APP_V}</span>
+          </div>
         </Link>
       </div>
       <div className="hidden md:flex space-x-2 pr-2">

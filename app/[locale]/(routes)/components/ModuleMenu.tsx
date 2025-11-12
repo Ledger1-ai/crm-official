@@ -16,6 +16,7 @@ import AdministrationMenu from "./menu-items/Administration";
 import DashboardMenu from "./menu-items/Dashboard";
 import EmailsModuleMenu from "./menu-items/Emails";
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 
 type Props = {
   modules: any;
@@ -40,27 +41,26 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
       <div
         className={` ${
           open ? "w-72" : "w-20 "
-        }  h-screen p-5  pt-8 relative duration-300`}
+        }  h-screen p-5  pt-8 relative duration-300 sidebar`}
       >
         <div className="flex gap-x-4 items-center">
-          <div
-            className={`cursor-pointer duration-500 border rounded-full px-4 py-2 ${
-              open && "rotate-[360deg]"
-            }`}
+          <button
+            aria-label="Toggle sidebar"
+            aria-expanded={open}
+            aria-controls="app-sidebar"
+            className={`sidebar-toggle ${open ? "rotate-0" : ""}`}
             onClick={() => setOpen(!open)}
           >
-            N
-          </div>
+            <Menu className="w-5 h-5" />
+          </button>
 
-          <h1
-            className={` origin-left font-medium text-xl duration-200 ${
-              !open && "scale-0"
-            }`}
-          >
-            {process.env.NEXT_PUBLIC_APP_NAME}
-          </h1>
+          <img
+            src="/logo.png"
+            alt="App logo"
+            className={`h-8 w-auto origin-left duration-200 ${!open && "scale-0"}`}
+          />
         </div>
-        <div className="pt-6">
+        <div id="app-sidebar" className="pt-6 sidebar-list">
           <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
           {modules.find(
             (menuItem: any) => menuItem.name === "crm" && menuItem.enabled

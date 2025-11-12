@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -62,9 +61,9 @@ const ResendCard = async () => {
     <Card className="min-w-[350px] max-w-[450px]">
       <CardHeader className="text-lg">
         <CardTitle>Resend.com - API Key</CardTitle>
-        <CardDescription className="text-xs">
-          <p>ENV API key:</p>
-          <p>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div>ENV API key:</div>
+          <div>
             {process.env.RESEND_API_KEY ? (
               <CopyKeyComponent
                 keyValue={process.env.RESEND_API_KEY}
@@ -73,9 +72,9 @@ const ResendCard = async () => {
             ) : (
               "not enabled"
             )}
-          </p>
-          <p>API key from DB:</p>
-          <p>
+          </div>
+          <div>API key from DB:</div>
+          <div>
             {resend_key?.serviceKey ? (
               <CopyKeyComponent
                 keyValue={resend_key?.serviceKey}
@@ -84,8 +83,8 @@ const ResendCard = async () => {
             ) : (
               "not enabled"
             )}
-          </p>
-        </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <form action={setSMTP}>

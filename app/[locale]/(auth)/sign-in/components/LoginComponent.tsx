@@ -108,25 +108,33 @@ export function LoginComponent() {
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
     try {
+      const normalizedEmail = data.email.trim().toLowerCase();
       const status = await signIn("credentials", {
         redirect: false,
-        email: data.email,
+        email: normalizedEmail,
         password: data.password,
         callbackUrl: process.env.NEXT_PUBLIC_APP_URL,
       });
       //console.log(status, "status");
       if (status?.error) {
+        const msg = status.error as string;
         toast({
           variant: "destructive",
           title: "Error",
-          description: status.error,
+          description: msg,
         });
+        // If the account exists but has no password set (OAuth-only), prefill and open reset dialog
+        if (typeof msg === "string" && msg.toLowerCase().includes("no password is set")) {
+          setEmail(normalizedEmail);
+          setOpen(true);
+        }
       }
       if (status?.ok) {
         // console.log("Status OK");
         toast({
           description: "Login successful.",
         });
+        router.push("/");
       }
     } catch (error: any) {
       console.log(error);
@@ -137,7 +145,6 @@ export function LoginComponent() {
       });
     } finally {
       setIsLoading(false);
-      router.push("/");
     }
   }
 
@@ -166,7 +173,7 @@ export function LoginComponent() {
   }
 
   return (
-    <Card className="shadow-lg my-5 ">
+    <Card className="shadow-lg my-5 w-full max-w-md sm:max-w-lg mx-auto">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>Click here to login with: </CardDescription>

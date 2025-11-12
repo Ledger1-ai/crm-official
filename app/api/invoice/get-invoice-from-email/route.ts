@@ -3,6 +3,9 @@ import Imap from "imap";
 import { simpleParser, ParsedMail } from "mailparser";
 import { Readable } from "stream";
 import axios from "axios";
+// TLS workaround: disable certificate verification to avoid DEPTH_ZERO_SELF_SIGNED_CERT
+// WARNING: Do not leave this enabled in production without proper CA configuration.
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const imapConfig: Imap.Config = {
   user: process.env.IMAP_USER!,
@@ -10,6 +13,7 @@ const imapConfig: Imap.Config = {
   host: process.env.IMAP_HOST,
   port: parseInt(process.env.IMAP_PORT ?? "993"),
   tls: true,
+  tlsOptions: { rejectUnauthorized: false },
 };
 
 export async function GET() {
@@ -25,12 +29,19 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in GET function:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    const debug = process.env.NODE_ENV !== "production";
+    const payload = debug
+      ? {
+          error: "Internal Server Error",
+          message: error?.message,
+          code: error?.code,
+          name: error?.name,
+          stack: error?.stack,
+        }
+      : { error: "Internal Server Error" };
+    return NextResponse.json(payload, { status: 500 });
   }
 }
 
@@ -142,8 +153,10 @@ function getAttachments(parsed: ParsedMail): any[] {
 async function sendAttachmentToAPI(attachment: any) {
   try {
     console.log("Sending attachment to API:", attachment.filename);
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const response = await axios.post(
-      "http://localhost:3000/api/upload/cron",
+      `${baseUrl}/api/upload/cron`,
       { file: attachment },
       { headers: { "Content-Type": "application/json" } }
     );

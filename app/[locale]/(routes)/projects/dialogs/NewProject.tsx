@@ -56,6 +56,11 @@ const NewProjectDialog = () => {
 
   const form = useForm<NewAccountFormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      visibility: "",
+    },
   });
 
   useEffect(() => {

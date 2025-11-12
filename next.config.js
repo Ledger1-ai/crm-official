@@ -10,8 +10,6 @@ const nextConfig = {
       "localhost",
       "res.cloudinary.com",
       "lh3.googleusercontent.com",
-      "uploadthing.com",
-      "utfs.io",
     ],
   },
 };

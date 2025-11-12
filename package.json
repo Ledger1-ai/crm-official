@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate &&  prisma db push && prisma db seed && next build",
+    "build": "prisma generate && node ./scripts/prisma-db-push-named.cjs && prisma db seed && next build",
     "start": "next start",
+    "db:push:named": "node ./scripts/prisma-db-push-named.cjs",
     "lint": "next lint"
   },
   "prisma": {
@@ -38,9 +39,9 @@
     "@react-email/components": "^0.0.28",
     "@react-email/markdown": "0.0.12",
     "@react-email/render": "^1.0.2",
+    "@sparticuz/chromium": "^119.0.2",
     "@tanstack/react-table": "^8.20.5",
     "@tremor/react": "^3.18.4",
-    "@uploadthing/react": "^7.1.1",
     "ai": "^3.4.33",
     "autoprefixer": "^10.4.20",
     "aws-crt": "^1.23.0",
@@ -71,6 +72,8 @@
     "postcss": "^8.4.49",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.4",
+    "puppeteer": "^23.7.0",
+    "puppeteer-core": "^23.7.0",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-beautiful-dnd": "^13.1.1",
     "react-day-picker": "^8.10.1",
@@ -89,7 +92,6 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss": "^3.4.14",
     "tailwindcss-animate": "^1.0.7",
-    "uploadthing": "^7.3.0",
     "xmlbuilder2": "^3.1.1",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"
@@ -113,6 +115,17 @@
     "overrides": {
       "@types/react": "npm:types-react@19.0.0-rc.1",
       "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "aws-crt",
+      "bcrypt",
+      "canvas",
+      "cypress",
+      "prisma",
+      "puppeteer",
+      "sharp"
+    ]
   }
 }

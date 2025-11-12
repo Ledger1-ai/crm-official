@@ -22,13 +22,13 @@ export async function GET(request: Request) {
     const hasTitle = searchParams.has("title");
     const title = hasTitle
       ? searchParams.get("title")?.slice(0, 200)
-      : "NextCRM";
+      : "Ledger1CRM";
 
     const hasDescription = searchParams.has("description");
 
     const description = hasDescription
       ? searchParams.get("description")?.slice(0, 200)
-      : "NextCRM is an open source CRM build on top of NextJS. Technology stack: NextJS with Typescrtipt, MongoDB, TailwindCSS, React, Prisma, shadCN, resend.com, react.email and more. ";
+      : "Ledger1CRM is an open-source CRM built on Next.js with a turquoise glassmorphism aesthetic. Tech stack: Next.js, TypeScript, MongoDB, TailwindCSS, React, Prisma, shadcn/ui, Resend, react.email.";
 
     return new ImageResponse(
       (
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
               src={`${websiteUrl}/img/hero.png`}
               width="50%"
               height="50%"
-              alt="Prism"
+              alt="Ledger1CRM"
             />
             <div
               tw="absolute left-[-80px] top-[-30px] w-[150px] h-[120%] bg-neutral-800"
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
               <SiOpenai size={50} color={"white"} />
             </span>
 
-            <p tw="text-neutral-300 pb-10">https://demo.nextcrm.io</p>
+            <p tw="text-neutral-300 pb-10">{websiteUrl}</p>
           </div>
         </div>
       ),

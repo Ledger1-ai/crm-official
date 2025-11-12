@@ -11,14 +11,14 @@ type Props = {
 
 const DashboardMenu = ({ open, title }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("nevermind");
+  const isPath = pathname.split("/").filter(Boolean).length === 1;
   return (
-    <div className="flex flex-row items-center mx-auto p-2">
+    <div className="flex flex-row items-center p-2 w-full">
       <Link
         href={"/"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
+        className={`menu-item ${isPath ? "menu-item-active" : ""}`}
       >
-        <Home className="w-6" />
+        <Home className="w-6 icon" />
         <span className={open ? "" : "hidden"}>{title}</span>
       </Link>
     </div>

@@ -27,16 +27,24 @@ export async function POST(req: Request) {
       });
     }
 
+    // Normalize incoming email to reduce case sensitivity issues
+    const normalizedEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : email;
+
     const password = generateRandomPassword();
 
+    // Try to find user by provided email or normalized form (covers legacy mixed-case storage)
     const user = await prismadb.users.findFirst({
       where: {
-        email: email,
+        OR: [
+          { email: email },
+          { email: normalizedEmail as string },
+        ],
       },
     });
 
     if (!user) {
-      return new NextResponse("No user with that Email exist in Db!", {
+      return new NextResponse("No user with that email exists.", {
         status: 401,
       });
     }
@@ -53,22 +61,31 @@ export async function POST(req: Request) {
         status: 401,
       });
     } else {
-      const data = await resend.emails.send({
-        from: process.env.EMAIL_FROM!,
-        to: user.email,
-        subject: "NextCRM - Password reset",
-        text: "", // Add this line to fix the types issue
-        //react: DemoTemplate({ firstName: "John" }),
-        react: PasswordResetEmail({
-          username: user?.name!,
-          avatar: user.avatar,
-          email: user.email,
-          password: password,
-          userLanguage: user.userLanguage,
-        }),
-      });
-      console.log(data, "data");
-      console.log("Email sent to: " + user.email);
+      if (resend) {
+        try {
+          const data = await resend.emails.send({
+            from: process.env.EMAIL_FROM!,
+            to: user.email,
+            subject: "Ledger1CRM - Password reset",
+            text: "", // Add this line to fix the types issue
+            react: PasswordResetEmail({
+              username: user?.name!,
+              avatar: user.avatar,
+              email: user.email,
+              password: password,
+              userLanguage: user.userLanguage,
+            }),
+          });
+          console.log(data, "data");
+          console.log("Email sent to: " + user.email);
+        } catch (e) {
+          console.log("[USER_PASSWORD_CHANGE_EMAIL_ERROR]", e);
+        }
+      } else {
+        console.log(
+          "RESEND_API_KEY not configured; skipping password reset email"
+        );
+      }
     }
 
     return NextResponse.json({ message: "Password changed!", status: true });

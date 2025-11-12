@@ -37,7 +37,7 @@ const ProfilePage = async () => {
         <H4Title>Notion Integration</H4Title>
         <NotionForm userId={data.id} />
 
-        <H4Title>OpenAI Integration</H4Title>
+        <H4Title>Azure OpenAI Integration</H4Title>
         <OpenAiForm userId={data.id} />
       </div>
     </Container>

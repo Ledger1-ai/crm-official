@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import { openAiHelper } from "@/lib/openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import { getServerSession } from "next-auth";
-import OpenAI from "openai";
 
 // IMPORTANT! Set the runtime to edge
 //export const runtime = "edge";
@@ -27,12 +26,20 @@ export async function POST(req: Request) {
 
   const { prompt } = await req.json();
 
-  // Ask OpenAI for a streaming completion given the prompt
-  const response = await openai.completions.create({
-    model: "gpt-3.5-turbo-instruct",
-    max_tokens: 2000,
+  // Ask OpenAI (or Azure OpenAI via helper) for a streaming chat completion given the prompt
+  const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const azureDeployment = process.env.AZURE_OPENAI_DEPLOYMENT;
+  const modelToUse =
+    azureEndpoint && azureDeployment ? azureDeployment : "gpt-3.5-turbo";
+
+  const response = await openai.chat.completions.create({
+    model: modelToUse,
     stream: true,
-    prompt,
+    messages: [
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: prompt },
+    ],
+    // max_tokens: 2000,
   });
 
   // Convert the response into a friendly text-stream

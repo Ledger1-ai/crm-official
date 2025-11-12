@@ -13,11 +13,8 @@ const EmployeesModuleMenu = ({ open }: Props) => {
   const isPath = pathname.includes("employees");
   return (
     <div className="flex flex-row items-center mx-auto p-2">
-      <Link
-        href={"/employees"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
-      >
-        <Users className="w-6" />
+      <Link href={"/employees"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
+        <Users className="w-6 icon" />
         <span className={open ? "" : "hidden"}>Employees</span>
       </Link>
     </div>

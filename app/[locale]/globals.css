@@ -60,21 +60,31 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Ledger1CRM: Turquoise primary accent */
+    --primary: 191 65% 58%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Use brand accent and focus ring */
+    --accent: 191 100% 92%;
+    --accent-foreground: 191 50% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 215 20.2% 65.1%;
+    --ring: 191 65% 58%;
 
     --radius: 0.5rem;
+
+    /* Ledger1CRM theming variables */
+    --osiris-gradient: radial-gradient(800px circle at 20% 0%, rgba(77, 191, 217, 0.22), transparent 40%),
+      radial-gradient(600px circle at 80% 20%, rgba(77, 191, 217, 0.18), transparent 45%),
+      linear-gradient(to bottom, #eff9fd, #e6f5fb);
+    --glass-bg: hsla(0, 0%, 100%, 0.65);
+    --glass-border: hsla(191, 60%, 58%, 0.25);
+    --glass-shadow: 0 8px 30px hsla(191, 65%, 46%, 0.18), inset 0 1px 0 hsla(0, 0%, 100%, 0.4);
   }
 
   .dark {
@@ -93,19 +103,29 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Ledger1CRM: Turquoise primary accent */
+    --primary: 191 65% 58%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Use brand accent and focus ring in dark */
+    --accent: 191 45% 30%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 85.7% 97.3%;
 
-    --ring: 217.2 32.6% 17.5%;
+    --ring: 191 65% 58%;
+
+    /* Ledger1CRM dark theming variables */
+    --osiris-gradient: radial-gradient(1000px circle at 10% -10%, rgba(77, 191, 217, 0.18), transparent 35%),
+      radial-gradient(800px circle at 100% 10%, rgba(77, 191, 217, 0.15), transparent 40%),
+      linear-gradient(to bottom, #041a1a, #031616);
+    --glass-bg: hsla(191, 25%, 16%, 0.6);
+    --glass-border: hsla(191, 85%, 70%, 0.18);
+    --glass-shadow: 0 10px 40px hsla(191, 65%, 46%, 0.28), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
   }
 }
 
@@ -115,5 +135,189 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Ledger1CRM: liquid glass morphism global gradient background */
+    background: var(--osiris-gradient);
+    background-attachment: fixed;
+    background-size: cover;
   }
+}
+
+/* Ledger1CRM: Glassmorphism utility */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+}
+
+/* Optional: gradient text utility for headings */
+.brand-gradient-text {
+  background: linear-gradient(90deg, #7bd3e6, #4dbfd9 60%, #2aa9c7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Sidebar: hamburger toggle and menu item glassmorphism */
+.sidebar-toggle {
+  position: relative;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 250ms ease, border-color 250ms ease, background 250ms ease;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+}
+.sidebar-toggle:hover {
+  transform: scale(1.05);
+  border-color: hsla(191, 65%, 58%, 0.35);
+  box-shadow: 0 14px 48px hsla(191, 65%, 46%, 0.35), inset 0 1px 0 hsla(0, 0%, 100%, 0.12);
+}
+.sidebar-toggle:active {
+  transform: scale(0.98);
+}
+
+/* Sidebar menu items */
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  transition: transform 150ms ease, box-shadow 250ms ease, border-color 250ms ease, background 250ms ease, color 250ms ease;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  color: hsl(var(--foreground));
+  opacity: 0.94;
+}
+.menu-item:hover {
+  transform: none;
+  border-color: hsla(191, 65%, 58%, 0.35);
+  box-shadow: 0 12px 40px hsla(191, 65%, 46%, 0.28), inset 0 1px 0 hsla(0, 0%, 100%, 0.10);
+}
+
+/* Active/selected state: strong accent, glow, and indicator bar */
+.menu-item-active {
+  background: hsla(191, 45%, 30%, 0.35);
+  border-color: hsla(191, 65%, 58%, 0.55);
+  color: hsl(var(--primary-foreground));
+  box-shadow: 0 14px 50px hsla(191, 65%, 46%, 0.45), inset 0 1px 0 hsla(0, 0%, 100%, 0.18);
+  transform: none;
+}
+.menu-item-active::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(77, 191, 217, 0.6), rgba(42, 169, 199, 0.95));
+}
+.menu-item .icon {
+  opacity: 0.85;
+}
+.menu-item-active .icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(77, 191, 217, 0.55));
+}
+
+/* Accessible focus states for keyboard users */
+.menu-item:focus-visible,
+.sidebar-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsla(191, 65%, 58%, 0.75), var(--glass-shadow);
+  border-color: hsla(191, 65%, 58%, 0.65);
+}
+
+/* Sidebar container glassmorphism */
+.sidebar {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border-radius: 1rem;
+}
+
+/* Sidebar list layout */
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Sidebar alignment fixes: ensure all menu items align to the left edge */
+.sidebar-list>* {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-self: stretch;
+}
+.sidebar-list .menu-item {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* Subtle sheen on hover for items */
+.menu-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.12), transparent 60%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+.menu-item:hover::after,
+.menu-item:focus-visible::after {
+  opacity: 1;
+}
+
+/* Sleek global scrollbars */
+:root {
+  --scrollbar-thumb: rgba(100, 116, 139, 0.45); /* slate-500 */
+  --scrollbar-thumb-hover: rgba(100, 116, 139, 0.7);
+  --scrollbar-track: transparent;
+}
+.dark {
+  --scrollbar-thumb: rgba(148, 163, 184, 0.35); /* slate-400 */
+  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.55);
+  --scrollbar-track: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit-based browsers */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }

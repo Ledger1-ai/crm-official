@@ -181,7 +181,7 @@ export function UpdateAccountForm({
                   <FormControl>
                     <Input
                       disabled={isLoading}
-                      placeholder="NextCRM Inc."
+                      placeholder="Ledger1CRM Inc."
                       {...field}
                     />
                   </FormControl>

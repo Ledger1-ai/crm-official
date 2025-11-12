@@ -6,46 +6,91 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useToast } from "@/components/ui/use-toast";
-import { FileUploaderDropzone } from "@/components/ui/file-uploader-dropzone";
+import { Button } from "@/components/ui/button";
 
 import useAvatarStore from "@/store/useAvatarStore";
-import axios from "axios";
 
 interface ProfileFormProps {
   data: Users;
 }
 
 export function ProfilePhotoForm({ data }: ProfileFormProps) {
-  const [avatar, setAvatar] = useState(data.avatar);
+  const [avatar, setAvatar] = useState(data.avatar || "");
+  const [isUploading, setIsUploading] = useState(false);
 
   const { toast } = useToast();
   const router = useRouter();
   const setAvatarStore = useAvatarStore((state) => state.setAvatar);
 
   useEffect(() => {
-    setAvatar(data.avatar);
-  }, [data.avatar, toast]);
+    setAvatar(data.avatar || "");
+  }, [data.avatar]);
 
-  const handleUploadSuccess = async (newAvatar: string) => {
-    try {
-      setAvatar(newAvatar);
-      setAvatarStore(newAvatar);
-      await axios.put("/api/profile/updateProfilePhoto", { avatar: newAvatar });
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
       toast({
-        title: "Profile photo updated.",
-        description: "Your profile photo has been updated.",
+        variant: "destructive",
+        title: "Invalid file type",
+        description: "Please select an image file.",
         duration: 5000,
       });
-    } catch (e) {
-      console.log(e);
+      return;
+    }
+
+    // Validate file size (4MB)
+    if (file.size > 4 * 1024 * 1024) {
       toast({
-        variant: "default",
-        title: "Error updating profile photo.",
-        description: "There was an error updating your profile photo.",
+        variant: "destructive",
+        title: "File too large",
+        description: "Please select an image smaller than 4MB.",
+        duration: 5000,
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/profile/upload-photo', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to upload photo');
+      }
+
+      setAvatar(result.avatar);
+      setAvatarStore(result.avatar);
+      
+      toast({
+        title: "Profile photo updated",
+        description: "Your profile photo has been updated successfully.",
+        duration: 5000,
+      });
+
+      router.refresh();
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error updating profile photo",
+        description: error.message || "There was an error updating your profile photo.",
         duration: 5000,
       });
     } finally {
-      router.refresh();
+      setIsUploading(false);
+      // Reset input
+      e.target.value = '';
     }
   };
 
@@ -57,13 +102,31 @@ export function ProfilePhotoForm({ data }: ProfileFormProps) {
           alt="avatar"
           width={100}
           height={100}
+          className="rounded-full"
         />
       </div>
-      <div>
-        <FileUploaderDropzone
-          uploader={"profilePhotoUploader"}
-          onUploadSuccess={handleUploadSuccess}
+      <div className="flex flex-col gap-2">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={isUploading}
+          className="hidden"
+          id="profile-photo-input"
         />
+        <label htmlFor="profile-photo-input">
+          <Button
+            type="button"
+            disabled={isUploading}
+            onClick={() => document.getElementById('profile-photo-input')?.click()}
+            className="cursor-pointer"
+          >
+            {isUploading ? 'Uploading...' : 'Upload Photo'}
+          </Button>
+        </label>
+        <p className="text-sm text-muted-foreground">
+          Images will be resized to 500x500px. Max size: 4MB
+        </p>
       </div>
     </div>
   );

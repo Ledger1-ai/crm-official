@@ -346,7 +346,7 @@ const Kanban = (props: any) => {
                   className="flex flex-col items-center justify-center  h-full w-80 "
                   key={section.id}
                 >
-                  <Droppable key={section.id} droppableId={section.id}>
+                  <Droppable key={section.id} droppableId={section.id} isDropDisabled={false}>
                     {(provided) => (
                       <div
                         ref={provided.innerRef}

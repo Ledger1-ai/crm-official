@@ -53,17 +53,29 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email or password is missing");
         }
 
+        // Normalize email to avoid case sensitivity issues in lookups
+        const normalizedEmail =
+          typeof credentials.email === "string"
+            ? credentials.email.trim().toLowerCase()
+            : credentials.email;
+
         const user = await prismadb.users.findFirst({
           where: {
-            email: credentials.email,
+            email: normalizedEmail,
           },
         });
 
         //clear white space from password
         const trimmedPassword = credentials.password.trim();
 
-        if (!user || !user?.password) {
-          throw new Error("User not found, please register first");
+        if (!user) {
+          throw new Error("User not found. Please register first.");
+        }
+
+        if (!user?.password) {
+          throw new Error(
+            "Account exists but no password is set. Sign in with Google/GitHub or use 'Forgot password' to set one."
+          );
         }
 
         const isCorrectPassword = await bcrypt.compare(
@@ -80,12 +92,35 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  events: {
+    // Update lastLoginAt only on sign-in to avoid concurrent session-triggered writes
+    async signIn({ user }: any) {
+      if (!user?.id) return;
+      try {
+        await prismadb.users.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        });
+      } catch (_err) {
+        // swallow to avoid deadlocks during concurrent sign-ins
+      }
+    },
+  },
   callbacks: {
     //TODO: fix this any
     async session({ token, session }: any) {
+      // Guard against missing token data to avoid runtime errors and JWT session failures
+      if (!token?.email) {
+        return session;
+      }
+
+      // Normalize email for stable lookups and consistent storage
+      const tokenEmail =
+        typeof token?.email === "string" ? token.email.toLowerCase() : token?.email;
+
       const user = await prismadb.users.findFirst({
         where: {
-          email: token.email,
+          email: tokenEmail,
         },
       });
 
@@ -93,7 +128,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const newUser = await prismadb.users.create({
             data: {
-              email: token.email,
+              email: tokenEmail,
               name: token.name,
               avatar: token.picture,
               is_admin: false,
@@ -120,17 +155,11 @@ export const authOptions: NextAuthOptions = {
           session.user.lastLoginAt = newUser.lastLoginAt;
           return session;
         } catch (error) {
-          return console.log(error);
+          console.error("[auth.session] users.create error:", error);
+          return session;
         }
       } else {
-        await prismadb.users.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            lastLoginAt: new Date(),
-          },
-        });
+        // User already exists in localDB, put user data in session (avoid DB writes here)
         //User allready exist in localDB, put user data in session
         session.user.id = user.id;
         session.user.name = user.name;

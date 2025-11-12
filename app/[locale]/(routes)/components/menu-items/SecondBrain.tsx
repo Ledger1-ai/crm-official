@@ -21,11 +21,8 @@ const SecondBrainModuleMenu = ({ open }: Props) => {
   const isPath = pathname.includes("secondBrain");
   return (
     <div className="flex flex-row items-center mx-auto p-2">
-      <Link
-        href={"/secondBrain"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
-      >
-        <Lightbulb className="w-6" />
+      <Link href={"/secondBrain"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
+        <Lightbulb className="w-6 icon" />
         <span className={open ? "" : "hidden"}>Second brain</span>
       </Link>
     </div>

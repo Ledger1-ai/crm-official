@@ -14,11 +14,8 @@ const DataboxModuleMenu = ({ open }: Props) => {
   const isPath = pathname.includes("databox");
   return (
     <div className="flex flex-row items-center mx-auto p-2">
-      <Link
-        href={"/databox"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
-      >
-        <FileEdit className="w-6" />
+      <Link href={"/databox"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
+        <FileEdit className="w-6 icon" />
         <span className={open ? "" : "hidden"}>Databox</span>
       </Link>
     </div>

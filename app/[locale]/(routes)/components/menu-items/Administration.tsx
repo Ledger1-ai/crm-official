@@ -11,12 +11,9 @@ const AdministrationMenu = ({ open, title }: Props) => {
   const pathname = usePathname();
   const isPath = pathname.includes("admin");
   return (
-    <div className="flex flex-row items-center mx-auto p-2">
-      <Link
-        href={"/admin"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
-      >
-        <Wrench className="w-6" />
+    <div className="flex flex-row items-center p-2 w-full">
+      <Link href={"/admin"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
+        <Wrench className="w-6 icon" />
         <span className={open ? "" : "hidden"}>{title}</span>
       </Link>
     </div>

@@ -16,9 +16,9 @@ const ReportsModuleMenu = ({ open, title }: Props) => {
     <div className={`flex flex-row items-center mx-auto p-2`}>
       <Link
         href={"/reports"}
-        className={`flex gap-2 p-2 ${isPath ? "text-muted-foreground" : null}`}
+        className={`menu-item ${isPath ? "menu-item-active" : ""}`}
       >
-        <FileBarChart className={`w-6 `} />
+        <FileBarChart className="w-6 icon" />
         <span className={open ? "" : "hidden"}>{title}</span>
       </Link>
     </div>

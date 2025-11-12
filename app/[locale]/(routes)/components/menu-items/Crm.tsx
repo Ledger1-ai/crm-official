@@ -22,25 +22,17 @@ const CrmModuleMenu = ({ open, localizations }: Props) => {
   const isPath = pathname.includes("crm");
 
   return (
-    <div
-      className={`flex flex-row items-center mx-auto p-2 ${
-        isPath ? "text-muted-foreground" : null
-      }`}
-    >
+    <div className="flex flex-row items-center mx-auto p-2">
       <DropdownMenu>
         <DropdownMenuTrigger
-          className={
-            open
-              ? "w-full hover:bg-slate-700 hover:text-gray-200 hover:transition hover:duration-150 rounded-md mx-auto"
-              : ""
-          }
+          className={`menu-item ${isPath ? "menu-item-active" : ""} w-full`}
         >
-          <div className="flex gap-2 p-2">
-            <Coins />
+          <div className="flex items-center gap-2">
+            <Coins className="w-6 icon" />
             <span className={open ? "" : "hidden"}>{localizations.title}</span>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[250px] ml-10">
+        <DropdownMenuContent className="w-[250px] ml-10 glass">
           <DropdownMenuItem onClick={() => router.push("/crm/dashboard")}>
             Dashboard
           </DropdownMenuItem>
@@ -58,7 +50,7 @@ const CrmModuleMenu = ({ open, localizations }: Props) => {
             {localizations.contacts}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push("/crm/leads")}>
-            {localizations.leads}
+            Leads Manager
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push("/crm/opportunities")}>
             {localizations.opportunities}

@@ -26,6 +26,10 @@ export async function POST(req: Request) {
       },
     });
 
+    const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
+    const azureDeployment = process.env.AZURE_OPENAI_DEPLOYMENT;
+    const modelToUse =
+      azureEndpoint && azureDeployment ? azureDeployment : gptModel[0].model;
     //console.log("Active GPT Model:", gptModel[0].model);
 
     //console.log(prompt, "prompt");
@@ -35,8 +39,8 @@ export async function POST(req: Request) {
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt },
       ],
-      model: gptModel[0].model,
-      temperature: 0,
+      model: modelToUse,
+      temperature: 1,
     });
 
     return NextResponse.json(

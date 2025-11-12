@@ -25,7 +25,7 @@ const ProjectDashboard = async () => {
     <Container
       title="Dashboard"
       description={
-        "Welcome to NextCRM cockpit, here you can see your company overview"
+        "Welcome to Ledger1CRM cockpit, here you can see your company overview"
       }
     >
       <ProjectDashboardCockpit
