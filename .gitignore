@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
+# Remove .md files
+*.md
 
 #jsons
 /jsons
