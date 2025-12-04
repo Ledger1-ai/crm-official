@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Shield, LineChart, PlugZap, CheckCircle, Wrench, FileText, Zap, Clock, DollarSign, HeartHandshake, Sparkles, Bot, Lock, Globe } from "lucide-react";
 import competitors from "@/data/competitors.json";
@@ -10,7 +11,7 @@ import AgentInterface from "@/app/[locale]/components/AgentInterface";
 import AnalyticsGraph from "@/app/[locale]/components/AnalyticsGraph";
 
 type Props = {
-    params: Promise<{ competitor: string }>;
+    params: Promise<{ competitor: string; locale: string }>;
 };
 
 function getBaseUrl(): string {
@@ -88,6 +89,10 @@ const STATIC = {
 
 export default async function CompetitorPage(props: Props) {
     const params = await props.params;
+    
+    // Enable static rendering
+    setRequestLocale(params.locale);
+    
     const competitor = competitors.find((c) => c.slug === params.competitor);
 
     if (!competitor) {

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Building2, Users, BarChart3, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Globe, Lock, HeartHandshake, Workflow } from "lucide-react";
 import industries from "@/data/industries.json";
@@ -11,7 +12,7 @@ import AgentInterface from "@/app/[locale]/components/AgentInterface";
 import AnalyticsGraph from "@/app/[locale]/components/AnalyticsGraph";
 
 type Props = {
-    params: Promise<{ industry: string }>;
+    params: Promise<{ industry: string; locale: string }>;
 };
 
 function getBaseUrl(): string {
@@ -81,6 +82,10 @@ const STATIC = {
 
 export default async function IndustryPage(props: Props) {
     const params = await props.params;
+    
+    // Enable static rendering
+    setRequestLocale(params.locale);
+    
     const industry = industries.find((i) => i.slug === params.industry);
 
     if (!industry) {

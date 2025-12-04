@@ -9,10 +9,31 @@ import Footer from "./components/Footer";
 import getAllCommits from "@/actions/github/get-repo-commits";
 import { Metadata } from "next";
 
+function getSafeMetadataBase(): URL {
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const PRODUCTION_FALLBACK = "https://crm.ledger1.ai";
+  
+  if (!envUrl || envUrl.trim() === "") {
+    return new URL(PRODUCTION_FALLBACK);
+  }
+  
+  const trimmed = envUrl.trim();
+  
+  // Skip localhost URLs in production
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)/i.test(trimmed)) {
+    return new URL(PRODUCTION_FALLBACK);
+  }
+  
+  // Ensure URL has protocol
+  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+    return new URL(`https://${trimmed}`);
+  }
+  
+  return new URL(trimmed);
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL! || "http://localhost:3000"
-  ),
+  metadataBase: getSafeMetadataBase(),
   title: "Ledger1CRM Dashboard",
   description: "Manage your sales and support with AI.",
   openGraph: {

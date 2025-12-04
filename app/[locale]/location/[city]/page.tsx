@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Globe2, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Lock, HeartHandshake, Workflow, Building, Users } from "lucide-react";
 import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
@@ -10,7 +11,7 @@ import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
 import AbstractDashboard from "@/app/[locale]/components/AbstractDashboard";
 
 type Props = {
-    params: Promise<{ city: string }>;
+    params: Promise<{ city: string; locale: string }>;
 };
 
 function getBaseUrl(): string {
@@ -80,6 +81,10 @@ const STATIC = {
 
 export default async function LocationPage(props: Props) {
     const params = await props.params;
+    
+    // Enable static rendering
+    setRequestLocale(params.locale);
+    
     const location = locations.find((l) => l.slug === params.city);
 
     if (!location) {

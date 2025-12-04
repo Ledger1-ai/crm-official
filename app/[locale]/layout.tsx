@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { createTranslator, NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -26,6 +27,29 @@ async function getLocales(locale: string) {
   }
 }
 
+function getSafeBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const PRODUCTION_FALLBACK = "https://crm.ledger1.ai";
+  
+  if (!envUrl || envUrl.trim() === "") {
+    return PRODUCTION_FALLBACK;
+  }
+  
+  const trimmed = envUrl.trim();
+  
+  // Skip localhost URLs in production
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)/i.test(trimmed)) {
+    return PRODUCTION_FALLBACK;
+  }
+  
+  // Ensure URL has protocol
+  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+    return `https://${trimmed}`;
+  }
+  
+  return trimmed;
+}
+
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const { locale } = params;
@@ -34,7 +58,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const title = t("RootLayout.title");
   const description = t("RootLayout.description");
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ledger1crm.com";
+  const siteUrl = getSafeBaseUrl();
 
   return {
     metadataBase: new URL(siteUrl),
@@ -95,6 +119,10 @@ export default async function RootLayout(props: Props) {
   const params = await props.params;
   const { locale } = params;
   const { children } = props;
+  
+  // Enable static rendering
+  setRequestLocale(locale);
+  
   const messages = await getLocales(locale);
 
   return (
