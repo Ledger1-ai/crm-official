@@ -35,7 +35,7 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
       if (persisted !== null) {
         setOpen(persisted === "true");
       }
-    } catch (_) {}
+    } catch (_) { }
   }, []);
 
   if (!isMounted) {
@@ -45,9 +45,8 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
   return (
     <div className="flex flex-col">
       <div
-        className={` ${
-          open ? "w-72" : "w-24 "
-        }  h-screen p-5  pt-8 relative duration-300 sidebar`}
+        className={` ${open ? "w-72" : "w-24 "
+          }  h-screen p-5  pt-8 relative duration-300 sidebar`}
         data-open={open ? "true" : "false"}
       >
         <div className="flex gap-x-4 items-center">
@@ -61,7 +60,7 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
               setOpen(next);
               try {
                 localStorage.setItem("sidebar-open", String(next));
-              } catch (_) {}
+              } catch (_) { }
             }}
           >
             <Menu className="w-5 h-5" />
@@ -90,12 +89,12 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
           ) ? (
             <EmailsModuleMenu open={open} title={dict.ModuleMenu.emails} />
           ) : null}
-          {modules.find(
+          {/* {modules.find(
             (menuItem: any) =>
               menuItem.name === "secondBrain" && menuItem.enabled
           ) ? (
             <SecondBrainModuleMenu open={open} />
-          ) : null}
+          ) : null} */}
           {modules.find(
             (menuItem: any) => menuItem.name === "employee" && menuItem.enabled
           ) ? (
