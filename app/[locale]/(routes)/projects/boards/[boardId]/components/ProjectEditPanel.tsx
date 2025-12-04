@@ -164,7 +164,7 @@ function ButtonEditorRow({
                 ))}
               </select>
             )}
-      <div className="md:col-span-12 flex items-center gap-2">
+            <div className="md:col-span-12 flex items-center gap-2">
               <input
                 id={`file-${item.id}`}
                 type="file"
@@ -286,7 +286,7 @@ export default function ProjectEditPanel({ boardId }: Props) {
       const cfg = { buttons: defaultButtons, theme: { primary: builderPrimaryColor, secondary: builderSecondaryColor } };
       console.log('[ProjectEditPanel] sync JSON from builder', cfg);
       setDefaultSetConfigText(JSON.stringify(cfg, null, 2));
-    } catch {}
+    } catch { }
   }, [defaultButtons, builderPrimaryColor, builderSecondaryColor]);
 
   // Documents
@@ -328,7 +328,7 @@ export default function ProjectEditPanel({ boardId }: Props) {
             const theme = (cfg as any)?.theme || {};
             if (typeof theme.primary === 'string') setBuilderPrimaryColor(theme.primary);
             if (typeof theme.secondary === 'string') setBuilderSecondaryColor(theme.secondary);
-          } catch {}
+          } catch { }
         } else {
           setDefaultSetName("Default");
           setDefaultSetConfigText("{}");
@@ -407,7 +407,7 @@ export default function ProjectEditPanel({ boardId }: Props) {
         const theme = (cfg as any)?.theme || {};
         if (typeof theme.primary === 'string') setBuilderPrimaryColor(theme.primary);
         if (typeof theme.secondary === 'string') setBuilderSecondaryColor(theme.secondary);
-      } catch {}
+      } catch { }
       toast.success("Default preset saved");
     } catch (e: any) {
       toast.error(e?.message || "Failed to save default preset");
@@ -541,17 +541,16 @@ export default function ProjectEditPanel({ boardId }: Props) {
                                           letterSpacing: 0.2,
                                           whiteSpace: 'nowrap',
                                           textDecoration: 'none',
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          gap: 8,
+                                          display: 'inline-block',
                                           outline: 'none',
                                           border: 0,
+                                          lineHeight: '18px',
                                         }}
                                       >
                                         {b.iconUrl ? (
                                           <img src={b.iconUrl} alt="" width={18} height={18} style={{ display: 'inline-block', verticalAlign: 'middle', border: '0', marginRight: 8, objectFit: 'contain', background: 'transparent' }} />
                                         ) : null}
-                                        {b.label || 'Button'}
+                                        <span style={{ verticalAlign: 'middle' }}>{b.label || 'Button'}</span>
                                       </a>
                                     </td>
                                   </tr>
