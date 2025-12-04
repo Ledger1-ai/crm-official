@@ -39,7 +39,7 @@ export default function MarketingHeader() {
     return (
         <>
             <SecondaryNavbar />
-            <header className="h-20 flex items-center border-b border-white/10 bg-[#0F0F1A] sticky top-0 z-50 w-full shadow-sm">
+            <header className="h-20 flex items-center border-b border-white/10 bg-[#0F0F1A]/15 backdrop-blur-md sticky top-0 z-50 w-full shadow-sm">
                 <div className="container mx-auto px-4 lg:px-6 flex items-center justify-between h-full">
                     {/* Logo */}
                     <Link className="flex items-center justify-center z-50 relative" href="/" aria-label="Ledger AI Home">
