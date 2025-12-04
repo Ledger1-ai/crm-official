@@ -38,28 +38,28 @@ import MarketingFooter from "./components/MarketingFooter";
 import MarketingHeader from "./components/MarketingHeader";
 
 export const metadata: Metadata = {
-    title: "Ledger1CRM | The AI CRM for Sales & Support",
-    description: "Ledger1CRM is the ultimate AI CRM. Automate sales with predictive AI and handle customer support with autonomous agents. Secure and scalable.",
+    title: "Ledger1 – AI Sales & Support Engine",
+    description: "Automated prospecting, social intelligence, and 24/7 AI agents that never sleep.",
     keywords: ["AI CRM", "Sales AI", "Customer Support Bot", "SME CRM", "Next.js CRM"],
     openGraph: {
-        title: "Ledger1CRM | AI Sales & Support Engine",
-        description: "Empower your SME with Fortune 500 intelligence. The only CRM that closes deals and solves tickets autonomously.",
+        title: "Ledger1 – AI Sales & Support Engine",
+        description: "Automated prospecting, social intelligence, and 24/7 AI agents that never sleep.",
         type: "website",
-        url: "https://ledger1crm.com",
+        url: "https://crm.ledger1.ai",
         images: [
             {
-                url: "/api/og?title=Ledger1CRM&description=The%20AI%20Sales%20%26%20Support%20Engine",
+                url: "https://crm.ledger1.ai/social-preview.jpg",
                 width: 1200,
                 height: 630,
-                alt: "Ledger1CRM Dashboard",
+                alt: "Ledger1 – AI Sales & Support Engine",
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: "Ledger1CRM | AI-Powered Growth",
-        description: "Automate your sales and support with the world's most advanced AI CRM.",
-        images: ["/api/og?title=Ledger1CRM&description=The%20AI%20Sales%20%26%20Support%20Engine"],
+        title: "Ledger1 – AI Sales & Support Engine",
+        description: "Automated prospecting, social intelligence, and 24/7 AI agents that never sleep.",
+        images: ["https://crm.ledger1.ai/social-preview.jpg"],
     },
 };
 
