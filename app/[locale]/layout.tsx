@@ -43,7 +43,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       template: `%s | Ledger1CRM`,
     },
     description,
-    keywords: ["CRM", "AI CRM", "Sales Automation", "Next.js CRM", "Open Source CRM"],
+    keywords: ["CRM", "AI CRM", "Sales Automation", "Next.js CRM"],
     authors: [{ name: "Ledger1CRM Team" }],
     creator: "Ledger1CRM",
     publisher: "Ledger1CRM",

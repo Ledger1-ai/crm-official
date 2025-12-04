@@ -20,6 +20,10 @@ import {
     ArrowRight,
     TrendingUp,
     Lock,
+    MessageSquare,
+    BarChart3,
+    Users,
+    Layers,
 } from "lucide-react";
 import GeometricBackground from "./components/GeometricBackground";
 import AbstractDashboard from "./components/AbstractDashboard";
@@ -29,11 +33,13 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import MarketingFooter from "./components/MarketingFooter";
+import MarketingHeader from "./components/MarketingHeader";
 
 export const metadata: Metadata = {
-    title: "Ledger1CRM | The Open Source AI CRM for Sales & Support",
-    description: "Ledger1CRM is the ultimate open-source AI CRM. Automate sales with predictive AI and handle customer support with autonomous agents. Self-hosted and secure.",
-    keywords: ["AI CRM", "Open Source CRM", "Sales AI", "Customer Support Bot", "SME CRM", "Self-Hosted CRM", "Next.js CRM"],
+    title: "Ledger1CRM | The AI CRM for Sales & Support",
+    description: "Ledger1CRM is the ultimate AI CRM. Automate sales with predictive AI and handle customer support with autonomous agents. Secure and scalable.",
+    keywords: ["AI CRM", "Sales AI", "Customer Support Bot", "SME CRM", "Next.js CRM"],
     openGraph: {
         title: "Ledger1CRM | AI Sales & Support Engine",
         description: "Empower your SME with Fortune 500 intelligence. The only CRM that closes deals and solves tickets autonomously.",
@@ -51,7 +57,7 @@ export const metadata: Metadata = {
     twitter: {
         card: "summary_large_image",
         title: "Ledger1CRM | AI-Powered Growth",
-        description: "Automate your sales and support with the world's most advanced open-source AI CRM.",
+        description: "Automate your sales and support with the world's most advanced AI CRM.",
         images: ["/api/og?title=Ledger1CRM&description=The%20AI%20Sales%20%26%20Support%20Engine"],
     },
 };
@@ -66,10 +72,10 @@ const jsonLd = {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD",
-        "description": "Open Source Community Edition"
+        "description": "Community Edition"
     },
-    "featureList": ["Predictive Sales AI", "Autonomous Support Agents", "Open Source", "Self-Hosted"],
-    "description": "An open-source AI CRM that combines predictive sales analytics with autonomous customer support agents."
+    "featureList": ["Predictive Sales AI", "Autonomous Support Agents"],
+    "description": "An AI CRM that combines predictive sales analytics with autonomous customer support agents."
 };
 
 export default function LandingPage() {
@@ -79,64 +85,26 @@ export default function LandingPage() {
     return (
         <div className="dark min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
             {/* Header */}
-            <header className="px-4 lg:px-6 h-20 flex items-center border-b border-white/10 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-                <Link className="flex items-center justify-center" href="#">
-                    <Image
-                        src="/logo.png"
-                        alt="Ledger1CRM Logo"
-                        width={180}
-                        height={50}
-                        className="object-contain h-10 w-auto brightness-200 contrast-125"
-                        priority
-                    />
-                </Link>
-                <nav className="ml-auto flex gap-6 items-center">
-                    <Link
-                        className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden md:block"
-                        href="/compare"
-                    >
-                        Competitors
-                    </Link>
-                    <Link
-                        className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden md:block"
-                        href="/industry"
-                    >
-                        Industries
-                    </Link>
-                    <Link
-                        className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden md:block"
-                        href="/location"
-                    >
-                        Locations
-                    </Link>
-                    <Link href={demoLink} target="_blank">
-                        <Button variant="outline" className="hidden sm:flex border-primary/50 text-primary hover:bg-primary/10 hover:text-primary-foreground">
-                            Schedule Demo
-                        </Button>
-                    </Link>
-                    <Link href="/dashboard">
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(6,182,212,0.5)]">Login</Button>
-                    </Link>
-                </nav>
-            </header>
+            {/* Header */}
+            <MarketingHeader />
 
             <main className="flex-1 relative">
                 {/* Hero Section */}
-                <section className="w-full py-20 md:py-32 lg:py-48 relative overflow-hidden">
+                <section className="w-full pt-10 pb-20 md:pt-16 md:pb-32 lg:pt-24 lg:pb-48 relative overflow-hidden">
                     <GeometricBackground />
                     <div className="container px-4 md:px-6 relative z-10">
                         <div className="flex flex-col items-center space-y-8 text-center">
                             <div className="space-y-6 max-w-4xl">
                                 <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm">
                                     <Sparkles className="mr-2 h-4 w-4" />
-                                    <span>Powered by State-of-the-Art AI Models</span>
+                                    <span>AI-Assisted software empowering merchants with enterprise grade software</span>
                                 </div>
                                 <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50 drop-shadow-2xl">
-                                    The AI CRM Empowering SMEs with <br />
-                                    <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-500">Fortune 500 Intelligence</span>
+                                    Your Business. <br />
+                                    <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-500">Supercharged.</span>
                                 </h1>
                                 <p className="mx-auto max-w-[800px] text-muted-foreground md:text-xl lg:text-2xl leading-relaxed">
-                                    Level the playing field. Access the same advanced predictive analytics, automation, and intelligence used by industry giants—at a fraction of the cost.
+                                    Focus on the features that keep you competitive in this new era. Be excited about business again. The first CRM that doesn&apos;t just manage your data—it actively works for you. From finding prospects to closing deals with voice AI, Ledger1CRM is your unfair advantage.
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-6 min-w-[300px] justify-center pt-4">
@@ -165,24 +133,39 @@ export default function LandingPage() {
                                 The AI Advantage
                             </h2>
                             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                                Don't just manage data. Leverage it. Our AI engine transforms your CRM into a growth engine.
+                                Don&apos;t just manage data. Leverage it. Our AI engine transforms your CRM into a growth engine.
                             </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             <FeatureCard
-                                icon={<BrainCircuit className="h-12 w-12 text-cyan-400" />}
-                                title="Predictive Sales AI"
-                                description="Stop guessing. Our AI analyzes historical data to predict which leads are most likely to close, helping you focus on what matters."
+                                icon={<Zap className="h-12 w-12 text-yellow-400" />}
+                                title="AI Lead Generator"
+                                description="Stops you from chasing cold leads. Our AI scans the web, curates personalized emails based on deep company research, and fills your pipeline automatically."
                             />
                             <FeatureCard
-                                icon={<Bot className="h-12 w-12 text-teal-400" />}
-                                title="Automated Workflows"
-                                description="Let AI handle the busy work. From email follow-ups to data entry, automate repetitive tasks and reclaim your time."
+                                icon={<Bot className="h-12 w-12 text-cyan-400" />}
+                                title="AI Sales Agents"
+                                description="Your 24/7 Sales Team. Capable of handling Inbound and Outbound calls, SMS, and Chat. They qualify leads and book appointments while you sleep."
+                            />
+                            <FeatureCard
+                                icon={<Globe className="h-12 w-12 text-pink-400" />}
+                                title="Social Intelligence AI"
+                                description="Never miss a buying signal. Monitors every social channel to catch trends and competitor moves instantly."
+                            />
+                            <FeatureCard
+                                icon={<MessageSquare className="h-12 w-12 text-violet-400" />}
+                                title="Conversation Analytics"
+                                description="Understand what sells. Deep sentiment tracking on every call to refine your pitch perfectly."
                             />
                             <FeatureCard
                                 icon={<TrendingUp className="h-12 w-12 text-emerald-400" />}
-                                title="Smart Insights"
-                                description="Get real-time, actionable insights. Ask questions in plain English and get data-driven answers instantly."
+                                title="Pipeline Automation"
+                                description="Forecast with certainty. AI predicts revenue and automates follow-ups so no deal slips through the cracks."
+                            />
+                            <FeatureCard
+                                icon={<Layers className="h-12 w-12 text-blue-400" />}
+                                title="Built on NextCRM"
+                                description="Solid foundation. Built on the robust NextCRM architecture for reliability and extensibility."
                             />
                         </div>
                     </div>
@@ -194,11 +177,11 @@ export default function LandingPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                             <div className="space-y-8">
                                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                                    Sales Engine.<br />
-                                    <span className="text-primary">Support Hero.</span>
+                                    What Ledger1CRM<br />
+                                    <span className="text-primary">Does For You.</span>
                                 </h2>
                                 <p className="text-muted-foreground md:text-xl leading-relaxed">
-                                    One platform to rule them all. Watch as our AI autonomously closes deals while simultaneously delighting your existing customers with instant support.
+                                    A self-driving growth engine that operates 24/7. Freedom from repetitive tasks. Confidence in your pipeline. A business that grows even when you&apos;re not watching.
                                 </p>
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4 group">
@@ -206,9 +189,9 @@ export default function LandingPage() {
                                             <Globe className="h-6 w-6 text-primary" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-xl mb-1 group-hover:text-primary transition-colors">Open Source & Self-Hosted</h3>
+                                            <h3 className="font-bold text-xl mb-1 group-hover:text-primary transition-colors">Cloud Native & Secure</h3>
                                             <p className="text-muted-foreground">
-                                                Maintain full sovereignty over your data. Deploy on your own infrastructure or use our secure cloud.
+                                                Enterprise-grade infrastructure that scales with you. Deploy with confidence on our secure cloud.
                                             </p>
                                         </div>
                                     </div>
@@ -276,30 +259,7 @@ export default function LandingPage() {
             </main>
 
             {/* Footer */}
-            <footer className="flex flex-col gap-8 sm:flex-row py-12 w-full shrink-0 items-center px-4 md:px-6 border-t border-white/10 bg-black/40 backdrop-blur-lg">
-                <div className="flex flex-col gap-2">
-                    <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} Ledger1CRM. All rights reserved.
-                    </p>
-                    <p className="text-xs text-muted-foreground/60">
-                        Empowering SMEs with the future of CRM technology.
-                    </p>
-                </div>
-                <nav className="sm:ml-auto flex gap-8">
-                    <Link className="text-sm hover:text-primary transition-colors text-muted-foreground" href="#">
-                        Terms
-                    </Link>
-                    <Link className="text-sm hover:text-primary transition-colors text-muted-foreground" href="#">
-                        Privacy
-                    </Link>
-                    <Link className="text-sm hover:text-primary transition-colors text-muted-foreground" href="#">
-                        Support
-                    </Link>
-                    <Link className="text-sm hover:text-primary transition-colors text-muted-foreground" href="#">
-                        Twitter
-                    </Link>
-                </nav>
-            </footer>
+            <MarketingFooter />
         </div>
     );
 }

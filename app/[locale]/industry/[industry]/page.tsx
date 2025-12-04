@@ -3,11 +3,10 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Building2, Users, BarChart3, CheckCircle, Shield, LineChart, PlugZap } from "lucide-react";
-import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
-import AbstractDashboard from "@/app/[locale]/components/AbstractDashboard";
 import industries from "@/data/industries.json";
 import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
 import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
+import AbstractDashboard from "@/app/[locale]/components/AbstractDashboard";
 
 type Props = {
     params: Promise<{ industry: string }>;
@@ -20,7 +19,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     const title = `Best AI CRM for ${industry.name} | Ledger1CRM`;
     const description = `Ledger1CRM is the top-rated AI CRM for the ${industry.name} industry. ${industry.use_case}. Start for free.`;
-    const ogUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/og`);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const ogUrl = new URL(`${baseUrl}/api/og`);
     ogUrl.searchParams.set("title", `AI CRM for ${industry.name}`);
     ogUrl.searchParams.set("description", `The #1 Choice for ${industry.name} Professionals`);
     ogUrl.searchParams.set("type", "industry");
@@ -59,10 +59,6 @@ export async function generateStaticParams() {
     }));
 }
 
-/**
- * Static base content rendered consistently across all industry pages,
- * regardless of the SEO landing variant. Industry data is used only for hero/context.
- */
 const STATIC = {
     features: {
         core: [
@@ -146,7 +142,7 @@ function BulletList({ items }: { items: string[] }) {
             {items.map((it, idx) => (
                 <li key={idx} className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{it}</span>
+                    <span className="text-gray-400">{it}</span>
                 </li>
             ))}
         </ul>
@@ -164,24 +160,24 @@ export default async function IndustryPage(props: Props) {
     const primaryCta = { label: `Schedule ${industry.name} Demo`, url: "https://calendar.google.com/appointments/schedules/AcZssZ2Vduqr0QBnEAM50SeixE8a7kXuKt62zEFjQCQ8_xvoO6iF3hluVQHpaM6RYWMGB110_zM3MUF0" };
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans">
+        <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
             <MarketingHeader />
             {/* Hero */}
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
-                <GeometricBackground />
+                <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
                 <div className="container px-4 md:px-6 relative z-10 text-center">
                     <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm mb-6">
                         <span>CRM for {industry.name}</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50 drop-shadow-2xl mb-6">
+                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 mb-6">
                         {industry.hero_title}
                     </h1>
-                    <p className="mx-auto max-w-[800px] text-muted-foreground md:text-xl leading-relaxed mb-8">
+                    <p className="mx-auto max-w-[800px] text-gray-400 md:text-xl leading-relaxed mb-8">
                         {industry.description}
                     </p>
                     <div className="flex justify-center gap-4">
                         <Link href={primaryCta.url} target="_blank">
-                            <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                            <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]">
                                 {primaryCta.label} <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
@@ -190,32 +186,33 @@ export default async function IndustryPage(props: Props) {
             </section>
 
             {/* Dashboard Preview */}
-            <section className="py-20 bg-black/40 backdrop-blur-sm border-y border-white/5">
+            <section className="py-20 bg-black/20 border-y border-white/5">
                 <div className="container px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div className="space-y-8">
                             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
                                 Tailored for {industry.name}
                             </h2>
-                            <p className="text-muted-foreground text-lg">
-                                Ledger1CRM isn't a generic tool. It adapts to the specific workflows of the {industry.name} sector, handling {industry.use_case.toLowerCase()} with ease.
+                            <p className="text-gray-400 text-lg">
+                                Ledger1CRM isn&apos;t a generic tool. It adapts to the specific workflows of the {industry.name} sector, handling {industry.use_case.toLowerCase()} with ease.
                             </p>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 p-2 rounded-lg"><Building2 className="text-primary" /></div>
-                                    <div>Industry-Specific Data Models</div>
+                                    <div className="text-gray-300">Industry-Specific Data Models</div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 p-2 rounded-lg"><Users className="text-primary" /></div>
-                                    <div>Automated Client Engagement</div>
+                                    <div className="text-gray-300">Automated Client Engagement</div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 p-2 rounded-lg"><BarChart3 className="text-primary" /></div>
-                                    <div>Predictive Analytics for {industry.name}</div>
+                                    <div className="text-gray-300">Predictive Analytics for {industry.name}</div>
                                 </div>
                             </div>
                         </div>
-                        <div className="relative h-[400px] w-full rounded-2xl overflow-hidden border border-white/10 bg-black/50 backdrop-blur-xl">
+                        <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(6,182,212,0.15)] border border-white/10 bg-black/50 backdrop-blur-xl flex items-center justify-center group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
                             <AbstractDashboard />
                         </div>
                     </div>
@@ -226,22 +223,22 @@ export default async function IndustryPage(props: Props) {
             <section className="py-20">
                 <div className="container px-4 md:px-6">
                     <div className="grid lg:grid-cols-3 gap-10">
-                        <div>
-                            <div className="flex items-center gap-2 mb-3">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition-colors">
+                            <div className="flex items-center gap-2 mb-6">
                                 <PlugZap className="w-6 h-6 text-primary" />
                                 <h3 className="text-2xl font-semibold">Core Features</h3>
                             </div>
                             <BulletList items={STATIC.features.core} />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-3">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition-colors">
+                            <div className="flex items-center gap-2 mb-6">
                                 <LineChart className="w-6 h-6 text-primary" />
                                 <h3 className="text-2xl font-semibold">Analytics</h3>
                             </div>
                             <BulletList items={STATIC.features.analytics} />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-3">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition-colors">
+                            <div className="flex items-center gap-2 mb-6">
                                 <Shield className="w-6 h-6 text-primary" />
                                 <h3 className="text-2xl font-semibold">AI Agents</h3>
                             </div>
@@ -252,36 +249,38 @@ export default async function IndustryPage(props: Props) {
             </section>
 
             {/* Automation Playbooks */}
-            <section className="py-20 bg-muted/30">
+            <section className="py-20 bg-white/5">
                 <div className="container px-4 md:px-6">
-                    <h2 className="text-3xl font-bold mb-6">Automation Playbooks</h2>
-                    <BulletList items={STATIC.playbooks} />
+                    <h2 className="text-3xl font-bold mb-8 text-center">Automation Playbooks</h2>
+                    <div className="max-w-4xl mx-auto">
+                        <BulletList items={STATIC.playbooks} />
+                    </div>
                 </div>
             </section>
 
             {/* Integrations */}
             <section className="py-20">
                 <div className="container px-4 md:px-6">
-                    <h2 className="text-3xl font-bold mb-10">Integrations</h2>
+                    <h2 className="text-3xl font-bold mb-10 text-center">Integrations</h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div className="rounded-lg border p-6">
-                            <h3 className="font-semibold mb-3">Email & Calendar</h3>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
+                            <h3 className="font-semibold mb-3 text-primary">Email & Calendar</h3>
                             <BulletList items={STATIC.integrations.email_calendar} />
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <h3 className="font-semibold mb-3">Communications</h3>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
+                            <h3 className="font-semibold mb-3 text-primary">Communications</h3>
                             <BulletList items={STATIC.integrations.communications} />
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <h3 className="font-semibold mb-3">Documents</h3>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
+                            <h3 className="font-semibold mb-3 text-primary">Documents</h3>
                             <BulletList items={STATIC.integrations.documents} />
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <h3 className="font-semibold mb-3">Marketing</h3>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
+                            <h3 className="font-semibold mb-3 text-primary">Marketing</h3>
                             <BulletList items={STATIC.integrations.marketing} />
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <h3 className="font-semibold mb-3">Data Platforms</h3>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
+                            <h3 className="font-semibold mb-3 text-primary">Data Platforms</h3>
                             <BulletList items={STATIC.integrations.data} />
                         </div>
                     </div>
@@ -289,29 +288,29 @@ export default async function IndustryPage(props: Props) {
             </section>
 
             {/* Compliance & Security */}
-            <section className="py-20 bg-muted/30">
+            <section className="py-20 bg-white/5">
                 <div className="container px-4 md:px-6">
                     <div className="grid md:grid-cols-2 gap-8">
-                        <div className="rounded-lg border p-6">
-                            <div className="flex items-center gap-2 mb-3">
+                        <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
+                            <div className="flex items-center gap-2 mb-6">
                                 <Shield className="w-6 h-6 text-primary" />
                                 <h3 className="text-2xl font-semibold">Compliance</h3>
                             </div>
                             <BulletList items={STATIC.compliance.regions} />
                             <div className="mt-6">
-                                <h4 className="font-semibold mb-2">Capabilities</h4>
+                                <h4 className="font-semibold mb-2 text-gray-300">Capabilities</h4>
                                 <BulletList items={STATIC.compliance.capabilities} />
                             </div>
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <div className="flex items-center gap-2 mb-3">
+                        <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
+                            <div className="flex items-center gap-2 mb-6">
                                 <Shield className="w-6 h-6 text-primary" />
                                 <h3 className="text-2xl font-semibold">Security</h3>
                             </div>
-                            <h4 className="font-semibold mb-2">Certifications</h4>
+                            <h4 className="font-semibold mb-2 text-gray-300">Certifications</h4>
                             <BulletList items={STATIC.security.certifications} />
                             <div className="mt-6">
-                                <h4 className="font-semibold mb-2">Controls</h4>
+                                <h4 className="font-semibold mb-2 text-gray-300">Controls</h4>
                                 <BulletList items={STATIC.security.controls} />
                             </div>
                         </div>
@@ -322,12 +321,12 @@ export default async function IndustryPage(props: Props) {
             {/* Onboarding */}
             <section className="py-20">
                 <div className="container px-4 md:px-6">
-                    <h2 className="text-3xl font-bold mb-6">Onboarding Process</h2>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h2 className="text-3xl font-bold mb-10 text-center">Onboarding Process</h2>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
                         {STATIC.onboarding.map((step, idx) => (
-                            <li key={idx} className="rounded-lg border p-4 flex items-start gap-3">
+                            <li key={idx} className="rounded-xl border border-white/10 bg-white/5 p-4 flex items-start gap-3 hover:border-primary/30 transition-colors">
                                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shrink-0">{idx + 1}</span>
-                                <span className="text-muted-foreground">{step}</span>
+                                <span className="text-gray-300">{step}</span>
                             </li>
                         ))}
                     </ul>
@@ -335,17 +334,17 @@ export default async function IndustryPage(props: Props) {
             </section>
 
             {/* Support & SLA */}
-            <section className="py-20 bg-muted/30">
+            <section className="py-20 bg-white/5">
                 <div className="container px-4 md:px-6">
-                    <h2 className="text-3xl font-bold mb-6">Support & SLA</h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="rounded-lg border p-6">
-                            <h3 className="text-xl font-semibold mb-2">Standard</h3>
-                            <p className="text-muted-foreground">{STATIC.support_sla.standard}</p>
+                    <h2 className="text-3xl font-bold mb-10 text-center">Support & SLA</h2>
+                    <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                        <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
+                            <h3 className="text-xl font-semibold mb-2 text-primary">Standard</h3>
+                            <p className="text-gray-400">{STATIC.support_sla.standard}</p>
                         </div>
-                        <div className="rounded-lg border p-6">
-                            <h3 className="text-xl font-semibold mb-2">Premium</h3>
-                            <p className="text-muted-foreground">{STATIC.support_sla.premium}</p>
+                        <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
+                            <h3 className="text-xl font-semibold mb-2 text-primary">Premium</h3>
+                            <p className="text-gray-400">{STATIC.support_sla.premium}</p>
                         </div>
                     </div>
                 </div>
@@ -354,12 +353,12 @@ export default async function IndustryPage(props: Props) {
             {/* FAQs */}
             <section className="py-20">
                 <div className="container px-4 md:px-6">
-                    <h2 className="text-3xl font-bold mb-10">Frequently Asked Questions</h2>
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <h2 className="text-3xl font-bold mb-10 text-center">Frequently Asked Questions</h2>
+                    <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         {STATIC.faqs.map((faq, idx) => (
-                            <div key={idx} className="rounded-lg border p-6">
-                                <h3 className="font-semibold mb-2">{faq.q}</h3>
-                                <p className="text-muted-foreground">{faq.a}</p>
+                            <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                                <h3 className="font-semibold mb-2 text-white">{faq.q}</h3>
+                                <p className="text-gray-400">{faq.a}</p>
                             </div>
                         ))}
                     </div>
@@ -367,15 +366,15 @@ export default async function IndustryPage(props: Props) {
             </section>
 
             {/* Final CTA */}
-            <section className="py-20 bg-black/40 backdrop-blur-sm">
+            <section className="py-20 bg-black/20 border-t border-white/5">
                 <div className="container px-4 md:px-6 text-center">
                     <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
-                    <p className="text-muted-foreground mb-8">
+                    <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
                         Ledger1CRM helps {industry.name} teams grow with AI-native workflows, world-class security, and flexible integrations.
                     </p>
                     <div className="flex justify-center">
                         <Link href={primaryCta.url} target="_blank">
-                            <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                            <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]">
                                 {primaryCta.label} <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>

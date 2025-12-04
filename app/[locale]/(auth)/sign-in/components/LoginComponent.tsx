@@ -283,7 +283,7 @@ export function LoginComponent() {
       <CardFooter className="flex flex-col space-y-5">
         <div className="text-sm text-gray-500">
           Need account? Register{" "}
-          <Link href={"/register"} className="text-blue-500">
+          <Link href={"/register"} className="text-primary">
             here
           </Link>
         </div>
@@ -291,7 +291,7 @@ export function LoginComponent() {
           Need password reset? Click
           {/* Dialog start */}
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger className="text-blue-500">
+            <DialogTrigger className="text-primary">
               <span className="px-2">here</span>
             </DialogTrigger>
             <DialogContent>

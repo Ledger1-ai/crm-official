@@ -17,7 +17,7 @@ const NotionsBox = async () => {
         <CardContent>
           <div className="text-xs text-muted-foreground">
             Not connected to Notion DB. Here is how to connect:{" "}
-            <Link href={"/secondBrain"} className="text-blue-500">
+            <Link href={"/secondBrain"} className="text-primary">
               settings
             </Link>
           </div>

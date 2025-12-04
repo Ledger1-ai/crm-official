@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import locations from "@/data/locations.json";
 import { ArrowRight, MapPin } from "lucide-react";
+import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
+import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
 
 export const metadata = {
     title: "Ledger1CRM Available Worldwide | Global AI CRM",
@@ -32,6 +34,7 @@ export const metadata = {
 export default function LocationsPage() {
     return (
         <div className="min-h-screen bg-background text-foreground">
+            <MarketingHeader />
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
                 <GeometricBackground />
                 <div className="container px-4 md:px-6 relative z-10">
@@ -66,6 +69,7 @@ export default function LocationsPage() {
                     </div>
                 </div>
             </section>
+            <MarketingFooter />
         </div>
     );
 }

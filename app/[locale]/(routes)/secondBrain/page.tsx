@@ -52,7 +52,7 @@ const SecondBrainPage = async () => {
           <ol>4. Copy integration token</ol>
           <ol>
             5. Paste integration token to your{" "}
-            <Link href={"/profile"} className="text-blue-500">
+            <Link href={"/profile"} className="text-primary">
               profile
             </Link>
           </ol>

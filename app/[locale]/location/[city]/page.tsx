@@ -7,6 +7,7 @@ import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import locations from "@/data/locations.json";
 import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
 import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
+import AbstractDashboard from "@/app/[locale]/components/AbstractDashboard";
 
 type Props = {
     params: Promise<{ city: string }>;
@@ -19,7 +20,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     const title = `Top Rated AI CRM in ${location.name} | Ledger1CRM`;
     const description = `Join the fastest growing businesses in ${location.name} using Ledger1CRM. Local support, global compliance, and state-of-the-art AI.`;
-    const ogUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/og`);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const ogUrl = new URL(`${baseUrl}/api/og`);
     ogUrl.searchParams.set("title", `Ledger1CRM in ${location.name}`);
     ogUrl.searchParams.set("description", `Empowering Businesses in ${location.name}`);
     ogUrl.searchParams.set("type", "location");
@@ -189,6 +191,16 @@ export default async function LocationPage(props: Props) {
                 </div>
             </section>
 
+            {/* Dashboard Visual */}
+            <section className="py-10 pb-20">
+                <div className="container px-4 md:px-6">
+                    <div className="relative h-[500px] w-full max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(6,182,212,0.15)] border border-white/10 bg-black/50 backdrop-blur-xl flex items-center justify-center group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
+                        <AbstractDashboard />
+                    </div>
+                </div>
+            </section>
+
             {/* Local Context Section */}
             <section className="py-24 bg-black/40 backdrop-blur-sm">
                 <div className="container px-4 md:px-6 text-center">
@@ -198,10 +210,10 @@ export default async function LocationPage(props: Props) {
                             Why {location.name} Businesses Choose Us
                         </h2>
                         <p className="text-muted-foreground text-xl leading-relaxed">
-                            "{location.context}"
+                            &quot;{location.context}&quot;
                         </p>
                         <p className="text-muted-foreground">
-                            We understand the unique challenges of the {location.name} market. Whether it's local compliance, currency support, or time-zone specific AI agents, Ledger1CRM is built to help you dominate locally and scale globally.
+                            We understand the unique challenges of the {location.name} market. Whether it&apos;s local compliance, currency support, or time-zone specific AI agents, Ledger1CRM is built to help you dominate locally and scale globally.
                         </p>
                     </div>
                 </div>

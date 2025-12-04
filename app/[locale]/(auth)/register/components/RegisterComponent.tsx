@@ -293,7 +293,7 @@ export function RegisterComponent() {
       <CardFooter className="flex flex-col space-y-5">
         <div className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Link href={"/sign-in"} className="text-blue-500">
+          <Link href={"/sign-in"} className="text-primary">
             sign-in
           </Link>
         </div>

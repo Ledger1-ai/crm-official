@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import competitors from "@/data/competitors.json";
 import { ArrowRight } from "lucide-react";
+import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
+import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
 
 export const metadata = {
     title: "Compare Ledger1CRM to Competitors | Find Your Best CRM Alternative",
@@ -33,6 +35,7 @@ export const metadata = {
 export default function ComparePage() {
     return (
         <div className="min-h-screen bg-background text-foreground">
+            <MarketingHeader />
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
                 <GeometricBackground />
                 <div className="container px-4 md:px-6 relative z-10">
@@ -64,6 +67,7 @@ export default function ComparePage() {
                     </div>
                 </div>
             </section>
+            <MarketingFooter />
         </div>
     );
 }

@@ -46,7 +46,7 @@ const ProfilePage = async () => {
           <h1>AI configuration not found</h1>
           <p>
             Please configure Azure OpenAI in your environment or add your OpenAI API key in your{" "}
-            <Link href={"/profile"} className="text-blue-500">
+            <Link href={"/profile"} className="text-primary">
               profile settings page{" "}
             </Link>
             to use the assistant.
