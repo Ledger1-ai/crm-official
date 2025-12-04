@@ -33,8 +33,8 @@ export default function MarketingFooter() {
                         <ul className="flex flex-col items-center md:items-start space-y-3 text-sm">
                             <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
                             <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                            <li><Link href="/changelog" className="hover:text-white transition-colors">Changelog</Link></li>
-                            <li><Link href="/roadmap" className="hover:text-white transition-colors">Roadmap</Link></li>
+
+
                         </ul>
                     </div>
 
