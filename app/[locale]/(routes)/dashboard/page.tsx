@@ -155,7 +155,7 @@ const DashboardPage = async () => {
             size="default"
           />
         </Suspense>
-        
+
         <Suspense fallback={<LoadingBox />}>
           <MetricsSummaryCard
             title="Active Pipeline"
@@ -328,11 +328,11 @@ const DashboardPage = async () => {
           </Suspense>
         )}
 
-        {secondBrainModule?.enabled && (
+        {/* {secondBrainModule?.enabled && (
           <Suspense fallback={<LoadingBox />}>
             <NotionsBox />
           </Suspense>
-        )}
+        )} */}
       </div>
     </Container>
   );

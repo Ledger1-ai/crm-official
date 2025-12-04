@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Shield, LineChart, PlugZap, CheckCircle, Wrench, FileText, Zap, Clock, DollarSign, HeartHandshake, Sparkles, Bot, Lock, Globe } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, LineChart, PlugZap, CheckCircle, Wrench, FileText, Zap, Clock, DollarSign, HeartHandshake, Sparkles, Bot, Lock, Globe, Mail, MessageSquare, BarChart3, Database } from "lucide-react";
 import competitors from "@/data/competitors.json";
 import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
 import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
@@ -34,7 +34,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const title = `Ledger1CRM vs ${competitor.name} | The Best Alternative`;
     const description = `Compare Ledger1CRM vs ${competitor.name}. See why businesses are switching for better AI features, lower costs, and superior support.`;
     const baseUrl = getBaseUrl();
-    
+
     let ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(`Ledger1CRM vs ${competitor.name}`)}&description=${encodeURIComponent("The Smarter, AI-Native Alternative")}&type=competitor&badge=${encodeURIComponent("Better Alternative")}`;
 
     return {
@@ -104,7 +104,7 @@ export default async function CompetitorPage(props: Props) {
     return (
         <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
             <MarketingHeader />
-            
+
             {/* Hero */}
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
                 <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
@@ -180,7 +180,7 @@ export default async function CompetitorPage(props: Props) {
                             Every week, we help teams migrate from {competitor.name}. Here are the three reasons they tell us most often.
                         </p>
                     </div>
-                    
+
                     <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {/* AI That Actually Works */}
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition-all duration-300">
@@ -315,21 +315,21 @@ export default async function CompetitorPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">Works With Your Stack</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Your CRM should connect to the tools you already use—not force you to change everything. 
+                            Your CRM should connect to the tools you already use—not force you to change everything.
                             Ledger1CRM integrates with the platforms your team relies on every day.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
                         {[
-                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: "📧" },
-                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: "💬" },
-                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: "📄" },
-                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: "📊" },
-                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: "🗄️" },
+                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: <Mail className="h-6 w-6" /> },
+                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: <MessageSquare className="h-6 w-6" /> },
+                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: <FileText className="h-6 w-6" /> },
+                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: <BarChart3 className="h-6 w-6" /> },
+                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: <Database className="h-6 w-6" /> },
                         ].map((category) => (
                             <div key={category.title} className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-primary/30 transition-colors">
-                                <div className="text-2xl mb-3">{category.icon}</div>
+                                <div className="mb-3 text-primary">{category.icon}</div>
                                 <h3 className="font-semibold mb-4 text-primary">{category.title}</h3>
                                 <ul className="space-y-2">
                                     {category.items.map((item) => (
@@ -352,7 +352,7 @@ export default async function CompetitorPage(props: Props) {
                                 Your customer data is your most valuable asset. We protect it with the same rigor as the world&apos;s largest enterprises.
                             </p>
                         </div>
-                        
+
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
@@ -372,7 +372,7 @@ export default async function CompetitorPage(props: Props) {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -417,10 +417,10 @@ export default async function CompetitorPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">One Price. Everything Included.</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto mb-12">
-                            No per-seat fees. No surprise charges for AI features. No nickel-and-diming on integrations. 
+                            No per-seat fees. No surprise charges for AI features. No nickel-and-diming on integrations.
                             You get the full platform for one predictable price.
                         </p>
-                        
+
                         <div className="rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/10 to-transparent p-8">
                             <div className="text-4xl font-bold mb-2">Flat Rate Per Organization</div>
                             <p className="text-gray-400 mb-8">Unlimited users • Unlimited contacts • All AI features</p>
@@ -466,25 +466,25 @@ export default async function CompetitorPage(props: Props) {
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold mb-4">Support That Has Your Back</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Every customer gets real support from real humans—not chatbots that make you repeat yourself. 
+                            Every customer gets real support from real humans—not chatbots that make you repeat yourself.
                             Choose the level that fits your needs.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                         <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Standard Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base, 
-                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving 
+                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base,
+                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving
                                 most questions.
                             </p>
                         </div>
                         <div className="rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Premium Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager 
-                                conducts quarterly business reviews and proactive optimization sessions. Ideal for 
+                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager
+                                conducts quarterly business reviews and proactive optimization sessions. Ideal for
                                 teams where CRM uptime is business-critical.
                             </p>
                         </div>
@@ -501,7 +501,7 @@ export default async function CompetitorPage(props: Props) {
                             Switching CRMs is a big decision. Here are the answers to questions we hear most often from teams considering the move.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         {STATIC.faqs.map((faq, idx) => (
                             <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 p-6">
@@ -518,7 +518,7 @@ export default async function CompetitorPage(props: Props) {
                 <div className="container px-4 md:px-6 text-center">
                     <h2 className="text-3xl font-bold mb-6">Ready to Make the Switch?</h2>
                     <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                        Join the hundreds of teams who&apos;ve moved from {competitor.name} to Ledger1CRM. 
+                        Join the hundreds of teams who&apos;ve moved from {competitor.name} to Ledger1CRM.
                         We&apos;ll make the migration seamless and have you up and running in days, not months.
                     </p>
                     <div className="flex justify-center">

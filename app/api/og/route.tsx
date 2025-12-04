@@ -214,7 +214,7 @@ export async function GET(request: Request) {
               >
                 <div style={{ display: "flex", fontSize: 14, color: "#94a3b8", fontWeight: 600 }}>Local Support</div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#34d399", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🌍</div>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#34d399", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "white" }}>24/7</div>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <div style={{ display: "flex", fontSize: 14, color: "white", fontWeight: 600 }}>24/7 Local Hours</div>
                     <div style={{ display: "flex", fontSize: 12, color: "#64748b" }}>Your timezone, your language</div>

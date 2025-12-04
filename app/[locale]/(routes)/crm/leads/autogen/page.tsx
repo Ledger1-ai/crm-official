@@ -208,8 +208,8 @@ export default function LeadGenWizardPage() {
         type="button"
         onClick={() => setMode("ai-only")}
         className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "ai-only"
-            ? "bg-primary text-primary-foreground shadow-lg"
-            : "border hover:bg-accent"
+          ? "bg-primary text-primary-foreground shadow-lg"
+          : "border hover:bg-accent"
           }`}
       >
         <Sparkles className="w-4 h-4" />
@@ -219,8 +219,8 @@ export default function LeadGenWizardPage() {
         type="button"
         onClick={() => { setMode("step-by-step"); setStep(1); }}
         className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "step-by-step"
-            ? "bg-primary text-primary-foreground shadow-lg"
-            : "border hover:bg-accent"
+          ? "bg-primary text-primary-foreground shadow-lg"
+          : "border hover:bg-accent"
           }`}
       >
         <FileText className="w-4 h-4" />
@@ -230,8 +230,8 @@ export default function LeadGenWizardPage() {
         type="button"
         onClick={() => setMode("advanced")}
         className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "advanced"
-            ? "bg-primary text-primary-foreground shadow-lg"
-            : "border hover:bg-accent"
+          ? "bg-primary text-primary-foreground shadow-lg"
+          : "border hover:bg-accent"
           }`}
       >
         <Settings className="w-4 h-4" />
@@ -263,10 +263,10 @@ export default function LeadGenWizardPage() {
                 <div className="flex flex-col items-center flex-1">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${isComplete
+                      ? "bg-primary border-primary text-primary-foreground"
+                      : isActive
                         ? "bg-primary border-primary text-primary-foreground"
-                        : isActive
-                          ? "bg-primary border-primary text-primary-foreground"
-                          : "border-muted-foreground/30 text-muted-foreground"
+                        : "border-muted-foreground/30 text-muted-foreground"
                       }`}
                   >
                     {isComplete ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
@@ -580,7 +580,7 @@ export default function LeadGenWizardPage() {
                 disabled={submitting}
                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium disabled:opacity-50 hover:shadow-lg"
               >
-                {submitting ? "🤖 Launching AI..." : "🚀 Start Generation"}
+                {submitting ? "Launching AI..." : "Start Generation"}
               </button>
             </div>
           </div>

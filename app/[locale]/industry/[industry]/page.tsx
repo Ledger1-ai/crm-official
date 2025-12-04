@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Building2, Users, BarChart3, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Globe, Lock, HeartHandshake, Workflow } from "lucide-react";
+import { ArrowRight, Building2, Users, BarChart3, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Globe, Lock, HeartHandshake, Workflow, Mail, MessageSquare, FileText, Database } from "lucide-react";
 import industries from "@/data/industries.json";
 import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
 import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
@@ -35,7 +35,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const title = `Best AI CRM for ${industry.name} | Ledger1CRM`;
     const description = `Ledger1CRM is the top-rated AI CRM for the ${industry.name} industry. ${industry.use_case}. Start for free.`;
     const baseUrl = getBaseUrl();
-    
+
     let ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(`AI CRM for ${industry.name}`)}&description=${encodeURIComponent(`The #1 Choice for ${industry.name} Professionals`)}&type=industry&badge=${encodeURIComponent("Industry Leader")}`;
 
     return {
@@ -97,7 +97,7 @@ export default async function IndustryPage(props: Props) {
     return (
         <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
             <MarketingHeader />
-            
+
             {/* Hero */}
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
                 <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
@@ -175,17 +175,17 @@ export default async function IndustryPage(props: Props) {
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4">AI That Understands {industry.name}</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Our AI agents aren&apos;t generic chatbots with your logo. They&apos;re trained to understand the nuances 
+                            Our AI agents aren&apos;t generic chatbots with your logo. They&apos;re trained to understand the nuances
                             of {industry.name.toLowerCase()} conversations, terminology, and workflows.
                         </p>
                     </div>
-                    
+
                     <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {/* Left: Agent Interface */}
                         <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(6,182,212,0.15)] border border-white/10 bg-black/50 backdrop-blur-xl">
                             <AgentInterface />
                         </div>
-                        
+
                         {/* Right: Agent Descriptions */}
                         <div className="space-y-6">
                             <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
@@ -196,11 +196,11 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="font-semibold">Inbound Triage Agent</h3>
                                 </div>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Instantly qualifies new inquiries based on your ideal customer profile. Routes hot leads to the right rep, 
+                                    Instantly qualifies new inquiries based on your ideal customer profile. Routes hot leads to the right rep,
                                     schedules follow-ups for warm prospects, and politely declines poor fits—all without human intervention.
                                 </p>
                             </div>
-                            
+
                             <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
@@ -209,11 +209,11 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="font-semibold">Outbound Nurture Agent</h3>
                                 </div>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Keeps cold and warm leads engaged with personalized outreach. Adapts messaging based on engagement signals 
+                                    Keeps cold and warm leads engaged with personalized outreach. Adapts messaging based on engagement signals
                                     and moves prospects through your pipeline at the right pace—persistent without being pushy.
                                 </p>
                             </div>
-                            
+
                             <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -222,11 +222,11 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="font-semibold">Retention Agent</h3>
                                 </div>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Monitors account health signals and proactively reaches out to at-risk customers before they churn. 
+                                    Monitors account health signals and proactively reaches out to at-risk customers before they churn.
                                     Surfaces expansion opportunities when engagement patterns indicate readiness to grow.
                                 </p>
                             </div>
-                            
+
                             <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
@@ -235,7 +235,7 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="font-semibold">Scheduling Agent</h3>
                                 </div>
                                 <p className="text-gray-400 text-sm leading-relaxed">
-                                    Handles the back-and-forth of meeting scheduling so your team never has to. Syncs with your calendar, 
+                                    Handles the back-and-forth of meeting scheduling so your team never has to. Syncs with your calendar,
                                     respects your availability preferences, and sends reminders that dramatically reduce no-shows.
                                 </p>
                             </div>
@@ -257,10 +257,10 @@ export default async function IndustryPage(props: Props) {
                                 Know Where You Stand, See Where You&apos;re Going
                             </h2>
                             <p className="text-gray-400 leading-relaxed mb-6">
-                                Dashboards that actually tell you something useful. Track the metrics that matter for {industry.name.toLowerCase()}—not 
+                                Dashboards that actually tell you something useful. Track the metrics that matter for {industry.name.toLowerCase()}—not
                                 vanity numbers, but actionable insights that drive better decisions.
                             </p>
-                            
+
                             <div className="space-y-4">
                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -309,11 +309,11 @@ export default async function IndustryPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">Workflows That Run Themselves</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Stop manually moving deals through stages and chasing follow-ups. Ledger1CRM automates the 
+                            Stop manually moving deals through stages and chasing follow-ups. Ledger1CRM automates the
                             repetitive work so your team can focus on what humans do best—building relationships.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-8">
                             <h3 className="text-xl font-semibold mb-4">Lead-to-Customer Journey</h3>
@@ -339,7 +339,7 @@ export default async function IndustryPage(props: Props) {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-8">
                             <h3 className="text-xl font-semibold mb-4">Customer Success Playbooks</h3>
                             <p className="text-gray-400 mb-6">
@@ -378,21 +378,21 @@ export default async function IndustryPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">Connects to Everything You Use</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Your CRM should be the hub, not a silo. Ledger1CRM integrates seamlessly with the tools 
+                            Your CRM should be the hub, not a silo. Ledger1CRM integrates seamlessly with the tools
                             your {industry.name.toLowerCase()} team relies on every day.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
                         {[
-                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: "📧" },
-                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: "💬" },
-                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: "📄" },
-                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: "📊" },
-                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: "🗄️" },
+                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: <Mail className="h-6 w-6" /> },
+                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: <MessageSquare className="h-6 w-6" /> },
+                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: <FileText className="h-6 w-6" /> },
+                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: <BarChart3 className="h-6 w-6" /> },
+                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: <Database className="h-6 w-6" /> },
                         ].map((category) => (
                             <div key={category.title} className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-6 hover:border-primary/30 transition-colors">
-                                <div className="text-2xl mb-3">{category.icon}</div>
+                                <div className="mb-3 text-primary">{category.icon}</div>
                                 <h3 className="font-semibold mb-4 text-primary">{category.title}</h3>
                                 <ul className="space-y-2">
                                     {category.items.map((item) => (
@@ -412,11 +412,11 @@ export default async function IndustryPage(props: Props) {
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold mb-4">Enterprise-Grade Security</h2>
                             <p className="text-gray-400 max-w-2xl mx-auto">
-                                Your customer data is your most valuable asset. We protect it with the same rigor 
+                                Your customer data is your most valuable asset. We protect it with the same rigor
                                 as the world&apos;s largest enterprises, with compliance built in from day one.
                             </p>
                         </div>
-                        
+
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
@@ -426,7 +426,7 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="text-xl font-semibold">Global Compliance</h3>
                                 </div>
                                 <p className="text-gray-400 mb-6">
-                                    Whether you&apos;re serving customers in Europe, North America, or Asia-Pacific, Ledger1CRM 
+                                    Whether you&apos;re serving customers in Europe, North America, or Asia-Pacific, Ledger1CRM
                                     helps you stay compliant with local data protection regulations.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -437,7 +437,7 @@ export default async function IndustryPage(props: Props) {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -446,7 +446,7 @@ export default async function IndustryPage(props: Props) {
                                     <h3 className="text-xl font-semibold">Security Controls</h3>
                                 </div>
                                 <p className="text-gray-400 mb-6">
-                                    From SSO to field-level permissions, we give you granular control over who can 
+                                    From SSO to field-level permissions, we give you granular control over who can
                                     access what—without making security a bottleneck.
                                 </p>
                                 <ul className="space-y-3">
@@ -487,12 +487,12 @@ export default async function IndustryPage(props: Props) {
                                     Up and Running in Days, Not Months
                                 </h2>
                                 <p className="text-gray-400 leading-relaxed mb-6">
-                                    We&apos;ve streamlined the onboarding process to get your team productive fast. 
-                                    Most {industry.name.toLowerCase()} teams complete setup in under a week—including 
+                                    We&apos;ve streamlined the onboarding process to get your team productive fast.
+                                    Most {industry.name.toLowerCase()} teams complete setup in under a week—including
                                     data migration, integration setup, and team training.
                                 </p>
                                 <p className="text-gray-400 leading-relaxed">
-                                    Our implementation specialists have deep experience with {industry.name.toLowerCase()} 
+                                    Our implementation specialists have deep experience with {industry.name.toLowerCase()}
                                     workflows and will help you configure Ledger1CRM to match exactly how your team works.
                                 </p>
                             </div>
@@ -526,25 +526,25 @@ export default async function IndustryPage(props: Props) {
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold mb-4">Support That Has Your Back</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Every customer gets real support from real humans who understand {industry.name.toLowerCase()}. 
+                            Every customer gets real support from real humans who understand {industry.name.toLowerCase()}.
                             Choose the level that fits your needs.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                         <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Standard Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base, 
-                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving 
+                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base,
+                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving
                                 most questions.
                             </p>
                         </div>
                         <div className="rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Premium Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager 
-                                conducts quarterly business reviews and proactive optimization sessions. Ideal for 
+                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager
+                                conducts quarterly business reviews and proactive optimization sessions. Ideal for
                                 teams where CRM uptime is business-critical.
                             </p>
                         </div>
@@ -561,7 +561,7 @@ export default async function IndustryPage(props: Props) {
                             Got questions about using Ledger1CRM for {industry.name.toLowerCase()}? Here are answers to what we hear most often.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         {STATIC.faqs.map((faq, idx) => (
                             <div key={idx} className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-6">
@@ -578,7 +578,7 @@ export default async function IndustryPage(props: Props) {
                 <div className="container px-4 md:px-6 text-center">
                     <h2 className="text-3xl font-bold mb-6">Ready to Transform Your {industry.name} Operations?</h2>
                     <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                        Join the {industry.name.toLowerCase()} teams who&apos;ve already made the switch to AI-native CRM. 
+                        Join the {industry.name.toLowerCase()} teams who&apos;ve already made the switch to AI-native CRM.
                         See exactly how Ledger1CRM can help you close more deals and keep customers longer.
                     </p>
                     <div className="flex justify-center">

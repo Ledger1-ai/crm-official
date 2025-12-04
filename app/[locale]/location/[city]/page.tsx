@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Globe2, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Lock, HeartHandshake, Workflow, Building, Users } from "lucide-react";
+import { ArrowRight, MapPin, Globe2, CheckCircle, Shield, LineChart, PlugZap, Bot, Target, Zap, Clock, TrendingUp, Lock, HeartHandshake, Workflow, Building, Users, Mail, MessageSquare, FileText, BarChart3, Database } from "lucide-react";
 import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import locations from "@/data/locations.json";
 import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
@@ -34,7 +34,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const title = `Top Rated AI CRM in ${location.name} | Ledger1CRM`;
     const description = `Join the fastest growing businesses in ${location.name} using Ledger1CRM. Local support, global compliance, and state-of-the-art AI.`;
     const baseUrl = getBaseUrl();
-    
+
     let ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent(`Ledger1CRM in ${location.name}`)}&description=${encodeURIComponent(`Empowering Businesses in ${location.name}`)}&type=location&badge=${encodeURIComponent("Local Favorite")}`;
 
     return {
@@ -96,7 +96,7 @@ export default async function LocationPage(props: Props) {
     return (
         <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
             <MarketingHeader />
-            
+
             {/* Hero */}
             <section className="relative w-full py-20 md:py-32 overflow-hidden">
                 <GeometricBackground />
@@ -148,8 +148,8 @@ export default async function LocationPage(props: Props) {
                                     &quot;{location.context}&quot;
                                 </p>
                                 <p className="text-gray-400 leading-relaxed">
-                                    We understand the unique challenges of the {location.name} market. Whether it&apos;s local compliance 
-                                    requirements, currency support, or time-zone optimized AI agents, Ledger1CRM is built to help 
+                                    We understand the unique challenges of the {location.name} market. Whether it&apos;s local compliance
+                                    requirements, currency support, or time-zone optimized AI agents, Ledger1CRM is built to help
                                     you dominate locally while scaling globally.
                                 </p>
                             </div>
@@ -193,11 +193,11 @@ export default async function LocationPage(props: Props) {
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4">AI That Works While You Sleep</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Your AI agents don&apos;t take breaks, don&apos;t need coffee, and never forget to follow up. 
+                            Your AI agents don&apos;t take breaks, don&apos;t need coffee, and never forget to follow up.
                             They handle the repetitive work so your {location.name} team can focus on building relationships.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                             <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
@@ -208,7 +208,7 @@ export default async function LocationPage(props: Props) {
                                 Instantly qualifies new inquiries, routes hot leads to the right rep, and schedules follow-ups—all without human intervention.
                             </p>
                         </div>
-                        
+
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
                                 <TrendingUp className="w-6 h-6 text-green-400" />
@@ -218,7 +218,7 @@ export default async function LocationPage(props: Props) {
                                 Keeps leads engaged with personalized outreach, adapting messaging based on engagement signals and moving prospects through your pipeline.
                             </p>
                         </div>
-                        
+
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                             <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                                 <HeartHandshake className="w-6 h-6 text-amber-400" />
@@ -228,7 +228,7 @@ export default async function LocationPage(props: Props) {
                                 Monitors account health and proactively reaches out to at-risk customers before they churn. Surfaces expansion opportunities automatically.
                             </p>
                         </div>
-                        
+
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-all">
                             <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
                                 <Clock className="w-6 h-6 text-purple-400" />
@@ -253,11 +253,11 @@ export default async function LocationPage(props: Props) {
                             </div>
                             <h2 className="text-3xl font-bold mb-4">See the Full Picture of Your Business</h2>
                             <p className="text-gray-400 max-w-2xl mx-auto">
-                                Dashboards that tell you something useful—not vanity metrics, but actionable insights 
+                                Dashboards that tell you something useful—not vanity metrics, but actionable insights
                                 that help you make better decisions for your {location.name} operations.
                             </p>
                         </div>
-                        
+
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="space-y-6">
                                 <div className="flex items-start gap-3">
@@ -306,11 +306,11 @@ export default async function LocationPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">Workflows That Run Themselves</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Stop manually moving deals through stages and chasing follow-ups. Ledger1CRM automates the 
+                            Stop manually moving deals through stages and chasing follow-ups. Ledger1CRM automates the
                             repetitive work so your team can focus on what humans do best—building relationships.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-8">
                             <h3 className="text-xl font-semibold mb-4">Lead-to-Customer Journey</h3>
@@ -336,7 +336,7 @@ export default async function LocationPage(props: Props) {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div className="bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl p-8">
                             <h3 className="text-xl font-semibold mb-4">Customer Success Playbooks</h3>
                             <p className="text-gray-400 mb-6">
@@ -375,21 +375,21 @@ export default async function LocationPage(props: Props) {
                         </div>
                         <h2 className="text-3xl font-bold mb-4">Works With Your Existing Stack</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Your CRM should be the hub, not a silo. Ledger1CRM integrates seamlessly with the tools 
+                            Your CRM should be the hub, not a silo. Ledger1CRM integrates seamlessly with the tools
                             your {location.name} team relies on every day.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
                         {[
-                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: "📧" },
-                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: "💬" },
-                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: "📄" },
-                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: "📊" },
-                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: "🗄️" },
+                            { title: "Email & Calendar", items: ["Gmail", "Outlook 365", "Google Calendar", "iCal"], icon: <Mail className="h-6 w-6" /> },
+                            { title: "Communications", items: ["Twilio Voice", "WhatsApp", "SMS", "Slack"], icon: <MessageSquare className="h-6 w-6" /> },
+                            { title: "Documents", items: ["Google Drive", "Dropbox", "DocuSign", "Adobe Sign"], icon: <FileText className="h-6 w-6" /> },
+                            { title: "Marketing", items: ["HubSpot Forms", "Meta Lead Ads", "Google Ads"], icon: <BarChart3 className="h-6 w-6" /> },
+                            { title: "Data", items: ["Snowflake", "BigQuery", "S3", "CSV"], icon: <Database className="h-6 w-6" /> },
                         ].map((category) => (
                             <div key={category.title} className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-6 hover:border-primary/30 transition-colors">
-                                <div className="text-2xl mb-3">{category.icon}</div>
+                                <div className="mb-3 text-primary">{category.icon}</div>
                                 <h3 className="font-semibold mb-4 text-primary">{category.title}</h3>
                                 <ul className="space-y-2">
                                     {category.items.map((item) => (
@@ -409,11 +409,11 @@ export default async function LocationPage(props: Props) {
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold mb-4">Enterprise-Grade Security</h2>
                             <p className="text-gray-400 max-w-2xl mx-auto">
-                                Your customer data is your most valuable asset. We protect it with the same rigor 
+                                Your customer data is your most valuable asset. We protect it with the same rigor
                                 as the world&apos;s largest enterprises, with compliance built in from day one.
                             </p>
                         </div>
-                        
+
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
@@ -423,7 +423,7 @@ export default async function LocationPage(props: Props) {
                                     <h3 className="text-xl font-semibold">Global Compliance</h3>
                                 </div>
                                 <p className="text-gray-400 mb-6">
-                                    Whether you&apos;re serving customers locally in {location.name} or expanding globally, 
+                                    Whether you&apos;re serving customers locally in {location.name} or expanding globally,
                                     Ledger1CRM helps you stay compliant with data protection regulations wherever you operate.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -434,7 +434,7 @@ export default async function LocationPage(props: Props) {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -443,7 +443,7 @@ export default async function LocationPage(props: Props) {
                                     <h3 className="text-xl font-semibold">Security Controls</h3>
                                 </div>
                                 <p className="text-gray-400 mb-6">
-                                    From SSO to field-level permissions, we give you granular control over who can 
+                                    From SSO to field-level permissions, we give you granular control over who can
                                     access what—without making security a bottleneck.
                                 </p>
                                 <ul className="space-y-3">
@@ -484,11 +484,11 @@ export default async function LocationPage(props: Props) {
                                     Up and Running in Days, Not Months
                                 </h2>
                                 <p className="text-gray-400 leading-relaxed mb-6">
-                                    We&apos;ve streamlined the onboarding process to get your {location.name} team productive fast. 
+                                    We&apos;ve streamlined the onboarding process to get your {location.name} team productive fast.
                                     Most teams complete setup in under a week—including data migration, integration setup, and team training.
                                 </p>
                                 <p className="text-gray-400 leading-relaxed">
-                                    Our implementation specialists will help you configure Ledger1CRM to match exactly 
+                                    Our implementation specialists will help you configure Ledger1CRM to match exactly
                                     how your team works, with support during your local business hours.
                                 </p>
                             </div>
@@ -522,25 +522,25 @@ export default async function LocationPage(props: Props) {
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold mb-4">Support That Has Your Back</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Every customer gets real support from real humans—available during {location.name} business hours. 
+                            Every customer gets real support from real humans—available during {location.name} business hours.
                             Choose the level that fits your needs.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                         <div className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Standard Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base, 
-                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving 
+                                Business hours coverage with 24-48 hour response times. Full access to our knowledge base,
+                                video tutorials, and community forums. Perfect for teams who are comfortable self-serving
                                 most questions.
                             </p>
                         </div>
                         <div className="rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-8">
                             <h3 className="text-xl font-semibold mb-2 text-primary">Premium Support</h3>
                             <p className="text-gray-400 leading-relaxed">
-                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager 
-                                conducts quarterly business reviews and proactive optimization sessions. Ideal for 
+                                24/7 coverage with 1-4 hour response times. Your dedicated Customer Success Manager
+                                conducts quarterly business reviews and proactive optimization sessions. Ideal for
                                 teams where CRM uptime is business-critical.
                             </p>
                         </div>
@@ -557,7 +557,7 @@ export default async function LocationPage(props: Props) {
                             Got questions about using Ledger1CRM in {location.name}? Here are answers to what we hear most often.
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         {STATIC.faqs.map((faq, idx) => (
                             <div key={idx} className="rounded-2xl border border-white/10 bg-[#0F0F1A] p-6">
@@ -574,7 +574,7 @@ export default async function LocationPage(props: Props) {
                 <div className="container px-4 md:px-6 text-center">
                     <h2 className="text-3xl font-bold mb-6">Ready to Grow Your {location.name} Business?</h2>
                     <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                        Join the {location.name} businesses who&apos;ve already made the switch to AI-native CRM. 
+                        Join the {location.name} businesses who&apos;ve already made the switch to AI-native CRM.
                         See exactly how Ledger1CRM can help you close more deals and keep customers longer.
                     </p>
                     <div className="flex justify-center">
