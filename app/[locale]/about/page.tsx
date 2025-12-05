@@ -90,47 +90,47 @@ export default function AboutPage() {
                                 name="Krishna Patel"
                                 role="Chairman (Founder)"
                                 imageSrc="/images/team/member1.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/krishna-patel-89039120/"
+                                twitter="https://x.com/GenRevoeth"
                             />
                             <TeamMember
                                 name="Eric Turner"
                                 role="Chief Technology Officer (CTO)"
                                 imageSrc="/images/team/member2.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/ericturner85/"
+                                twitter="https://x.com/sinisterxtwitr"
                             />
                             <TeamMember
                                 name="Patrick Gorrell"
                                 role="Chief Executive Officer (CEO)"
                                 imageSrc="/images/team/member3.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/patrickgorrell/"
+                                twitter="https://x.com/tolkenbowls"
                             />
                             <TeamMember
                                 name="Michael Milton"
                                 role="Chief Marketing Officer (CMO)"
                                 imageSrc="/images/team/member4.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/mayordelmar/"
+                                twitter="https://x.com/mayordelmar"
                             />
                         </div>
 
                         {/* Row 2: 2 columns centered */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
                             <TeamMember
-                                name="Member 5"
+                                name="John Garcia"
                                 role="SVP, AI Research"
                                 imageSrc="/images/team/member5.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/john-garcia-54ab73398/"
+                                twitter="https://x.com/JohnG1isit"
                             />
                             <TeamMember
                                 name="Shahir Monjour"
                                 role="SVP, Engineering"
                                 imageSrc="/images/team/member6.jpg"
-                                linkedin="#"
-                                twitter="#"
+                                linkedin="https://www.linkedin.com/in/shahir-monjur/"
+                                twitter="https://x.com/shahir1395"
                             />
                         </div>
                     </div>
