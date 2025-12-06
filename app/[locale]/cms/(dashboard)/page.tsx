@@ -72,33 +72,39 @@ export default async function CMSDashboardPage() {
         </span>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {contentSections.map((section) => (
-          <Link
-            key={section.href}
-            href={`/cms/${section.href}`}
-            className="group p-5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all"
-          >
-            <div className="flex items-start justify-between">
-              <div className={`p-2.5 rounded-lg ${section.color}`}>
-                <section.icon className="h-5 w-5" />
-              </div>
-              <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
-            </div>
-            <h3 className="mt-4 font-semibold text-gray-900 dark:text-white">
-              {section.title}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {section.description}
-            </p>
-          </Link>
-        ))}
-      </div>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Content Grid */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {contentSections.map((section) => (
+              <Link
+                key={section.href}
+                href={`/cms/${section.href}`}
+                className="group p-5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`p-2.5 rounded-lg ${section.color}`}>
+                    <section.icon className="h-5 w-5" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                </div>
+                <h3 className="mt-4 font-semibold text-gray-900 dark:text-white">
+                  {section.title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {section.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-      {/* Activity Log - Full Width */}
-      <div className="w-full">
-        <Changelog />
+        {/* Activity Log - Side Panel */}
+        <div className="w-full lg:w-96 shrink-0">
+          <div className="sticky top-8">
+            <Changelog />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ export default function CareersAdminPage() {
         if (!confirm("Are you sure you want to delete this job?")) return;
 
         try {
-            const res = await fetch(`/ api / careers ? id = ${id} `, { method: "DELETE" });
+            const res = await fetch(`/api/careers?id=${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete");
             toast.success("Job deleted");
             fetchJobs();

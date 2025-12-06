@@ -59,7 +59,10 @@ export default function BlogAdminPage() {
             const res = await fetch("/api/blog", {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(editingPost),
+                body: JSON.stringify({
+                    ...editingPost,
+                    content: editingPost.content || "",
+                }),
             });
 
             if (!res.ok) throw new Error("Failed to save");

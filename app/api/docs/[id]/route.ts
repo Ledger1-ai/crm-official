@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prismadb } from "@/lib/prisma";
 import { logActivity } from "@/actions/audit";
 
@@ -44,6 +45,7 @@ export async function PATCH(
 
         await logActivity("Updated Documentation", "Documentation", `Updated article: ${doc.title}`);
 
+        revalidatePath('/docs');
         return NextResponse.json(doc);
     } catch (error) {
         console.log("[DOC_PATCH]", error);
@@ -60,6 +62,7 @@ export async function DELETE(
             where: { id: params.id },
         });
 
+        revalidatePath('/docs');
         return NextResponse.json(doc);
     } catch (error) {
         console.log("[DOC_DELETE]", error);

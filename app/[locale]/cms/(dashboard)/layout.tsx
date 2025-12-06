@@ -38,9 +38,12 @@ export default async function AdminDashboardLayout({
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     <NavLink href={`/${locale}/cms`} icon={<LayoutDashboard />} label="Dashboard" />
 
+                    <div className="pt-4 pb-2 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Recruitment</div>
+                    <NavLink href={`/${locale}/cms/applications`} icon={<Users />} label="Applications" />
+
                     <div className="pt-4 pb-2 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</div>
                     <NavLink href={`/${locale}/cms/blog`} icon={<FileText />} label="Blog" />
-                    <NavLink href={`/${locale}/cms/careers`} icon={<Briefcase />} label="Careers" />
+                    <NavLink href={`/${locale}/cms/careers`} icon={<Briefcase />} label="Jobs (Postings)" />
                     <NavLink href={`/${locale}/cms/docs`} icon={<BookOpen />} label="Documentation" />
                     <NavLink href={`/${locale}/cms/footer`} icon={<Globe />} label="Footer" />
                     <NavLink href={`/${locale}/cms/social`} icon={<Share2 />} label="Social Media" />

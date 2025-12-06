@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Clock, DollarSign, Heart, Coffee, Laptop } from "lucide-react";
 import Link from "next/link";
 import { prismadb } from "@/lib/prisma";
-
+import { CareersGrid } from "./_components/CareersGrid";
 export const metadata = {
     title: "Careers - Ledger1CRM",
     description: "Join the team building the future of AI CRM.",
@@ -17,11 +17,7 @@ export default async function CareersPage() {
         orderBy: { createdAt: "desc" },
     });
 
-    // Group jobs by department
-    const jobsByDept = jobs.reduce((acc: any, job: any) => {
-        (acc[job.department] = acc[job.department] || []).push(job);
-        return acc;
-    }, {});
+
 
     return (
         <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
@@ -94,25 +90,7 @@ export default async function CareersPage() {
                                 No open positions at the moment. Please check back later!
                             </div>
                         ) : (
-                            <div className="space-y-6">
-                                {Object.entries(jobsByDept).map(([dept, deptJobs]: [string, any]) => (
-                                    <div key={dept} className="mb-8">
-                                        <h3 className="text-xl font-bold mb-4 text-primary">{dept}</h3>
-                                        <div className="space-y-4">
-                                            {deptJobs.map((job: any) => (
-                                                <JobCard
-                                                    key={job.id}
-                                                    title={job.title}
-                                                    department={job.department}
-                                                    location={job.location}
-                                                    type={job.type}
-                                                    applyLink={job.applyLink}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <CareersGrid jobs={jobs} />
                         )}
                     </div>
                 </section>

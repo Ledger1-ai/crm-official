@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prismadb } from "@/lib/prisma";
 import { logActivity } from "@/actions/audit";
 
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
 
         await logActivity("Created Documentation", "Documentation", `Created article: ${title}`);
 
+        revalidatePath('/docs');
         return NextResponse.json(doc);
     } catch (error) {
         console.log("[DOCS_POST]", error);

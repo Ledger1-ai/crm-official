@@ -1098,10 +1098,34 @@ model JobPosting {
   department   String
   location     String
   type         String   @default("Full-time")
-  description  String
+  description  String?
+  summary      String?
+  content      String?
   requirements String?
   applyLink    String?
   active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  applications JobApplication[]
+}
+
+model JobApplication {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobId        String   @db.ObjectId
+  jobTitle     String   // Denormalized for easier display/querying
+  job          JobPosting @relation(fields: [jobId], references: [id])
+  
+  name         String
+  email        String
+  phone        String?
+  resumeUrl    String?
+  coverLetter  String?
+  linkedinUrl  String?
+  portfolioUrl String?
+  
+  status       String   @default("PENDING") // PENDING, REVIEWING, REJECTED, HIRED
+  jiraTicketId String?
+  
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

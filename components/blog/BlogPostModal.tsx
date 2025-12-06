@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Calendar, ArrowRight } from "lucide-react"; // Removed Tag as it wasn't used, or add it if needed
 
@@ -64,9 +64,12 @@ export function BlogPostModal({ post, isOpen, onClose }: BlogPostModalProps) {
                                 </span>
                             </div>
 
-                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
+                            <DialogTitle className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight">
                                 {post.title}
-                            </h1>
+                            </DialogTitle>
+                            <DialogDescription className="sr-only">
+                                Read full article: {post.title}
+                            </DialogDescription>
 
                             <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-strong:text-white prose-code:bg-white/10 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
                                 <CustomMarkdownRenderer content={post.content} />

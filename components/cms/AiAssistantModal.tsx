@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, Loader2, FileText, Wand2, X } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -74,7 +74,7 @@ export function AiAssistantModal({
 
                     {/* Content */}
                     <div className="relative z-10">
-                        <h3 className="text-xl font-bold mb-2 flex items-center gap-3 text-white">
+                        <DialogTitle className="text-xl font-bold mb-2 flex items-center gap-3 text-white">
                             <div className={cn("p-2 rounded-lg", mode === 'create' ? "bg-blue-500/10" : "bg-purple-500/10")}>
                                 {mode === "create" ? (
                                     <Sparkles className={cn("h-5 w-5", mode === 'create' ? "text-blue-400" : "text-purple-400")} />
@@ -83,10 +83,10 @@ export function AiAssistantModal({
                                 )}
                             </div>
                             {getTitle()}
-                        </h3>
-                        <p className="text-slate-400 mb-6 leading-relaxed text-sm">
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-400 mb-6 leading-relaxed text-sm">
                             {getDescription()}
-                        </p>
+                        </DialogDescription>
 
                         <div className="space-y-4">
                             <div>
