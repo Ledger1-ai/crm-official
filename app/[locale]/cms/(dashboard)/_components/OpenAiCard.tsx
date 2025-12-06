@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -62,10 +61,10 @@ const OpenAiCard = async () => {
     <Card className="min-w-[350px]  max-w-[450px]">
       <CardHeader className="text-lg">
         <CardTitle>OpenAi - API Key</CardTitle>
-        <CardDescription className="text-xs overflow-hidden">
+        <div className="text-xs text-muted-foreground overflow-hidden space-y-1">
           {/*  Here will be actual settings */}
-          <p>ENV API key:</p>
-          <p>
+          <div>ENV API key:</div>
+          <div>
             {process.env.OPENAI_API_KEY ? (
               <CopyKeyComponent
                 envValue={process.env.OPENAI_API_KEY}
@@ -74,8 +73,8 @@ const OpenAiCard = async () => {
             ) : (
               "not enabled"
             )}
-          </p>
-          <p>API key from DB:</p>
+          </div>
+          <div>API key from DB:</div>
           {openAi_key?.serviceKey ? (
             <CopyKeyComponent
               keyValue={openAi_key.serviceKey}
@@ -84,7 +83,7 @@ const OpenAiCard = async () => {
           ) : (
             "not enabled"
           )}
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <form action={setOpenAiKey}>

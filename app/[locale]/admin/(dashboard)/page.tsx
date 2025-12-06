@@ -1,50 +1,47 @@
-import Link from "next/link";
-
-import { getUser } from "@/actions/get-user";
-
-import { Button } from "@/components/ui/button";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import Container from "@/app/[locale]/(routes)/components/ui/Container";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-import GptCard from "./_components/GptCard";
-import ResendCard from "./_components/ResendCard";
-import OpenAiCard from "./_components/OpenAiCard";
+// Import cards from CMS for now as they are shared components in practice
+import GptCard from "@/app/[locale]/cms/(dashboard)/_components/GptCard";
+import ResendCard from "@/app/[locale]/cms/(dashboard)/_components/ResendCard";
+import OpenAiCard from "@/app/[locale]/cms/(dashboard)/_components/OpenAiCard";
 
-const AdminPage = async () => {
-  const user = await getUser();
+const AnyLink = Link as any;
+const AnyButton = Button as any;
 
-  if (!user?.is_admin) {
-    return (
-      <Container
-        title="Administration"
-        description="You are not admin, access not allowed"
-      >
-        <div className="flex w-full h-full items-center justify-center">
-          Access not allowed
-        </div>
-      </Container>
-    );
-  }
+export default async function AdminDashboardPage() {
+  const session = await getServerSession(authOptions);
 
   return (
     <Container
       title="Administration"
-      description={"Here you can setup your Ledger1CRM instance"}
+      description="Here you can setup your Ledger1CRM instance"
     >
-      <div className="space-x-2">
-        <Button asChild>
-          <Link href="/admin/users">Users administration</Link>
-        </Button>
-        <Button asChild>
-          <Link href="/admin/modules">Modules administration</Link>
-        </Button>
-      </div>
-      <div className="flex flex-row flex-wrap space-y-2 md:space-y-0 gap-2">
-        <GptCard />
-        <ResendCard />
-        <OpenAiCard />
+      <div className="space-y-8">
+        {/* Navigation Buttons */}
+        <div className="flex gap-4">
+          <AnyLink href="/admin/users">
+            <AnyButton variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
+              Users administration
+            </AnyButton>
+          </AnyLink>
+          <AnyLink href="/admin/modules">
+            <AnyButton variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
+              Modules administration
+            </AnyButton>
+          </AnyLink>
+        </div>
+
+        {/* Cards Grid */}
+        <div className="flex flex-wrap gap-6">
+          <GptCard />
+          <ResendCard />
+          <OpenAiCard />
+        </div>
       </div>
     </Container>
   );
-};
-
-export default AdminPage;
+}

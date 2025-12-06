@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,7 +19,7 @@ const GptCard = async () => {
     <Card className="min-w-[350px]  max-w-[450px]">
       <CardHeader className="text-lg">
         <CardTitle>AI assistant GPT model</CardTitle>
-        <CardDescription className="text-xs">
+        <div className="text-xs text-muted-foreground">
           actual model:{" "}
           {
             //filter in gptModels where status = ACTIVE
@@ -28,7 +27,7 @@ const GptCard = async () => {
               .filter((model: gpt_models) => model.status === "ACTIVE")
               .map((model: gpt_models) => model.model)
           }
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <SetGptModel models={gptModels} />
