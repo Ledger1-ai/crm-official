@@ -13,7 +13,7 @@ export const metadata = {
 export default async function AdminLayout({
     children,
 }: {
-    children: React.ReactNode;
+    children: any;
 }) {
     // Check if we are on the login page to avoid infinite redirect loop
     // We can't easily check pathname in server component layout without headers hack or middleware
@@ -57,7 +57,7 @@ export default async function AdminLayout({
 
     // Let's do the move. It's cleaner.
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="min-h-screen">
             {children}
         </div>
     );

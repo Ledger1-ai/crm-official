@@ -662,6 +662,31 @@ model Users {
   calendar_selected_ids      String[]
   default_calendar_id        String?
   calendar_colors            Json?
+
+  // Team / Partner
+  team_id                    String?   @db.ObjectId
+  assigned_team              Team?     @relation(fields: [team_id], references: [id])
+  team_role                  String?   @default("MEMBER") // OWNER, ADMIN, MEMBER
+}
+
+model Team {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String   @unique
+  logo_url    String?
+  owner_id    String?  @db.ObjectId
+  created_at  DateTime @default(now()) @db.Date
+  updated_at  DateTime @updatedAt @db.Date
+
+  // Relations
+  members     Users[]
+  subscription_plan SubscriptionPlan @default(FREE)
+}
+
+enum SubscriptionPlan {
+  FREE
+  TEAM
+  ENTERPRISE
 }
 
 enum Language {

@@ -13,18 +13,24 @@ import DataboxModuleMenu from "./menu-items/Databoxes";
 import CrmModuleMenu from "./menu-items/Crm";
 
 import AdministrationMenu from "./menu-items/Administration";
+import PartnerMenu from "./menu-items/Partner";
 import DashboardMenu from "./menu-items/Dashboard";
 import EmailsModuleMenu from "./menu-items/Emails";
 import { cn } from "@/lib/utils";
 import { Menu } from "lucide-react";
 
+import { hasFeature } from "@/lib/subscription";
+
 type Props = {
   modules: any;
   dict: any;
   build: number;
+  subscriptionPlan: string;
 };
 
-const ModuleMenu = ({ modules, dict, build }: Props) => {
+const AnyMenu = Menu as any;
+
+const ModuleMenu = ({ modules, dict, build, subscriptionPlan }: Props) => {
   const [open, setOpen] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -63,7 +69,7 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
               } catch (_) { }
             }}
           >
-            <Menu className="w-5 h-5" />
+            <AnyMenu className="w-5 h-5" />
           </button>
 
           <img
@@ -76,17 +82,17 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
           <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
           {modules.find(
             (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "crm") ? (
             <CrmModuleMenu open={open} localizations={dict.ModuleMenu.crm} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "projects" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "projects") ? (
             <ProjectModuleMenu open={open} title={dict.ModuleMenu.projects} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "emails" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "emails") ? (
             <EmailsModuleMenu open={open} title={dict.ModuleMenu.emails} />
           ) : null}
           {/* {modules.find(
@@ -97,22 +103,22 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
           ) : null} */}
           {modules.find(
             (menuItem: any) => menuItem.name === "employee" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "employee") ? (
             <EmployeesModuleMenu open={open} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "invoice" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "invoices") ? (
             <InvoicesModuleMenu open={open} title={dict.ModuleMenu.invoices} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "reports" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "reports") ? (
             <ReportsModuleMenu open={open} title={dict.ModuleMenu.reports} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "documents" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "documents") ? (
             <DocumentsModuleMenu
               open={open}
               title={dict.ModuleMenu.documents}
@@ -120,15 +126,16 @@ const ModuleMenu = ({ modules, dict, build }: Props) => {
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "databox" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "databox") ? (
             <DataboxModuleMenu open={open} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "openai" && menuItem.enabled
-          ) ? (
+          ) && hasFeature(subscriptionPlan, "openai") ? (
             <ChatGPTModuleMenu open={open} />
           ) : null}
           <AdministrationMenu open={open} title={dict.ModuleMenu.settings} />
+          <PartnerMenu open={open} />
         </div>
       </div>
       <div

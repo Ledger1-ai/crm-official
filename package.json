@@ -1,6 +1,6 @@
 {
   "name": "nextcrm-app",
-  "version": "0.0.3-beta",
+  "version": "1.0.3n-beta",
   "private": true,
   "scripts": {
     "dev": "set NODE_OPTIONS=--no-deprecation && next dev",

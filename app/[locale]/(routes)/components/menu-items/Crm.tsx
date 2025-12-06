@@ -11,6 +11,13 @@ import { Coins } from "lucide-react";
 
 import { usePathname, useRouter } from "next/navigation";
 
+const AnyDropdownMenu = DropdownMenu as any;
+const AnyDropdownMenuTrigger = DropdownMenuTrigger as any;
+const AnyDropdownMenuContent = DropdownMenuContent as any;
+const AnyDropdownMenuItem = DropdownMenuItem as any;
+const AnyDropdownMenuSeparator = DropdownMenuSeparator as any;
+const AnyCoins = Coins as any;
+
 type Props = {
   open: boolean;
   localizations: any;
@@ -23,46 +30,46 @@ const CrmModuleMenu = ({ open, localizations }: Props) => {
 
   return (
     <div className="flex flex-row items-center mx-auto p-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger
+      <AnyDropdownMenu>
+        <AnyDropdownMenuTrigger
           className={`menu-item ${isPath ? "menu-item-active" : ""} w-full`}
         >
           <div className="flex items-center gap-2">
-            <Coins className="w-6 icon" />
+            <AnyCoins className="w-6 icon" />
             <span className={open ? "" : "hidden"}>{localizations.title}</span>
           </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[250px] ml-10 glass">
-          <DropdownMenuItem onClick={() => router.push("/crm/dashboard")}>
+        </AnyDropdownMenuTrigger>
+        <AnyDropdownMenuContent className="w-[250px] ml-10">
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/dashboard")}>
             Dashboard
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/dashboard/user")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/dashboard/user")}>
             My Dashboard
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm")}>
             Overview
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/crm/accounts")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuSeparator />
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/accounts")}>
             {localizations.accounts}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/contacts")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/contacts")}>
             {localizations.contacts}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/leads")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/leads")}>
             Leads Manager
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/dialer")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/dialer")}>
             Dialer
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/opportunities")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/opportunities")}>
             {localizations.opportunities}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/crm/contracts")}>
+          </AnyDropdownMenuItem>
+          <AnyDropdownMenuItem onClick={() => router.push("/crm/contracts")}>
             {localizations.contracts}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </AnyDropdownMenuItem>
+        </AnyDropdownMenuContent>
+      </AnyDropdownMenu>
     </div>
   );
 };
