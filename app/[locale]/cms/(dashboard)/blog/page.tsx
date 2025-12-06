@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Loader2, Plus, Trash, Edit, Save, X, Sparkles } from "lucide-react";
 import { MarkdownEditor } from "../_components/MarkdownEditor";
 import { generateBlogPost } from "@/actions/cms/generate-blog-post";
+import { reviseContent } from "@/actions/cms/revise-content";
+import { AiAssistantModal } from "@/components/cms/AiAssistantModal";
 
 interface BlogPost {
     id: string;
@@ -27,7 +29,7 @@ export default function BlogAdminPage() {
     // AI Generation State
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAiPrompt, setShowAiPrompt] = useState(false);
-    const [aiTopic, setAiTopic] = useState("");
+    const [aiMode, setAiMode] = useState<"create" | "revise">("create");
 
     useEffect(() => {
         fetchPosts();
@@ -85,15 +87,10 @@ export default function BlogAdminPage() {
         }
     };
 
-    const handleAiGenerate = async () => {
-        if (!aiTopic.trim()) {
-            toast.error("Please enter a topic");
-            return;
-        }
-
+    const handleAiGenerate = async (topic: string) => {
         try {
             setIsGenerating(true);
-            const generatedData = await generateBlogPost(aiTopic);
+            const generatedData = await generateBlogPost(topic);
 
             setEditingPost(prev => ({
                 ...prev,
@@ -106,13 +103,42 @@ export default function BlogAdminPage() {
 
             toast.success("Blog post generated successfully!");
             setShowAiPrompt(false);
-            setAiTopic("");
         } catch (error) {
             console.error(error);
-            toast.error("Failed to generate blog post. Please check your Azure OpenAI configuration.");
+            toast.error("Failed to generate blog post.");
         } finally {
             setIsGenerating(false);
         }
+    };
+
+    const handleAiRevise = async (instruction: string) => {
+        if (!editingPost?.content) {
+            toast.error("No content to revise");
+            return;
+        }
+
+        try {
+            setIsGenerating(true);
+            const revisedContent = await reviseContent(editingPost.content, instruction, "blog");
+
+            setEditingPost(prev => ({
+                ...prev,
+                content: revisedContent
+            }));
+
+            toast.success("Content revised successfully!");
+            setShowAiPrompt(false);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to revise content.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const openAiModal = (mode: "create" | "revise") => {
+        setAiMode(mode);
+        setShowAiPrompt(true);
     };
 
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>;
@@ -120,78 +146,31 @@ export default function BlogAdminPage() {
     if (editingPost) {
         return (
             <div className="p-8 max-w-5xl mx-auto space-y-6 relative">
-                {/* AI Prompt Modal */}
-                {showAiPrompt && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
-                        <div className="bg-[#0F0F1A] border border-blue-500/20 p-8 rounded-2xl w-full max-w-lg shadow-2xl shadow-blue-500/10 relative overflow-hidden">
-                            {/* Background Glow */}
-                            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-                            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-
-                            {/* Content */}
-                            <div className="relative z-10">
-                                <h3 className="text-xl font-bold mb-2 flex items-center gap-3 text-white">
-                                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                                        <Sparkles className="h-5 w-5 text-blue-400" />
-                                    </div>
-                                    AI Content Generator
-                                </h3>
-                                <p className="text-slate-400 mb-6 leading-relaxed">
-                                    Transform your ideas into a complete blog post. Enter a topic below and let our AI handle the writing, formatting, and SEO.
-                                </p>
-
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5 block">Topic or Concept</label>
-                                        <input
-                                            autoFocus
-                                            className="w-full p-4 bg-slate-900/50 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none transition-all"
-                                            placeholder="e.g. The impact of AI agents on modern sales workflows..."
-                                            value={aiTopic}
-                                            onChange={(e) => setAiTopic(e.target.value)}
-                                            onKeyDown={(e) => e.key === "Enter" && handleAiGenerate()}
-                                        />
-                                    </div>
-
-                                    <div className="flex justify-end gap-3 pt-2">
-                                        <button
-                                            onClick={() => setShowAiPrompt(false)}
-                                            className="px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            onClick={handleAiGenerate}
-                                            disabled={isGenerating}
-                                            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-sm font-medium flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {isGenerating ? (
-                                                <>
-                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                    Generating...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Sparkles className="h-4 w-4" />
-                                                    Generate Post
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* AI Assistant Modal */}
+                <AiAssistantModal
+                    isOpen={showAiPrompt}
+                    onClose={() => setShowAiPrompt(false)}
+                    mode={aiMode}
+                    type="blog"
+                    isGenerating={isGenerating}
+                    onGenerate={handleAiGenerate}
+                    onRevise={handleAiRevise}
+                />
 
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">{editingPost.id ? "Edit Post" : "New Post"}</h1>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => setShowAiPrompt(true)}
+                            onClick={() => openAiModal("create")}
                             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center gap-2 mr-2"
                         >
-                            <Sparkles className="h-4 w-4" /> Generate with AI
+                            <Sparkles className="h-4 w-4" /> Create with AI
+                        </button>
+                        <button
+                            onClick={() => openAiModal("revise")}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-2 mr-2"
+                        >
+                            <Sparkles className="h-4 w-4" /> Revise with AI
                         </button>
                         <button onClick={() => setEditingPost(null)} className="px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-slate-800">Cancel</button>
                         <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2">
@@ -212,7 +191,7 @@ export default function BlogAdminPage() {
                             </p>
                         </div>
                         <button
-                            onClick={() => setShowAiPrompt(true)}
+                            onClick={() => openAiModal("create")}
                             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors"
                         >
                             Generate Draft

@@ -13,6 +13,9 @@ import axios from "axios";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Sparkles } from "lucide-react";
+import { generateDocPost } from "@/actions/cms/generate-doc-post";
+import { reviseContent } from "@/actions/cms/revise-content";
+import { AiAssistantModal } from "@/components/cms/AiAssistantModal";
 
 export default function DocEditorPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id } = use(params);
@@ -31,6 +34,64 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
         content: "",
         resources: [] as { label: string, url: string }[],
     });
+
+    // AI Generation State
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [showAiPrompt, setShowAiPrompt] = useState(false);
+    const [aiMode, setAiMode] = useState<"create" | "revise">("create");
+
+    const handleAiGenerate = async (topic: string) => {
+        try {
+            setIsGenerating(true);
+            const generatedData = await generateDocPost(topic);
+
+            setFormData(prev => ({
+                ...prev,
+                title: generatedData.title,
+                slug: generatedData.slug,
+                category: generatedData.category || prev.category,
+                content: generatedData.content,
+            }));
+
+            toast.success("Documentation generated successfully!");
+            setShowAiPrompt(false);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to generate documentation.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleAiRevise = async (instruction: string) => {
+        if (!formData.content) {
+            toast.error("No content to revise");
+            return;
+        }
+
+        try {
+            setIsGenerating(true);
+            const revisedContent = await reviseContent(formData.content, instruction, "docs");
+
+            setFormData(prev => ({
+                ...prev,
+                content: revisedContent
+            }));
+
+            toast.success("Content revised successfully!");
+            setShowAiPrompt(false);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to revise content.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const openAiModal = (mode: "create" | "revise") => {
+        setAiMode(mode);
+        setShowAiPrompt(true);
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -100,7 +161,18 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col h-full bg-background/50 backdrop-blur-sm">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full bg-background/50 backdrop-blur-sm relative">
+            {/* AI Prompt Modal */}
+            <AiAssistantModal
+                isOpen={showAiPrompt}
+                onClose={() => setShowAiPrompt(false)}
+                mode={aiMode}
+                type="docs"
+                isGenerating={isGenerating}
+                onGenerate={handleAiGenerate}
+                onRevise={handleAiRevise}
+            />
+
             {/* Toolbar Header */}
             <div className="h-16 border-b px-6 flex items-center justify-between bg-card/50 sticky top-0 z-10 backdrop-blur-md">
                 <div className="flex items-center gap-4">
@@ -119,9 +191,14 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                         </Button>
                     )}
                     <Separator orientation="vertical" className="h-6 mx-2" />
-                    <Button type="button" variant="outline" className="border-indigo-500/50 text-indigo-400 hover:bg-indigo-500/10 hover:text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)]" onClick={() => toast("AI Co-pilot: Suggesting content structure...")}>
+                    <Button type="button" variant="outline" className="border-indigo-500/50 text-indigo-400 hover:bg-indigo-500/10 hover:text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.2)]" onClick={() => openAiModal("create")}>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        AI Assist
+                        AI Create
+                    </Button>
+                    <Separator orientation="vertical" className="h-6 mx-2" />
+                    <Button type="button" variant="outline" className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.2)]" onClick={() => openAiModal("revise")}>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        AI Revise
                     </Button>
                     <Separator orientation="vertical" className="h-6 mx-2" />
                     <Button
