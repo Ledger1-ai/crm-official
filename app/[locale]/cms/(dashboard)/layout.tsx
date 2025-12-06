@@ -63,7 +63,7 @@ export default async function AdminDashboardLayout({
                             <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
                         </div>
                     </div>
-                    <SignOutButton callbackUrl={`/${locale}/cms`} />
+                    <SignOutButton callbackUrl={`/${locale}/cms/login`} />
                 </div>
             </aside>
 

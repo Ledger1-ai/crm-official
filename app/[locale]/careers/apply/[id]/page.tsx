@@ -1,5 +1,5 @@
-import MarketingHeader from "@/components/MarketingHeader";
-import MarketingFooter from "@/components/MarketingFooter";
+import MarketingHeader from "@/app/[locale]/components/MarketingHeader";
+import MarketingFooter from "@/app/[locale]/components/MarketingFooter";
 import { prismadb } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ApplicationForm } from "./_components/ApplicationForm"; // Client form

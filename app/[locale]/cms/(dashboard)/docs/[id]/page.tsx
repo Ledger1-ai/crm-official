@@ -14,8 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Sparkles } from "lucide-react";
 import { generateDocPost } from "@/actions/cms/generate-doc-post";
-import { reviseContent } from "@/actions/cms/revise-content";
+import { enhanceContent } from "@/actions/cms/enhance-content";
+import { deleteCategory } from "@/actions/cms/delete-category";
 import { AiAssistantModal } from "@/components/cms/AiAssistantModal";
+import { AiRevisionPreviewModal } from "@/components/cms/AiRevisionPreviewModal";
+import { CustomMarkdownRenderer } from "@/components/ui/custom-markdown-renderer";
 
 export default function DocEditorPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id } = use(params);
@@ -39,6 +42,7 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAiPrompt, setShowAiPrompt] = useState(false);
     const [aiMode, setAiMode] = useState<"create" | "revise">("create");
+    const [pendingRevision, setPendingRevision] = useState<any>(null);
 
     const handleAiGenerate = async (topic: string) => {
         try {
@@ -71,14 +75,14 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
 
         try {
             setIsGenerating(true);
-            const revisedContent = await reviseContent(formData.content, instruction, "docs");
+            const updates = await enhanceContent({
+                title: formData.title,
+                content: formData.content,
+                category: formData.category,
+                type: "docs"
+            }, instruction);
 
-            setFormData(prev => ({
-                ...prev,
-                content: revisedContent
-            }));
-
-            toast.success("Content revised successfully!");
+            setPendingRevision(updates);
             setShowAiPrompt(false);
         } catch (error) {
             console.error(error);
@@ -86,6 +90,17 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
         } finally {
             setIsGenerating(false);
         }
+    };
+
+    const handleAcceptRevision = (finalData: any) => {
+        setFormData(prev => ({
+            ...prev,
+            title: finalData.title || prev.title,
+            content: finalData.content || prev.content,
+            category: finalData.category || prev.category
+        }));
+        setPendingRevision(null);
+        toast.success("Changes applied successfully!");
     };
 
     const openAiModal = (mode: "create" | "revise") => {
@@ -103,6 +118,13 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                 if (id !== "new") {
                     const docResponse = await axios.get(`/api/docs/${id}`);
                     const data = docResponse.data;
+
+                    if (!data) {
+                        toast.error("Article not found");
+                        router.push("/cms/docs");
+                        return;
+                    }
+
                     // Ensure resources is initialized
                     if (!data.resources) data.resources = [];
                     setFormData(data);
@@ -156,6 +178,23 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
         }
     };
 
+    const handleDeleteCategory = async () => {
+        if (!formData.category) return;
+        if (!confirm(`DANGER: Are you sure you want to delete the ENTIRE category "${formData.category}" and ALL articles inside it? This cannot be undone.`)) return;
+
+        setLoading(true);
+        try {
+            const result = await deleteCategory(formData.category);
+            toast.success(`Category deleted. Removed ${result.count} articles.`);
+            router.push("/cms/docs");
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to delete category");
+            setLoading(false);
+        }
+    };
+
     if (fetching) {
         return <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
     }
@@ -171,6 +210,19 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                 isGenerating={isGenerating}
                 onGenerate={handleAiGenerate}
                 onRevise={handleAiRevise}
+            />
+
+            {/* AI Revision Preview Modal */}
+            <AiRevisionPreviewModal
+                isOpen={!!pendingRevision}
+                onClose={() => setPendingRevision(null)}
+                onAccept={handleAcceptRevision}
+                originalData={{
+                    title: formData.title,
+                    content: formData.content,
+                    category: formData.category
+                }}
+                newData={pendingRevision || {}}
             />
 
             {/* Toolbar Header */}
@@ -235,11 +287,14 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                             />
                         </TabsContent>
                         <TabsContent value="preview" className="flex-1 min-h-0 mt-0 overflow-y-auto p-8 prose prose-sm dark:prose-invert max-w-none">
-                            {/* Simple preview logic, ideally reuse a component */}
-                            <div className="text-muted-foreground text-center mt-20">
-                                <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                Preview content would render here.
-                            </div>
+                            {formData.content ? (
+                                <CustomMarkdownRenderer content={formData.content} />
+                            ) : (
+                                <div className="text-muted-foreground text-center mt-20">
+                                    <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                    Preview content would render here.
+                                </div>
+                            )}
                         </TabsContent>
                     </Tabs>
                 </div>
@@ -266,7 +321,19 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                                     <option key={cat} value={cat} />
                                 ))}
                             </datalist>
-                            <p className="text-[10px] text-muted-foreground">Type to create a new category.</p>
+                            <div className="flex justify-between items-center">
+                                <p className="text-[10px] text-muted-foreground">Type to create a new category.</p>
+                                {formData.category && existingCategories.includes(formData.category) && (
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteCategory}
+                                        className="text-[10px] text-red-500 hover:text-red-400 hover:underline flex items-center gap-1"
+                                    >
+                                        <Trash className="h-3 w-3" />
+                                        Delete Category
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <div className="space-y-3">
@@ -390,10 +457,12 @@ export default function DocEditorPage({ params }: { params: Promise<{ id: string
                     <Separator />
 
                     <div className="pt-2">
-                        <Link href={`/docs/${formData.slug}`} target="_blank" className="text-xs flex items-center gap-2 text-blue-500 hover:underline">
-                            <ExternalLink className="h-3 w-3" />
-                            View on live site
-                        </Link>
+                        {formData.slug && (
+                            <Link href={`/docs/${formData.slug}`} target="_blank" className="text-xs flex items-center gap-2 text-blue-500 hover:underline">
+                                <ExternalLink className="h-3 w-3" />
+                                View on live site
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

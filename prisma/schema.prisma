@@ -1182,3 +1182,15 @@ model SystemActivity {
 
   user      Users    @relation(name: "UserSystemActivities", fields: [userId], references: [id])
 }
+
+
+
+model PageView {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  path      String
+  userAgent String?
+  ipHash    String?
+  city      String?
+  country   String?
+  createdAt DateTime @default(now()) @db.Date
+}

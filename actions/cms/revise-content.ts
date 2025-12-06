@@ -55,7 +55,7 @@ export async function reviseContent(
                 { role: "system", content: "You are a helpful AI editor." },
                 { role: "user", content: prompt },
             ],
-            temperature: 0.7, // Lower temperature for revision to stick closer to intent
+            temperature: 1, // Lower temperature for revision to stick closer to intent
         });
 
         const revisedContent = response.choices[0].message.content;

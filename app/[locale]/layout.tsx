@@ -11,6 +11,9 @@ import { setRequestLocale } from "next-intl/server";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import { ToastProvider } from "@/app/providers/ToastProvider";
+import NextTopLoader from "nextjs-toploader";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,23 +33,23 @@ async function getLocales(locale: string) {
 function getSafeBaseUrl(): string {
   const envUrl = process.env.NEXT_PUBLIC_APP_URL;
   const PRODUCTION_FALLBACK = "https://crm.ledger1.ai";
-  
+
   if (!envUrl || envUrl.trim() === "") {
     return PRODUCTION_FALLBACK;
   }
-  
+
   const trimmed = envUrl.trim();
-  
+
   // Skip localhost URLs in production
   if (/^https?:\/\/(localhost|127\.0\.0\.1)/i.test(trimmed)) {
     return PRODUCTION_FALLBACK;
   }
-  
+
   // Ensure URL has protocol
   if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
     return `https://${trimmed}`;
   }
-  
+
   return trimmed;
 }
 
@@ -119,10 +122,10 @@ export default async function RootLayout(props: Props) {
   const params = await props.params;
   const { locale } = params;
   const { children } = props;
-  
+
   // Enable static rendering
   setRequestLocale(locale);
-  
+
   const messages = await getLocales(locale);
 
   return (
@@ -134,9 +137,12 @@ export default async function RootLayout(props: Props) {
         />
       </head>
       <body className={inter.className + " min-h-screen"}>
+        <NextTopLoader color="#2563EB" showSpinner={false} />
+        <AnalyticsTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            <ToastProvider />
           </ThemeProvider>
         </NextIntlClientProvider>
         <Toaster />

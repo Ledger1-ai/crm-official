@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getRecentActivities } from "@/actions/audit";
-import { Loader2, History, User, Activity as ActivityIcon } from "lucide-react";
+import { Loader2, History, User, Activity as ActivityIcon, Download } from "lucide-react";
 import {
     Card,
     CardContent,
@@ -81,14 +81,23 @@ export default function Changelog() {
 
     return (
         <Card className="h-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm rounded-xl flex flex-col overflow-hidden">
-            <div className="flex items-center gap-3 p-6 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 bg-gray-50/50 dark:bg-slate-900/50">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <ActivityIcon className="h-5 w-5 text-white" />
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-800 flex-shrink-0 bg-gray-50/50 dark:bg-slate-900/50">
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <ActivityIcon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">Activity Log</h2>
+                        <p className="text-xs text-gray-500 font-medium">Last 14 Days</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">Activity Log</h2>
-                    <p className="text-xs text-gray-500 font-medium">Recent system changes</p>
-                </div>
+                <button
+                    onClick={() => window.open('/api/cms/activity/export', '_blank')}
+                    className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    title="Export to CSV"
+                >
+                    <Download className="h-4 w-4" />
+                </button>
             </div>
 
             <ScrollArea className="flex-1 bg-white dark:bg-slate-900">

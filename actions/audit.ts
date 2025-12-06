@@ -39,9 +39,17 @@ export async function logActivity(
     }
 }
 
-export async function getRecentActivities(limit = 10) {
+export async function getRecentActivities(limit = 50) {
     try {
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
         const activities = await prismadb.systemActivity.findMany({
+            where: {
+                createdAt: {
+                    gte: twoWeeksAgo
+                }
+            },
             take: limit,
             orderBy: {
                 createdAt: "desc",

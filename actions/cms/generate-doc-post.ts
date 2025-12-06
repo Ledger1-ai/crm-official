@@ -36,9 +36,12 @@ export async function generateDocPost(topic: string) {
         -   Technical, precise, and objective.
         -   Use "You" to address the user.
         -   Avoid marketing fluff.
-    3.  **Formatting**:
-        -   Use **bold** for UI elements (buttons, field names).
-        -   Use code blocks for commands or code snippets.
+    3.  **Formatting (Github Flavored Markdown)**:
+        -   Use **bold** for UI elements, buttons, and key terms.
+        -   Use \`code blocks\` with language syntax highlighting (e.g. \`\`\`bash) for commands.
+        -   Use > blockquotes for tips, notes, or warnings.
+        -   Use proper H2 (##) and H3 (###) hierarchy. No H1 in content.
+        -   Use nice readable spacing between sections.
     
     **IMPORTANT**: Return ONLY the raw JSON string. Do not wrap it in markdown code blocks or any other formatting.
   `;
