@@ -1,10 +1,11 @@
 "use client";
 
-import { FileText, Briefcase, BookOpen, Globe, Share2, Users, ArrowRight, Zap, Activity, Radio } from "lucide-react";
+import { FileText, Briefcase, BookOpen, Globe, Share2, Users, ArrowRight, Zap, Activity, Radio, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ActiveUsersModal } from "@/components/cms/ActiveUsersModal";
 import { SystemStatusModal } from "@/components/cms/SystemStatusModal";
+import { SupportInboxModal } from "@/components/cms/SupportInboxModal";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -81,6 +82,16 @@ const items = [
         iconColor: "text-slate-400",
         type: "link"
     },
+    {
+        title: "Support Inbox",
+        description: "Customer messages",
+        action: "support_inbox",
+        icon: Mail,
+        gradient: "from-indigo-500/20 via-indigo-500/5 to-transparent border-indigo-500/20 hover:border-indigo-500/50",
+        iconColor: "text-indigo-400",
+        type: "modal",
+        badge: "New"
+    }
 ];
 
 export default function DashboardGrid() {
@@ -149,6 +160,11 @@ export default function DashboardGrid() {
 
             <SystemStatusModal
                 isOpen={activeModal === "system_status"}
+                onClose={() => setActiveModal(null)}
+            />
+
+            <SupportInboxModal
+                isOpen={activeModal === "support_inbox"}
                 onClose={() => setActiveModal(null)}
             />
         </>

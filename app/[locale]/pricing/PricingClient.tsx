@@ -265,7 +265,35 @@ export default function PricingClient() {
                             </p>
                         </div>
 
-                        <form className="space-y-6 max-w-2xl mx-auto">
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
+                                const form = e.target as HTMLFormElement;
+                                const formData = new FormData(form);
+
+                                try {
+                                    const res = await fetch('/api/support/create', {
+                                        method: 'POST',
+                                        body: JSON.stringify({
+                                            name: formData.get('name'),
+                                            email: formData.get('email'),
+                                            message: formData.get('message'),
+                                            company: formData.get('company'),
+                                            subject: "Pricing Inquiry",
+                                            source: "PRICING"
+                                        })
+                                    });
+
+                                    if (res.ok) {
+                                        alert("Message sent! We'll be in touch.");
+                                        form.reset();
+                                    }
+                                } catch (err) {
+                                    alert("Failed to send message.");
+                                }
+                            }}
+                            className="space-y-6 max-w-2xl mx-auto"
+                        >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">

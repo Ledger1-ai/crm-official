@@ -1172,6 +1172,19 @@ model SocialSettings {
   updatedAt         DateTime @updatedAt
 }
 
+model SupportTicket {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  source    String   // "PRICING", "SUPPORT"
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String   @default("NEW") // "NEW", "JIRA_CREATED", "ARCHIVED"
+  jiraTicketId String?
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+}
+
 model SystemActivity {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
