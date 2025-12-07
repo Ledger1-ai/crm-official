@@ -9,14 +9,16 @@ import { getCurrentUserTeamId } from "@/lib/team-utils";
 export const getContractsWithIncludes = async () => {
   const session = await getServerSession(authOptions);
   const teamInfo = await getCurrentUserTeamId();
-  const teamId = teamInfo?.teamId;
 
-  if (!session || !teamId) return [];
+  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return [];
+
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   const data = await (prismadb.crm_Contracts as any).findMany({
-    where: {
-      team_id: teamId,
-    },
+    where: whereClause,
     include: {
       assigned_to_user: {
         select: {
@@ -39,15 +41,19 @@ export const getContractsWithIncludes = async () => {
 export const getContractsByAccountId = async (accountId: string) => {
   const session = await getServerSession(authOptions);
   const teamInfo = await getCurrentUserTeamId();
-  const teamId = teamInfo?.teamId;
 
-  if (!session || !teamId) return [];
+  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return [];
+
+  const whereClause: any = {
+    account: accountId
+  };
+
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   const data = await (prismadb.crm_Contracts as any).findMany({
-    where: {
-      account: accountId, // Validation that account belongs to team should ideally be done or we rely on contract's team_id if we added it.
-      team_id: teamId,
-    },
+    where: whereClause,
     include: {
       assigned_to_user: {
         select: {

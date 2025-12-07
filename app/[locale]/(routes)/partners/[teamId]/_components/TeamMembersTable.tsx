@@ -42,10 +42,13 @@ type Member = {
 
 type Props = {
     teamId: string;
+    teamSlug: string;
     members: Member[];
+    isSuperAdmin?: boolean;
 };
 
-const TeamMembersTable = ({ teamId, members }: Props) => {
+const TeamMembersTable = ({ teamId, teamSlug, members, isSuperAdmin }: Props) => {
+    // ... existing hook logic ... 
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -263,7 +266,7 @@ const TeamMembersTable = ({ teamId, members }: Props) => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
-                                <Badge variant={member.team_role === "OWNER" ? "default" : member.team_role === "ADMIN" ? "secondary" : "outline"}>
+                                <Badge variant={member.team_role === "SUPER_ADMIN" ? "destructive" : member.team_role === "OWNER" ? "default" : member.team_role === "ADMIN" ? "secondary" : "outline"}>
                                     {member.team_role || "MEMBER"}
                                 </Badge>
                                 <DropdownMenu>
@@ -280,6 +283,14 @@ const TeamMembersTable = ({ teamId, members }: Props) => {
                                         <DropdownMenuItem onClick={() => handleRoleUpdate(member.id, "MEMBER")}>
                                             <User className="w-4 h-4 mr-2" /> Make Member
                                         </DropdownMenuItem>
+
+                                        {/* Super Admin Option - Only if internal team and authorized */}
+                                        {teamSlug === "ledger1" && isSuperAdmin && (
+                                            <DropdownMenuItem onClick={() => handleRoleUpdate(member.id, "SUPER_ADMIN")} className="text-red-500 font-bold bg-red-50 focus:bg-red-100 mt-1">
+                                                <Shield className="w-4 h-4 mr-2" /> Make Super Admin
+                                            </DropdownMenuItem>
+                                        )}
+
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem className="text-red-600" onClick={() => handleRemove(member.id)}>
                                             <Trash className="w-4 h-4 mr-2" /> Remove from Team

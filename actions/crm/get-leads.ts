@@ -19,16 +19,16 @@ export const getLeads = async () => {
   // Admins see all leads, regular users see only their assigned leads
   const teamInfo = await getCurrentUserTeamId();
 
-  // If no team, return empty (or handle as special case)
-  if (!teamInfo?.teamId) {
-    // If system admin but no team, maybe return all? For now, strict isolation: separate teams.
-    // But migration put everyone in 'ledger1'.
+  // If no team and not global admin, return empty
+  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) {
     return [];
   }
 
-  const whereClause: any = {
-    team_id: teamInfo.teamId
-  };
+  const whereClause: any = {};
+
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   // If not admin/account_admin, restrict to assigned_to within the team
   if (!user?.is_admin && !user?.is_account_admin) {

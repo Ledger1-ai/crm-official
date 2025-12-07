@@ -72,14 +72,14 @@ export const columns: ColumnDef<AdminUser>[] = [
     enableSorting: true,
     enableHiding: true,
   },
-  {
-    accessorKey: "is_admin",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Admin" />
-    ),
 
+  {
+    accessorKey: "team_role",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Team Role" />
+    ),
     cell: ({ row }) => (
-      <div className="">{row.original.is_admin ? "Enable" : "Disable"}</div>
+      <div className="">{row.getValue("team_role") || "MEMBER"}</div>
     ),
     enableSorting: true,
     enableHiding: true,
@@ -102,6 +102,7 @@ export const columns: ColumnDef<AdminUser>[] = [
       return (
         <div className="flex items-center">
           {status.icon && (
+            // @ts-ignore
             <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
           )}
           <span>{status.label}</span>

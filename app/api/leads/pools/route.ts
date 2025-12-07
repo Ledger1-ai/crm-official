@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadbCrm } from "@/lib/prisma-crm";
 import { prismadb } from "@/lib/prisma";
+import { getCurrentUserTeamId } from "@/lib/team-utils";
 
 /**
  * GET /api/leads/pools
@@ -17,16 +18,25 @@ export async function GET() {
   }
 
   try {
-    // Check if user is admin (primary DB flags)
-    const me = await prismadb.users.findUnique({
-      where: { id: session.user.id },
-      select: { is_admin: true, is_account_admin: true },
-    });
-    const isAdmin = !!(me?.is_admin || me?.is_account_admin);
+    const teamInfo = await getCurrentUserTeamId();
 
-    // Admins see all pools, regular users see only their own
+    // Super Admin sees all pools
+    const isGlobalAdmin = teamInfo?.isGlobalAdmin;
+
+    // Team Members see pools assigned to their team
+    const teamId = teamInfo?.teamId;
+
+    if (!teamId && !isGlobalAdmin) {
+      return NextResponse.json({ pools: [] }, { status: 200 });
+    }
+
+    const whereClause: any = {};
+    if (!isGlobalAdmin) {
+      whereClause.team_id = teamId;
+    }
+
     const pools = await (prismadbCrm as any).crm_Lead_Pools.findMany({
-      where: isAdmin ? {} : { user: session.user.id },
+      where: whereClause,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -135,22 +145,26 @@ export async function DELETE(req: Request) {
     // Verify ownership or admin
     const pool = await (prismadbCrm as any).crm_Lead_Pools.findUnique({
       where: { id: poolId },
-      select: { user: true }
+      select: { user: true, team_id: true }
     });
 
     if (!pool) {
       return new NextResponse("Pool not found", { status: 404 });
     }
 
-    // Check if user is admin (primary DB flags)
-    const me = await prismadb.users.findUnique({
-      where: { id: session.user.id },
-      select: { is_admin: true, is_account_admin: true },
-    });
-    const isAdmin = !!(me?.is_admin || me?.is_account_admin);
+    const teamInfo = await getCurrentUserTeamId();
+    const isGlobalAdmin = teamInfo?.isGlobalAdmin;
+    const isTeamAdmin = teamInfo?.isAdmin; // Team Admin/Owner
+    const myTeamId = teamInfo?.teamId;
 
-    // Allow if owner or admin
-    if (pool.user !== session.user.id && !isAdmin) {
+    // Allow if:
+    // 1. Global Admin
+    // 2. Creator (pool.user === me)
+    // 3. Team Admin AND pool belongs to my team
+    const isCreator = pool.user === session.user.id;
+    const isTeamPool = pool.team_id === myTeamId;
+
+    if (!isGlobalAdmin && !isCreator && (!isTeamAdmin || !isTeamPool)) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 

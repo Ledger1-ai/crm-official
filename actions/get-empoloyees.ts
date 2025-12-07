@@ -7,14 +7,15 @@ import { getCurrentUserTeamId } from "@/lib/team-utils";
 export const getEmployees = async () => {
   const session = await getServerSession(authOptions);
   const teamInfo = await getCurrentUserTeamId();
-  const teamId = teamInfo?.teamId;
+  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return [];
 
-  if (!session || !teamId) return [];
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   const data = await (prismadb.employees as any).findMany({
-    where: {
-      team_id: teamId,
-    },
+    where: whereClause,
   });
   return data;
 };

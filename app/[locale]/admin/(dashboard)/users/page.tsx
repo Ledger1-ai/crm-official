@@ -11,19 +11,25 @@ import { columns } from "@/app/[locale]/cms/(dashboard)/users/table-components/c
 import { Users } from "@prisma/client";
 import SendMailToAll from "@/app/[locale]/cms/(dashboard)/users/components/send-mail-to-all";
 
+import { getCurrentUserTeamId } from "@/lib/team-utils";
+
 const AdminUsersPage = async () => {
     const users: Users[] = await getUsers();
-
     const session = await getServerSession(authOptions);
+    const teamInfo = await getCurrentUserTeamId();
 
-    if (!session?.user?.isAdmin) {
+    // Allow access if Global Admin OR Team Admin
+    const isGlobalAdmin = session?.user?.isAdmin;
+    const isTeamAdmin = teamInfo?.teamRole === "ADMIN" || teamInfo?.teamRole === "OWNER";
+
+    if (!isGlobalAdmin && !isTeamAdmin) {
         return (
             <Container
                 title="Administration"
-                description="You are not admin, access not allowed"
+                description="You are not authorized to view this page."
             >
                 <div className="flex w-full h-full items-center justify-center">
-                    Access not allowed
+                    Access not allowed. You must be a Team Admin or Global Admin.
                 </div>
             </Container>
         );

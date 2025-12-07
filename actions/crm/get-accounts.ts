@@ -8,10 +8,15 @@ export const getAccounts = async () => {
   if (!session?.user?.id) return [];
 
   const teamInfo = await getCurrentUserTeamId();
-  if (!teamInfo?.teamId) return [];
+  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) return [];
+
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   const data = await (prismadb.crm_Accounts as any).findMany({
-    where: { team_id: teamInfo.teamId },
+    where: whereClause,
     include: {
       assigned_to_user: {
         select: {

@@ -1,8 +1,24 @@
 import { prismadb } from "@/lib/prisma";
+import { getCurrentUserTeamId } from "@/lib/team-utils";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-//Get all users  for admin module
+//Get all users for admin module (Scoped to Team)
 export const getUsers = async () => {
-  const data = await prismadb.users.findMany({
+  const session = await getServerSession(authOptions);
+  const teamInfo = await getCurrentUserTeamId();
+  const teamId = teamInfo?.teamId;
+
+  // If super admin, maybe allow seeing all? 
+  // But user request specifically asked for "users listed on your team".
+  // So strictly filtering by team seems correct for this context.
+
+  if (!teamId) return [];
+
+  const data = await (prismadb.users as any).findMany({
+    where: {
+      team_id: teamId,
+    },
     orderBy: {
       created_on: "desc",
     },

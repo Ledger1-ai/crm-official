@@ -11,6 +11,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 
+import { getCurrentUserTeamId } from "@/lib/team-utils";
 import { getTeam } from "@/actions/teams/get-team";
 import TeamSettingsForm from "./_components/TeamSettingsForm";
 import TeamMembersTable from "./_components/TeamMembersTable";
@@ -18,6 +19,7 @@ import TeamMembersTable from "./_components/TeamMembersTable";
 const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }> }) => {
     const resolvedParams = await params;
     const team = await getTeam(resolvedParams.teamId);
+    const currentUserInfo = await getCurrentUserTeamId();
 
     if (!team) {
         return notFound();
@@ -43,7 +45,12 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
                     <TeamSettingsForm team={team} />
                 </TabsContent>
                 <TabsContent value="members" className="space-y-4">
-                    <TeamMembersTable teamId={team.id} members={team.members as any} />
+                    <TeamMembersTable
+                        teamId={team.id}
+                        teamSlug={team.slug}
+                        members={team.members as any}
+                        isSuperAdmin={currentUserInfo?.isGlobalAdmin}
+                    />
                 </TabsContent>
             </Tabs>
         </div>

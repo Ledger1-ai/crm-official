@@ -1,16 +1,51 @@
 import { prismadb } from "@/lib/prisma";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getCurrentUserTeamId } from "@/lib/team-utils";
+
 export const getAllCrmData = async () => {
+  const session = await getServerSession(authOptions);
+  const teamInfo = await getCurrentUserTeamId();
+
+  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return { users: [], accounts: [], opportunities: [], leads: [], contacts: [], contracts: [], saleTypes: [], saleStages: [], campaigns: [], industries: [] };
+
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
+
+  // Users are special, maybe filter by team_id too?
+  // Previous logic for users was just Active. Now we should filter by Team?
+  // Prismadb.users has team_id.
+  const usersWhere = {
+    userStatus: "ACTIVE",
+    ...(teamInfo?.isGlobalAdmin ? {} : { team_id: teamInfo?.teamId })
+  };
+
   const users = await prismadb.users.findMany({
-    where: {
-      userStatus: "ACTIVE",
-    },
+    where: usersWhere,
   });
-  const accounts = await prismadb.crm_Accounts.findMany({});
-  const opportunities = await prismadb.crm_Opportunities.findMany({});
-  const leads = await prismadb.crm_Leads.findMany({});
-  const contacts = await prismadb.crm_Contacts.findMany({});
-  const contracts = await prismadb.crm_Contracts.findMany({});
+  const accounts = await (prismadb.crm_Accounts as any).findMany({ where: whereClause });
+  const opportunities = await prismadb.crm_Opportunities.findMany({
+    where: whereClause,
+    include: {
+      assigned_to_user: { select: { avatar: true, name: true } },
+    }
+  });
+  const leads = await prismadb.crm_Leads.findMany({ where: whereClause });
+  const contacts = await (prismadb.crm_Contacts as any).findMany({ where: whereClause });
+  const contracts = await (prismadb.crm_Contracts as any).findMany({ where: whereClause });
+
+  // Shared data might not have team_id?
+  // Sales Types, Stages, Campaigns, Industries...
+  // Check schema for these. 
+  // If they are global, keep empty where.
+  // Reviewing schema in previous turns... 
+  // I recall I did NOT add team_id to SalesTypes/Stages/Campaigns/Industries in the previous task. 
+  // I only did it for major entities.
+  // So keep them global/shared for now unless I find they have team_id.
+
   const saleTypes = await prismadb.crm_Opportunities_Type.findMany({});
   const saleStages = await prismadb.crm_Opportunities_Sales_Stages.findMany({});
   const campaigns = await prismadb.crm_campaigns.findMany({});

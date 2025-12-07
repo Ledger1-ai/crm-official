@@ -8,16 +8,15 @@ export const getBoards = async (userId: string) => {
   if (!session?.user?.id) return [];
 
   const teamInfo = await getCurrentUserTeamId();
-  if (!teamInfo?.teamId) return [];
+  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) return [];
+
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
 
   const data = await (prismadb.boards as any).findMany({
-    where: {
-      team_id: teamInfo.teamId,
-      // Keep visibility logic if needed, but within team scope?
-      // "Items ... stay with the team and is not visible by anyone else"
-      // So public boards should only be public WITHIN the team.
-      // So AND team_id.
-    },
+    where: whereClause,
     include: {
       assigned_user: {
         select: {

@@ -31,20 +31,6 @@ export function DataTableToolbar<TData>({
           className="h-8 w-[150px] lg:w-[250px]"
         />
 
-        {table.getColumn("userStatus") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("userStatus")}
-            title="Status"
-            options={statuses}
-          />
-        )}
-        {table.getColumn("is_admin") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("is_admin")}
-            title="Admin"
-            options={isAdmin}
-          />
-        )}
         {isFiltered && (
           <Button
             variant="ghost"
@@ -57,6 +43,6 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <DataTableViewOptions table={table} />
-    </div>
+    </div >
   );
 }

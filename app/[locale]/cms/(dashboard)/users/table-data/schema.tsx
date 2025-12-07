@@ -12,6 +12,7 @@ export const adminUserSchema = z.object({
   email: z.string(),
   userStatus: z.string().optional(),
   userLanguage: z.string().optional(),
+  team_role: z.string().nullable().optional(),
 });
 
 export type AdminUser = z.infer<typeof adminUserSchema>;

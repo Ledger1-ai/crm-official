@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getCurrentUserTeamId } from "@/lib/team-utils";
 import { redirect } from "next/navigation";
 import getAllCommits from "@/actions/github/get-repo-commits";
 
@@ -25,8 +26,10 @@ export default async function AdminDashboardLayout({
         return redirect(`/${locale}/admin/login`);
     }
 
-    // Check for admin status
-    if (!session?.user?.isAdmin) {
+    // Check for admin status (Global or Team Admin)
+    const teamInfo = await getCurrentUserTeamId();
+
+    if (!teamInfo?.isAdmin) {
         return redirect(`/${locale}/admin/login?error=unauthorized`);
     }
 
