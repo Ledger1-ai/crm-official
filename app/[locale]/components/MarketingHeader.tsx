@@ -73,7 +73,7 @@ export default function MarketingHeader() {
                                 Login
                             </Button>
                         </Link>
-                        <Link href="/dashboard">
+                        <Link href="/register">
                             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all rounded-full">
                                 Get Started
                             </Button>
@@ -111,7 +111,7 @@ export default function MarketingHeader() {
                                 Login
                             </Button>
                         </Link>
-                        <Link href="/dashboard" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/register" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
                             <Button className="w-full text-lg h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] rounded-full">
                                 Get Started
                             </Button>

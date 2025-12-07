@@ -16,7 +16,8 @@ export const getTeams = async () => {
                         email: true,
                         avatar: true
                     }
-                }
+                },
+                assigned_plan: true
             }
         });
 

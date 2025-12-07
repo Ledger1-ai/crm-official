@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import Container from "@/app/[locale]/(routes)/components/ui/Container";
 
 import { getTeams } from "@/actions/teams/get-teams";
+import { getPlans } from "@/actions/plans/plan-actions";
 import PartnersView from "./_components/PartnersView";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -30,7 +31,10 @@ const PartnersPage = async () => {
         return redirect("/");
     }
 
-    const teams = await getTeams();
+    const [teams, plans] = await Promise.all([
+        getTeams(),
+        getPlans()
+    ]);
 
     return (
         <Container
@@ -40,7 +44,7 @@ const PartnersPage = async () => {
             <div className="p-4">
                 {/* @ts-expect-error Server Component */}
                 <Suspense fallback={<div>Loading teams...</div>}>
-                    <PartnersView initialTeams={teams as any} />
+                    <PartnersView initialTeams={teams as any} availablePlans={plans as any} />
                 </Suspense>
             </div>
         </Container>

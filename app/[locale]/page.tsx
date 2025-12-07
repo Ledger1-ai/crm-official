@@ -115,7 +115,7 @@ export default function LandingPage() {
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
                                 </Link>
-                                <Link href="/dashboard">
+                                <Link href="/register">
                                     <Button variant="outline" size="lg" className="h-14 px-10 text-lg w-full sm:w-auto border-white/20 hover:bg-white/10 hover:text-white rounded-full backdrop-blur-sm">
                                         Get Started Free
                                     </Button>
@@ -355,7 +355,7 @@ export default function LandingPage() {
                                         Schedule a Demo
                                     </Button>
                                 </Link>
-                                <Link href="/dashboard">
+                                <Link href="/register">
                                     <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white/20 hover:bg-white/10 hover:text-white rounded-full backdrop-blur-sm">
                                         Start Free Trial
                                     </Button>

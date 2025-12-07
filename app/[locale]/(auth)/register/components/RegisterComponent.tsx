@@ -39,7 +39,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-export function RegisterComponent() {
+export function RegisterComponent({ availablePlans }: { availablePlans: any[] }) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -48,6 +48,8 @@ export function RegisterComponent() {
   const [show, setShow] = React.useState<boolean>(false);
 
   const formSchema = z.object({
+    companyName: z.string().min(2, "Company name is required").max(50),
+    planId: z.string().min(1, "Please select a plan"),
     name: z.string().min(3).max(50),
     username: z.string().min(3).max(50),
     email: z.string().email(),
@@ -61,6 +63,8 @@ export function RegisterComponent() {
   const form = useForm<BillboardFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      companyName: "",
+      planId: "",
       name: "",
       username: "",
       email: "",
@@ -144,14 +148,58 @@ export function RegisterComponent() {
           </div>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} suppressHydrationWarning={true}>
             <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company / Team Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Acme Inc."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="planId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subscription Plan</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a plan" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availablePlans.map((plan) => (
+                          <SelectItem key={plan.id} value={plan.id}>
+                            {plan.name} - {plan.price === 0 ? "Free" : `${plan.price} ${plan.currency}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}

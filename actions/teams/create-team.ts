@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-export const createTeam = async (name: string, slug: string) => {
+export const createTeam = async (name: string, slug: string, planId?: string) => {
     try {
         const session = await getServerSession(authOptions);
 
@@ -28,6 +28,7 @@ export const createTeam = async (name: string, slug: string) => {
             data: {
                 name,
                 slug,
+                plan_id: planId,
             },
         });
 

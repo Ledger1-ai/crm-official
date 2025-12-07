@@ -73,6 +73,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error("User not found. Please register first.");
         }
 
+        // Check if user is active
+        if (user.userStatus !== "ACTIVE") {
+          throw new Error("Your account is pending approval. Please contact support.");
+        }
+
         if (!user?.password) {
           throw new Error(
             "Account exists but no password is set. Sign in with Google/GitHub or use 'Forgot password' to set one."

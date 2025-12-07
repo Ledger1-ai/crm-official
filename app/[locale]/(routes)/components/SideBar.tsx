@@ -15,7 +15,11 @@ const SideBar = async ({ build }: { build: number }) => {
     getModules(),
     (prismadb.users as any).findUnique({
       where: { id: session.user.id },
-      include: { assigned_team: true }
+      include: {
+        assigned_team: {
+          include: { assigned_plan: true }
+        }
+      }
     })
   ]);
 
@@ -29,10 +33,20 @@ const SideBar = async ({ build }: { build: number }) => {
 
   if (!dict) return null;
 
-  const subscriptionPlan = (user as any)?.assigned_team?.subscription_plan || "FREE";
+  const team = (user as any)?.assigned_team;
+  let features: string[] = [];
+
+  if (team?.assigned_plan) {
+    features = team.assigned_plan.features;
+  } else {
+    // Fallback import
+    const { getSubscriptionPlan } = await import("@/lib/subscription");
+    const slug = team?.subscription_plan || "FREE";
+    features = getSubscriptionPlan(slug).features;
+  }
 
   const isPartnerAdmin = (user as any).is_admin || (user as any).assigned_team?.slug === "ledger1";
 
-  return <ModuleMenu modules={modules} dict={dict} build={build} subscriptionPlan={subscriptionPlan} isPartnerAdmin={isPartnerAdmin} />;
+  return <ModuleMenu modules={modules} dict={dict} build={build} features={features} isPartnerAdmin={isPartnerAdmin} />;
 };
 export default SideBar;

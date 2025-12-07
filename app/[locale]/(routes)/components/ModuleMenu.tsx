@@ -19,21 +19,23 @@ import EmailsModuleMenu from "./menu-items/Emails";
 import { cn } from "@/lib/utils";
 import { Menu } from "lucide-react";
 
-import { hasFeature } from "@/lib/subscription";
+
 
 type Props = {
   modules: any;
   dict: any;
   build: number;
-  subscriptionPlan: string;
+  features: string[]; // Replaced subscriptionPlan
   isPartnerAdmin: boolean;
 };
 
 const AnyMenu = Menu as any;
 
-const ModuleMenu = ({ modules, dict, build, subscriptionPlan, isPartnerAdmin }: Props) => {
+const ModuleMenu = ({ modules, dict, build, features, isPartnerAdmin }: Props) => {
   const [open, setOpen] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+
+  const hasFeature = (feature: string) => features.includes("all") || features.includes(feature);
 
   useEffect(() => {
     setIsMounted(true);
@@ -83,17 +85,17 @@ const ModuleMenu = ({ modules, dict, build, subscriptionPlan, isPartnerAdmin }: 
           <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
           {modules.find(
             (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "crm") ? (
+          ) && hasFeature("crm") ? (
             <CrmModuleMenu open={open} localizations={dict.ModuleMenu.crm} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "projects" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "projects") ? (
+          ) && hasFeature("projects") ? (
             <ProjectModuleMenu open={open} title={dict.ModuleMenu.projects} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "emails" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "emails") ? (
+          ) && hasFeature("emails") ? (
             <EmailsModuleMenu open={open} title={dict.ModuleMenu.emails} />
           ) : null}
           {/* {modules.find(
@@ -104,22 +106,22 @@ const ModuleMenu = ({ modules, dict, build, subscriptionPlan, isPartnerAdmin }: 
           ) : null} */}
           {modules.find(
             (menuItem: any) => menuItem.name === "employee" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "employee") ? (
+          ) && hasFeature("employee") ? (
             <EmployeesModuleMenu open={open} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "invoice" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "invoices") ? (
+          ) && hasFeature("invoices") ? (
             <InvoicesModuleMenu open={open} title={dict.ModuleMenu.invoices} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "reports" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "reports") ? (
+          ) && hasFeature("reports") ? (
             <ReportsModuleMenu open={open} title={dict.ModuleMenu.reports} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "documents" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "documents") ? (
+          ) && hasFeature("documents") ? (
             <DocumentsModuleMenu
               open={open}
               title={dict.ModuleMenu.documents}
@@ -127,12 +129,12 @@ const ModuleMenu = ({ modules, dict, build, subscriptionPlan, isPartnerAdmin }: 
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "databox" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "databox") ? (
+          ) && hasFeature("databox") ? (
             <DataboxModuleMenu open={open} />
           ) : null}
           {modules.find(
             (menuItem: any) => menuItem.name === "openai" && menuItem.enabled
-          ) && hasFeature(subscriptionPlan, "openai") ? (
+          ) && hasFeature("openai") ? (
             <ChatGPTModuleMenu open={open} />
           ) : null}
           <AdministrationMenu open={open} title={dict.ModuleMenu.settings} />

@@ -2,7 +2,7 @@
 
 import { prismadb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { checkLimit } from "@/lib/subscription";
+import { checkTeamLimit } from "@/lib/subscription";
 import bcrypt from "bcrypt";
 
 import { getCurrentUserTeamId } from "@/lib/team-utils";
@@ -79,14 +79,18 @@ export const searchUsers = async (query: string) => {
     }
 }
 
+
 export const addMember = async (teamId: string, userId: string) => {
     try {
-        const team = await (prismadb as any).team.findUnique({ where: { id: teamId } });
+        const team = await (prismadb as any).team.findUnique({
+            where: { id: teamId },
+            include: { assigned_plan: true }
+        });
         if (!team) return { error: "Team not found" };
 
         const memberCount = await (prismadb.users as any).count({ where: { team_id: teamId } });
 
-        if (!checkLimit(team.subscription_plan as any, "max_users", memberCount)) {
+        if (!checkTeamLimit(team, "max_users", memberCount)) {
             return { error: "Team member limit reached. Upgrade your plan." };
         }
 

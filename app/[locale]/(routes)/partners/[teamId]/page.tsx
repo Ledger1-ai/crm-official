@@ -13,12 +13,16 @@ import {
 
 import { getCurrentUserTeamId } from "@/lib/team-utils";
 import { getTeam } from "@/actions/teams/get-team";
+import { getPlans } from "@/actions/plans/plan-actions";
 import TeamSettingsForm from "./_components/TeamSettingsForm";
 import TeamMembersTable from "./_components/TeamMembersTable";
 
 const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }> }) => {
     const resolvedParams = await params;
-    const team = await getTeam(resolvedParams.teamId);
+    const [team, plans] = await Promise.all([
+        getTeam(resolvedParams.teamId),
+        getPlans()
+    ]);
     const currentUserInfo = await getCurrentUserTeamId();
 
     if (!team) {
@@ -42,7 +46,7 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
                     {/* <TabsTrigger value="settings">Settings</TabsTrigger> */}
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
-                    <TeamSettingsForm team={team} />
+                    <TeamSettingsForm team={team} availablePlans={plans as any} />
                 </TabsContent>
                 <TabsContent value="members" className="space-y-4">
                     <TeamMembersTable

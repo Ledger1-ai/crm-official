@@ -713,8 +713,14 @@ model Team {
 
   // Relations
   members     Users[]
-  subscription_plan SubscriptionPlan @default(FREE)
+  subscription_plan SubscriptionPlan @default(FREE) // Deprecated, keep for migration
   
+  plan_id     String?  @db.ObjectId
+  assigned_plan Plan?  @relation(fields: [plan_id], references: [id])
+  
+  status      TeamStatus @default(ACTIVE)
+  suspension_reason String?
+
   // Data Ownership
   accounts    crm_Accounts[]
   leads       crm_Leads[]
@@ -731,10 +737,41 @@ model Team {
   accounts_tasks      crm_Accounts_Tasks[]
 }
 
+model Plan {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String   @unique // FREE, TEAM, ENTERPRISE
+  description String?
+  price       Float    @default(0)
+  currency    String   @default("USD")
+  
+  // Limits
+  max_users   Int      @default(1)
+  max_storage Int      @default(1000) // MB
+  max_credits Int      @default(0)
+  
+  // Features (Modules)
+  features    String[] 
+  
+  isActive    Boolean  @default(true)
+  
+  created_at  DateTime @default(now()) @db.Date
+  updated_at  DateTime @default(now()) @updatedAt @db.Date
+
+  // Relations
+  teams       Team[]
+}
+
 enum SubscriptionPlan {
   FREE
   TEAM
   ENTERPRISE
+}
+
+enum TeamStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
 }
 
 enum Language {

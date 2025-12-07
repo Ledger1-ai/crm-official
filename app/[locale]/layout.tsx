@@ -14,6 +14,7 @@ import { ThemeProvider } from "@/app/providers/ThemeProvider";
 import { ToastProvider } from "@/app/providers/ToastProvider";
 import NextTopLoader from "nextjs-toploader";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import SuspensionCheck from "@/components/SuspensionCheck";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -142,6 +143,8 @@ export default async function RootLayout(props: Props) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            {/* Team Suspension Check */}
+            <SuspensionCheck />
             <ToastProvider />
           </ThemeProvider>
         </NextIntlClientProvider>

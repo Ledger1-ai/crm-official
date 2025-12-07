@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 // @ts-ignore
 import { SubscriptionPlan } from "@prisma/client";
 
-export const updateTeam = async (teamId: string, data: { name?: string; slug?: string; owner_id?: string; subscription_plan?: SubscriptionPlan }) => {
+export const updateTeam = async (teamId: string, data: { name?: string; slug?: string; owner_id?: string; subscription_plan?: SubscriptionPlan; plan_id?: string; }) => {
     try {
         // Check slug uniqueness if changing
         if (data.slug) {
