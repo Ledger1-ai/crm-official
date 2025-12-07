@@ -79,17 +79,74 @@ async function main() {
     console.log("Industry Types already seeded");
   }
 
-  //Seed GPT Models
-  const gptModels = await prisma.gpt_models.findMany();
+  //Seed AI Models (migrated from gpt_models + new defaults)
+  const defaultModels = [
+    // OpenAI
+    { name: "GPT-5 (Preview)", modelId: "gpt-5-preview", provider: "OPENAI", isActive: true },
+    { name: "GPT-5", modelId: "gpt-5", provider: "OPENAI", isActive: true },
+    { name: "GPT-4o", modelId: "gpt-4o", provider: "OPENAI", isActive: true },
+    { name: "GPT-4 Turbo", modelId: "gpt-4-turbo", provider: "OPENAI", isActive: true },
+    { name: "o1 Preview", modelId: "o1-preview", provider: "OPENAI", isActive: true },
 
-  if (gptModels.length === 0) {
-    await prisma.gpt_models.createMany({
-      data: gptModelsData,
+    // Azure (Legacy + New)
+    { name: "Azure GPT-5 (Preview)", modelId: "gpt-5-preview", provider: "AZURE", isActive: true },
+    { name: "Azure GPT-5", modelId: "gpt-5", provider: "AZURE", isActive: true },
+    { name: "Azure GPT-4o", modelId: "gpt-4o", provider: "AZURE", isActive: true },
+    { name: "Azure GPT-4 Turbo", modelId: "gpt-4-turbo", provider: "AZURE", isActive: true },
+    { name: "Azure GPT-3.5 Turbo", modelId: "gpt-35-turbo", provider: "AZURE", isActive: true },
+
+    // Anthropic
+    { name: "Claude 4.5 Sonnet", modelId: "claude-4-5-sonnet-latest", provider: "ANTHROPIC", isActive: true },
+    { name: "Claude 4.5 Opus", modelId: "claude-4-5-opus-latest", provider: "ANTHROPIC", isActive: true },
+    { name: "Claude 4.5 Haiku", modelId: "claude-4-5-haiku-latest", provider: "ANTHROPIC", isActive: true },
+
+    // Google
+    { name: "Gemini 3.0 Pro", modelId: "gemini-3.0-pro", provider: "GOOGLE", isActive: true },
+    { name: "Gemini 3.0 Flash", modelId: "gemini-3.0-flash", provider: "GOOGLE", isActive: true },
+
+    // Mistral
+    { name: "Mistral Large 2", modelId: "mistral-large-latest", provider: "MISTRAL", isActive: true },
+
+    // Perplexity
+    { name: "Llama 3.1 Sonar Ex Large", modelId: "llama-3.1-sonar-e-large-128k-online", provider: "PERPLEXITY", isActive: true },
+
+    // Grok
+    { name: "Grok 2", modelId: "grok-2", provider: "GROK", isActive: true },
+
+    // Deepseek
+    { name: "DeepSeek Chat", modelId: "deepseek-chat", provider: "DEEPSEEK", isActive: true },
+  ];
+
+  // Proper Sync Logic
+  for (const m of defaultModels) {
+    const existing = await prisma.aiModel.findFirst({
+      where: { modelId: m.modelId, provider: m.provider }
     });
-    console.log("GPT Models seeded successfully");
-  } else {
-    console.log("GPT Models already seeded");
+
+    if (!existing) {
+      await prisma.aiModel.create({
+        data: {
+          name: m.name,
+          modelId: m.modelId,
+          provider: m.provider as any,
+          isActive: m.isActive ?? true,
+          inputPrice: 0,
+          outputPrice: 0
+        }
+      });
+      console.log(`Created ${m.provider} - ${m.name}`);
+    } else {
+      await prisma.aiModel.update({
+        where: { id: existing.id },
+        data: {
+          name: m.name,
+          isActive: m.isActive ?? true
+        }
+      });
+      console.log(`Updated ${m.provider} - ${m.name}`);
+    }
   }
+  console.log("AI Models sync complete");
 
   // Seed Footer Data
   const footerSetting = await prisma.footerSetting.findFirst();

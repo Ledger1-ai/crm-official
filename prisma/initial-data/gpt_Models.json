@@ -8,13 +8,55 @@
   {
     "v": 0,
     "model": "gpt-4",
-    "status": "INACTIVE",
+    "status": "ACTIVE",
     "description": "GPT 4"
   },
   {
     "v": 0,
+    "model": "gpt-4-turbo",
+    "status": "ACTIVE",
+    "description": "GPT 4 Turbo"
+  },
+  {
+    "v": 0,
     "model": "gpt-4o",
-    "status": "INACTIVE",
+    "status": "ACTIVE",
     "description": "GPT 4o"
+  },
+  {
+    "v": 0,
+    "model": "gpt-4o-mini",
+    "status": "ACTIVE",
+    "description": "GPT 4o Mini"
+  },
+  {
+    "v": 0,
+    "model": "o1-preview",
+    "status": "ACTIVE",
+    "description": "o1 Preview"
+  },
+  {
+    "v": 0,
+    "model": "o1-mini",
+    "status": "ACTIVE",
+    "description": "o1 Mini"
+  },
+  {
+    "v": 0,
+    "model": "gpt-5",
+    "status": "INACTIVE",
+    "description": "GPT 5 (Placeholder)"
+  },
+  {
+    "v": 0,
+    "model": "gpt-5-turbo",
+    "status": "INACTIVE",
+    "description": "GPT 5 Turbo (Placeholder)"
+  },
+  {
+    "v": 0,
+    "model": "gpt-5-preview",
+    "status": "INACTIVE",
+    "description": "GPT 5 Preview (Placeholder)"
   }
 ]

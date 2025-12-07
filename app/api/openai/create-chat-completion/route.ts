@@ -1,54 +1,53 @@
+
 import { NextResponse } from "next/server";
-import { prismadb } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prismadb } from "@/lib/prisma"; // Use lib/prisma explicitly
+import { getAiClient } from "@/lib/ai-helper"; // We'll create this next
+import { createDataStreamResponse, streamText } from 'ai';
 
-import { openAiHelper } from "@/lib/openai";
-
-export const maxDuration = 300;
+export const maxDuration = 300; // 5 minutes
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { prompt, userId } = body;
-
-  const openai = await openAiHelper(userId);
-
-  if (!openai) {
-    return new NextResponse("No openai key found", { status: 500 });
-  }
-
-  if (!prompt) {
-    return new NextResponse("No prompt", { status: 400 });
-  }
-
   try {
-    const gptModel = await prismadb.gpt_models.findMany({
-      where: {
-        status: "ACTIVE",
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { messages, modelId } = await req.json();
+
+    // 1. Get User Team
+    const user = await prismadb.users.findUnique({
+      where: { email: session.user.email },
+      include: { assigned_team: true }
+    });
+
+    if (!user?.assigned_team) {
+      return new NextResponse("Team not found", { status: 400 });
+    }
+
+    // 2. Get AI Client (Unified)
+    const { client, model, provider } = await getAiClient(user.assigned_team.id);
+
+    // 3. Create Stream
+    // Note: 'model' from getAiClient is already the instantiated provider model (e.g. openai("gpt-4o"))
+
+    // Check if we need to track usage/pricing (TODO)
+
+    return createDataStreamResponse({
+      execute: (dataStream) => {
+        const result = streamText({
+          model: model,
+          messages,
+          maxSteps: 5, // Optional: for tool usage
+        });
+        result.mergeIntoDataStream(dataStream);
       },
     });
 
-    const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
-    const azureDeployment = process.env.AZURE_OPENAI_DEPLOYMENT;
-    const modelToUse =
-      azureEndpoint && azureDeployment ? azureDeployment : gptModel[0].model;
-    //console.log("Active GPT Model:", gptModel[0].model);
-
-    //console.log(prompt, "prompt");
-    // Ask OpenAI for a chats completion given the prompt
-    const response = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: prompt },
-      ],
-      model: modelToUse,
-      temperature: 1,
-    });
-
-    return NextResponse.json(
-      { response: response.choices[0] },
-      { status: 200 }
-    );
   } catch (error) {
-    console.log("[OPENAI_CHAT_POST]", error);
-    return new NextResponse("Initial error", { status: 500 });
+    console.log("[CHAT_COMPLETION]", error);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 }

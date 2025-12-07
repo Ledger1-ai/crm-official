@@ -5,7 +5,7 @@ const Footer = async () => {
     <footer className="glass rounded-lg flex flex-row h-8 justify-end items-center w-full text-xs text-gray-500 p-5">
       <div className="hidden md:flex pr-5">
         <div className="flex items-center gap-2">
-          <span className="text-gray-500">v{process.env.NEXT_PUBLIC_APP_V}</span>
+          <span className="text-gray-500">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
           <img src="/logo.png" alt="Ledger1CRM logo" className="h-6 w-auto" />
         </div>
       </div>

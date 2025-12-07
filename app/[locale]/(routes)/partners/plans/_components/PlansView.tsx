@@ -1,13 +1,26 @@
 
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
-import { Plus, Edit, Trash, Check, X } from "lucide-react";
-
+import { Plus, Edit, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { toast } from "react-hot-toast";
+
 import {
     Table,
     TableBody,
@@ -25,17 +38,15 @@ import {
     DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 import { createPlan, updatePlan, deletePlan } from "@/actions/plans/plan-actions";
+
 
 type Plan = {
     id: string;
     name: string;
     slug: string;
+    description: string;
     price: number;
     currency: string;
     max_users: number;
@@ -43,6 +54,8 @@ type Plan = {
     max_credits: number;
     features: string[];
     isActive: boolean;
+    billing_cycle: "MONTHLY" | "YEARLY" | "LIFETIME" | "ONE_TIME";
+    grace_period_days: number;
 };
 
 type Props = {
@@ -80,6 +93,8 @@ const PlansView = ({ initialPlans }: Props) => {
         max_credits: 0,
         features: [],
         isActive: true,
+        billing_cycle: "MONTHLY",
+        grace_period_days: 7,
     });
 
     const openCreate = () => {
@@ -94,6 +109,8 @@ const PlansView = ({ initialPlans }: Props) => {
             max_credits: 0,
             features: [],
             isActive: true,
+            billing_cycle: "MONTHLY",
+            grace_period_days: 7,
         });
         setIsDialogOpen(true);
     };
@@ -285,6 +302,33 @@ const PlansView = ({ initialPlans }: Props) => {
                                 <Input
                                     value={formData.currency}
                                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Billing Cycle</Label>
+                                <Select
+                                    value={formData.billing_cycle}
+                                    onValueChange={(val: any) => setFormData({ ...formData, billing_cycle: val })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select Cycle" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="MONTHLY">Monthly</SelectItem>
+                                        <SelectItem value="YEARLY">Yearly</SelectItem>
+                                        <SelectItem value="LIFETIME">Lifetime</SelectItem>
+                                        <SelectItem value="ONE_TIME">One Time</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Grace Period (Days)</Label>
+                                <Input
+                                    type="number"
+                                    value={formData.grace_period_days}
+                                    onChange={(e) => setFormData({ ...formData, grace_period_days: Number(e.target.value) })}
                                 />
                             </div>
                             <div className="space-y-2 flex items-end pb-2">

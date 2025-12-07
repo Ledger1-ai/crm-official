@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getDictionary } from "@/dictionaries";
 
-const SideBar = async ({ build }: { build: number }) => {
+const SideBar = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) return null;
@@ -47,6 +47,6 @@ const SideBar = async ({ build }: { build: number }) => {
 
   const isPartnerAdmin = (user as any).is_admin || (user as any).assigned_team?.slug === "ledger1";
 
-  return <ModuleMenu modules={modules} dict={dict} build={build} features={features} isPartnerAdmin={isPartnerAdmin} />;
+  return <ModuleMenu modules={modules} dict={dict} features={features} isPartnerAdmin={isPartnerAdmin} />;
 };
 export default SideBar;

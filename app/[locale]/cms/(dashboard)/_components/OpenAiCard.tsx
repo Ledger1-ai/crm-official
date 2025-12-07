@@ -14,7 +14,28 @@ import { revalidatePath } from "next/cache";
 import { Input } from "@/components/ui/input";
 import CopyKeyComponent from "./copy-key";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
 const OpenAiCard = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) return null;
+
+  const user = await prismadb.users.findUnique({
+    where: {
+      email: session.user.email
+    },
+    include: {
+      assigned_team: true
+    }
+  });
+
+  // Only allow Ledger1 team (Internal Team)
+  if (user?.assigned_team?.slug !== "ledger1") {
+    return null;
+  }
+
   const setOpenAiKey = async (formData: FormData) => {
     "use server";
     const schema = z.object({
@@ -25,9 +46,6 @@ const OpenAiCard = async () => {
       id: formData.get("id"),
       serviceKey: formData.get("serviceKey"),
     });
-
-    //console.log(parsed.id, "id");
-    //console.log(parsed.serviceKey, "serviceKey");
 
     if (!parsed.id) {
       await prismadb.systemServices.create({
@@ -89,7 +107,12 @@ const OpenAiCard = async () => {
         <form action={setOpenAiKey}>
           <div>
             <input type="hidden" name="id" value={openAi_key?.id} />
-            <Input type="text" name="serviceKey" placeholder="Your API key" />
+            <Input
+              type="text"
+              name="serviceKey"
+              placeholder="Your API key"
+              defaultValue={openAi_key?.serviceKey || ""}
+            />
           </div>
           <div className="flex justify-end pt-2 gap-2">
             <Button type={"reset"}>Reset</Button>

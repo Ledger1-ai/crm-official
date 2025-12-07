@@ -24,14 +24,13 @@ import { Menu } from "lucide-react";
 type Props = {
   modules: any;
   dict: any;
-  build: number;
   features: string[]; // Replaced subscriptionPlan
   isPartnerAdmin: boolean;
 };
 
 const AnyMenu = Menu as any;
 
-const ModuleMenu = ({ modules, dict, build, features, isPartnerAdmin }: Props) => {
+const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
   const [open, setOpen] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -147,7 +146,7 @@ const ModuleMenu = ({ modules, dict, build, features, isPartnerAdmin }: Props) =
         })}
       >
         <span className="microtext text-gray-500 pb-2">
-          build: 0.0.3-beta-{build}
+          v{process.env.NEXT_PUBLIC_APP_VERSION}
         </span>
       </div>
     </div>

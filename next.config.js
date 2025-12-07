@@ -2,7 +2,6 @@ const withNextIntl = require("next-intl/plugin")("./i18n.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   images: {
     remotePatterns: [
@@ -23,7 +22,10 @@ const nextConfig = {
         hostname: "voice.ledger1.ai",
       },
     ],
-  }
+  },
+  env: {
+    NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
+  },
 };
 
 module.exports = withNextIntl(nextConfig);

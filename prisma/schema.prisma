@@ -720,6 +720,7 @@ model Team {
   
   status      TeamStatus @default(ACTIVE)
   suspension_reason String?
+  renewal_date DateTime?
 
   // Data Ownership
   accounts    crm_Accounts[]
@@ -735,6 +736,15 @@ model Team {
   lead_pools          crm_Lead_Pools[]
   employees           Employees[]
   accounts_tasks      crm_Accounts_Tasks[]
+  
+  ai_config           TeamAiConfig?
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  LIFETIME
+  ONE_TIME
 }
 
 model Plan {
@@ -749,6 +759,10 @@ model Plan {
   max_users   Int      @default(1)
   max_storage Int      @default(1000) // MB
   max_credits Int      @default(0)
+
+  // Subscription Settings
+  billing_cycle BillingCycle @default(MONTHLY)
+  grace_period_days Int @default(7)
   
   // Features (Modules)
   features    String[] 
@@ -848,19 +862,55 @@ model oauth_Authorization_Codes {
   createdAt       DateTime @default(now()) @db.Date
 }
 
-model gpt_models {
+enum AiProvider {
+  OPENAI
+  AZURE
+  ANTHROPIC
+  GOOGLE
+  GROK
+  DEEPSEEK
+  PERPLEXITY
+  MISTRAL
+}
+
+model AiModel {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int        @map("__v")
-  model       String
+  v           Int        @default(0) @map("__v")
+  name        String     // Display name (e.g. "GPT-4o")
+  modelId     String     // API model ID (e.g. "gpt-4o")
+  provider    AiProvider
   description String?
-  status      gptStatus?
+  
+  // Pricing per 1k tokens (managed by Partner)
+  inputPrice  Float      @default(0)
+  outputPrice Float      @default(0)
+  
+  isActive    Boolean    @default(true)
+  isDefault   Boolean    @default(false)
   created_on  DateTime?  @default(now()) @db.Date
 }
 
-enum gptStatus {
-  ACTIVE
-  INACTIVE
+model SystemAiConfig {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  provider  AiProvider @unique
+  apiKey    String
+  baseUrl   String?    // Optional override
+  configuration Json?  // Store provider-specific config (Azure endpoint, etc)
+  defaultModelId String? // Default model for this provider (e.g. "gpt-4o")
+  isActive  Boolean    @default(true)
 }
+
+model TeamAiConfig {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  team_id      String     @unique @db.ObjectId
+  provider     AiProvider @default(OPENAI) // Active provider for this team
+  modelId      String?    // Specific model override (e.g. "gpt-4o")
+  useSystemKey Boolean    @default(true)
+  apiKey       String?    // Stored if useSystemKey is false
+
+  assigned_team Team      @relation(fields: [team_id], references: [id])
+}
+
 
 model chat_Sessions {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId

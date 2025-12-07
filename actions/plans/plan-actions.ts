@@ -43,6 +43,8 @@ export async function createPlan(data: any) {
                 max_credits: data.max_credits,
                 features: data.features,
                 isActive: data.isActive,
+                billing_cycle: data.billing_cycle,
+                grace_period_days: Number(data.grace_period_days),
             }
         });
         revalidatePath("/partners/plans");
@@ -70,6 +72,8 @@ export async function updatePlan(id: string, data: any) {
                 max_credits: data.max_credits,
                 features: data.features,
                 isActive: data.isActive,
+                billing_cycle: data.billing_cycle,
+                grace_period_days: Number(data.grace_period_days),
             }
         });
         revalidatePath("/partners/plans");

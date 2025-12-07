@@ -8,6 +8,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prismadb } from "@/lib/prisma";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const PartnersPage = async () => {
     const session = await getServerSession(authOptions);
@@ -41,7 +43,20 @@ const PartnersPage = async () => {
             title="Partners"
             description="Manage your Teams and CRM Instances"
         >
-            <div className="p-4">
+            <div className="p-4 space-y-6">
+                <div className="flex gap-4">
+                    <Link href="/partners/ai-system-config">
+                        <Button variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
+                            AI System Keys & Defaults
+                        </Button>
+                    </Link>
+                    <Link href="/partners/ai-pricing">
+                        <Button variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
+                            AI Model Pricing
+                        </Button>
+                    </Link>
+                </div>
+
                 {/* @ts-expect-error Server Component */}
                 <Suspense fallback={<div>Loading teams...</div>}>
                     <PartnersView initialTeams={teams as any} availablePlans={plans as any} />

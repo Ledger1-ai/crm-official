@@ -1,37 +1,17 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
-import { prismadb } from "@/lib/prisma";
-import SetGptModel from "../forms/SetGptModel";
-
-import OnTestButton from "./OnTestButton";
-import { gpt_models } from "@prisma/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const GptCard = async () => {
-  const gptModels: gpt_models[] = await prismadb.gpt_models.findMany();
-  //console.log(gptModels, "gptModels");
-
   return (
     <Card className="min-w-[350px]  max-w-[450px]">
       <CardHeader className="text-lg">
-        <CardTitle>AI assistant GPT model</CardTitle>
+        <CardTitle>AI Assistant Config</CardTitle>
         <div className="text-xs text-muted-foreground">
-          actual model:{" "}
-          {
-            //filter in gptModels where status = ACTIVE
-            gptModels
-              .filter((model: gpt_models) => model.status === "ACTIVE")
-              .map((model: gpt_models) => model.model)
-          }
+          Feature is being upgraded.
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
-        <SetGptModel models={gptModels} />
-        <OnTestButton />
+        {/* <SetGptModel models={gptModels} /> */}
       </CardContent>
     </Card>
   );

@@ -24,11 +24,26 @@ export const createTeam = async (name: string, slug: string, planId?: string) =>
             return { error: "Team with this ID already exists" };
         }
 
+
+        let renewalDate = null;
+        if (planId) {
+            const plan = await prismadb.plan.findUnique({ where: { id: planId } });
+            if (plan) {
+                const now = new Date();
+                if (plan.billing_cycle === 'MONTHLY') {
+                    renewalDate = new Date(now.setMonth(now.getMonth() + 1));
+                } else if (plan.billing_cycle === 'YEARLY') {
+                    renewalDate = new Date(now.setFullYear(now.getFullYear() + 1));
+                }
+            }
+        }
+
         const team = await prismadb.team.create({
             data: {
                 name,
                 slug,
                 plan_id: planId,
+                renewal_date: renewalDate,
             },
         });
 

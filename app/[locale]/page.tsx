@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
@@ -102,7 +103,7 @@ export default function LandingPage() {
                                 </div>
                                 <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50 drop-shadow-2xl">
                                     Your Business. <br />
-                                    <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-500">Supercharged.</span>
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-500">Supercharged.</span>
                                 </h1>
                                 <p className="mx-auto max-w-[800px] text-muted-foreground md:text-xl lg:text-2xl leading-relaxed">
                                     Focus on the features that keep you competitive in this new era. Be excited about business again. The first CRM that doesn&apos;t just manage your data—it actively works for you. From finding prospects to closing deals with voice AI, Ledger1CRM is your unfair advantage.
