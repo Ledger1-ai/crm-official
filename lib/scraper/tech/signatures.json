@@ -1,4 +1,4 @@
-p{
+{
   "React": ["__reactroot", "_reactroot", "data-reactroot", "react"],
   "Vue.js": ["__vue__", "vue"],
   "Angular": ["ng-version", "ng-app", "angular"],
