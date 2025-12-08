@@ -1,16 +1,9 @@
 import { prismadb } from "@/lib/prisma";
 
 export const getExpectedRevenue = async () => {
-  const activeOpportunities = await prismadb.crm_Opportunities.findMany({
-    where: {
-      status: "ACTIVE",
-    },
+  const agg = await prismadb.crm_Opportunities.aggregate({
+    where: { status: "ACTIVE" },
+    _sum: { budget: true },
   });
-
-  const totalAmount = activeOpportunities.reduce(
-    (sum: number, opportunity: any) => sum + Number(opportunity.budget),
-    0
-  );
-
-  return totalAmount;
+  return Number(agg._sum.budget ?? 0);
 };

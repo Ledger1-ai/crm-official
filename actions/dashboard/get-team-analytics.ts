@@ -66,47 +66,19 @@ function clamp(min: number, val: number, max: number) {
   return Math.max(min, Math.min(max, val));
 }
 
-async function getLeadTouchMetrics(leadId: string, userId: string): Promise<LeadTouchMetrics> {
-  // Activity counts scoped to this user & lead
-  const emailSent = await prismadb.crm_Lead_Activities.count({
-    where: { user: userId, type: "email_sent", lead: leadId as any },
-  });
-  const callsInitiated = await prismadb.crm_Lead_Activities.count({
-    where: { user: userId, type: { contains: "call", mode: "insensitive" }, lead: leadId as any },
-  });
-  const touches = emailSent + callsInitiated;
-
-  // Days to booking (proxy for speed to meaningful engagement/close)
-  const lead = await prismadb.crm_Leads.findUnique({
-    where: { id: leadId },
-    select: { outreach_sent_at: true, outreach_meeting_booked_at: true },
-  });
-  let daysToBooking: number | undefined = undefined;
-  if (lead?.outreach_sent_at && lead?.outreach_meeting_booked_at) {
-    const ms = new Date(lead.outreach_meeting_booked_at).getTime() - new Date(lead.outreach_sent_at).getTime();
-    daysToBooking = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
-  }
-
-  return { emailSent, callsInitiated, touches, daysToBooking };
-}
-
 function computeLeadPoints(stage: PipelineStage, metrics: LeadTouchMetrics): { points: number; basePoints: number; effBonusPoints: number; speedBonusPoints: number } {
   const base = STAGE_WEIGHTS[stage] || 0;
   let efficiencyMultiplier = 1;
   let speedMultiplier = 1;
 
-  // Efficiency bonus: reward closing with fewer touches
-  // Applied only when stage is Closed
+  // Efficiency bonus: reward closing with fewer touches (only when stage is Closed)
   if (stage === "Closed") {
     const touches = metrics.touches;
-    // Up to +30% bonus for <=3 touches, decreasing with more touches
-    const effBonus = clamp(0, (3 - touches) / 10, 0.3); // 0..0.3
+    const effBonus = clamp(0, (3 - touches) / 10, 0.3); // 0..0.3 up to +30% bonus
     efficiencyMultiplier = 1 + effBonus;
 
-    // Speed bonus: reward faster movement to meeting booking
     if (typeof metrics.daysToBooking === "number") {
-      // Up to +70% bonus when booking within 0–14 days, decreasing linearly
-      const speedBonus = clamp(0, (14 - metrics.daysToBooking) / 20, 0.7); // 0..0.7
+      const speedBonus = clamp(0, (14 - metrics.daysToBooking) / 20, 0.7); // 0..0.7 up to +70% bonus
       speedMultiplier = 1 + speedBonus;
     }
   }
@@ -141,6 +113,8 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
     orderBy: { name: "asc" },
   });
 
+  const userIds = users.map((u) => u.id);
+
   // Pre-fetch all leads to build team overview
   const allLeads = await prismadb.crm_Leads.findMany({
     select: {
@@ -154,6 +128,30 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
     },
   });
 
+  const leadIds = allLeads.map((l: any) => l.id);
+
+  // Fetch activities once and reduce in-memory
+  const emailActivities = await prismadb.crm_Lead_Activities.findMany({
+    where: { type: "email_sent" },
+    select: { user: true, lead: true },
+  });
+  const callActivities = await prismadb.crm_Lead_Activities.findMany({
+    where: { type: { contains: "call", mode: "insensitive" } },
+    select: { user: true, lead: true },
+  });
+
+  // Build maps keyed by `${userId}|${leadId}` => count
+  const emailByUserLead = new Map<string, number>();
+  for (const a of emailActivities as any[]) {
+    const key = `${a.user}|${a.lead}`;
+    emailByUserLead.set(key, (emailByUserLead.get(key) || 0) + 1);
+  }
+  const callsByUserLead = new Map<string, number>();
+  for (const a of callActivities as any[]) {
+    const key = `${a.user}|${a.lead}`;
+    callsByUserLead.set(key, (callsByUserLead.get(key) || 0) + 1);
+  }
+
   // Team overview stage counts
   const teamStageCounts = zeroStages();
   for (const l of allLeads as any[]) {
@@ -165,10 +163,8 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
   const emailsPresent = (allLeads as any[]).filter((l) => !!l.email && String(l.email).trim().length > 0).length;
   const phonesPresent = (allLeads as any[]).filter((l) => !!l.phone && String(l.phone).trim().length > 0).length;
 
-  const emailSentTeam = await prismadb.crm_Lead_Activities.count({ where: { type: "email_sent" } });
-  const callsInitiatedTeam = await prismadb.crm_Lead_Activities.count({
-    where: { type: { contains: "call", mode: "insensitive" } },
-  });
+  const emailSentTeam = emailActivities.length;
+  const callsInitiatedTeam = callActivities.length;
 
   const team: TeamOverview = {
     totalLeads: allLeads.length,
@@ -183,7 +179,7 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
 
   const leaderboard: UserLeaderboardEntry[] = [];
 
-  // Build per-user leaderboard entries
+  // Build per-user leaderboard entries without N+1 queries
   for (const u of users) {
     const myLeads = (allLeads as any[]).filter((l) => (l.assigned_to as string | null) === u.id);
 
@@ -194,22 +190,39 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
     let totalPoints = 0;
     let closedCount = 0;
 
+    let speedsterCount = 0; // Closed within 7 days
+    let sniperCount = 0; // Closed with <=3 touches
+
     for (const l of myLeads) {
       const s: PipelineStage = (l.pipeline_stage as PipelineStage) || "Identify";
       if (byStage[s] !== undefined) byStage[s]++;
-      const metrics = await getLeadTouchMetrics(l.id, u.id);
-      const p = computeLeadPoints(s, metrics);
+
+      const key = `${u.id}|${l.id}`;
+      const emailSent = emailByUserLead.get(key) || 0;
+      const callsInitiated = callsByUserLead.get(key) || 0;
+      const touches = emailSent + callsInitiated;
+
+      let daysToBooking: number | undefined = undefined;
+      if (l.outreach_sent_at && l.outreach_meeting_booked_at) {
+        const ms = new Date(l.outreach_meeting_booked_at as any).getTime() - new Date(l.outreach_sent_at as any).getTime();
+        daysToBooking = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
+      }
+
+      const p = computeLeadPoints(s, { emailSent, callsInitiated, touches, daysToBooking });
       basePoints += p.basePoints;
       effBonusPoints += p.effBonusPoints;
       speedBonusPoints += p.speedBonusPoints;
       totalPoints += p.points;
-      if (s === "Closed") closedCount++;
+      if (s === "Closed") {
+        closedCount++;
+        if (typeof daysToBooking === "number" && daysToBooking <= 7) speedsterCount++;
+        if (touches <= 3) sniperCount++;
+      }
     }
 
     // Achievements detection
     const achievements: { id: string; title: string; description: string; earnedAt?: string }[] = [];
 
-    // Helper counts for achievements
     const engageAIOrMore = STAGES.filter((s) => s !== "Identify")
       .map((s) => byStage[s])
       .reduce((a, b) => a + b, 0);
@@ -228,17 +241,6 @@ export async function getTeamAnalytics(): Promise<TeamAnalytics> {
     }
     if (closedCount >= 5) {
       achievements.push({ id: "closer-5", title: "Closer x5", description: "Closed 5+ leads." });
-    }
-
-    // Speedster and Sniper require per-lead metrics; recompute quickly
-    let speedsterCount = 0;
-    let sniperCount = 0;
-    for (const l of myLeads) {
-      const s: PipelineStage = (l.pipeline_stage as PipelineStage) || "Identify";
-      if (s !== "Closed") continue;
-      const m = await getLeadTouchMetrics(l.id, u.id);
-      if (typeof m.daysToBooking === "number" && m.daysToBooking <= 7) speedsterCount++;
-      if (m.touches <= 3) sniperCount++;
     }
     if (speedsterCount >= 3) {
       achievements.push({ id: "speedster", title: "Speedster", description: "Closed 3+ leads within 7 days of outreach." });
