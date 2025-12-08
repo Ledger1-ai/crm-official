@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma"; // Use lib/prisma explicitly
 import { getAiClient } from "@/lib/ai-helper"; // We'll create this next
-import { createDataStreamResponse, streamText } from 'ai';
+import { streamText } from 'ai';
 
 export const maxDuration = 300; // 5 minutes
 
@@ -35,16 +35,13 @@ export async function POST(req: Request) {
 
     // Check if we need to track usage/pricing (TODO)
 
-    return createDataStreamResponse({
-      execute: (dataStream) => {
-        const result = streamText({
-          model: model,
-          messages,
-          maxSteps: 5, // Optional: for tool usage
-        });
-        result.mergeIntoDataStream(dataStream);
-      },
+    const result = streamText({
+      model: model,
+      messages,
+      maxSteps: 5, // Optional: for tool usage
     });
+
+    return result.toDataStreamResponse();
 
   } catch (error) {
     console.log("[CHAT_COMPLETION]", error);

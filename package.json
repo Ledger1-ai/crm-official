@@ -1,6 +1,6 @@
 {
   "name": "ledger1crm-app",
-  "version": "1.0.4a-beta",
+  "version": "1.0.4f-beta",
   "private": true,
   "scripts": {
     "dev": "set NODE_OPTIONS=--no-deprecation && next dev",
@@ -13,7 +13,10 @@
     "seed": "ts-node ./prisma/seeds/seed.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.53",
     "@ai-sdk/azure": "^2.0.79",
+    "@ai-sdk/google": "^2.0.44",
+    "@ai-sdk/mistral": "^2.0.25",
     "@ai-sdk/openai": "^2.0.77",
     "@ai-sdk/react": "^2.0.107",
     "@aws-sdk/client-chime-sdk-meetings": "^3.946.0",

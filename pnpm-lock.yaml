@@ -12,9 +12,18 @@ importers:
 
   .:
     dependencies:
+      '@ai-sdk/anthropic':
+        specifier: ^2.0.53
+        version: 2.0.53(zod@4.1.13)
       '@ai-sdk/azure':
         specifier: ^2.0.79
         version: 2.0.79(zod@4.1.13)
+      '@ai-sdk/google':
+        specifier: ^2.0.44
+        version: 2.0.44(zod@4.1.13)
+      '@ai-sdk/mistral':
+        specifier: ^2.0.25
+        version: 2.0.25(zod@4.1.13)
       '@ai-sdk/openai':
         specifier: ^2.0.77
         version: 2.0.77(zod@4.1.13)
@@ -367,6 +376,12 @@ importers:
 
 packages:
 
+  '@ai-sdk/anthropic@2.0.53':
+    resolution: {integrity: sha512-ih7NV+OFSNWZCF+tYYD7ovvvM+gv7TRKQblpVohg2ipIwC9Y0TirzocJVREzZa/v9luxUwFbsPji++DUDWWxsg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/azure@2.0.79':
     resolution: {integrity: sha512-+iR1q8hnzBfjVAYmflbTYzmKhZuiory/uayh3p/I6AgJEKBuBf8U9pKgzWA/V+hhJFXSWp2AEV2353GS1Mp01Q==}
     engines: {node: '>=18'}
@@ -375,6 +390,18 @@ packages:
 
   '@ai-sdk/gateway@2.0.18':
     resolution: {integrity: sha512-sDQcW+6ck2m0pTIHW6BPHD7S125WD3qNkx/B8sEzJp/hurocmJ5Cni0ybExg6sQMGo+fr/GWOwpHF1cmCdg5rQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/google@2.0.44':
+    resolution: {integrity: sha512-c5dck36FjqiVoeeMJQLTEmUheoURcGTU/nBT6iJu8/nZiKFT/y8pD85KMDRB7RerRYaaQOtslR2d6/5PditiRw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/mistral@2.0.25':
+    resolution: {integrity: sha512-JRlmXAgG/vuB3ojWjkGzN5W8ZYM8GX6dEkTFJX5sC1NwDgzfiTBIMDeQ/RA6dYZ06OIXtBZTt4oaruP+1xc92g==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -6360,6 +6387,12 @@ packages:
 
 snapshots:
 
+  '@ai-sdk/anthropic@2.0.53(zod@4.1.13)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.18(zod@4.1.13)
+      zod: 4.1.13
+
   '@ai-sdk/azure@2.0.79(zod@4.1.13)':
     dependencies:
       '@ai-sdk/openai': 2.0.77(zod@4.1.13)
@@ -6372,6 +6405,18 @@ snapshots:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.18(zod@4.1.13)
       '@vercel/oidc': 3.0.5
+      zod: 4.1.13
+
+  '@ai-sdk/google@2.0.44(zod@4.1.13)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.18(zod@4.1.13)
+      zod: 4.1.13
+
+  '@ai-sdk/mistral@2.0.25(zod@4.1.13)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.18(zod@4.1.13)
       zod: 4.1.13
 
   '@ai-sdk/openai@2.0.77(zod@4.1.13)':
