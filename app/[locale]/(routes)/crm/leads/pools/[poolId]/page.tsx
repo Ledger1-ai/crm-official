@@ -51,6 +51,33 @@ type TeamMembersResponse = {
   isAdmin: boolean;
 };
 
+// Deterministic tag color mapping for tech stack labels
+const TAG_PALETTE = [
+  { textLight: "text-blue-700", textDark: "dark:text-blue-300", borderLight: "border-blue-300", borderDark: "dark:border-blue-600" },
+  { textLight: "text-green-700", textDark: "dark:text-green-300", borderLight: "border-green-300", borderDark: "dark:border-green-600" },
+  { textLight: "text-purple-700", textDark: "dark:text-purple-300", borderLight: "border-purple-300", borderDark: "dark:border-purple-600" },
+  { textLight: "text-orange-700", textDark: "dark:text-orange-300", borderLight: "border-orange-300", borderDark: "dark:border-orange-600" },
+  { textLight: "text-pink-700", textDark: "dark:text-pink-300", borderLight: "border-pink-300", borderDark: "dark:border-pink-600" },
+  { textLight: "text-teal-700", textDark: "dark:text-teal-300", borderLight: "border-teal-300", borderDark: "dark:border-teal-600" },
+  { textLight: "text-red-700", textDark: "dark:text-red-300", borderLight: "border-red-300", borderDark: "dark:border-red-600" },
+  { textLight: "text-amber-700", textDark: "dark:text-amber-300", borderLight: "border-amber-300", borderDark: "dark:border-amber-600" },
+  { textLight: "text-sky-700", textDark: "dark:text-sky-300", borderLight: "border-sky-300", borderDark: "dark:border-sky-600" },
+  { textLight: "text-indigo-700", textDark: "dark:text-indigo-300", borderLight: "border-indigo-300", borderDark: "dark:border-indigo-600" },
+];
+
+function tagIndex(tech: string): number {
+  let hash = 0;
+  for (let i = 0; i < tech.length; i++) hash = (hash * 31 + tech.charCodeAt(i)) >>> 0;
+  return hash % TAG_PALETTE.length;
+}
+
+function tagClass(tech: string): string {
+  const { textLight, textDark, borderLight, borderDark } = TAG_PALETTE[tagIndex(tech.toLowerCase())];
+  // Outline-only tags (no infill) with theme-aware weight and color
+  // Light mode: medium weight + darker text; Dark mode: semibold + lighter text
+  return `${textLight} ${textDark} ${borderLight} ${borderDark} inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium dark:font-semibold`;
+}
+
 export default function PoolDetailPage({ params }: { params: Promise<{ poolId: string }> }) {
   const { poolId } = use(params);
   const router = useRouter();
@@ -70,6 +97,37 @@ export default function PoolDetailPage({ params }: { params: Promise<{ poolId: s
   const [candidateAssignments, setCandidateAssignments] = useState<Record<string, string>>({});
   const [assigning, setAssigning] = useState(false);
   const [detailsModal, setDetailsModal] = useState<LeadCandidate | null>(null);
+  // Premium email enrich UI state
+  const [enrichingId, setEnrichingId] = useState<string | null>(null);
+  const [enrichError, setEnrichError] = useState<string | null>(null);
+
+  const enrichEmail = async (contact: any) => {
+    try {
+      setEnrichError(null);
+      setEnrichingId(contact?.id || null);
+      if (!contact?.email) {
+        setEnrichError("No email present for enrichment");
+        setEnrichingId(null);
+        return;
+      }
+      const res = await fetch(`/api/enrich/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: contact.email, contactCandidateId: contact.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        setEnrichError(data?.error || "Failed to trigger enrichment");
+      } else {
+        // Refresh candidates so updated emailStatus appears when webhook lands
+        mutate();
+      }
+    } catch (e: any) {
+      setEnrichError(e?.message || "Unexpected error");
+    } finally {
+      setEnrichingId(null);
+    }
+  };
 
   // Auto-select current user for non-admins
   useEffect(() => {
@@ -358,7 +416,7 @@ export default function PoolDetailPage({ params }: { params: Promise<{ poolId: s
                           cand.techStack.slice(0, 2).map((tech: string, idx: number) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
+                              className={tagClass(tech)}
                             >
                               {tech}
                             </span>
@@ -463,7 +521,7 @@ export default function PoolDetailPage({ params }: { params: Promise<{ poolId: s
                       {detailsModal.techStack.map((tech: string, idx: number) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700"
+                          className={tagClass(tech)}
                         >
                           {tech}
                         </span>
@@ -521,6 +579,16 @@ export default function PoolDetailPage({ params }: { params: Promise<{ poolId: s
                                   </div>
                                 )}
                               </div>
+
+                              {/* Premium manual enrich button */}
+                              <button
+                                className="ml-2 rounded border px-2 py-0.5 text-xs hover:bg-muted disabled:opacity-50"
+                                onClick={() => enrichEmail(contact)}
+                                disabled={enrichingId === contact.id}
+                                title="Confirm this address is live (premium)"
+                              >
+                                {enrichingId === contact.id ? "Enriching…" : "Enrich"}
+                              </button>
                             </div>
                           )}
 

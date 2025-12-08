@@ -118,7 +118,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
     let result: any;
     try {
       // Omit temperature for reasoning models (o1, etc.)
-      const temperature = isReasoningModel(model.modelId) ? undefined : 1.0;
+      const temperature = isReasoningModel(model.modelId) ? undefined : 1;
 
       const textStreamPromise = streamText({
         model,
