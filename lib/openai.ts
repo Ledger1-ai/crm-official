@@ -9,6 +9,7 @@ export function isReasoningModel(modelId: string | undefined | null): boolean {
 }
 
 export async function getAiSdkModel(userId: string | "system") {
+    const DEBUG_PREFIX = "[getAiSdkModel]";
     // Helper to get system config
     const getSystemConfig = async () => {
         try {
@@ -25,7 +26,7 @@ export async function getAiSdkModel(userId: string | "system") {
     };
 
     const systemConfig = await getSystemConfig();
-    const systemModelId = systemConfig?.modelId || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
+    const systemModelId = systemConfig?.defaultModelId || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";    
 
     // Helper to get Azure provider
     const getAzureModel = (modelId: string, apiKey?: string, config?: any) => {
@@ -97,14 +98,19 @@ export async function getAiSdkModel(userId: string | "system") {
                 systemConfig.apiKey,
                 systemConfig.configuration
             );
-            if (az) return az;
+            if (az) {
+                console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig (AZURE) | userId=system`);
+                return az;
+            }
         }
 
         // Legacy fallback
         if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
+            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: EnvVars (AZURE legacy fallback) | userId=system`);
             return getAzureModel(systemModelId)!;
         }
 
+        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig/OpenAI (fallback) | userId=system`);
         return getOpenAIModel(systemModelId, systemConfig?.apiKey);
     }
 
@@ -118,11 +124,16 @@ export async function getAiSdkModel(userId: string | "system") {
         // Fallback to system logic
         if (systemConfig?.provider === "AZURE") {
             const az = getAzureModel(systemModelId, systemConfig.apiKey, systemConfig.configuration);
-            if (az) return az;
+            if (az) {
+                console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig (AZURE, no team) | userId=${userId}`);
+                return az;
+            }
         }
         if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
+            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: EnvVars (AZURE legacy, no team) | userId=${userId}`);
             return getAzureModel(systemModelId)!;
         }
+        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig/OpenAI (no team) | userId=${userId}`);
         return getOpenAIModel(systemModelId, systemConfig?.apiKey);
     }
 
@@ -140,22 +151,29 @@ export async function getAiSdkModel(userId: string | "system") {
             if (teamConfig.useSystemKey) {
                 if (systemConfig?.provider === "AZURE") {
                     const az = getAzureModel(modelId, systemConfig.apiKey, systemConfig.configuration);
-                    if (az) return az;
+                    if (az) {
+                        console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (AZURE, useSystemKey) | userId=${userId} | teamId=${user.team_id}`);
+                        return az;
+                    }
                 }
                 if (process.env.AZURE_OPENAI_API_KEY) {
+                    console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (AZURE envVars, useSystemKey) | userId=${userId} | teamId=${user.team_id}`);
                     return getAzureModel(modelId)!;
                 }
             } else {
                 // Custom Team Azure? Not fully supported in UI yet (only apiKey in schema), 
                 // assumng env vars or partial support via apiKey
+                console.debug(`${DEBUG_PREFIX} TeamConfig AZURE without useSystemKey - not fully supported | userId=${userId} | teamId=${user.team_id}`);
             }
         }
 
         // STANDARD OPENAI / DEFAULT
         if (teamConfig.provider === "OPENAI" || teamConfig.provider === undefined) {
             if (teamConfig.apiKey && !teamConfig.useSystemKey) {
+                console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (OPENAI, custom apiKey) | userId=${userId} | teamId=${user.team_id}`);
                 return getOpenAIModel(modelId, teamConfig.apiKey);
             }
+            console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (OPENAI, systemKey) | userId=${userId} | teamId=${user.team_id}`);
             return getOpenAIModel(modelId, systemConfig?.apiKey);
         }
     }
@@ -163,12 +181,17 @@ export async function getAiSdkModel(userId: string | "system") {
     // FALLBACK
     if (systemConfig?.provider === "AZURE") {
         const az = getAzureModel(systemModelId, systemConfig.apiKey, systemConfig.configuration);
-        if (az) return az;
+        if (az) {
+            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback SystemConfig (AZURE) | userId=${userId}`);
+            return az;
+        }
     }
 
     if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
+        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback EnvVars (AZURE legacy) | userId=${userId}`);
         return getAzureModel(systemModelId)!;
     }
 
+    console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback OpenAI (final) | userId=${userId}`);
     return getOpenAIModel(systemModelId, systemConfig?.apiKey);
 }

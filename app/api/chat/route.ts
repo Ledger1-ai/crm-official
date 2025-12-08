@@ -1,10 +1,28 @@
-import { NextResponse } from "next/server";
+\import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadbChat } from "@/lib/prisma-chat";
 const db: any = prismadbChat;
 import { getAiSdkModel, isReasoningModel } from "@/lib/openai";
 import { streamText } from "ai";
+
+// Helper to extract content from either UIMessage (parts array) or ModelMessage (content string) format
+function extractMessageContent(message: any): string {
+    // If content is already a string, use it
+    if (typeof message.content === 'string') {
+        return message.content;
+    }
+    // AI SDK 5.x UIMessage format: extract text from parts array
+    if (Array.isArray(message.parts)) {
+        return message.parts.map((part: any) => {
+            if (typeof part === 'string') return part;
+            if (part.type === 'text' && typeof part.text === 'string') return part.text;
+            if (typeof part.content === 'string') return part.content;
+            return '';
+        }).join('');
+    }
+    return '';
+}
 
 // POST /api/chat
 // Handles streaming chat completions
@@ -32,17 +50,24 @@ export async function POST(req: Request) {
         }
 
         // Build conversation for the model
+        // Handles both AI SDK 5.x UIMessage (parts array) and legacy ModelMessage (content string) formats
         let modelMessages: { role: "system" | "user" | "assistant"; content: string }[] = [];
         let lastUserContent = content;
 
         if (incomingMessages && Array.isArray(incomingMessages)) {
-            modelMessages = incomingMessages.map((m: any) => ({
-                role: m.role,
-                content: m.content,
-            }));
-            const last = [...incomingMessages].reverse().find((m: any) => m.role === "user");
-            if (!lastUserContent && last) {
-                lastUserContent = last.content;
+            // Convert incoming messages to ModelMessage format (content string)
+            modelMessages = incomingMessages
+                .filter((m: any) => m.role && (m.content || m.parts)) // Filter out empty messages
+                .map((m: any) => ({
+                    role: m.role as "system" | "user" | "assistant",
+                    content: extractMessageContent(m),
+                }))
+                .filter((m: any) => m.content); // Filter out messages with empty content
+            
+            // Find the last user message content
+            const lastUserMessage = [...incomingMessages].reverse().find((m: any) => m.role === "user");
+            if (!lastUserContent && lastUserMessage) {
+                lastUserContent = extractMessageContent(lastUserMessage);
             }
         } else if (content) {
             modelMessages = [
@@ -51,6 +76,11 @@ export async function POST(req: Request) {
             ];
         } else {
             return new NextResponse("No content or messages provided", { status: 400 });
+        }
+
+        // Ensure we have valid messages
+        if (modelMessages.length === 0 || !lastUserContent) {
+            return new NextResponse("No valid messages to process", { status: 400 });
         }
 
         // Create user message if the session is not temporary

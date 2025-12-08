@@ -34,24 +34,50 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
     const [localInput, setLocalInput] = useState("");
     const [editParentId, setEditParentId] = useState<string | undefined>(undefined);
 
-    // Use standard /api/chat endpoint
+    // Use standard /api/chat endpoint (AI SDK 5.x default)
     const apiEndpoint = "/api/chat";
 
-    // Initialize useChat
-    // @ts-ignore - The SDK types might be outdated or strict, but 'api' is the standard property
+    // Initialize useChat - AI SDK 5.x uses transport-based architecture
+    // The default transport uses /api/chat endpoint
+    // Note: body params are passed via sendMessage options, not here
     const chatHelpers = useChat({
         id: sessionId,
-        api: apiEndpoint,
-        initialMessages: initialMessages as any[],
-        // Pass sessionId in the body so the API knows which session to update
-        body: { sessionId, parentId: editParentId },
+        messages: initialMessages as any[],
         onError: (err: unknown) => {
             console.error("[CHAT_STREAM_ERROR]", err);
             toast.error(`Streaming error: ${(err as Error).message || "Unknown error"}`);
         },
-        onFinish: () => {
-            // console.log("[useChat] onFinish triggered");
+        onFinish: ({ message, messages: allMessages }: any) => {
+            // console.log("[useChat] onFinish triggered", { message, allMessages });
             setEditParentId(undefined);
+            
+            // Update messages state with the complete conversation including the assistant's response
+            if (allMessages && allMessages.length > 0) {
+                // AI SDK 5.x uses parts array, convert to content for display compatibility
+                const normalizedMessages = allMessages.map((m: any) => ({
+                    ...m,
+                    content: m.content || (m.parts ? m.parts.map((p: any) => 
+                        typeof p === 'string' ? p : (p.text || p.content || '')
+                    ).join('') : ''),
+                }));
+                setMessages(normalizedMessages);
+            } else if (message) {
+                // Fallback: add just the assistant message
+                const assistantContent = message.content || (message.parts ? message.parts.map((p: any) => 
+                    typeof p === 'string' ? p : (p.text || p.content || '')
+                ).join('') : '');
+                
+                const assistantMessage = {
+                    id: message.id || crypto.randomUUID(),
+                    role: 'assistant',
+                    content: assistantContent,
+                    createdAt: new Date().toISOString(),
+                    session: sessionId,
+                };
+                setMessages((prev: any[]) => [...prev, assistantMessage]);
+            }
+            
+            // Refresh to sync with DB (ensures persistence is reflected)
             onRefresh();
         }
     });
@@ -67,12 +93,23 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
         error
     } = chatHelpers as any;
 
-    // Safe Sync
+    // Safe Sync - detect when initialMessages changes (e.g., from onRefresh)
+    const initialMessagesKey = useMemo(
+        () => initialMessages.map(m => m.id).join(','),
+        [initialMessages]
+    );
+    
     useEffect(() => {
-        if (initialMessages && initialMessages.length > 0 && messages.length === 0) {
-            setMessages(initialMessages as any[]);
+        // Sync initialMessages to useChat state when they change from the parent
+        if (initialMessages && initialMessages.length > 0) {
+            const currentIds = messages.map((m: any) => m.id).join(',');
+            const initialIds = initialMessages.map(m => m.id).join(',');
+            // Only sync if the initial messages are different (e.g., loaded from DB)
+            if (currentIds !== initialIds) {
+                setMessages(initialMessages as any[]);
+            }
         }
-    }, [initialMessages, messages.length, setMessages]);
+    }, [initialMessagesKey, setMessages]);
 
     // ... (token calc)
 
@@ -156,24 +193,27 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
     }
 
     // Robust submit
-    async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const content = localInput.trim();
         if (!content) return;
 
         setLocalInput(""); // Clear immediately
+        const parentIdToUse = editParentId;
         setEditParentId(undefined);
 
         try {
             if (sendMessage) {
-                // Explicitly pass body again to be safe
-                await sendMessage(
-                    { role: "user", content },
-                    { body: { sessionId, parentId: editParentId } }
-                );
+                // AI SDK 5.x: sendMessage takes a CreateUIMessage object or string
+                // Create a proper message object with parts array for SDK 5.x
+                const userMessage = {
+                    role: 'user' as const,
+                    parts: [{ type: 'text', text: content }],
+                };
+                sendMessage(userMessage, { body: { sessionId, parentId: parentIdToUse } });
             } else {
                 console.warn("sendMessage missing, using manual fallback.");
-                await manualAppend({ role: "user", content });
+                manualAppend({ role: "user", content });
             }
         } catch (err) {
             toast.error("Failed to send message.");
@@ -217,41 +257,49 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
                 {messages.length === 0 && (
                     <div className="text-sm text-gray-500">No messages yet. Start the conversation!</div>
                 )}
-                {messages.map((m: any) => (
-                    <div
-                        key={m.id}
-                        className={`rounded-xl p-3 ${m.role === "user"
-                            ? "border bg-primary/10 border-primary/40 backdrop-blur-md shadow"
-                            : "glass"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs px-2 py-1 rounded bg-muted">
-                                {m.role.toUpperCase()}
-                            </span>
-                            {m.role === "user" && !isTemporary && (
-                                <button
-                                    className="text-xs p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-1"
-                                    onClick={() => {
-                                        setEditParentId(m.id);
-                                        setLocalInput(m.content);
-                                        toast.info("Editing previous message; this will create a branch.");
-                                    }}
-                                >
-                                    <Pencil className="w-3 h-3" />
-                                    Edit & Branch
-                                </button>
-                            )}
-                        </div>
+                {messages.map((m: any) => {
+                    // AI SDK 5.x uses parts array, legacy uses content string
+                    // Extract content from either format for display
+                    const displayContent = m.content || (m.parts ? m.parts.map((p: any) => 
+                        typeof p === 'string' ? p : (p.text || p.content || '')
+                    ).join('') : '');
+                    
+                    return (
+                        <div
+                            key={m.id}
+                            className={`rounded-xl p-3 ${m.role === "user"
+                                ? "border bg-primary/10 border-primary/40 backdrop-blur-md shadow"
+                                : "glass"
+                                }`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs px-2 py-1 rounded bg-muted">
+                                    {m.role.toUpperCase()}
+                                </span>
+                                {m.role === "user" && !isTemporary && (
+                                    <button
+                                        className="text-xs p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-1"
+                                        onClick={() => {
+                                            setEditParentId(m.id);
+                                            setLocalInput(displayContent);
+                                            toast.info("Editing previous message; this will create a branch.");
+                                        }}
+                                    >
+                                        <Pencil className="w-3 h-3" />
+                                        Edit & Branch
+                                    </button>
+                                )}
+                            </div>
 
-                        <div className="mt-2 whitespace-pre-wrap text-sm">
-                            {m.content}
-                            {m.role === 'assistant' && isLoading && m.id === messages[messages.length - 1]?.id && (
-                                <span className="ml-2 animate-pulse">...</span>
-                            )}
+                            <div className="mt-2 whitespace-pre-wrap text-sm">
+                                {displayContent}
+                                {m.role === 'assistant' && isLoading && m.id === messages[messages.length - 1]?.id && (
+                                    <span className="ml-2 animate-pulse">...</span>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
                     <div className="text-primary text-xs flex items-center gap-2">
                         <Loader className="w-3 h-3 animate-spin" /> Thinking...
