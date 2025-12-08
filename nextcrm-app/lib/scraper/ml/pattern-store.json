@@ -1,0 +1,47 @@
+{
+  "terrapincarestation.com": {
+    "domain": "terrapincarestation.com",
+    "distribution": {
+      "first.last": 0.4000000000000001,
+      "f.last": 0.20000000000000004,
+      "firstl": 0.10000000000000002,
+      "first": 0.10000000000000002,
+      "lastf": 0.05000000000000001,
+      "last": 0.05000000000000001,
+      "first_last": 0.07,
+      "first-last": 0.03
+    },
+    "lastUpdated": "2025-12-08T08:02:57.059Z",
+    "ttlMs": 1209600000
+  },
+  "foxcannabis.com": {
+    "domain": "foxcannabis.com",
+    "distribution": {
+      "first.last": 0.24000000000000005,
+      "f.last": 0.12000000000000002,
+      "firstl": 0.06000000000000001,
+      "first": 0.26,
+      "lastf": 0.030000000000000006,
+      "last": 0.22999999999999998,
+      "first_last": 0.042,
+      "first-last": 0.018
+    },
+    "lastUpdated": "2025-12-08T08:11:19.241Z",
+    "ttlMs": 1209600000
+  },
+  "ascendcannabisco.com": {
+    "domain": "ascendcannabisco.com",
+    "distribution": {
+      "first.last": 0.24000000000000005,
+      "f.last": 0.12000000000000002,
+      "firstl": 0.06000000000000001,
+      "first": 0.26,
+      "lastf": 0.030000000000000006,
+      "last": 0.22999999999999998,
+      "first_last": 0.042,
+      "first-last": 0.018
+    },
+    "lastUpdated": "2025-12-08T08:17:27.110Z",
+    "ttlMs": 1209600000
+  }
+}

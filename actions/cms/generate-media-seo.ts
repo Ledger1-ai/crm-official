@@ -37,7 +37,7 @@ export async function generateMediaSEO(filename: string, existingContext?: strin
                 { role: "system", content: "You are a helpful AI assistant that generates metadata." },
                 { role: "user", content: prompt },
             ],
-            temperature: isReasoningModel(model.modelId) ? undefined : 1.0,
+            temperature: isReasoningModel(model.modelId) ? undefined : 1,
         });
 
         return object;

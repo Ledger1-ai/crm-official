@@ -9,7 +9,7 @@
 
 import { getAiSdkModel, isReasoningModel } from "@/lib/openai";
 import { z } from "zod";
-import { generateObject, generateText } from "ai";
+import { generateObject, generateText, tool, ModelMessage } from "ai";
 
 import { prismadbCrm } from "@/lib/prisma-crm";
 import { launchBrowser, newPageWithDefaults, closeBrowser } from "@/lib/browser";
@@ -23,6 +23,19 @@ import {
   generatePersonDedupeKey,
   calculateCompanyConfidence
 } from "./normalize";
+import { fixConcatenatedWords as fixConcat } from "./quality/text-concatenation";
+import { shouldIgnoreEmail } from "./quality/email-filters";
+import { normalizePhone as normalizePhoneDigits } from "./quality/phone-normalizer";
+import { normalizeTechStack as canonTech } from "./quality/tech-normalizer";
+import { detectTechFromSnapshot } from "./tech/detector";
+import { sanitizeContact } from "./quality/contact-sanitizer";
+import { decodeEmailCandidates } from "./quality/email-deobfuscate";
+import { verifyEmail } from "./verify/email-verify";
+import { buildResendAdapters } from "./verify/adapters/resend-adapters";
+import { rankLinks } from "./ai/link-ranker";
+import ScraperConfig from "./config";
+import { learnDomainPatterns, guessEmailForName } from "./ml/pattern-model";
+import { normalizeTitleAndPersona } from "./quality/title-normalizer";
 
 type ICPConfig = {
   industries?: string[];
@@ -51,30 +64,44 @@ async function ddgWebSearch(query: string, count: number = 20): Promise<Array<{
   try {
     const page = await newPageWithDefaults(browser);
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
-    await new Promise(resolve => setTimeout(resolve, 2000));
+      const homeResp = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+      let homeResponseHeaders: any = undefined;
+      try {
+        // Puppeteer Response.headers() returns a plain object
+        homeResponseHeaders = typeof (homeResp as any)?.headers === 'function' ? (homeResp as any).headers() : (homeResp as any)?.headers;
+      } catch {}
+    // Wait for results container; fallback to small delay
+    try { await (page as any).waitForSelector('#links', { timeout: 10000 }); } catch {}
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const results = await page.evaluate(() => {
-      const extracted: Array<{ name: string; url: string; snippet: string }> = [];
-
-      const links = document.querySelectorAll('a[href*="http"]');
-      links.forEach((link, idx) => {
-        if (idx < 25) {
-          const anchor = link as HTMLAnchorElement;
-          const href = anchor.href;
-          if (href && !href.includes('duckduckgo.com') &&
-            (href.startsWith('http://') || href.startsWith('https://'))) {
-            extracted.push({
-              name: (anchor.textContent || '').trim(),
-              url: href,
-              snippet: (anchor.closest('.result')?.textContent || '').substring(0, 200)
-            });
+    const results = await page.evaluate((max: number) => {
+      const out: Array<{ name: string; url: string; snippet: string }> = [];
+      const anchors = Array.from(document.querySelectorAll('#links a[href]')) as HTMLAnchorElement[];
+      for (const a of anchors) {
+        if (out.length >= max) break;
+        let href = a.getAttribute('href') || '';
+        let finalUrl = '';
+        try {
+          if (href.startsWith('http://') || href.startsWith('https://')) {
+            finalUrl = href;
+          } else {
+            // Attempt to resolve duckduckgo redirect links
+            const abs = (a as HTMLAnchorElement).href || '';
+            const u = new URL(abs);
+            if (u.hostname.includes('duckduckgo.com')) {
+              const uddg = u.searchParams.get('uddg');
+              if (uddg) finalUrl = decodeURIComponent(uddg);
+            }
           }
-        }
-      });
-
-      return extracted;
-    });
+        } catch {}
+        if (!finalUrl) continue;
+        const name = (a.textContent || '').trim();
+        const container = a.closest('.result') || a.parentElement;
+        const snippet = (container?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+        out.push({ name, url: finalUrl, snippet });
+      }
+      return out;
+    }, Math.max(1, Math.min(count || 20, 50)));
 
     return results.map(r => ({
       ...r,
@@ -97,59 +124,104 @@ function extractDomain(url: string): string {
   }
 }
 
+// Heuristic fixer to insert spaces in concatenated words like "Contactme" -> "Contact me"
+function fixConcatenatedWords(input: string | null | undefined): string {
+  if (!input) return "";
+  let s = String(input).trim();
+  // Insert space between lower->Upper boundaries (camel-case like)
+  s = s.replace(/([a-z])([A-Z])/g, '$1 $2');
+  // Insert space before some common lowercase suffixes stuck to the previous token
+  const suffixes = ['me','us','now','team','about','info','support','contact'];
+  for (const suf of suffixes) {
+    const re = new RegExp(`(^|[^A-Za-z])([A-Za-z]{3,})${suf}$`,'i');
+    s = s.replace(re, (_m, p1, p2) => `${p1}${p2} ${suf}`);
+  }
+  // Collapse extra whitespace
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  return s;
+}
+
+// Tool parameter schemas defined with Zod for cross-provider compatibility
+const searchCompaniesSchema = z.object({
+  query: z.string().describe("The search query to find companies (e.g., 'SaaS companies in San Francisco')"),
+  count: z.number().optional().describe("Number of results to return (1-50), defaults to 20"),
+});
+
+const visitWebsiteSchema = z.object({
+  url: z.string().describe("The URL to visit"),
+});
+
+const analyzeCompanyFitSchema = z.object({
+  domain: z.string().describe("Company domain"),
+  companyData: z.any().optional().describe("Company information extracted from website"),
+});
+
+const saveCompanySchema = z.object({
+  domain: z.string().describe("Company domain"),
+  companyName: z.string().describe("Company name"),
+  description: z.string().describe("Company description"),
+  industry: z.string().describe("Primary industry"),
+  techStack: z.array(z.string()).optional().describe("Detected technologies"),
+  contacts: z.array(z.object({
+    name: z.string().describe("Contact name (can be empty string if unknown)"),
+    title: z.string().describe("Job title (can be 'Contact' if unknown)"),
+    email: z.string().describe("Email address"),
+    phone: z.string().describe("Phone number (can be empty string if unknown)"),
+    linkedin: z.string().optional().describe("LinkedIn profile URL"),
+  })).describe("List of contacts with at least one email or phone"),
+});
+
+const refineSearchStrategySchema = z.object({
+  currentResults: z.number().describe("Number of qualified companies found so far"),
+  targetResults: z.number().describe("Target number of companies"),
+  reasoning: z.string().describe("Why the strategy should or shouldn't change"),
+});
+
 /**
- * AI Agent Tools - These are callable by the AI
+ * Build tools definition for AI SDK
+ * Using tool() helper with Zod schemas for cross-provider compatibility
+ * Per AI SDK v5 docs: use `inputSchema` property with Zod schemas
+ * Tool execution happens in executeToolCall() - not inline
  */
-/**
- * AI Agent Tools Definition
- */
-const toolsDefinition = {
-  search_companies: {
-    description: "Search for companies using Bing Search API. Returns company websites matching the query.",
-    parameters: z.object({
-      query: z.string().describe("The search query to find companies (e.g., 'SaaS companies in San Francisco')"),
-      count: z.number().default(20).describe("Number of results to return (1-50)"),
+function buildToolsDefinition(context: { jobId: string; poolId: string; icp: ICPConfig; userId: string; logs: any[] }) {
+  return {
+    search_companies: tool({
+      description: "Search for companies using DuckDuckGo Search. Returns company websites matching the query.",
+      inputSchema: searchCompaniesSchema,
+      async execute(input) {
+        return await executeToolCall("search_companies", input, context);
+      },
     }),
-  },
-  visit_website: {
-    description: "Visit a company website and extract all available information including company details and contact information.",
-    parameters: z.object({
-      url: z.string().describe("The URL to visit"),
+    visit_website: tool({
+      description: "Visit a company website and extract all available information including company details and contact information.",
+      inputSchema: visitWebsiteSchema,
+      async execute(input) {
+        return await executeToolCall("visit_website", input, context);
+      },
     }),
-  },
-  analyze_company_fit: {
-    description: "Analyze if a company matches the ICP criteria and should be added to the pool.",
-    parameters: z.object({
-      domain: z.string().describe("Company domain"),
-      companyData: z.any().describe("Company information extracted from website"),
+    analyze_company_fit: tool({
+      description: "Analyze if a company matches the ICP criteria and should be added to the pool.",
+      inputSchema: analyzeCompanyFitSchema,
+      async execute(input) {
+        return await executeToolCall("analyze_company_fit", input, context);
+      },
     }),
-  },
-  save_company: {
-    description: "Save a qualified company to the lead pool with extracted data.",
-    parameters: z.object({
-      domain: z.string(),
-      companyName: z.string(),
-      description: z.string(),
-      industry: z.string(),
-      techStack: z.array(z.string()).optional(),
-      contacts: z.array(z.object({
-        name: z.string(),
-        title: z.string(),
-        email: z.string(),
-        phone: z.string(),
-        linkedin: z.string().optional()
-      })),
+    save_company: tool({
+      description: "Save a qualified company to the lead pool with extracted data.",
+      inputSchema: saveCompanySchema,
+      async execute(input) {
+        return await executeToolCall("save_company", input, context);
+      },
     }),
-  },
-  refine_search_strategy: {
-    description: "Based on results so far, decide if search strategy should be adjusted.",
-    parameters: z.object({
-      currentResults: z.number().describe("Number of qualified companies found so far"),
-      targetResults: z.number().describe("Target number of companies"),
-      reasoning: z.string().describe("Why the strategy should or shouldn't change"),
+    refine_search_strategy: tool({
+      description: "Based on results so far, decide if search strategy should be adjusted.",
+      inputSchema: refineSearchStrategySchema,
+      async execute(input) {
+        return await executeToolCall("refine_search_strategy", input, context);
+      },
     }),
-  },
-};
+  };
+}
 
 /**
  * Discover sitemap URLs from a domain
@@ -328,6 +400,9 @@ async function extractPageData(page: any): Promise<{
   socialLinks: { [key: string]: string };
   techStack: string[];
   internalLinks: string[];
+  hrefList: string[];
+  rawTextExcerpt: string;
+  _techSnapshot?: { html?: string; scripts?: string[]; links?: string[] };
 }> {
   return page.evaluate(() => {
     const result: any = {
@@ -337,7 +412,9 @@ async function extractPageData(page: any): Promise<{
       phones: [],
       socialLinks: {},
       techStack: [],
-      internalLinks: []
+      internalLinks: [],
+      hrefList: [],
+      rawTextExcerpt: ""
     };
 
     // Meta description
@@ -396,35 +473,14 @@ async function extractPageData(page: any): Promise<{
     }
     result.phones = Array.from(new Set(allPhones)).slice(0, 10);
 
-    // Tech stack detection - expanded
+    // Scripts and link hrefs for detector
+    const scripts = Array.from(document.querySelectorAll('script[src]')).map((s) => (s as HTMLScriptElement).src || '');
+    const links = Array.from(document.querySelectorAll('link[href]')).map((l) => (l as HTMLLinkElement).href || '');
+    // Basic inline tech hints for fallback
     const html = document.documentElement.outerHTML.toLowerCase();
-    const techIndicators: { [key: string]: string[] } = {
-      'React': ['react', '_reactroot', '__react'],
-      'Vue.js': ['vue', '__vue__'],
-      'Angular': ['ng-app', 'ng-version', 'angular'],
-      'WordPress': ['wp-content', 'wordpress'],
-      'Shopify': ['shopify', 'cdn.shopify'],
-      'Next.js': ['__next', '_next/static'],
-      'Gatsby': ['gatsby', '___gatsby'],
-      'Laravel': ['laravel'],
-      'Ruby on Rails': ['rails', 'turbolinks'],
-      'Django': ['csrfmiddlewaretoken', 'django'],
-      'HubSpot': ['hubspot', 'hs-script'],
-      'Salesforce': ['salesforce', 'pardot'],
-      'Marketo': ['marketo', 'munchkin'],
-      'Intercom': ['intercom'],
-      'Zendesk': ['zendesk'],
-      'Drift': ['drift'],
-    };
 
-    Object.entries(techIndicators).forEach(([tech, indicators]) => {
-      for (const indicator of indicators) {
-        if (html.includes(indicator)) {
-          result.techStack.push(tech);
-          break;
-        }
-      }
-    });
+    // Detector will run outside the browser context for flexibility
+
 
     // Social links - expanded
     const socialPatterns = [
@@ -461,15 +517,26 @@ async function extractPageData(page: any): Promise<{
       }
     });
     result.internalLinks = Array.from(new Set(result.internalLinks)).slice(0, 50);
+    // Capture href list and a large text excerpt for deobfuscation outside the browser
+    result.hrefList = Array.from(document.querySelectorAll('a[href]')).map((a) => (a as HTMLAnchorElement).href);
+    result.rawTextExcerpt = (document.body.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 50000);
 
-    return result;
+    return {
+      ...result,
+      // Pass raw HTML for detector outside, plus scripts/links
+      _techSnapshot: {
+        html: document.documentElement.outerHTML,
+        scripts,
+        links,
+      }
+    };
   });
 }
 
 /**
  * Visit website with deep crawling - visits multiple pages for maximum contact extraction
  */
-async function visitWebsiteForAgent(url: string): Promise<any> {
+async function visitWebsiteForAgent(url: string, userId?: string, icp?: ICPConfig): Promise<any> {
   const browser = await launchBrowser();
   try {
     const page = await newPageWithDefaults(browser);
@@ -490,7 +557,11 @@ async function visitWebsiteForAgent(url: string): Promise<any> {
 
     // Step 1: Visit homepage
     try {
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+      const homeResp = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+      let homeResponseHeaders: any = undefined;
+      try {
+        homeResponseHeaders = typeof (homeResp as any)?.headers === 'function' ? (homeResp as any).headers() : (homeResp as any)?.headers;
+      } catch {}
       await new Promise(resolve => setTimeout(resolve, 1500));
       await dismissOverlays(page);
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -499,8 +570,13 @@ async function visitWebsiteForAgent(url: string): Promise<any> {
       aggregatedData.title = homeData.title;
       aggregatedData.description = homeData.description;
       aggregatedData.emails.push(...homeData.emails);
+      // Deobfuscate additional email candidates from text and hrefs
+      aggregatedData.emails.push(...decodeEmailCandidates(homeData.rawTextExcerpt, homeData.hrefList));
       aggregatedData.phones.push(...homeData.phones);
-      aggregatedData.techStack.push(...homeData.techStack);
+      // Detect tech via signatures outside browser
+      const detectedHomeTech = detectTechFromSnapshot({ ...(homeData._techSnapshot || {}), headers: homeResponseHeaders });
+      aggregatedData.techStack.push(...homeData.techStack, ...detectedHomeTech);
+      aggregatedData.techStack = canonTech(aggregatedData.techStack);
       Object.assign(aggregatedData.socialLinks, homeData.socialLinks);
       aggregatedData.pagesVisited.push(url);
     } catch (e) {
@@ -513,21 +589,33 @@ async function visitWebsiteForAgent(url: string): Promise<any> {
     // Step 3: Get high-value page URLs
     const highValueUrls = getHighValuePageUrls(domain, sitemapUrls);
 
-    // Step 4: Visit high-value pages (limit to 5 for performance)
-    const pagesToVisit = highValueUrls
-      .filter(u => !aggregatedData.pagesVisited.includes(u))
-      .slice(0, 5);
+    // AI sideloop: rank links using heuristics + optional model
+    let candidateLinks = Array.from(new Set([
+      ...highValueUrls,
+    ]));
+    candidateLinks = candidateLinks.filter(u => !aggregatedData.pagesVisited.includes(u));
+    const ranked = await rankLinks(userId, domain, candidateLinks, { icp, visited: aggregatedData.pagesVisited });
+    const pagesToVisit = ranked.slice(0, 5);
 
     for (const pageUrl of pagesToVisit) {
       try {
-        await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 12000 });
+        const pageResp = await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 12000 });
+        let pageResponseHeaders: any = undefined;
+        try {
+          pageResponseHeaders = typeof (pageResp as any)?.headers === 'function' ? (pageResp as any).headers() : (pageResp as any)?.headers;
+        } catch {}
         await new Promise(resolve => setTimeout(resolve, 1000));
         await dismissOverlays(page);
 
         const pageData = await extractPageData(page);
         aggregatedData.emails.push(...pageData.emails);
+        // Deobfuscate additional email candidates from text and hrefs
+        aggregatedData.emails.push(...decodeEmailCandidates(pageData.rawTextExcerpt, pageData.hrefList));
         aggregatedData.phones.push(...pageData.phones);
-        aggregatedData.techStack.push(...pageData.techStack);
+        // Detect tech via signatures outside browser
+        const detectedPageTech = detectTechFromSnapshot({ ...(pageData._techSnapshot || {}), headers: pageResponseHeaders });
+        aggregatedData.techStack.push(...pageData.techStack, ...detectedPageTech);
+        aggregatedData.techStack = canonTech(aggregatedData.techStack);
         Object.assign(aggregatedData.socialLinks, pageData.socialLinks);
         aggregatedData.pagesVisited.push(pageUrl);
       } catch (e) {
@@ -628,6 +716,19 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
   switch (toolName) {
     case "search_companies":
       const searchResults = await ddgWebSearch(args.query, args.count || 20);
+      // Log the search outcome to the job for traceability
+      try {
+        const top = searchResults.slice(0, 5).map(r => r.domain || (r.url ? extractDomain(r.url) : '')).filter(Boolean).join(', ');
+        await (prismadbCrm as any).crm_Lead_Gen_Jobs.update({
+          where: { id: context.jobId },
+          data: {
+            logs: [
+              ...(context.logs || []),
+              { ts: new Date().toISOString(), msg: `search_companies(\"${args.query}\") -> ${searchResults.length} result(s). Top: ${top || 'none'}` }
+            ]
+          }
+        });
+      } catch {}
       return {
         success: true,
         results: searchResults,
@@ -635,7 +736,7 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
       };
 
     case "visit_website":
-      const siteData = await visitWebsiteForAgent(args.url);
+      const siteData = await visitWebsiteForAgent(args.url, context.userId, context.icp);
       return {
         success: !siteData.error,
         data: siteData,
@@ -673,14 +774,39 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
         return { success: false, error: "Cannot save company without contacts" };
       }
 
-      const contactsWithInfo = args.contacts.filter((c: any) =>
-        (c.email && c.email.trim().length > 0) || (c.phone && c.phone.trim().length > 0)
-      );
-      console.log("[SAVE_COMPANY] Contacts with email or phone:", contactsWithInfo.length);
+      // Augment contacts with pattern-based guesses behind feature flag
+      const augmentedContacts: any[] = Array.isArray(args.contacts) ? [...args.contacts] : [];
+      if (ScraperConfig.patternGuess.enabled && domain) {
+        try {
+          const observedPairs = augmentedContacts
+            .filter((c) => c?.name && c?.email)
+            .map((c) => ({ name: String(c.name), email: String(c.email).toLowerCase() }));
+          if (observedPairs.length > 0) {
+            const ttlMs = ScraperConfig.patternGuess.ttlDays * 24 * 60 * 60 * 1000;
+            learnDomainPatterns(domain, observedPairs, ttlMs);
+          }
+          for (const c of augmentedContacts) {
+            if (!c.email && c.name) {
+              const guesses = guessEmailForName(domain, c.name, 1);
+              const top = guesses[0];
+              if (top && top.confidence >= ScraperConfig.patternGuess.minConfidenceToAssign) {
+                c.email = top.email;
+                (c as any).__patternGuess = top; // temp: attach for provenance
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("[SAVE_COMPANY] Pattern model error:", (e as Error).message);
+        }
+      }
 
-      if (contactsWithInfo.length === 0) {
-        console.log("[SAVE_COMPANY] Validation failed: No contact info");
-        return { success: false, error: "Cannot save company without at least one email or phone number" };
+      // Enforce email requirement: must have at least one email (phones alone are not sufficient)
+      const contactsWithEmails = augmentedContacts.filter((c: any) => c.email && c.email.trim().length > 0);
+      console.log("[SAVE_COMPANY] Contacts with emails:", contactsWithEmails.length);
+
+      if (contactsWithEmails.length === 0) {
+        console.log("[SAVE_COMPANY] Validation failed: No emails found");
+        return { success: false, error: "Cannot save company without at least one email address" };
       }
 
       // Use AI to enrich missing fields if not provided
@@ -719,7 +845,7 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
         companyName,
         hasDescription: !!description,
         industry,
-        contactCount: contactsWithInfo.length
+        contactCount: contactsWithEmails.length
       });
 
       try {
@@ -753,10 +879,10 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
         let qualityScore = 50;
 
         // +10 points for each contact found (up to +30)
-        qualityScore += Math.min(contactsWithInfo.length * 10, 30);
+        qualityScore += Math.min(contactsWithEmails.length * 10, 30);
 
         // +10 points if we have multiple emails
-        const emailCount = args.contacts.filter((c: any) => c.email).length;
+        const emailCount = augmentedContacts.filter((c: any) => c.email).length;
         if (emailCount >= 2) qualityScore += 10;
 
         // +5 points for tech stack
@@ -768,66 +894,203 @@ async function executeToolCall(toolName: string, args: any, context: any): Promi
         // Cap at 95 (ICP scoring will adjust from there)
         qualityScore = Math.min(qualityScore, 95);
 
-        // Save to user pool
-        const candidate = await db.crm_Lead_Candidates.create({
-          data: {
-            pool: context.poolId,
-            domain,
-            dedupeKey,
-            companyName,
-            description,
-            industry,
-            techStack: args.techStack || [],
-            homepageUrl: `https://${domain}`,
-            score: qualityScore,
-            status: "NEW",
-            provenance: { source: "agentic_ai", jobId: context.jobId }
-          }
+        // Save to user pool (de-duplicate within pool by dedupeKey)
+        const existingCandidate = await db.crm_Lead_Candidates.findFirst({
+          where: { pool: context.poolId, dedupeKey }
         });
+
+        // Prepare merged tech stack
+        const incomingTech: string[] = Array.isArray(args.techStack) ? args.techStack : [];
+        const mergeTech = (a?: any, b?: any) => Array.from(new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]));
+
+        let candidate: any;
+        if (existingCandidate) {
+          const mergedTech = mergeTech(existingCandidate.techStack, incomingTech);
+          const mergedScore = Math.max(existingCandidate.score || 0, qualityScore);
+          const betterDescription = (existingCandidate.description?.length || 0) >= (description?.length || 0)
+            ? existingCandidate.description
+            : description;
+          const finalCompanyName = existingCandidate.companyName || companyName;
+          const finalIndustry = existingCandidate.industry || industry;
+
+          candidate = await db.crm_Lead_Candidates.update({
+            where: { id: existingCandidate.id },
+            data: {
+              companyName: finalCompanyName,
+              description: betterDescription,
+              industry: finalIndustry,
+              techStack: mergedTech,
+              homepageUrl: existingCandidate.homepageUrl || `https://${domain}`,
+              score: mergedScore,
+              // keep earliest status or set to NEW if missing
+              status: existingCandidate.status || "NEW",
+              provenance: { source: "agentic_ai", jobId: context.jobId, merged: true }
+            }
+          });
+        } else {
+          candidate = await db.crm_Lead_Candidates.create({
+            data: {
+              pool: context.poolId,
+              domain,
+              dedupeKey,
+              companyName,
+              description,
+              industry,
+              techStack: incomingTech,
+              homepageUrl: `https://${domain}`,
+              score: qualityScore,
+              status: "NEW",
+              provenance: { source: "agentic_ai", jobId: context.jobId }
+            }
+          });
+        }
 
         // Save ALL contacts with emails or phones
         let contactsSavedCount = 0;
-        if (args.contacts && Array.isArray(args.contacts)) {
-          for (const contact of args.contacts) {
-            const email = normalizeEmail(contact.email);
-            const phone = normalizePhone(contact.phone);
+        let validEmailCount = 0;
+        let personaDecisionMakerFound = false;
+        if (augmentedContacts && Array.isArray(augmentedContacts)) {
+          for (const contact of augmentedContacts) {
+            const cleaned = sanitizeContact({
+              name: contact.name,
+              email: contact.email,
+              phone: contact.phone,
+              title: contact.title,
+              linkedin: contact.linkedin,
+            }, { deprioritizeRoleEmails: true });
 
-            // Save contact if it has either email or phone
-            if (email || phone) {
+            if (cleaned) {
+              let email = cleaned.email || null;
+              const phone = cleaned.phone || null;
+
+              // Strict guard: require email per-contact (drop phone-only entries)
+              if (!email) {
+                continue;
+              }
+
+              // Optional email verification (syntax-only by default; adapters can extend MX/SMTP)
+              let emailStatus: any = "UNKNOWN";
+              let verificationResult: any = null;
+              let confScore = 70;
+              try {
+                if (ScraperConfig.verify.enabled && email) {
+                  const verification = await verifyEmail(email, {
+                    stages: ScraperConfig.verify.stages,
+                    cacheTtlMs: ScraperConfig.verify.domainTtlDays * 24 * 60 * 60 * 1000,
+                    domainTtlMs: ScraperConfig.verify.domainTtlDays * 24 * 60 * 60 * 1000,
+                    smtpTtlMs: ScraperConfig.verify.smtpTtlDays * 24 * 60 * 60 * 1000,
+                    adapters: ScraperConfig.verify.useAdapters ? buildResendAdapters() : undefined,
+                  });
+                  verificationResult = verification;
+                  if (verification.steps.catchAll?.value === "yes") {
+                    emailStatus = "CATCH_ALL";
+                    confScore = Math.max(confScore, 65);
+                  } else if (verification.status === "valid") {
+                    emailStatus = "VALID";
+                    confScore = Math.max(confScore, 85);
+                    validEmailCount++;
+                  } else if (verification.status === "risky") {
+                    emailStatus = "RISKY";
+                    confScore = Math.max(confScore, 70);
+                  } else if (verification.status === "invalid") {
+                    emailStatus = "INVALID";
+                    email = null; // drop invalid
+                    confScore = Math.max(confScore, 50);
+                  }
+                }
+              } catch (e) {
+                // Non-fatal: keep email if present
+              }
+
               // Build a safe display name using email/company/domain fallbacks (avoid "Direct Direct")
-              const safeName = safeContactDisplayName(
+              let safeName = cleaned.name || safeContactDisplayName(
                 contact.name,
-                email,
+                cleaned.email,
                 companyName,
                 domain
               );
+              // Ensure concatenations are fixed
+              safeName = fixConcat(safeName) || safeName;
 
               const personDedupeKey = generatePersonDedupeKey(
                 email || phone || "",
                 safeName,
                 domain,
-                contact.title
+                cleaned.title
               );
 
-              await db.crm_Contact_Candidates.create({
-                data: {
-                  leadCandidate: candidate.id,
-                  fullName: normalizeName(safeName) || safeName,
-                  title: contact.title || null,
-                  email: email || null,
-                  phone: phone || null,
-                  linkedinUrl: contact.linkedin || null,
-                  dedupeKey: personDedupeKey,
-                  confidence: 70,
-                  status: "NEW",
-                  provenance: { source: "agentic_ai", jobId: context.jobId }
-                }
+              // Title normalization & persona tagging
+              const titleInfo = normalizeTitleAndPersona(cleaned.title);
+              if (titleInfo) {
+                const isDecisionMaker =
+                  titleInfo.persona === "TECH_DECISION_MAKER" ||
+                  (titleInfo.ladder === "C-SUITE" || titleInfo.ladder === "VP" || titleInfo.ladder === "DIRECTOR");
+                if (isDecisionMaker) personaDecisionMakerFound = true;
+              }
+
+              const existingContact = await db.crm_Contact_Candidates.findFirst({
+                where: { leadCandidate: candidate.id, dedupeKey: personDedupeKey }
               });
-              contactsSavedCount++;
+
+              if (existingContact) {
+                // Merge missing fields; keep existing confidence if higher
+                await db.crm_Contact_Candidates.update({
+                  where: { id: existingContact.id },
+                  data: {
+                    fullName: normalizeName(safeName) || existingContact.fullName,
+                    title: existingContact.title || (titleInfo?.normalizedTitle ?? cleaned.title) || null,
+                    email: existingContact.email || email || null,
+                    phone: existingContact.phone || phone || null,
+                    linkedinUrl: existingContact.linkedinUrl || cleaned.linkedin || null,
+                    emailStatus: (existingContact as any).emailStatus || emailStatus,
+                    confidence: Math.max(existingContact.confidence || 0, confScore),
+                    provenance: {
+                      ...(existingContact.provenance || {}),
+                      merged: true,
+                      jobId: context.jobId,
+                      normalizedTitle: titleInfo || undefined,
+                      patternGuess: (contact as any).__patternGuess || undefined,
+                      emailVerification: verificationResult || undefined,
+                    }
+                  }
+                });
+              } else {
+                await db.crm_Contact_Candidates.create({
+                  data: {
+                    leadCandidate: candidate.id,
+                    fullName: normalizeName(safeName) || safeName,
+                    title: (titleInfo?.normalizedTitle ?? cleaned.title) || null,
+                    email: email || null,
+                    phone: phone || null,
+                    linkedinUrl: cleaned.linkedin || null,
+                    dedupeKey: personDedupeKey,
+                    emailStatus: emailStatus,
+                    confidence: confScore,
+                    status: "NEW",
+                    provenance: {
+                      source: "agentic_ai",
+                      jobId: context.jobId,
+                      normalizedTitle: titleInfo || undefined,
+                      patternGuess: (contact as any).__patternGuess || undefined,
+                      emailVerification: verificationResult || undefined,
+                    }
+                  }
+                });
+                contactsSavedCount++;
+              }
             }
           }
         }
 
+        try {
+          let adjustedScore = qualityScore;
+          if (personaDecisionMakerFound) adjustedScore = Math.min(adjustedScore + 10, 95);
+          if (validEmailCount >= 2) adjustedScore = Math.min(adjustedScore + 5, 95);
+          await db.crm_Lead_Candidates.update({
+            where: { id: candidate.id },
+            data: { score: Math.max(candidate.score || 0, adjustedScore) }
+          });
+        } catch {}
         return {
           success: true,
           candidateId: candidate.id,
@@ -1029,9 +1292,8 @@ Remember: QUALITY > QUANTITY. Better to save 50 perfect companies with 250 conta
 
 Be strategic, thorough, and relentless in finding contact information. Good luck! 🚀`;
 
-  // Start with explicit System and User messages for the context using AI SDK CoreMessage format
-  const messages: any[] = [
-    { role: "system", content: systemPrompt },
+  // Start with a User message; pass systemPrompt via the 'system' option in generateText
+const messages: ModelMessage[] = [
     {
       role: "user",
       content: `Begin lead generation. Find ${maxCompanies} companies matching the ICP.
@@ -1058,6 +1320,10 @@ Start now by searching for companies.`
   let iterations = 0;
   const maxIterations = 50; // Prevent infinite loops
   const context = { jobId, poolId, logs: [], icp, userId };
+  let noProgressStreak = 0;
+  let prevCompaniesSaved = 0;
+  let prevContactsSaved = 0;
+  const STALL_THRESHOLD = 5;
 
   // Buffer logs locally to reduce DB write conflicts
   let logBuffer: Array<{ ts: string; msg: string; level?: string }> = [];
@@ -1181,30 +1447,34 @@ Start now by searching for companies.`
       // Use generateText from AI SDK
       // We pass the full history (messages) so it knows what happened
       // We also pass the tools definition
-      const { text, toolCalls, response } = await generateText({
+      // maxSteps is handled by maxIterations (default 50) in the while loop above
+      const tools = buildToolsDefinition(context);
+      const genOpts: any = {
         model,
+        system: systemPrompt,
         messages,
-        tools: toolsDefinition as any,
-        maxSteps: 1, // We handle steps manually in the loop
-        temperature: isReasoningModel(model.modelId) ? undefined : 1,
-      });
-
-      // Append the assistant's response (text + tool calls) to history
-      messages.push(...response.messages);
+        tools,
+      };
+      // Only set temperature for non-reasoning models; omit entirely otherwise
+      if (!isReasoningModel(model.modelId)) {
+        genOpts.temperature = 1;
+      }
+      const { text, toolCalls, response, toolResults } = await generateText(genOpts);
 
       // Check if agent wants to use tools
       if (toolCalls && toolCalls.length > 0) {
         const toolCount = toolCalls.length;
-        addLog(`🎬 Executing ${toolCount} tool${toolCount > 1 ? 's' : ''} in parallel...`);
 
-        // Execute all tool calls in parallel using Promise.all
-        const toolExecutionPromises = toolCalls.map(async (toolCall: any, index: number) => {
-          const toolName = toolCall.toolName;
-          const toolArgs = toolCall.args;
+        // Append assistant message with tool-call parts (explicit ModelMessage shape)
+        // Use SDK-generated assistant/tool messages to ensure exact v5 shapes
+        if (response?.messages && Array.isArray(response.messages)) {
+          messages.push(...(response.messages as unknown as ModelMessage[]));
+        }
 
-          console.log(`Agent calling: ${toolName}`, toolArgs);
-
-          // Create detailed log message based on tool type
+        // Logging for visibility
+        toolCalls.forEach((tc: any, index: number) => {
+          const toolName = tc.toolName;
+          const toolArgs = tc.input ?? {};
           let logMsg = "";
           switch (toolName) {
             case "search_companies":
@@ -1221,92 +1491,127 @@ Start now by searching for companies.`
               logMsg = `💾 [${index + 1}/${toolCount}] Saving: ${(toolArgs as any).companyName || (toolArgs as any).domain}`;
               break;
             case "refine_search_strategy":
-              logMsg = `🎯 [${index + 1}/${toolCount}] Strategy: ${(toolArgs as any).reasoning.substring(0, 100)}...`;
+              logMsg = `🎯 [${index + 1}/${toolCount}] Strategy: ${(toolArgs as any).reasoning?.substring(0, 100) ?? ''}...`;
               break;
             default:
               logMsg = `🤖 [${index + 1}/${toolCount}] ${toolName}`;
           }
-
-          // Log start (buffered)
           addLog(logMsg);
-
-          // Execute tool
-          const startTime = Date.now();
-          const toolResult = await executeToolCall(toolName, toolArgs, context);
-          const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-
-          // Log completion with result summary
-          let completionMsg = "";
-          switch (toolName) {
-            case "search_companies":
-              const resultCount = toolResult.results?.length || toolResult.count || 0;
-              completionMsg = `✓ [${index + 1}/${toolCount}] Search complete: ${resultCount} results in ${duration}s`;
-              break;
-            case "visit_website":
-              const visitDomain = extractDomain((toolArgs as any).url);
-              const emails = toolResult.data?.emails?.length || 0;
-              completionMsg = `✓ [${index + 1}/${toolCount}] ${visitDomain}: ${emails} emails, ${toolResult.data?.phones?.length || 0} phones (${duration}s)`;
-              break;
-            case "save_company":
-              if (toolResult.success) {
-                completionMsg = `✓ [${index + 1}/${toolCount}] ✅ SAVED: ${(toolArgs as any).companyName || (toolArgs as any).domain} with ${toolResult.contactsCreated} contacts (${duration}s)`;
-              } else {
-                completionMsg = `✗ [${index + 1}/${toolCount}] ❌ FAILED: ${(toolArgs as any).companyName || (toolArgs as any).domain} - ${toolResult.error} (${duration}s)`;
-                console.error("[SAVE_FAILED]", (toolArgs as any).companyName, toolResult.error);
-              }
-              break;
-            default:
-              completionMsg = `✓ [${index + 1}/${toolCount}] ${toolName} complete (${duration}s)`;
-          }
-          addLog(completionMsg);
-
-          return {
-            toolCall,
-            toolResult
-          };
         });
 
-        // Wait for all tools to complete
-        const completedTools = await Promise.all(toolExecutionPromises);
-
-        // Process results and add to conversation
-        // For Vercel AI SDK, we append 'tool' messages
-        const toolMessages = completedTools.map(({ toolCall, toolResult }) => ({
-          role: "tool",
-          content: [{
-            type: "tool-result",
-            toolCallId: toolCall.toolCallId,
-            toolName: toolCall.toolName,
-            result: toolResult,
-          }],
-        }));
-        messages.push(...toolMessages);
-
-        // Track saves for stats
-        for (const { toolCall, toolResult } of completedTools) {
-          if (toolCall.toolName === "save_company" && toolResult.success) {
+        // Track saves and summarize using toolResults
+        const savedResults = (toolResults ?? []).filter((tr: any) => {
+          if (tr.toolName !== "save_company") return false;
+          const out = tr.output;
+          if (!out) return false;
+          if (typeof out === 'object' && 'type' in out) {
+            if (out.type === 'json' && out.value && typeof out.value === 'object') {
+              return !!out.value.success;
+            }
+            if (out.type === 'text') {
+              try { const obj = JSON.parse(out.value); return !!obj.success; } catch { return false; }
+            }
+            return false;
+          }
+          // Fallback if provider returned plain object
+          return !!(out as any).success;
+        });
+        for (const tr of savedResults) {
+          const out = tr.output;
+          if (typeof out === 'object' && 'type' in out) {
+            if (out.type === 'json' && out.value) {
+              companiesSaved++;
+              contactsSaved += out.value.contactsCreated || 0;
+            }
+          } else {
             companiesSaved++;
-            contactsSaved += toolResult.contactsCreated || 0;
+            contactsSaved += (out as any)?.contactsCreated || 0;
           }
         }
 
-        // Log summary with updated counters
-        const saveCount = completedTools.filter((t: any) => t.toolCall.toolName === "save_company" && t.toolResult.success).length;
-        const visitCount = completedTools.filter((t: any) => t.toolCall.toolName === "visit_website").length;
-        const searchCount = completedTools.filter((t: any) => t.toolCall.toolName === "search_companies").length;
-
-        let summary = `✅ Batch complete:`;
-        if (searchCount > 0) summary += ` ${searchCount} search${searchCount > 1 ? 's' : ''}`;
-        if (visitCount > 0) summary += ` ${visitCount} visit${visitCount > 1 ? 's' : ''}`;
-        if (saveCount > 0) summary += ` ${saveCount} saved`;
+        let summary = `✅ Batch complete: ${toolCount} tool call${toolCount > 1 ? 's' : ''}`;
+        if (savedResults.length > 0) summary += ` | ${savedResults.length} saved`;
         summary += ` | Total: ${companiesSaved}/${maxCompanies} companies (${contactsSaved} contacts)`;
-
         addLog(summary);
 
-        // Flush logs to DB after batch completion
+        // Detect SERP skip/no results towards stall completion
+        let __serpZero = false;
+        try {
+          for (const tr of (toolResults ?? [])) {
+            if (tr.toolName !== 'search_companies') continue;
+            let payload: any = tr.output;
+            if (payload && typeof payload === 'object' && 'type' in payload) {
+              if (payload.type === 'json') payload = payload.value;
+              else if (payload.type === 'text') { try { payload = JSON.parse(payload.value); } catch { /* ignore */ }
+              }
+            }
+            const cnt = typeof payload?.count === 'number' ? payload.count : (Array.isArray(payload?.results) ? payload.results.length : 0);
+            if (cnt === 0) { __serpZero = true; break; }
+          }
+        } catch {}
+        if (__serpZero && savedResults.length === 0) {
+          addLog('SERP returned 0 results and no companies were saved in this batch. Refining strategy and continuing.');
+          messages.push({
+            role: 'user',
+            content: 'SERP returned zero results. Refine and continue: diversify queries (synonyms, broader/narrower), broaden geos, include directories (LinkedIn, Crunchbase, ProductHunt), and prioritize /about, /team, /contact pages.'
+          });
+          noProgressStreak = 0;
+        }
+
+        // Explicitly echo search_companies results back into the conversation for the model
+        try {
+          const callMap = new Map((toolCalls ?? []).map((tc: any) => [tc.toolCallId, tc.input ?? {}]));
+          const searchSummaries: string[] = [];
+          for (const tr of (toolResults ?? [])) {
+            if (tr.toolName !== 'search_companies') continue;
+            const input = callMap.get(tr.toolCallId) || {};
+            const query = (input as any).query || '(unknown query)';
+            let payload: any = tr.output;
+            if (payload && typeof payload === 'object' && 'type' in payload) {
+              if (payload.type === 'json') payload = payload.value;
+              else if (payload.type === 'text') { try { payload = JSON.parse(payload.value); } catch { /* ignore */ } }
+            }
+            const results = Array.isArray(payload?.results) ? payload.results : [];
+            const count = typeof payload?.count === 'number' ? payload.count : results.length;
+            const topDomains = results.slice(0, 5).map((r: any) => r.domain || (r.url ? extractDomain(r.url) : '')).filter(Boolean);
+            searchSummaries.push(`- Query: "${query}" -> ${count} result(s). Top domains: ${topDomains.join(', ') || 'none'}`);
+            addLog(`🔎 Search summary: "${query}" -> ${count} result(s)`);
+          }
+          if (searchSummaries.length > 0) {
+            messages.push({
+              role: 'user',
+              content: `Search results received and summarized for the agent:\n${searchSummaries.join('\n')}`
+            });
+          }
+        } catch (e) {
+          addLog(`⚠️ Failed to echo search results to conversation: ${(e as Error).message}`);
+        }
+
         await flushLogsToDb(false);
+        // Progress stall detection
+        if (companiesSaved === prevCompaniesSaved && contactsSaved === prevContactsSaved) {
+          noProgressStreak++;
+        } else {
+          noProgressStreak = 0;
+          prevCompaniesSaved = companiesSaved;
+          prevContactsSaved = contactsSaved;
+        }
+        if (noProgressStreak >= STALL_THRESHOLD) {
+          addLog(`No progress for ${STALL_THRESHOLD} consecutive iterations. Refining search strategy and continuing.`);
+          messages.push({
+            role: 'user',
+            content: 'No progress detected. Refine search now: diversify queries (synonyms, broader/narrower), broaden geos, include directories (LinkedIn, Crunchbase, ProductHunt), and prioritize /about, /team, /contact pages before continuing.'
+          });
+          noProgressStreak = 0;
+        }
       } else if (text) {
         // Agent is thinking/reasoning (text response without tools)
+        // Add assistant message to history
+        messages.push({
+          role: "assistant",
+          content: text,
+        });
+        
         console.log("Agent reasoning:", text);
         addLog(`💭 Agent thinking: ${text}`);
 
@@ -1336,6 +1641,22 @@ Don't keep searching - SAVE the companies you've already found!`;
           });
           addLog(`📍 Checkpoint: ${companiesSaved}/${maxCompanies} companies | Directing agent to save...`);
           await flushLogsToDb(false); // Opportunistic flush
+          // Progress stall detection
+          if (companiesSaved === prevCompaniesSaved && contactsSaved === prevContactsSaved) {
+            noProgressStreak++;
+          } else {
+            noProgressStreak = 0;
+            prevCompaniesSaved = companiesSaved;
+            prevContactsSaved = contactsSaved;
+          }
+          if (noProgressStreak >= STALL_THRESHOLD) {
+            addLog(`No progress for ${STALL_THRESHOLD} consecutive iterations. Refining search strategy and continuing.`);
+            messages.push({
+              role: 'user',
+              content: 'No progress detected. Refine search now: diversify queries (synonyms, broader/narrower), broaden geos, include directories (LinkedIn, Crunchbase, ProductHunt), and prioritize /about, /team, /contact pages before continuing.'
+            });
+            noProgressStreak = 0;
+          }
         }
       }
 
@@ -1353,6 +1674,21 @@ Don't keep searching - SAVE the companies you've already found!`;
   // Log completion
   addLog(`🤖 Agent complete: ${companiesSaved} companies, ${contactsSaved} contacts in ${iterations} iterations`);
   await flushLogsToDb(true); // Force final flush
+  // Mark job as completed in DB
+  try {
+    await db.crm_Lead_Gen_Jobs.update({
+      where: { id: jobId },
+      data: {
+        status: "COMPLETED",
+        counters: {
+          companiesSaved,
+          contactsSaved,
+          iterations,
+          progress: 100
+        }
+      }
+    });
+  } catch {}
 
   return {
     companiesSaved,

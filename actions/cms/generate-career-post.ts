@@ -45,7 +45,7 @@ export async function generateCareerPost(jobTitle: string) {
                 { role: "system", content: "You are a helpful AI assistant that generates job descriptions." },
                 { role: "user", content: prompt },
             ],
-            temperature: isReasoningModel(model.modelId) ? undefined : 0.7,
+            temperature: isReasoningModel(model.modelId) ? undefined : 1,
         });
 
         return object;
