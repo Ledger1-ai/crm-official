@@ -27,9 +27,10 @@ interface TeamAiFormProps {
         apiKey: string | null;
     } | null;
     activeModels: AiModel[];
+    enabledProviders: AiProvider[];
 }
 
-export const TeamAiForm = ({ teamId, initialConfig, activeModels }: TeamAiFormProps) => {
+export const TeamAiForm = ({ teamId, initialConfig, activeModels, enabledProviders }: TeamAiFormProps) => {
     const [isPending, startTransition] = useTransition();
 
     // State to track current provider selection for filtering
@@ -58,7 +59,8 @@ export const TeamAiForm = ({ teamId, initialConfig, activeModels }: TeamAiFormPr
         });
     };
 
-    const providers = Object.values(AiProvider);
+    // Use enabledProviders passed from parent instead of all providers
+    const providers = enabledProviders.length > 0 ? enabledProviders : Object.values(AiProvider);
 
     return (
         <Card>
@@ -89,6 +91,11 @@ export const TeamAiForm = ({ teamId, initialConfig, activeModels }: TeamAiFormPr
                             </SelectContent>
                         </Select>
                         <p className="text-sm text-muted-foreground">Select the default AI provider for your team&apos;s features.</p>
+                        {!providers.includes(selectedProvider) && (
+                            <p className="text-xs text-red-500">
+                                Warning: The currently selected provider is disabled by the platform administrator. Please select a different provider.
+                            </p>
+                        )}
                     </div>
 
                     <div className="space-y-2">
