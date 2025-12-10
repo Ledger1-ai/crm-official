@@ -195,21 +195,21 @@ export default function CalendarAvailabilityPanel() {
   return (
     <div className="space-y-6">
       {/* Header and email status */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">Availability Calendar</h3>
           <div className="text-sm text-muted-foreground">
             Gmail Status: <span className={gmailConnected ? 'text-green-600' : 'text-red-600'}>{connectionLabel}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <Input
             value={timeZone}
             onChange={(e) => setTimeZone(e.target.value)}
-            className="w-56"
+            className="w-full sm:w-56"
             placeholder="Time Zone (e.g. America/Denver)"
           />
-          <Button onClick={refreshStatus} variant="outline">Refresh Email Status</Button>
+          <Button onClick={refreshStatus} variant="outline" className="whitespace-nowrap">Refresh Status</Button>
         </div>
       </div>
 

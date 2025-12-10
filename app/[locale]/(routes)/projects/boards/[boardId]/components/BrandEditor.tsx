@@ -4,6 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Loader2, Save } from "lucide-react";
+import { toast } from "react-hot-toast";
+
 type Props = {
   projectId: string;
 };
@@ -63,49 +68,94 @@ export default function BrandEditor({ projectId }: Props) {
       });
       if (!res.ok) {
         const txt = await res.text();
-        alert(txt || "Failed to save brand");
+        toast.error(txt || "Failed to save brand");
       } else {
-        alert("Brand saved");
+        toast.success("Brand saved");
       }
     } catch (e: any) {
-      alert(e?.message || "Failed to save brand");
+      toast.error(e?.message || "Failed to save brand");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="rounded border p-3 space-y-3" style={{ borderColor: brandPrimaryColor || undefined }}>
-      <div className="flex items-center gap-3">
-        {brandLogoUrl ? (
-          <img src={brandLogoUrl} alt="Project logo" className="h-10 w-10 rounded object-contain" />
-        ) : (
-          <div className="h-10 w-10 rounded bg-muted" />
-        )}
-        <div className="flex flex-col">
-          <label className="text-xs text-muted-foreground">Logo URL</label>
-          <Input value={brandLogoUrl} onChange={(e)=>setBrandLogoUrl(e.target.value)} placeholder="https://..." />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label>Logo URL</Label>
+          <div className="flex gap-2">
+            <Input
+              value={brandLogoUrl}
+              onChange={(e) => setBrandLogoUrl(e.target.value)}
+              placeholder="https://..."
+              className="bg-background/50 border-border/50"
+            />
+            {brandLogoUrl ? (
+              <div className="h-10 w-10 shrink-0 rounded border border-border/50 bg-background/50 flex items-center justify-center overflow-hidden">
+                <img src={brandLogoUrl} alt="Project logo" className="w-8 h-8 object-contain" />
+              </div>
+            ) : (
+              <div className="h-10 w-10 shrink-0 rounded border border-border/50 bg-muted/50" />
+            )}
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label className="text-xs text-muted-foreground">Primary Color</label>
-          <Input value={brandPrimaryColor} onChange={(e)=>setBrandPrimaryColor(e.target.value)} placeholder="#0ea5e9 or rgb(...)" />
+
+        <div className="space-y-2">
+          <Label>Primary Color</Label>
+          <div className="flex gap-2">
+            <Input
+              value={brandPrimaryColor}
+              onChange={(e) => setBrandPrimaryColor(e.target.value)}
+              placeholder="#0ea5e9 or rgb(...)"
+              className="bg-background/50 border-border/50"
+            />
+            <div
+              className="h-10 w-10 shrink-0 rounded border border-border/50 shadow-sm"
+              style={{ backgroundColor: brandPrimaryColor || 'transparent' }}
+            />
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label className="text-xs text-muted-foreground">Pick Logo from Uploads</label>
-          <select
-            className="border rounded px-2 py-2 text-sm min-w-[240px]"
+
+        <div className="space-y-2 md:col-span-2">
+          <Label>Pick Logo from Uploads</Label>
+          <Select
             value={brandLogoUrl || ""}
-            onChange={(e) => setBrandLogoUrl(e.target.value)}
+            onValueChange={(val) => setBrandLogoUrl(val)}
           >
-            <option value="">-- Select from uploads --</option>
-            {availableImages.map((img) => (
-              <option key={img.url} value={img.url}>{img.name}</option>
-            ))}
-          </select>
+            <SelectTrigger className="w-full bg-background/50 border-border/50">
+              <SelectValue placeholder="Select from uploads" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableImages.length === 0 ? (
+                <div className="p-2 text-sm text-muted-foreground text-center">No images found</div>
+              ) : (
+                availableImages.map((img) => (
+                  <SelectItem key={img.url} value={img.url} className="truncate">
+                    {img.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">Select an image uploaded to the Documents tab.</p>
         </div>
       </div>
-      <div className="ml-auto flex justify-end">
-        <Button size="sm" onClick={onSave} disabled={saving || loading}>{saving ? "Saving..." : "Save"}</Button>
+
+      <div className="flex justify-end pt-4 border-t border-border/30">
+        <Button onClick={onSave} disabled={saving || loading} className="min-w-[100px]">
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );

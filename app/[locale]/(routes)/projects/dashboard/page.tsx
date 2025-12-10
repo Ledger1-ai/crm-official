@@ -8,6 +8,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSections } from "@/actions/projects/get-sections";
 import { Sections } from "@prisma/client";
+import NewTaskDialog from "../dialogs/NewTask";
+import NewProjectDialog from "../dialogs/NewProject";
 
 const ProjectDashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -28,6 +30,10 @@ const ProjectDashboard = async () => {
         "Welcome to Ledger1CRM cockpit, here you can see your company overview"
       }
     >
+      <div className="flex gap-2 py-5">
+        <NewProjectDialog />
+        <NewTaskDialog users={activeUsers} boards={boards as any} />
+      </div>
       <ProjectDashboardCockpit
         dashboardData={dashboardData}
         users={activeUsers}

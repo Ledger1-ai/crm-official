@@ -113,7 +113,7 @@ export function DataTableRowActions<TData>({
   };
 
   return (
-    <>
+    <div className="flex items-center gap-1">
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -129,43 +129,46 @@ export function DataTableRowActions<TData>({
           <UpdateProjectForm initialData={project} openEdit={setEditOpen} />
         </SheetContent>
       </Sheet>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-          >
-            <DotsHorizontalIcon className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[260px]">
-          <DropdownMenuItem
-            onClick={() => router.push(`/projects/boards/${project.id}`)}
-          >
-            <Glasses className="mr-2 w-4 h-4" />
-            View detail
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-2 w-4 h-4" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={onWatch}>
-            <Eye className="mr-2 w-4 h-4" />
-            Watch project
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onUnWatch}>
-            <EyeOff className="mr-2 w-4 h-4" />
-            Stop watching project
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 w-4 h-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-primary"
+        onClick={() => router.push(`/projects/boards/${project.id}`)}
+        title="View Board"
+      >
+        <Glasses className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-primary"
+        onClick={() => setEditOpen(true)}
+        title="Edit"
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-primary"
+        onClick={onWatch}
+        title="Watch Project"
+      >
+        <Eye className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+        onClick={() => setOpen(true)}
+        title="Delete"
+      >
+        <Trash className="h-4 w-4" />
+      </Button>
+    </div>
   );
 }

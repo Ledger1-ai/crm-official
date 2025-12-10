@@ -18,7 +18,7 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Date Created" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">
+      <div className="min-w-[80px]">
         {moment(row.getValue("date_created")).format("YY-MM-DD")}
       </div>
     ),
@@ -32,7 +32,7 @@ export const columns: ColumnDef<Task>[] = [
     ),
 
     cell: ({ row }) => (
-      <div className="w-[150px]">
+      <div className="min-w-[100px]">
         {row.original.assigned_user.name ?? "Unassigned"}
       </div>
     ),
@@ -47,11 +47,11 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => (
       <Link href={`/projects/boards/${row.original.id}`} prefetch={false}>
-        <div className="flex items-center gap-2 w-[320px]">
+        <div className="flex items-center gap-2 min-w-[200px]">
           {row.original.brand_logo_url && (
             <img src={row.original.brand_logo_url} alt="Logo" className="h-10 w-10 object-contain rounded hover:opacity-90 transition-opacity" />
           )}
-          <span>{row.getValue("title")}</span>
+          <span className="font-medium">{row.getValue("title")}</span>
         </div>
       </Link>
     ),
@@ -62,7 +62,9 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Description" />
     ),
     cell: ({ row }) => (
-      <div className="w-[300px]">{row.getValue("description")}</div>
+      <div className="min-w-[200px] max-w-[400px] line-clamp-2" title={row.getValue("description")}>
+        {row.getValue("description")}
+      </div>
     ),
   },
   {
@@ -80,7 +82,7 @@ export const columns: ColumnDef<Task>[] = [
       }
 
       return (
-        <div className="flex w-[100px] items-center">
+        <div className="flex items-center">
           {status.label && <Badge variant="outline">{status.label}</Badge>}
         </div>
       );

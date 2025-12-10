@@ -29,22 +29,6 @@ export default async function AdminDashboardPage() {
       description="Here you can setup your Ledger1CRM instance"
     >
       <div className="space-y-8">
-        {/* Navigation Buttons */}
-        <div className="flex gap-4">
-          <AnyLink href="/admin/users">
-            <AnyButton variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
-              Users administration
-            </AnyButton>
-          </AnyLink>
-          {(user?.is_admin || user?.assigned_team?.slug === "ledger1") && (
-            <AnyLink href="/admin/modules">
-              <AnyButton variant="outline" className="text-cyan-400 border-cyan-800 hover:bg-cyan-950">
-                Modules administration
-              </AnyButton>
-            </AnyLink>
-          )}
-        </div>
-
         {/* Cards Grid */}
         <div className="flex flex-wrap gap-6">
           <div className="w-full lg:w-1/2">

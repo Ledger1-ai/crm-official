@@ -28,6 +28,7 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { PanelTopClose, PanelTopOpen } from "lucide-react";
+import TaskCard from "./TaskCard";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -71,45 +72,47 @@ export function TasksDataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full overflow-hidden">
       <div className="flex justify-between items-start gap-3">
         <div></div>
         <div className="flex justify-end space-x-2">
           {hide ? (
             <PanelTopOpen
               onClick={() => setHide(!hide)}
-              className="text-muted-foreground"
+              className="text-muted-foreground cursor-pointer"
             />
           ) : (
             <PanelTopClose
               onClick={() => setHide(!hide)}
-              className="text-muted-foreground"
+              className="text-muted-foreground cursor-pointer"
             />
           )}
         </div>
       </div>
 
       {hide ? (
-        <div className="flex gap-2">
-          This content is hidden now. Click on <PanelTopOpen /> to show content
+        <div className="flex gap-2 text-sm text-muted-foreground">
+          This content is hidden now. Click on <PanelTopOpen className="inline h-4 w-4" /> to show content
         </div>
       ) : (
         <>
           <DataTableToolbar table={table} />
-          <div className="rounded-md border">
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
                       return (
-                        <TableHead key={header.id}>
+                        <TableHead key={header.id} className="whitespace-nowrap">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </TableHead>
                       );
                     })}
@@ -124,7 +127,7 @@ export function TasksDataTable<TData, TValue>({
                       data-state={row.getIsSelected() && "selected"}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="py-2">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -146,9 +149,24 @@ export function TasksDataTable<TData, TValue>({
               </TableBody>
             </Table>
           </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3">
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TaskCard key={row.id} task={row.original as any} />
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No results.
+              </div>
+            )}
+          </div>
+
           <DataTablePagination table={table} />
         </>
       )}
     </div>
   );
 }
+

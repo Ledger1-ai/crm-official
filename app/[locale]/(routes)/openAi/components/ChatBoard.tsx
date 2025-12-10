@@ -232,7 +232,7 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
             )}
 
             {/* Composer */}
-            <div className="p-4 bg-gradient-to-t from-background via-background/95 to-transparent z-20">
+            <div className="p-4 pb-20 md:pb-4 bg-gradient-to-t from-background via-background/95 to-transparent z-20">
                 <div className="max-w-3xl mx-auto">
                     <form onSubmit={onSubmit} className="relative flex items-end gap-2 p-2 bg-card border rounded-2xl shadow-lg focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                         <Textarea

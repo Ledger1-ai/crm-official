@@ -62,12 +62,19 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
             }  h-full p-5 pt-8 relative duration-300 sidebar border-r bg-background`}
           data-open={open ? "true" : "false"}
         >
-          <div className="flex gap-x-4 items-center">
+          <div className={cn(
+            "flex items-center",
+            open ? "flex-row gap-x-4" : "flex-col gap-y-2"
+          )}>
             <button
               aria-label="Toggle sidebar"
               aria-expanded={open}
               aria-controls="app-sidebar"
-              className={`sidebar-toggle ${open ? "rotate-0" : ""}`}
+              className={cn(
+                "sidebar-toggle transition-transform duration-300",
+                open ? "rotate-0" : "",
+                !open && "flex justify-center w-full"
+              )}
               onClick={() => {
                 const next = !open;
                 setOpen(next);
@@ -79,26 +86,35 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
               <AnyMenu className="w-5 h-5" />
             </button>
 
-            <img
-              src="/logo.png"
-              alt="App logo"
-              className={`h-8 w-auto origin-left duration-200 ${!open && "scale-0"}`}
-            />
+            {/* Logo - Full logo when open, compact logo when closed */}
+            {open ? (
+              <img
+                src="/logo.png"
+                alt="App logo"
+                className="h-8 w-auto origin-left duration-200"
+              />
+            ) : (
+              <img
+                src="/crmlogo.png"
+                alt="App logo compact"
+                className="h-8 w-auto duration-200"
+              />
+            )}
           </div>
           <div id="app-sidebar" className="pt-6 sidebar-list overflow-y-auto h-[calc(100vh-100px)]">
             <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
             {modules.find(
               (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
             ) && hasFeature("crm") ? (
-              <button
-                className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""} w-full`}
-                onClick={() => router.push("/crm")}
-              >
-                <div className="flex items-center gap-2">
+              <div className="flex flex-row items-center p-2 w-auto md:w-full">
+                <button
+                  className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""} w-full`}
+                  onClick={() => router.push("/crm")}
+                >
                   <Coins className="w-6 icon" />
                   <span className={open ? "" : "hidden"}>{dict.ModuleMenu.crm.title}</span>
-                </div>
-              </button>
+                </button>
+              </div>
             ) : null}
             {modules.find(
               (menuItem: any) => menuItem.name === "projects" && menuItem.enabled
@@ -170,15 +186,14 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
         {modules.find(
           (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
         ) && hasFeature("crm") ? (
-          <button
-            className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""} w-full`}
-            onClick={() => router.push("/crm")}
-          >
-            <div className="flex items-center gap-2">
+          <div className="flex flex-row items-center p-2 w-auto md:w-full">
+            <button
+              className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""}`}
+              onClick={() => router.push("/crm")}
+            >
               <Coins className="w-6 icon" />
-              <span className={open ? "" : "hidden"}>{dict.ModuleMenu.crm.title}</span>
-            </div>
-          </button>
+            </button>
+          </div>
         ) : null}
         {modules.find(
           (menuItem: any) => menuItem.name === "projects" && menuItem.enabled

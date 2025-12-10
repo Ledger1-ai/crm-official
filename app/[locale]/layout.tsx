@@ -141,7 +141,7 @@ export default async function RootLayout(props: Props) {
           content="width=device-width, height=device-height, initial-scale=1"
         />
       </head>
-      <body className={inter.className + " min-h-screen"} suppressHydrationWarning>
+      <body className={inter.className + " h-screen overflow-hidden"} suppressHydrationWarning>
         <NextTopLoader color="#2563EB" showSpinner={false} />
         <AnalyticsTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>

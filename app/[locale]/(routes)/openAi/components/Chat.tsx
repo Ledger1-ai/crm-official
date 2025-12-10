@@ -176,7 +176,7 @@ export default function ChatApp() {
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
 
   return (
-    <div className="relative flex w-full h-[calc(100dvh-9.5rem)] md:h-[calc(100vh-5rem)] overflow-hidden bg-background">
+    <div className="relative flex w-full h-full overflow-hidden bg-background">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div

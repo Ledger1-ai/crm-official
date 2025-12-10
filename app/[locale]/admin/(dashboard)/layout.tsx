@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { getCurrentUserTeamId } from "@/lib/team-utils";
 import { redirect } from "next/navigation";
 import getAllCommits from "@/actions/github/get-repo-commits";
+import { prismadb } from "@/lib/prisma";
+import AdminSidebar from "./components/AdminSidebar";
 
 import { ReactNode } from "react";
 
@@ -11,6 +13,7 @@ import SideBar from "@/app/[locale]/(routes)/components/SideBar";
 import Footer from "@/app/[locale]/(routes)/components/Footer";
 
 const AnyFooter = Footer as any;
+const AnySideBar = SideBar as any;
 
 export default async function AdminDashboardLayout({
     children,
@@ -36,9 +39,20 @@ export default async function AdminDashboardLayout({
     // Fetch build info for sidebar
     const build = await getAllCommits();
 
+    // Check if user is partner admin (Ledger1) or global admin
+    // We need to fetch the user again with team slug to be sure, or rely on teamInfo if it has slug
+    // teamInfo from getCurrentUserTeamId returns { id, name, plan, isAdmin, isOwner }
+    // It doesn't seem to return slug. Let's fetch user to be safe and consistent with page.tsx
+    const user = await prismadb.users.findUnique({
+        where: { email: session.user.email as string },
+        include: { assigned_team: true }
+    });
+
+    const showModules = user?.is_admin || user?.assigned_team?.slug === "ledger1";
+
     return (
         <div className="flex h-screen overflow-hidden">
-            <SideBar build={build} />
+            <AnySideBar build={build} />
             <div className="flex flex-col h-full w-full overflow-hidden">
                 <Header
                     id={session.user.id as string}
@@ -47,8 +61,11 @@ export default async function AdminDashboardLayout({
                     avatar={session.user.image as string}
                     lang={session.user.userLanguage as string}
                 />
-                <div className="flex-grow overflow-y-auto h-full p-5">
-                    {children}
+                <div className="flex flex-1 min-h-0 overflow-hidden">
+                    <AdminSidebar showModules={!!showModules} />
+                    <div className="flex-1 overflow-y-auto h-full p-5">
+                        {children}
+                    </div>
                 </div>
                 <AnyFooter />
             </div>

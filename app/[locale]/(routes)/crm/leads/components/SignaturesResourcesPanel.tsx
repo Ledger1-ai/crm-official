@@ -226,12 +226,14 @@ export default function SignaturesResourcesPanel() {
   return (
     <div className="w-full h-full">
       <Tabs value={tab} onValueChange={setTab}>
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="signature">Signature</TabsTrigger>
-            <TabsTrigger value="resources">Resources</TabsTrigger>
-            <TabsTrigger value="prompt">Prompt Settings</TabsTrigger>
-          </TabsList>
+        <div className="flex items-center justify-start mb-4 w-full overflow-hidden">
+          <div className="overflow-x-auto no-scrollbar w-full">
+            <TabsList className="inline-flex h-8 p-0.5 min-w-max">
+              <TabsTrigger value="signature" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Signature</TabsTrigger>
+              <TabsTrigger value="resources" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Resources</TabsTrigger>
+              <TabsTrigger value="prompt" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Prompt</TabsTrigger>
+            </TabsList>
+          </div>
         </div>
 
         {/* Signature Tab - embedded builder behind an explicit toggle */}
@@ -256,12 +258,12 @@ export default function SignaturesResourcesPanel() {
           <div className="space-y-6">
             {/* Per-user resource buttons */}
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <h3 className="text-lg font-semibold">Resource Buttons</h3>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={resetResourcesToDefault}>Reset to PortalPay Defaults</Button>
-                  <Button onClick={addResource}>Add Resource</Button>
-                  <Button onClick={saveResources}>Save Resources</Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" onClick={resetResourcesToDefault} className="text-xs sm:text-sm">Reset Defaults</Button>
+                  <Button onClick={addResource} className="text-xs sm:text-sm">Add</Button>
+                  <Button onClick={saveResources} className="text-xs sm:text-sm">Save</Button>
                 </div>
               </div>
               <div className="space-y-2">
@@ -336,11 +338,11 @@ export default function SignaturesResourcesPanel() {
 
             {/* Project Presets Builder */}
             <div className="space-y-3 border rounded-lg p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3">
                 <h3 className="text-lg font-semibold">Project Presets</h3>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
                   <select
-                    className="rounded border p-2 text-sm bg-background"
+                    className="rounded border p-2 text-sm bg-background w-full sm:w-auto"
                     value={selectedProjectId}
                     onChange={async (e) => {
                       const pid = e.target.value;
@@ -353,7 +355,6 @@ export default function SignaturesResourcesPanel() {
                         const j = await res.json();
                         const sets = Array.isArray(j?.sets) ? j.sets : [];
                         setPresetSets(sets);
-                        // seed editing state
                         const edit: Record<string, { name: string; configText: string }> = {};
                         for (const s of sets) {
                           edit[s.id] = { name: s.name || 'Preset', configText: JSON.stringify(s.config ?? {}, null, 2) };
@@ -366,81 +367,84 @@ export default function SignaturesResourcesPanel() {
                       }
                     }}
                   >
-                    <option value="">-- Select a project --</option>
+                    <option value="">-- Select project --</option>
                     {projects.map((p) => (
                       <option key={p.id} value={p.id}>{p.title}</option>
                     ))}
                   </select>
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      if (!selectedProjectId) { toast.error('Select a project'); return; }
-                      setPresetsLoading(true);
-                      try {
-                        const res = await fetch(`/api/projects/${selectedProjectId}/button-sets`);
-                        if (!res.ok) throw new Error(await res.text());
-                        const j = await res.json();
-                        const sets = Array.isArray(j?.sets) ? j.sets : [];
-                        setPresetSets(sets);
-                        const edit: Record<string, { name: string; configText: string }> = {};
-                        for (const s of sets) {
-                          edit[s.id] = { name: s.name || 'Preset', configText: JSON.stringify(s.config ?? {}, null, 2) };
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      className="text-xs"
+                      onClick={async () => {
+                        if (!selectedProjectId) { toast.error('Select a project'); return; }
+                        setPresetsLoading(true);
+                        try {
+                          const res = await fetch(`/api/projects/${selectedProjectId}/button-sets`);
+                          if (!res.ok) throw new Error(await res.text());
+                          const j = await res.json();
+                          const sets = Array.isArray(j?.sets) ? j.sets : [];
+                          setPresetSets(sets);
+                          const edit: Record<string, { name: string; configText: string }> = {};
+                          for (const s of sets) {
+                            edit[s.id] = { name: s.name || 'Preset', configText: JSON.stringify(s.config ?? {}, null, 2) };
+                          }
+                          setEditingPreset(edit);
+                        } catch (e) {
+                          toast.error('Failed to load presets');
+                        } finally {
+                          setPresetsLoading(false);
                         }
-                        setEditingPreset(edit);
-                      } catch (e) {
-                        toast.error('Failed to load presets');
-                      } finally {
-                        setPresetsLoading(false);
-                      }
-                    }}
-                  >
-                    Load Presets
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      if (!selectedProjectId) { toast.error('Select a project'); return; }
-                      try {
-                        const res = await fetch(`/api/projects/${selectedProjectId}/button-sets`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ name: 'Preset', config: {}, isDefault: false }),
-                        });
-                        if (!res.ok) throw new Error(await res.text());
-                        const j = await res.json();
-                        const created = j?.set;
-                        toast.success('Preset created');
-                        // append to list
-                        setPresetSets((prev) => [...prev, created]);
-                        setEditingPreset((prev) => ({ ...prev, [created.id]: { name: created.name || 'Preset', configText: JSON.stringify(created.config ?? {}, null, 2) } }));
-                      } catch (e) {
-                        toast.error('Failed to create preset');
-                      }
-                    }}
-                  >
-                    New Preset
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={async () => {
-                      if (!selectedProjectId) { toast.error('Select a project'); return; }
-                      const def = presetSets.find((s: any) => !!s.isDefault);
-                      if (!def) { toast.error('No default preset found'); return; }
-                      try {
-                        const res = await fetch(`/api/projects/${selectedProjectId}/button-sets/${def.id}/duplicate`, { method: 'POST' });
-                        if (!res.ok) throw new Error(await res.text());
-                        const j = await res.json();
-                        const created = j?.set;
-                        toast.success('Default duplicated to personal preset');
-                        // append created
-                        setPresetSets((prev) => [...prev, created]);
-                        setEditingPreset((prev) => ({ ...prev, [created.id]: { name: created.name || 'Preset', configText: JSON.stringify(created.config ?? {}, null, 2) } }));
-                      } catch (e) {
-                        toast.error('Failed to duplicate default');
-                      }
-                    }}
-                  >
-                    Duplicate Default
-                  </Button>
+                      }}
+                    >
+                      Load
+                    </Button>
+                    <Button
+                      className="text-xs"
+                      onClick={async () => {
+                        if (!selectedProjectId) { toast.error('Select a project'); return; }
+                        try {
+                          const res = await fetch(`/api/projects/${selectedProjectId}/button-sets`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: 'Preset', config: {}, isDefault: false }),
+                          });
+                          if (!res.ok) throw new Error(await res.text());
+                          const j = await res.json();
+                          const created = j?.set;
+                          toast.success('Preset created');
+                          setPresetSets((prev) => [...prev, created]);
+                          setEditingPreset((prev) => ({ ...prev, [created.id]: { name: created.name || 'Preset', configText: JSON.stringify(created.config ?? {}, null, 2) } }));
+                        } catch (e) {
+                          toast.error('Failed to create preset');
+                        }
+                      }}
+                    >
+                      New
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="text-xs"
+                      onClick={async () => {
+                        if (!selectedProjectId) { toast.error('Select a project'); return; }
+                        const def = presetSets.find((s: any) => !!s.isDefault);
+                        if (!def) { toast.error('No default preset found'); return; }
+                        try {
+                          const res = await fetch(`/api/projects/${selectedProjectId}/button-sets/${def.id}/duplicate`, { method: 'POST' });
+                          if (!res.ok) throw new Error(await res.text());
+                          const j = await res.json();
+                          const created = j?.set;
+                          toast.success('Duplicated');
+                          setPresetSets((prev) => [...prev, created]);
+                          setEditingPreset((prev) => ({ ...prev, [created.id]: { name: created.name || 'Preset', configText: JSON.stringify(created.config ?? {}, null, 2) } }));
+                        } catch (e) {
+                          toast.error('Failed to duplicate');
+                        }
+                      }}
+                    >
+                      Duplicate
+                    </Button>
+                  </div>
                 </div>
               </div>
 

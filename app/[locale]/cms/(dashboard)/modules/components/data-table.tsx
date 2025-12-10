@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ModuleCard } from "./ModuleCard";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -109,7 +110,8 @@ export function DataTable<TData, TValue>({
         </DropdownMenu>
         {/* Visibility */}
       </div>
-      <div className="rounded-md border">
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -120,9 +122,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -158,6 +160,19 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => (
+            <ModuleCard key={row.id} module={row.original as any} />
+          ))
+        ) : (
+          <div className="text-center p-4 border rounded-md text-muted-foreground">
+            No results.
+          </div>
+        )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button

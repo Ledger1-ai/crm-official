@@ -27,6 +27,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { UserCard } from "../components/UserCard";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -70,7 +71,8 @@ export function AdminUserDataTable<TData, TValue>({
   return (
     <div className="space-y-5 pt-5">
       <DataTableToolbar table={table} />
-      <div className="rounded-md border">
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -81,9 +83,9 @@ export function AdminUserDataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -119,6 +121,19 @@ export function AdminUserDataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => (
+            <UserCard key={row.id} user={row.original as any} />
+          ))
+        ) : (
+          <div className="text-center p-4 border rounded-md text-muted-foreground">
+            No results.
+          </div>
+        )}
       </div>
       <DataTablePagination table={table} />
     </div>

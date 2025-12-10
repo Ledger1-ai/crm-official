@@ -88,13 +88,13 @@ export function InviteForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex space-x-5 w-full p-5 items-end"
+        className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full p-5 items-end"
       >
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem className="w-1/3">
+            <FormItem className="w-full">
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} placeholder="jdoe" {...field} />
@@ -107,8 +107,8 @@ export function InviteForm() {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem className="w-1/3">
-              <FormLabel>E-main</FormLabel>
+            <FormItem className="w-full">
+              <FormLabel>E-mail</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
@@ -124,7 +124,7 @@ export function InviteForm() {
           control={form.control}
           name="language"
           render={({ field }) => (
-            <FormItem className="w-[250px]">
+            <FormItem className="w-full">
               <FormLabel>Language</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
@@ -141,7 +141,7 @@ export function InviteForm() {
             </FormItem>
           )}
         />
-        <Button className="w-[150px]" type="submit" disabled={isLoading}>
+        <Button className="w-full" type="submit" disabled={isLoading}>
           {isLoading ? (
             <Icons.spinner className="animate-spin" />
           ) : (

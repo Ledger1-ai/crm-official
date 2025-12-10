@@ -41,7 +41,7 @@ import { useToast } from "@/components/ui/use-toast";
 import AlertModal from "@/components/modals/alert-modal";
 import LoadingComponent from "@/components/LoadingComponent";
 import { DialogHeader } from "@/components/ui/dialog-document-view";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import SidePanel from "@/components/ui/SidePanel";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +49,7 @@ import { Badge } from "@/components/ui/badge";
 import NewSectionForm from "../forms/NewSection";
 import UpdateTaskDialog from "../../../dialogs/UpdateTask";
 import { getTaskDone } from "../../../actions/get-task-done";
+import KanbanColumn from "./KanbanColumn";
 
 let timer: any;
 const timeout = 1000;
@@ -65,7 +66,7 @@ const Kanban = (props: any) => {
 
   const [data, setData]: any = useState([]);
 
-  const [sectionId, setSectionId] = useState(null);
+  const [sectionId, setSectionId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const [open, setOpen] = useState(false);
@@ -307,6 +308,8 @@ const Kanban = (props: any) => {
   //console.log(sectionId, "sectionId - Kanban");
   //console.log(updateOpenSheet, "updateOpenSheet - Kanban");
 
+  // ... (keep existing logic up to return)
+
   return (
     <>
       <AlertModal
@@ -321,293 +324,122 @@ const Kanban = (props: any) => {
         onConfirm={onDeleteSection}
         loading={isLoadingSection}
       />
-      <div className="overflow-scroll flex flex-col space-y-2  ">
-        {/* Dialogs */}
-        <Dialog
-          open={sectionOpenDialog}
-          onOpenChange={() => setSectionOpenDialog(false)}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="p-2">Create new section</DialogTitle>
-              <DialogDescription className="p-2">
-                Fill out the form below to create a new section to this project.
-              </DialogDescription>
-            </DialogHeader>
-            <NewSectionForm
-              boardId={boardId}
-              onClose={() => setSectionOpenDialog(false)}
-            />
-          </DialogContent>
-        </Dialog>
-        {/* Dialogs end */}
-        {
-          //Sheets
-        }
-        <Sheet
-          open={updateOpenSheet}
-          onOpenChange={() => setUpdateOpenSheet(false)}
-        >
-          <SheetContent>
-            <UpdateTaskDialog
-              users={users}
-              boards={boards}
-              boardId={boardId}
-              initialData={selectedTask}
-              onDone={() => setUpdateOpenSheet(false)}
-            />
-            <div className="flex w-full justify-end pt-2">
-              <SheetTrigger asChild>
-                <Button variant={"destructive"}>Close</Button>
-              </SheetTrigger>
-            </div>
-          </SheetContent>
-        </Sheet>
-        {
-          //Sheets end
-        }
 
-        <div className="p-2 text-xs">
-          <p>{filteredData?.length} Sections</p>
-        </div>
-        {/* Kanban toolbar */}
-        <div className="mb-3 flex flex-wrap items-center gap-2 px-2">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tasks" className="w-[220px]" />
+      {/* Dialogs */}
+      <Dialog
+        open={sectionOpenDialog}
+        onOpenChange={() => setSectionOpenDialog(false)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="p-2">Create new section</DialogTitle>
+            <DialogDescription className="p-2">
+              Fill out the form below to create a new section to this project.
+            </DialogDescription>
+          </DialogHeader>
+          <NewSectionForm
+            boardId={boardId}
+            onClose={() => setSectionOpenDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Side Panel */}
+      <SidePanel
+        isOpen={updateOpenSheet}
+        onClose={() => setUpdateOpenSheet(false)}
+      >
+        <UpdateTaskDialog
+          users={users}
+          boards={boards}
+          boardId={boardId}
+          initialData={selectedTask}
+          onDone={() => setUpdateOpenSheet(false)}
+        />
+      </SidePanel>
+
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Kanban Toolbar */}
+        <div className="mb-4 flex flex-wrap items-center gap-2 px-2 shrink-0">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tasks..."
+            className="w-[200px] h-9 bg-background"
+          />
           <Select value={filterAssignee} onValueChange={setFilterAssignee}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Assignee" /></SelectTrigger>
+            <SelectTrigger className="w-[160px] h-9 bg-background"><SelectValue placeholder="Assignee" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Assignees</SelectItem>
               {users?.map((u: any) => (
                 <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="w-[140px] h-9 bg-background"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="complete">Complete</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filterPriority} onValueChange={setFilterPriority}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Priority" /></SelectTrigger>
+            <SelectTrigger className="w-[140px] h-9 bg-background"><SelectValue placeholder="Priority" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Priorities</SelectItem>
               <SelectItem value="low">Low</SelectItem>
               <SelectItem value="normal">Normal</SelectItem>
               <SelectItem value="high">High</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="ghost" onClick={() => { setSearch(""); setFilterAssignee("all"); setFilterStatus("all"); setFilterPriority("all"); }}>Clear</Button>
-        </div>
-        <div className="flex">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex flex-row items-start  ">
-              {filteredData?.map((section: any, index: any) => (
-                <div
-                  className="flex flex-col items-center justify-center  h-full w-80 "
-                  key={section.id}
-                >
-                  <Droppable key={section.id} droppableId={section.id} isDropDisabled={false} isCombineEnabled={false} ignoreContainerClipping={false}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="flex flex-col  w-full h-full px-2 "
-                      >
-                        <div className="flex flex-col items-center justify-center py-2   ">
-                          <div className="flex flex-row items-center justify-between w-full border ">
-                            <input
-                              type="text"
-                              className="  pl-2  px-1 py-1 rounded-md m-2  "
-                              placeholder={section?.title}
-                              onChange={(e) =>
-                                updateSectionTitle(e, section.id)
-                              }
-                            />
-                            <div className="flex items-center justify-end pr-2">
-                              <span className="border rounded-full px-2 m-2">
-                                {section?.tasks?.length}
-                              </span>
 
-                              <TrashIcon
-                                className="w-4 h-4"
-                                onClick={() => {
-                                  setSectionId(section.id);
-                                  setOpenSectionAlert(true);
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-full">
-                            <div className="flex flex-row items-center justify-center space-x-5 py-2  w-full">
-                              <button
-                                className="w-80 border justify-center items-center flex flex-row "
-                                onClick={() => createTask(section.id)}
-                              >
-                                <PlusIcon className="w-6 h-6" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="">
-                          {section.tasks?.map((task: any, index: any) => (
-                            <Draggable
-                              key={task.id}
-                              draggableId={task.id}
-                              index={index}
-                            >
-                              {(provided: any, snapshot: any) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  cursor={
-                                    snapshot.isDragging ? "grabbing" : "grab"
-                                  }
-                                  className="flex flex-col overflow-hidden items-start justify-center text-xs p-3 mb-2  rounded-md border  shadow-md "
-                                  type="button"
-                                >
-                                  <div className="flex flex-row justify-between mx-auto w-full py-1">
-                                    {/*  <pre>{JSON.stringify(task, null, 2)}</pre> */}
-                                    <h2 className="grow font-bold text-sm ">
-                                      {task.title === ""
-                                        ? "Untitled"
-                                        : task.title}
-                                    </h2>
-                                    {task?.assigned_user?.name ? (
-                                      <div className="ml-2 h-5 w-5 rounded-full bg-muted text-[10px] grid place-items-center border">
-                                        {(task.assigned_user.name || "").slice(0, 1).toUpperCase()}
-                                      </div>
-                                    ) : null}
-                                    <div className="ml-1">
-                                      {task?.dueDateAt &&
-                                        task.taskStatus != "COMPLETE" &&
-                                        task.dueDateAt < Date.now() && (
-                                          <HoverCard>
-                                            <HoverCardTrigger>
-                                              <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
-                                            </HoverCardTrigger>
-                                            <HoverCardContent>
-                                              Attention! This task is overdue!
-                                            </HoverCardContent>
-                                          </HoverCard>
-                                        )}
-                                      {task.taskStatus === "COMPLETE" && (
-                                        <HoverCard>
-                                          <HoverCardTrigger>
-                                            <Check className="w-4 h-4 text-green-500" />
-                                          </HoverCardTrigger>
-                                          <HoverCardContent>
-                                            This task is done!
-                                          </HoverCardContent>
-                                        </HoverCard>
-                                      )}
-                                    </div>
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger
-                                        asChild
-                                        className="w-[25px] ml-1 "
-                                      >
-                                        <DotsHorizontalIcon className="w-4 h-4 text-slate-600 pl-2" />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent className="w-[200px]">
-                                        <DropdownMenuItem
-                                          className="gap-2"
-                                          onClick={() =>
-                                            router.push(
-                                              `/projects/tasks/viewtask/${task.id}`
-                                            )
-                                          }
-                                        >
-                                          <EyeIcon className="w-4 h-4 opacity-50" />
-                                          View
-                                        </DropdownMenuItem>
-                                        {task.taskStatus !== "COMPLETE" && (
-                                          <DropdownMenuItem
-                                            className="gap-2"
-                                            onClick={() => {
-                                              setUpdateOpenSheet(true);
-                                              setSelectedTask(task);
-                                            }}
-                                          >
-                                            <Pencil className="w-4 h-4 opacity-50" />
-                                            Edit
-                                          </DropdownMenuItem>
-                                        )}
-                                        {task.taskStatus !== "COMPLETE" && (
-                                          <DropdownMenuItem
-                                            className="gap-2"
-                                            onClick={() => {
-                                              onDone(task.id);
-                                            }}
-                                          >
-                                            <Check className="w-4 h-4 opacity-50" />
-                                            Mark as done
-                                          </DropdownMenuItem>
-                                        )}
-                                        <DropdownMenuItem
-                                          className="gap-2"
-                                          onClick={() => {
-                                            setSelectedTask(task);
-                                            setOpen(true);
-                                          }}
-                                        >
-                                          <TrashIcon className="w-4 h-4 opacity-50" />
-                                          Delete
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </div>
-                                  <div className="py-1">
-                                    Due date:{" "}
-                                    {moment(task.dueDateAt).format(
-                                      "YYYY-MM-DD"
-                                    )}
-                                  </div>
-                                  <div className="my-2">
-                                    <p
-                                      className={
-                                        task.priority === "normal"
-                                          ? `text-yellow-500`
-                                          : task.priority === "high"
-                                          ? `text-red-500`
-                                          : task.priority === "low"
-                                          ? `text-green-500`
-                                          : `text-slate-600`
-                                      }
-                                    >
-                                      Priority: {task.priority}
-                                    </p>
-                                  </div>
-                                  <HoverCard>
-                                    <HoverCardTrigger className="line-clamp-2 mb-2">
-                                      {task.content}
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                      {task.content}
-                                    </HoverCardContent>
-                                  </HoverCard>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </div>
-                      </div>
-                    )}
-                  </Droppable>
-                </div>
+          {(search || filterAssignee !== "all" || filterStatus !== "all" || filterPriority !== "all") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setSearch(""); setFilterAssignee("all"); setFilterStatus("all"); setFilterPriority("all"); }}
+              className="h-9"
+            >
+              Clear Filters
+            </Button>
+          )}
+
+          <div className="ml-auto text-xs text-muted-foreground hidden md:block">
+            {filteredData?.reduce((acc: number, sec: any) => acc + (sec.tasks?.length || 0), 0)} tasks in {filteredData?.length} sections
+          </div>
+        </div>
+
+        {/* Kanban Board Area */}
+        <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 px-2">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="flex h-full gap-4 snap-x snap-mandatory min-w-fit pr-10">
+              {filteredData?.map((section: any, index: number) => (
+                <KanbanColumn
+                  key={section.id}
+                  section={section}
+                  index={index}
+                  onUpdateTitle={updateSectionTitle}
+                  onDeleteSection={(id) => { setSectionId(id); setOpenSectionAlert(true); }}
+                  onCreateTask={createTask}
+                  onViewTask={(task) => router.push(`/projects/tasks/viewtask/${task.id}`)}
+                  onEditTask={(task) => { setSelectedTask(task); setUpdateOpenSheet(true); }}
+                  onDeleteTask={(task) => { setSelectedTask(task); setOpen(true); }}
+                  onDoneTask={(task) => onDone(task.id)}
+                />
               ))}
-            </div>
-            <div className="flex justify-center items-center pl-3 h-16">
-              <PlusCircle
-                className="w-8 h-8 text-slate-600 cursor-pointer"
-                onClick={() => {
-                  setSectionOpenDialog(true);
-                }}
-              />
+
+              {/* Add Section Button Column */}
+              <div className="shrink-0 w-80 h-full flex items-start justify-center pt-2 snap-center opacity-50 hover:opacity-100 transition-opacity">
+                <Button
+                  variant="outline"
+                  className="w-full h-12 border-dashed border-2 bg-transparent hover:bg-muted/50"
+                  onClick={() => setSectionOpenDialog(true)}
+                >
+                  <PlusCircle className="w-5 h-5 mr-2" />
+                  Add Section
+                </Button>
+              </div>
             </div>
           </DragDropContext>
         </div>

@@ -31,6 +31,7 @@ import { DataTableToolbar } from "./data-table-toolbar";
 import { PanelTopClose, PanelTopOpen } from "lucide-react";
 import { AccountCard } from "./account-card";
 import { Account } from "../table-data/schema";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,14 +56,8 @@ export function AccountDataTable<TData, TValue>({
   const [view, setView] = React.useState<"table" | "compact" | "grid">("table");
   const [hide, setHide] = React.useState(false);
 
-  // Mobile detection
-  const [isMobile, setIsMobile] = React.useState(false);
-  React.useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  // Mobile detection using shared hook
+  const isMobile = useIsMobile();
 
   const table = useReactTable({
     data,
@@ -147,7 +142,8 @@ export function AccountDataTable<TData, TValue>({
           {currentView === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+                // On mobile, limit to 3 items to prevent dead space in dashboard view
+                (isMobile ? table.getRowModel().rows.slice(0, 3) : table.getRowModel().rows).map((row) => (
                   <AccountCard key={row.id} row={row as unknown as Row<Account>} />
                 ))
               ) : (

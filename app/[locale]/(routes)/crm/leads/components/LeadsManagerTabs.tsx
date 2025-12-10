@@ -16,11 +16,11 @@ export default function LeadsManagerTabs({ leads, crmData, defaultTab = "all" }:
   return (
     <div className="w-full h-full flex flex-col">
       <Tabs defaultValue={defaultTab} className="w-full h-full flex flex-col">
-        <div className="flex items-center justify-between mb-4 flex-shrink-0 overflow-x-auto no-scrollbar">
-          <TabsList className="h-9 p-1 bg-muted/50 backdrop-blur-sm border border-border/50">
-            <TabsTrigger value="all" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm">All Leads</TabsTrigger>
-            <TabsTrigger value="workspace" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm">Leads Workspace</TabsTrigger>
-            <TabsTrigger value="dialer" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm">Dialer</TabsTrigger>
+        <div className="flex items-center justify-start mb-4 flex-shrink-0 w-full">
+          <TabsList className="!flex !flex-col sm:!flex-row h-auto sm:h-9 p-1 bg-muted/50 backdrop-blur-sm border border-border/50 w-full sm:w-auto gap-1 sm:gap-0">
+            <TabsTrigger value="all" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-2 sm:py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm w-full sm:w-auto justify-center">All Leads</TabsTrigger>
+            <TabsTrigger value="workspace" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-2 sm:py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm w-full sm:w-auto justify-center">Workspace</TabsTrigger>
+            <TabsTrigger value="dialer" className="text-[10px] uppercase tracking-wider font-semibold px-3 py-2 sm:py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm w-full sm:w-auto justify-center">Dialer</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="all" className="overflow-auto flex-1">
