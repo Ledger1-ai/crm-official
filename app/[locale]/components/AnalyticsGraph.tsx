@@ -23,7 +23,7 @@ export default function AnalyticsGraph() {
     const barData = [65, 82, 45, 93, 58, 77, 88];
 
     return (
-        <div className="relative w-full h-full p-6 flex flex-col gap-4 overflow-hidden bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl">
+        <div className="relative w-full h-full p-4 flex flex-col gap-3 overflow-hidden bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex gap-2 items-center">
@@ -63,7 +63,7 @@ export default function AnalyticsGraph() {
             </div>
 
             {/* Chart Area */}
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 relative">
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 relative flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                     <div className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Revenue Forecast</div>
                     <div className="flex items-center gap-2">
@@ -79,51 +79,76 @@ export default function AnalyticsGraph() {
                     </div>
                 </div>
 
+
                 {/* Bar Chart */}
-                <div className="flex items-end justify-between gap-2 h-24">
+                <div className="flex-1 grid grid-cols-7 w-full relative mb-2 min-h-[60px]">
                     {barData.map((value, index) => (
-                        <motion.div
-                            key={index}
-                            className="flex-1 bg-emerald-500/20 rounded-t relative overflow-hidden"
-                            initial={{ height: 0 }}
-                            animate={{
-                                height: step >= 3 ? `${value}%` : 0,
-                            }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                        >
+                        <div key={index} className="h-full relative px-1 flex items-end">
                             <motion.div
-                                className="absolute bottom-0 left-0 right-0 bg-emerald-500"
+                                className="w-full bg-emerald-500/20 rounded-t relative overflow-hidden"
                                 initial={{ height: 0 }}
                                 animate={{
-                                    height: step >= 4 ? "100%" : 0,
+                                    height: step >= 3 ? `${value}%` : 0,
                                 }}
-                                transition={{ duration: 0.3, delay: index * 0.1 + 0.5 }}
-                            />
-                        </motion.div>
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                            >
+                                <motion.div
+                                    className="absolute bottom-0 left-0 right-0 bg-emerald-500"
+                                    initial={{ height: 0 }}
+                                    animate={{
+                                        height: step >= 4 ? "100%" : 0,
+                                    }}
+                                    transition={{ duration: 0.3, delay: index * 0.1 + 0.5 }}
+                                />
+                            </motion.div>
+                        </div>
                     ))}
+
+                    {/* Trend Line covering Bars - Generated Dynamically from Bar Data */}
+                    <AnimatePresence>
+                        {step >= 3 && (
+                            <motion.svg
+                                viewBox="0 0 100 100"
+                                preserveAspectRatio="none"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                            >
+                                <motion.path
+                                    d="M 0 80 Q 25 90 50 50 T 100 20"
+                                    stroke="rgba(255,255,255,0.9)"
+                                    strokeWidth="2"
+                                    fill="none"
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: 1 }}
+                                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                                />
+                            </motion.svg>
+                        )}
+                    </AnimatePresence>
                 </div>
 
-                {/* Trend Line */}
-                <AnimatePresence>
-                    {step >= 5 && (
-                        <motion.svg
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="absolute bottom-8 left-4 right-4 h-24 pointer-events-none"
-                        >
-                            <motion.path
-                                d="M 0 80 Q 50 60 100 50 T 200 30 T 300 20"
-                                stroke="rgba(16,185,129,0.8)"
-                                strokeWidth="2"
-                                fill="none"
-                                strokeDasharray="300"
-                                initial={{ strokeDashoffset: 300 }}
-                                animate={{ strokeDashoffset: 0 }}
-                                transition={{ duration: 1 }}
-                            />
-                        </motion.svg>
-                    )}
-                </AnimatePresence>
+                {/* RSI Subchart - Compact height */}
+                <div className="h-6 border-t border-white/10 pt-1 relative mt-1">
+                    <div className="absolute top-1 left-0 text-[8px] font-mono text-emerald-500/70">RSI</div>
+                    <motion.svg
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
+                        className="w-full h-full overflow-visible"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: step >= 3 ? 1 : 0 }}
+                    >
+                        <motion.path
+                            d="M 0 50 C 20 30, 20 70, 40 50 S 60 30, 80 50 S 100 70, 100 50"
+                            fill="none"
+                            stroke="rgba(16,185,129,0.9)"
+                            strokeWidth="1.5"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: step >= 3 ? 1 : 0 }}
+                            transition={{ duration: 1.5, ease: "linear" }}
+                        />
+                    </motion.svg>
+                </div>
             </div>
 
             {/* Sentiment & Pipeline Status */}
@@ -177,17 +202,18 @@ export default function AnalyticsGraph() {
                 </motion.div>
             </div>
 
-            {/* Prediction Result */}
+            {/* Prediction Result - Absolute Positioned to prevent layout shift */}
             <AnimatePresence>
                 {step >= 7 && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-gradient-to-r from-emerald-900/50 to-green-900/50 p-4 rounded-xl border border-emerald-500/50 flex items-center justify-between"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute bottom-4 left-4 right-4 z-20 bg-gradient-to-r from-emerald-950/90 to-green-900/90 backdrop-blur-md p-4 rounded-xl border border-emerald-500/50 flex items-center justify-between shadow-2xl"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center">
-                                <DollarSign className="w-5 h-5 text-black" />
+                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                <DollarSign className="w-5 h-5 text-white" />
                             </div>
                             <div>
                                 <div className="text-sm font-bold text-white">Q4 Forecast</div>

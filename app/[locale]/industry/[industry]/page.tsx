@@ -107,7 +107,7 @@ export default async function IndustryPage(props: Props) {
                     <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm mb-6">
                         <span>CRM for {industry.name}</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 mb-6">
+                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 mb-6 pb-4">
                         {industry.hero_title}
                     </h1>
                     <p className="mx-auto max-w-[800px] text-gray-400 md:text-xl leading-relaxed mb-8">

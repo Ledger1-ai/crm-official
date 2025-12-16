@@ -107,7 +107,7 @@ export default async function LocationPage(props: Props) {
                         <MapPin className="w-4 h-4 mr-2" />
                         <span>Serving {location.name}</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50 drop-shadow-2xl mb-6">
+                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50 drop-shadow-2xl mb-6 pb-4">
                         {location.hero_title}
                     </h1>
                     <p className="mx-auto max-w-[800px] text-gray-400 md:text-xl leading-relaxed mb-8">
