@@ -1,26 +1,27 @@
-import { Mail } from "lucide-react";
-
-import Link from "next/link";
-
-import { usePathname } from "next/navigation";
 import React from "react";
+import { Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const EmailsModuleMenu = ({ open, title }: Props) => {
+const EmailsModuleMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("emails");
+  const isPath = /^\/([a-z]{2}\/)?emails(\/|$)/.test(pathname);
 
   return (
-    <div className="flex flex-row items-center mx-auto p-2 w-auto md:w-full">
-      <Link href={"/emails"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-        <Mail className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/emails"
+      icon={Mail}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

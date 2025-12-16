@@ -1,0 +1,92 @@
+[
+    {
+        "id": "tuc",
+        "name": "The Utility Company",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/TUC.png",
+        "category": "primary"
+    },
+    {
+        "id": "arthaneeti",
+        "name": "Arthaneeti",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/AR.png",
+        "category": "ventures"
+    },
+    {
+        "id": "cornucopia",
+        "name": "Cornucopia Robotics",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/CornucopiaRobotics.png",
+        "category": "ventures"
+    },
+    {
+        "id": "digibazaar",
+        "name": "DigiBazaar",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/DigiBazaarMedallion.png",
+        "category": "ventures"
+    },
+    {
+        "id": "ie",
+        "name": "Industrial Economics",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/IE.png",
+        "category": "ventures"
+    },
+    {
+        "id": "mkvli",
+        "name": "MKVLI",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/MKVLI.png",
+        "category": "ventures"
+    },
+    {
+        "id": "nftpd",
+        "name": "NFTPD",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/NFTPD.png",
+        "category": "ventures"
+    },
+    {
+        "id": "osiris",
+        "name": "Osiris Protocol",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/OP.png",
+        "category": "ventures"
+    },
+    {
+        "id": "requiem",
+        "name": "Requiem Electric",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/RE.png",
+        "category": "ventures"
+    },
+    {
+        "id": "tgl",
+        "name": "The Graine Ledger",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/TGL.png",
+        "category": "ventures"
+    },
+    {
+        "id": "lochness",
+        "name": "Loch Ness Botanical Society",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/TLN.png",
+        "category": "ventures"
+    },
+    {
+        "id": "tsp",
+        "name": "The Satellite Project",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/TSPAum1.png",
+        "category": "ventures"
+    },
+    {
+        "id": "vulcan",
+        "name": "Vulcan Forge",
+        "url": "https://storage.googleapis.com/tgl_cdn/images/Medallions/VulcanForge2.png",
+        "category": "ventures"
+    },
+    {
+        "id": "ledger1",
+        "name": "Ledger1",
+        "url": "https://ledger1.ai/images/ledger1-logo-icon.png",
+        "category": "primary"
+    },
+    {
+        "id": "portalpay",
+        "name": "PortalPay",
+        "url": "https://pay.ledger1.ai/ppsymbol.png",
+        "category": "primary"
+    }
+]

@@ -5,7 +5,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 import {
   crm_Opportunities,
@@ -260,7 +260,7 @@ const CRMKanban = ({
                                     <span
                                       className={
                                         opportunity.close_date &&
-                                        new Date(opportunity.close_date) <
+                                          new Date(opportunity.close_date) <
                                           new Date()
                                           ? "text-red-500"
                                           : ""
@@ -317,13 +317,13 @@ const CRMKanban = ({
                                         (s) => s.probability || 0
                                       )
                                     ) && (
-                                    <ThumbsDown
-                                      className="w-4 h-4 text-red-500"
-                                      onClick={() =>
-                                        onThumbsDown(opportunity.id)
-                                      }
-                                    />
-                                  )}
+                                      <ThumbsDown
+                                        className="w-4 h-4 text-red-500"
+                                        onClick={() =>
+                                          onThumbsDown(opportunity.id)
+                                        }
+                                      />
+                                    )}
                                 </div>
                               </CardFooter>
                             </Card>
@@ -364,7 +364,7 @@ const CRMKanban = ({
                           <span
                             className={
                               opportunity.close_date &&
-                              new Date(opportunity.close_date) < new Date()
+                                new Date(opportunity.close_date) < new Date()
                                 ? "text-red-500"
                                 : ""
                             }

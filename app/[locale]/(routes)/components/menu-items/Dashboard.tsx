@@ -1,29 +1,29 @@
-import { Home } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
 import React from "react";
+import { Home } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const DashboardMenu = ({ open, title }: Props) => {
+const DashboardMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  // Mark active when the current path ends with "/dashboard" (locale-aware, e.g., /en/dashboard)
-  const isPath = pathname.endsWith("/dashboard");
+  // Strictly match /dashboard or /<locale>/dashboard. 
+  // Ensure it does NOT match /projects or others if logic was somehow fuzzy.
+  const isPath = pathname === "/dashboard" || /^\/[a-zA-Z0-9-]+\/dashboard(\/|$)/.test(pathname);
+
   return (
-    <div className="flex flex-row items-center p-2 w-auto md:w-full">
-      <Link
-        href={"/dashboard"}
-        className={`menu-item ${isPath ? "menu-item-active" : ""}`}
-        title={title}
-      >
-        <Home className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/dashboard"
+      icon={Home}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

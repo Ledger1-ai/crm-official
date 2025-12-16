@@ -23,6 +23,7 @@
     "@aws-sdk/client-chime-sdk-voice": "^3.946.0",
     "@aws-sdk/client-connect": "^3.946.0",
     "@aws-sdk/client-pinpoint": "^3.946.0",
+    "@aws-sdk/client-pinpoint-sms-voice-v2": "^3.952.0",
     "@aws-sdk/client-s3": "^3.946.0",
     "@aws-sdk/client-sesv2": "^3.946.0",
     "@aws-sdk/s3-request-presigner": "^3.946.0",
@@ -95,7 +96,7 @@
     "puppeteer": "^24.32.0",
     "puppeteer-core": "^24.32.0",
     "react": "19.2.3",
-    "react-beautiful-dnd": "^13.1.1",
+    "@hello-pangea/dnd": "^17.0.0",
     "react-day-picker": "^9.11.3",
     "react-doc-viewer": "^0.1.15",
     "react-dom": "19.2.3",
@@ -128,7 +129,6 @@
     "@types/node": "^24.10.1",
     "@types/nodemailer": "^7.0.4",
     "@types/react": "npm:types-react@19.0.0-alpha.3",
-    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3",
     "autoprefixer": "^10.4.22",
     "cypress": "^15.7.1",
@@ -144,6 +144,12 @@
     "overrides": {
       "@types/react": "npm:types-react@19.0.0-alpha.3",
       "@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": "19",
+        "react-dom": "19"
+      }
     },
     "onlyBuiltDependencies": [
       "@prisma/client",

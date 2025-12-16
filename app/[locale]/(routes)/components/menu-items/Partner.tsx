@@ -1,24 +1,26 @@
+import React from "react";
 import { Users } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
     open: boolean;
+    isMobile?: boolean;
 };
 
-const AnyLink = Link as any;
-const AnyUsers = Users as any;
-
-const PartnerMenu = ({ open }: Props) => {
+const PartnerMenu = ({ open, isMobile = false }: Props) => {
     const pathname = usePathname();
-    const isPath = pathname.includes("partners");
+    const isPath = /^\/([a-z]{2}\/)?partners(\/|$)/.test(pathname);
+
     return (
-        <div className="flex flex-row items-center p-2 w-auto md:w-full">
-            <AnyLink href={"/partners"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-                <AnyUsers className="w-6 icon" />
-                <span className={open ? "" : "hidden"}>Partners</span>
-            </AnyLink>
-        </div>
+        <MenuItem
+            href="/partners"
+            icon={Users}
+            title="Partners"
+            isOpen={open}
+            isActive={isPath}
+            isMobile={isMobile}
+        />
     );
 };
 

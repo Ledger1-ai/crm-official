@@ -114,10 +114,14 @@ model crm_Leads {
   lead_pool_maps     crm_Lead_Pools_Leads[]
   contact_candidate_maps crm_Contact_Candidate_Leads[]
   lead_activities    crm_Lead_Activities[] @relation(name: "LeadActivitiesToLead")
+  outreach_items     crm_Outreach_Items[]  @relation(name: "OutreachItemsLead")
 
   // Link to a Project/Board for tagging and association
   project            String?       @db.ObjectId
   assigned_project   Boards?       @relation(name: "LeadsAssignedProject", fields: [project], references: [id])
+
+  // Message Portal recipients linked to this lead
+  portal_recipients  crm_Portal_Recipient[] @relation(name: "PortalRecipientLead")
 
   team_id            String?       @db.ObjectId
   assigned_team      Team?         @relation(fields: [team_id], references: [id])
@@ -188,6 +192,121 @@ model crm_campaigns {
   description   String?
   status        String?
   opportunities crm_Opportunities[]
+}
+
+// Outreach Campaigns for Email/SMS tracking
+enum OutreachCampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum OutreachChannelType {
+  EMAIL
+  SMS
+  PHONE
+}
+
+model crm_Outreach_Campaigns {
+  id                String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v                 Int?                     @map("__v")
+  name              String
+  description       String?
+  status            OutreachCampaignStatus   @default(DRAFT)
+  
+  // Owner/Team
+  user              String                   @db.ObjectId
+  team_id           String?                  @db.ObjectId
+  
+  // Project/Context association
+  project           String?                  @db.ObjectId
+  pool              String?                  @db.ObjectId
+  
+  // Campaign-specific overrides
+  prompt_override   String?
+  signature_html    String?
+  signature_meta    Json?
+  resource_links    Json?
+  meeting_link      String?
+  
+  // Channels enabled
+  channels          OutreachChannelType[]    @default([EMAIL])
+  
+  // Stats (denormalized for quick access)
+  total_leads       Int                      @default(0)
+  emails_sent       Int                      @default(0)
+  emails_opened     Int                      @default(0)
+  sms_sent          Int                      @default(0)
+  sms_delivered     Int                      @default(0)
+  calls_initiated   Int                      @default(0)
+  meetings_booked   Int                      @default(0)
+  
+  // Timestamps
+  createdAt         DateTime?                @default(now()) @db.Date
+  updatedAt         DateTime?                @updatedAt @db.Date
+  launchedAt        DateTime?                @db.Date
+  completedAt       DateTime?                @db.Date
+  
+  // Relations
+  outreach_items    crm_Outreach_Items[]
+  assigned_user     Users?                   @relation(name: "OutreachCampaignsUser", fields: [user], references: [id])
+  assigned_team     Team?                    @relation(name: "OutreachCampaignsTeam", fields: [team_id], references: [id])
+  assigned_project  Boards?                  @relation(name: "OutreachCampaignsProject", fields: [project], references: [id])
+  assigned_pool     crm_Lead_Pools?          @relation(name: "OutreachCampaignsPools", fields: [pool], references: [id])
+}
+
+// Individual outreach items within a campaign
+enum OutreachItemStatus {
+  PENDING
+  RESEARCHING
+  READY
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  REPLIED
+  BOUNCED
+  FAILED
+  SKIPPED
+}
+
+model crm_Outreach_Items {
+  id                String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v                 Int?                     @map("__v")
+  campaign          String                   @db.ObjectId
+  lead              String                   @db.ObjectId
+  channel           OutreachChannelType
+  status            OutreachItemStatus       @default(PENDING)
+  
+  // Research data collected for personalization
+  research_data     Json?
+  
+  // Generated content
+  subject           String?
+  body_text         String?
+  body_html         String?
+  
+  // Tracking
+  message_id        String?
+  tracking_token    String?
+  
+  // Timestamps
+  createdAt         DateTime?                @default(now()) @db.Date
+  sentAt            DateTime?                @db.Date
+  deliveredAt       DateTime?                @db.Date
+  openedAt          DateTime?                @db.Date
+  clickedAt         DateTime?                @db.Date
+  repliedAt         DateTime?                @db.Date
+  
+  // Error tracking
+  error_message     String?
+  retry_count       Int                      @default(0)
+  
+  // Relations
+  assigned_campaign crm_Outreach_Campaigns?  @relation(fields: [campaign], references: [id])
+  assigned_lead     crm_Leads?               @relation(name: "OutreachItemsLead", fields: [lead], references: [id])
 }
 
 model crm_Opportunities_Sales_Stages {
@@ -322,6 +441,8 @@ model Boards {
   button_sets    Project_Button_Sets[] @relation(name: "BoardButtonSets")
   project_opportunities Project_Opportunities[]
   assigned_leads      crm_Leads[]            @relation(name: "LeadsAssignedProject")
+  outreach_campaigns  crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsProject")
+  message_portals     crm_Message_Portal[]   @relation(name: "PortalProject")
 
   team_id             String?                @db.ObjectId
   assigned_team       Team?                  @relation(fields: [team_id], references: [id])
@@ -691,6 +812,7 @@ model Users {
   lead_gen_jobs        crm_Lead_Gen_Jobs[] @relation(name: "LeadGenJobsAssignedUser")
   lead_activities      crm_Lead_Activities[] @relation(name: "LeadActivitiesToUser")
   system_activities    SystemActivity[]      @relation(name: "UserSystemActivities")
+  outreach_campaigns   crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsUser")
 
   // Outreach, signature, resources, and prompt settings
   meeting_link               String?
@@ -747,8 +869,11 @@ model Team {
   lead_pools          crm_Lead_Pools[]
   employees           Employees[]
   accounts_tasks      crm_Accounts_Tasks[]
+  outreach_campaigns  crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsTeam")
+  message_portals     crm_Message_Portal[] @relation(name: "PortalTeam")
   
   ai_config           TeamAiConfig?
+  sms_config          TeamSmsConfig?
 }
 
 enum BillingCycle {
@@ -922,6 +1047,74 @@ model TeamAiConfig {
   assigned_team Team      @relation(fields: [team_id], references: [id])
 }
 
+// =============================================================================
+// TEAM SMS CONFIG - 10DLC REGISTRATION
+// Stores brand and campaign registration IDs for SMS outreach per team
+// =============================================================================
+
+enum TenDlcRegistrationStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  DENIED
+  REQUIRES_UPDATE
+}
+
+model TeamSmsConfig {
+  id                        String                    @id @default(auto()) @map("_id") @db.ObjectId
+  team_id                   String                    @unique @db.ObjectId
+  
+  // Brand Registration (Company Info)
+  brand_registration_id     String?
+  brand_status              TenDlcRegistrationStatus? @default(PENDING)
+  brand_name                String?
+  brand_ein                 String?
+  brand_vertical            String?
+  brand_company_type        String?
+  brand_website_url         String?
+  brand_street              String?
+  brand_city                String?
+  brand_state               String?
+  brand_postal_code         String?
+  brand_country_code        String?
+  brand_contact_email       String?
+  brand_contact_phone       String?
+  brand_support_email       String?
+  brand_support_phone       String?
+  
+  // Campaign Registration
+  campaign_registration_id  String?
+  campaign_status           TenDlcRegistrationStatus? @default(PENDING)
+  campaign_use_case         String?                   @default("ACCOUNT_NOTIFICATION")
+  campaign_description      String?
+  campaign_message_flow     String?
+  campaign_sample_messages  String[]
+  campaign_help_message     String?
+  campaign_opt_out_message  String?
+  
+  // Phone Number (assigned after campaign approval)
+  phone_number_id           String?
+  phone_number              String?                   // E.164 format
+  phone_number_arn          String?
+  phone_number_status       String?
+  
+  // Configuration
+  sms_enabled               Boolean                   @default(false)
+  monthly_budget            Float?                    @default(0)
+  daily_limit               Int?                      @default(100)
+  
+  // Timestamps
+  createdAt                 DateTime                  @default(now()) @db.Date
+  updatedAt                 DateTime                  @updatedAt @db.Date
+  brand_submitted_at        DateTime?                 @db.Date
+  brand_approved_at         DateTime?                 @db.Date
+  campaign_submitted_at     DateTime?                 @db.Date
+  campaign_approved_at      DateTime?                 @db.Date
+  
+  // Relations
+  assigned_team             Team                      @relation(fields: [team_id], references: [id])
+}
+
 
 model chat_Sessions {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -992,6 +1185,7 @@ model crm_Lead_Pools {
   jobs          crm_Lead_Gen_Jobs[]
   candidates    crm_Lead_Candidates[]
   lead_maps     crm_Lead_Pools_Leads[]
+  outreach_campaigns crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsPools")
   assigned_user Users?            @relation(name: "LeadPoolsAssignedUser", fields: [user], references: [id])
 
   team_id       String?           @db.ObjectId
@@ -1382,6 +1576,270 @@ model PageView {
   createdAt DateTime @default(now()) @db.Date
 }
 
+// =============================================================================
+// INTERNAL TEAM MESSAGING SYSTEM
+// Email-like internal messaging between team members
+// =============================================================================
+
+enum InternalMessageStatus {
+  DRAFT
+  SENT
+  READ
+  ARCHIVED
+  DELETED
+}
+
+enum InternalMessagePriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model InternalMessage {
+  id              String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int?                     @map("__v")
+  
+  // Sender
+  sender_id       String                   @db.ObjectId
+  sender_name     String?
+  sender_email    String?
+  
+  // Subject and content
+  subject         String
+  body_text       String?
+  body_html       String?
+  
+  // Status and flags
+  status          InternalMessageStatus    @default(SENT)
+  priority        InternalMessagePriority  @default(NORMAL)
+  is_starred      Boolean                  @default(false)
+  
+  // Parent message for threading
+  parent_id       String?                  @db.ObjectId
+  thread_id       String?                  @db.ObjectId // Root message ID for the thread
+  
+  // Labels/tags
+  labels          String[]
+  
+  // Attachments (references to Documents)
+  attachment_ids  String[]                 @db.ObjectId
+  
+  // Team scope
+  team_id         String                   @db.ObjectId
+  
+  // Timestamps
+  createdAt       DateTime                 @default(now()) @db.Date
+  updatedAt       DateTime?                @updatedAt @db.Date
+  sentAt          DateTime?                @db.Date
+  
+  // Relations
+  recipients      InternalMessageRecipient[]
+  parent          InternalMessage?         @relation("MessageThread", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children        InternalMessage[]        @relation("MessageThread")
+  
+  @@index([team_id, createdAt])
+  @@index([sender_id])
+  @@index([thread_id])
+}
+
+model InternalMessageRecipient {
+  id              String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int?                     @map("__v")
+  message_id      String                   @db.ObjectId
+  recipient_id    String                   @db.ObjectId
+  recipient_type  String                   @default("TO") // TO, CC, BCC
+  
+  // Recipient-specific status
+  is_read         Boolean                  @default(false)
+  is_starred      Boolean                  @default(false)
+  is_archived     Boolean                  @default(false)
+  is_deleted      Boolean                  @default(false)
+  
+  // Timestamps
+  read_at         DateTime?                @db.Date
+  createdAt       DateTime                 @default(now()) @db.Date
+  
+  // Relations
+  message         InternalMessage          @relation(fields: [message_id], references: [id], onDelete: Cascade)
+  
+  @@unique([message_id, recipient_id])
+  @@index([recipient_id, is_read])
+}
+
+// =============================================================================
+// FORM BUILDER SYSTEM
+// Forms stored per project with embeddable/JS snippet support
+// =============================================================================
+
+enum FormFieldType {
+  TEXT
+  TEXTAREA
+  EMAIL
+  PHONE
+  NUMBER
+  SELECT
+  MULTI_SELECT
+  CHECKBOX
+  RADIO
+  DATE
+  TIME
+  DATETIME
+  FILE
+  HIDDEN
+}
+
+enum FormStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum FormVisibility {
+  PUBLIC   // Submissions visible to all team members
+  PRIVATE  // Submissions visible only to form creator
+}
+
+model Form {
+  id              String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int?                     @map("__v")
+  
+  // Basic info
+  name            String
+  description     String?
+  slug            String                   @unique // Used for public URL
+  
+  // Form configuration
+  status          FormStatus               @default(DRAFT)
+  success_message String?                  @default("Thank you for your submission!")
+  redirect_url    String?                  // Optional redirect after submission
+  
+  // Branding
+  primary_color   String?                  @default("#F54029")
+  logo_url        String?
+  custom_css      String?
+  
+  // Visibility
+  visibility      FormVisibility           @default(PUBLIC)
+  
+  // Settings
+  require_captcha Boolean                  @default(false)
+  notify_emails   String[]                 // Emails to notify on submission
+  webhook_url     String?                  // Optional webhook for submissions
+  auto_respond    Boolean                  @default(false)
+  auto_respond_subject String?
+  auto_respond_body String?
+  
+  // Association
+  project_id      String?                  @db.ObjectId // Optional project association
+  team_id         String                   @db.ObjectId
+  created_by      String                   @db.ObjectId
+  
+  // Stats (denormalized)
+  submission_count Int                     @default(0)
+  
+  // Timestamps
+  createdAt       DateTime                 @default(now()) @db.Date
+  updatedAt       DateTime?                @updatedAt @db.Date
+  
+  // Relations
+  fields          FormField[]
+  submissions     FormSubmission[]
+  
+  @@index([team_id, status])
+  @@index([project_id])
+}
+
+model FormField {
+  id              String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int?                     @map("__v")
+  form_id         String                   @db.ObjectId
+  
+  // Field definition
+  name            String                   // Internal field name
+  label           String                   // Display label
+  placeholder     String?
+  help_text       String?
+  field_type      FormFieldType            @default(TEXT)
+  
+  // Options for select/radio/checkbox
+  options         Json?                    // Array of { value, label }
+  
+  // Validation
+  is_required     Boolean                  @default(false)
+  min_length      Int?
+  max_length      Int?
+  pattern         String?                  // Regex pattern
+  
+  // Lead mapping - which lead field this maps to
+  lead_field_mapping String?               // e.g., "firstName", "lastName", "email", "phone", "company"
+  
+  // Display order
+  position        Int                      @default(0)
+  
+  // Visibility
+  is_visible      Boolean                  @default(true)
+  
+  // Relations
+  form            Form                     @relation(fields: [form_id], references: [id], onDelete: Cascade)
+  
+  @@index([form_id, position])
+}
+
+enum FormSubmissionStatus {
+  NEW
+  VIEWED
+  CONVERTED
+  SPAM
+  ARCHIVED
+}
+
+model FormSubmission {
+  id              String                   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int?                     @map("__v")
+  form_id         String                   @db.ObjectId
+  
+  // Submission data
+  data            Json                     // Key-value pairs of field_name: value
+  
+  // Extracted lead info (from data based on field mappings)
+  extracted_email String?
+  extracted_phone String?
+  extracted_name  String?
+  extracted_company String?
+  
+  // Status
+  status          FormSubmissionStatus     @default(NEW)
+  
+  // Converted lead reference
+  lead_id         String?                  @db.ObjectId
+  
+  // Submission metadata
+  source_url      String?                  // URL where form was submitted from
+  ip_hash         String?                  // Hashed IP for privacy
+  user_agent      String?
+  referrer        String?
+  utm_source      String?
+  utm_medium      String?
+  utm_campaign    String?
+  
+  // Team scope (denormalized from form for quick queries)
+  team_id         String                   @db.ObjectId
+  
+  // Timestamps
+  createdAt       DateTime                 @default(now()) @db.Date
+  viewed_at       DateTime?                @db.Date
+  converted_at    DateTime?                @db.Date
+  
+  // Relations
+  form            Form                     @relation(fields: [form_id], references: [id], onDelete: Cascade)
+  
+  @@index([form_id, status])
+  @@index([team_id, createdAt])
+  @@index([extracted_email])
+}
+
 model MediaItem {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   url         String
@@ -1404,4 +1862,165 @@ model MediaItem {
   updatedAt   DateTime @updatedAt
   
   userId      String?  @db.ObjectId // Uploader
+}
+
+// =============================================================================
+// MESSAGE PORTAL SYSTEM
+// Enables compliant SMS notifications: "You have a new message in your portal"
+// =============================================================================
+
+// Portal theme mode
+enum PortalThemeMode {
+  LIGHT
+  DARK
+  AUTO
+}
+
+// Portal configuration per project/team
+model crm_Message_Portal {
+  id                    String          @id @default(auto()) @map("_id") @db.ObjectId
+  v                     Int?            @map("__v")
+  project               String?         @db.ObjectId // References Boards
+  team_id               String?         @db.ObjectId // References Team
+  
+  // Portal branding
+  portal_name           String?         // e.g., "PortalPay Investor Updates"
+  portal_slug           String          @unique // e.g., "portalpay-updates"
+  logo_url              String?
+  logo_type             String?         @default("custom") // custom, project_symbol
+  project_symbol_id     String?         // ID of TUC medallion/symbol if using project_symbol
+  primary_color         String?         @default("#F54029")
+  secondary_color       String?         @default("#f5f5f5")
+  accent_color          String?         @default("#10b981")
+  welcome_message       String?
+  
+  // Theme settings
+  theme_mode            PortalThemeMode @default(AUTO)
+  dark_primary_color    String?         @default("#F54029")
+  dark_secondary_color  String?         @default("#1f2937")
+  dark_accent_color     String?         @default("#10b981")
+  
+  // Glass morphism settings
+  enable_glass_effect   Boolean         @default(true)
+  background_blur       Int?            @default(20)
+  
+  // Settings
+  require_registration  Boolean         @default(false) // false = magic link only
+  show_sender_info      Boolean         @default(true)
+  custom_domain         String?         // Future: custom domain support
+  
+  createdAt             DateTime        @default(now()) @db.Date
+  updatedAt             DateTime        @updatedAt @db.Date
+  
+  // Relations
+  messages              crm_Portal_Message[]
+  recipients            crm_Portal_Recipient[]
+  assigned_project      Boards?         @relation(name: "PortalProject", fields: [project], references: [id])
+  assigned_team         Team?           @relation(name: "PortalTeam", fields: [team_id], references: [id])
+}
+
+// Individual message stored in the portal
+model crm_Portal_Message {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                     Int?     @map("__v")
+  portal                String   @db.ObjectId // References crm_Message_Portal
+  outreach_item         String?  @db.ObjectId // Optional link to crm_Outreach_Items
+  
+  // Message content
+  subject               String
+  body_text             String   // Plain text version
+  body_html             String?  // HTML version for desktop
+  mobile_html           String?  // Mobile-optimized HTML (user can customize)
+  
+  // Metadata
+  sender_name           String?
+  sender_email          String?
+  sender_avatar         String?
+  
+  // Timestamps
+  sentAt                DateTime @default(now()) @db.Date
+  createdAt             DateTime @default(now()) @db.Date
+  
+  // Relations
+  assigned_portal       crm_Message_Portal @relation(fields: [portal], references: [id])
+  views                 crm_Portal_Message_View[]
+  recipient_links       crm_Portal_Message_Recipient[]
+}
+
+// Portal recipient (lead/contact with portal access)
+model crm_Portal_Recipient {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                     Int?     @map("__v")
+  portal                String   @db.ObjectId // References crm_Message_Portal
+  lead                  String?  @db.ObjectId // References crm_Leads
+  
+  // Access credentials
+  email                 String
+  phone                 String?
+  access_token          String   @unique // Magic link token (32-char random)
+  pin_code              String?  // Optional PIN for extra security
+  
+  // Profile (filled on registration or from lead)
+  first_name            String?
+  last_name             String?
+  company               String?
+  
+  // Status tracking
+  is_registered         Boolean  @default(false)
+  is_opted_out          Boolean  @default(false) // SMS opt-out
+  opted_out_at          DateTime? @db.Date
+  last_accessed         DateTime? @db.Date
+  access_count          Int      @default(0)
+  
+  createdAt             DateTime @default(now()) @db.Date
+  updatedAt             DateTime @updatedAt @db.Date
+  
+  // Relations
+  assigned_portal       crm_Message_Portal @relation(fields: [portal], references: [id])
+  assigned_lead         crm_Leads?         @relation(name: "PortalRecipientLead", fields: [lead], references: [id])
+  message_links         crm_Portal_Message_Recipient[]
+  
+  @@unique([portal, email])
+}
+
+// Link between message and recipient (for tracking per-recipient delivery)
+model crm_Portal_Message_Recipient {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                     Int?     @map("__v")
+  message               String   @db.ObjectId // References crm_Portal_Message
+  recipient             String   @db.ObjectId // References crm_Portal_Recipient
+  
+  // SMS delivery status
+  sms_sent              Boolean  @default(false)
+  sms_sent_at           DateTime? @db.Date
+  sms_message_id        String?  // AWS Pinpoint message ID
+  sms_status            String?  // delivered, failed, etc.
+  
+  // View tracking
+  first_viewed_at       DateTime? @db.Date
+  view_count            Int      @default(0)
+  
+  createdAt             DateTime @default(now()) @db.Date
+  
+  // Relations
+  assigned_message      crm_Portal_Message    @relation(fields: [message], references: [id])
+  assigned_recipient    crm_Portal_Recipient  @relation(fields: [recipient], references: [id])
+  
+  @@unique([message, recipient])
+}
+
+// Track detailed message views (analytics)
+model crm_Portal_Message_View {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  message               String   @db.ObjectId // References crm_Portal_Message
+  recipient_email       String?
+  access_token          String?  // Which token was used
+  
+  viewed_at             DateTime @default(now()) @db.Date
+  device_type           String?  // mobile, desktop, tablet
+  user_agent            String?
+  ip_hash               String?  // Hashed IP for privacy
+  
+  // Relations
+  assigned_message      crm_Portal_Message @relation(fields: [message], references: [id])
 }

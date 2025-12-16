@@ -21,17 +21,19 @@ async function main() {
   // Your seeding logic here using Prisma Client
   console.log("-------- Seeding DB --------");
 
-  //Seed Menu Items
-  const modules = await prisma.system_Modules_Enabled.findMany();
+  //Seed Menu Items - Sync logic to add missing modules
+  const existingModules = await prisma.system_Modules_Enabled.findMany();
+  const existingModuleNames = existingModules.map((m: any) => m.name);
 
-  if (modules.length === 0) {
-    await prisma.system_Modules_Enabled.createMany({
-      data: moduleData,
-    });
-    console.log("Modules seeded successfully");
-  } else {
-    console.log("Modules already seeded");
+  for (const moduleEntry of moduleData) {
+    if (!existingModuleNames.includes(moduleEntry.name)) {
+      await prisma.system_Modules_Enabled.create({
+        data: moduleEntry,
+      });
+      console.log(`Module "${moduleEntry.name}" added`);
+    }
   }
+  console.log("Modules sync complete");
 
   //Seed CRM Opportunity Types
   const crmOpportunityType = await prisma.crm_Opportunities_Type.findMany();

@@ -1,22 +1,27 @@
+import React from "react";
 import { Wrench } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const AdministrationMenu = ({ open, title }: Props) => {
+const AdministrationMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("admin");
+  const isPath = /^\/([a-z]{2}\/)?admin(\/|$)/.test(pathname);
+
   return (
-    <div className="flex flex-row items-center p-2 w-auto md:w-full">
-      <Link href={"/admin"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-        <Wrench className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/admin"
+      icon={Wrench}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

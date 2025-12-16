@@ -2,12 +2,7 @@
 
 import axios from "axios";
 import moment from "moment";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState, useMemo } from "react";
 import { Check, EyeIcon, Pencil, PlusCircle, PlusIcon } from "lucide-react";

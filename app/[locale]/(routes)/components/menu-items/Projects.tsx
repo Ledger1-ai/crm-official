@@ -1,26 +1,27 @@
-import { ServerIcon } from "lucide-react";
-
-import Link from "next/link";
-
-import { usePathname } from "next/navigation";
 import React from "react";
+import { ServerIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const ProjectModuleMenu = ({ open, title }: Props) => {
+const ProjectModuleMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("projects");
+  const isPath = /^\/([a-z]{2}\/)?projects(\/|$)/.test(pathname);
 
   return (
-    <div className="flex flex-row items-center mx-auto p-2 w-auto md:w-full">
-      <Link href={"/projects"} className={`menu-item ${isPath ? "menu-item-active" : ""}`} title={title}>
-        <ServerIcon className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/projects"
+      icon={ServerIcon}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

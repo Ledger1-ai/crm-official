@@ -1,24 +1,27 @@
-import { FileCheck } from "lucide-react";
-import Link from "next/link";
-
-import { usePathname } from "next/navigation";
 import React from "react";
+import { FileCheck } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const InvoicesModuleMenu = ({ open, title }: Props) => {
+const InvoicesModuleMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("invoice");
+  const isPath = /^\/([a-z]{2}\/)?invoice(\/|$)/.test(pathname);
+
   return (
-    <div className="flex flex-row items-center mx-auto p-2 w-auto md:w-full">
-      <Link href={"/invoice"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-        <FileCheck className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/invoice"
+      icon={FileCheck}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

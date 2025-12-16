@@ -3,7 +3,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Wand2, Users, Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Wand2, Users, Settings, ChevronLeft, ChevronRight, Mail } from "lucide-react";
 import Heading from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 
@@ -13,10 +13,11 @@ type Props = {
   managerSlot: React.ReactNode;
   wizardSlot: React.ReactNode;
   poolsSlot: React.ReactNode;
+  campaignsSlot?: React.ReactNode;
   settingsSlot?: React.ReactNode;
 };
 
-export default function TabsContainer({ title, description, managerSlot, wizardSlot, poolsSlot, settingsSlot }: Props) {
+export default function TabsContainer({ title, description, managerSlot, wizardSlot, poolsSlot, campaignsSlot, settingsSlot }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selected = searchParams.get("tab") || "manager";
@@ -63,6 +64,7 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
     { id: "manager", label: "Leads Manager", icon: LayoutDashboard },
     { id: "wizard", label: "LeadGen Wizard", icon: Wand2 },
     { id: "pools", label: "Lead Pools", icon: Users },
+    { id: "campaigns", label: "Campaigns", icon: Mail },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -198,6 +200,7 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
           {selected === "manager" && managerSlot}
           {selected === "wizard" && wizardSlot}
           {selected === "pools" && poolsSlot}
+          {selected === "campaigns" && campaignsSlot}
           {selected === "settings" && settingsSlot}
         </div>
       </div>

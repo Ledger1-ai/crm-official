@@ -9,6 +9,7 @@ import LeadGenWizardPage from "./autogen/page";
 import LeadPoolsPage from "./pools/page";
 import SettingsTabs from "./components/SettingsTabs";
 import LeadsManagerTabs from "./components/LeadsManagerTabs";
+import CampaignsView from "./components/CampaignsView";
 
 import { getAllCrmData } from "@/actions/crm/get-crm-data";
 import { getLeads } from "@/actions/crm/get-leads";
@@ -40,6 +41,7 @@ const LeadsPage = async ({ searchParams }: LeadsPageProps) => {
         }
         wizardSlot={tab === "wizard" ? <LeadGenWizardPage /> : null}
         poolsSlot={tab === "pools" ? <LeadPoolsPage /> : null}
+        campaignsSlot={tab === "campaigns" ? <CampaignsView /> : null}
         settingsSlot={tab === "settings" ? (
           <SettingsTabs />
         ) : null}

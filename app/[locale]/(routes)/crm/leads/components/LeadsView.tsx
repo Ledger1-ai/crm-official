@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'react-hot-toast';
 import { STAGE_BADGE_CLASS, formatStageLabel, type PipelineStage } from '@/components/stageStyles';
-import FirstContactWizard from '@/components/modals/FirstContactWizard';
+import OutreachCampaignWizard from './OutreachCampaignWizard';
 import StageProgressBar, { type StageDatum } from '@/components/StageProgressBar';
 import FollowUpWizard from '@/components/modals/FollowUpWizard';
 import { ExternalLink, Mail, TrendingUp, Target, X, User, Phone, FileText, Info, Activity, Calendar } from 'lucide-react';
@@ -461,13 +461,14 @@ export default function LeadsView({ data }: Props) {
           </div>
         </div>
       </div>
-      <FirstContactWizard
-        isOpen={firstContactOpen}
-        onClose={() => setFirstContactOpen(false)}
-        leadIds={selectedInPoolIds}
-        initialPrompt={wizardInitialPrompt}
-        poolId={selectedPoolId}
-      />
+      {firstContactOpen && (
+        <OutreachCampaignWizard
+          selectedLeads={visibleLeads.filter(l => selectedInPoolIds.includes(l.id)) as any}
+          poolId={selectedPoolId}
+          projectId={projectAssignedForSelectedPool}
+          onClose={() => setFirstContactOpen(false)}
+        />
+      )}
       <FollowUpWizard
         isOpen={followUpOpen}
         onClose={() => { setFollowUpOpen(false); setFollowUpLeadId(null); }}

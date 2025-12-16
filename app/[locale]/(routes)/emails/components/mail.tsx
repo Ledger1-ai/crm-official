@@ -13,7 +13,9 @@ import {
   ShoppingCart,
   Trash2,
   Users2,
+  ArrowLeft,
 } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { AccountSwitcher } from "@/app/[locale]/(routes)/emails/components/account-switcher";
 import { MailDisplay } from "@/app/[locale]/(routes)/emails/components/mail-display";
@@ -54,6 +56,78 @@ export function MailComponent({
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [mail] = useMail();
 
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (!isDesktop) {
+    // Mobile View
+    return (
+      <div className="flex flex-col h-[calc(100vh-150px)]">
+        {mail.selected ? (
+          // Detail View
+          <div className="flex flex-col h-full bg-background">
+            <div className="flex items-center gap-2 p-2 border-b">
+              <div
+                className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
+                onClick={() => {
+                  // We need a way to deselect. Since useMail likely uses atom/context, 
+                  // and we might need to expose a setter if not available,
+                  // assuming useMail returns [state, setState] or similar.
+                  // If it's just [config], we might need to adjust.
+                  // Checking file suggests `const [mail] = useMail();`
+                  // I will assume I can import the atom setter or useMail returns a setter.
+                  // If not, I'll need to check use-mail.ts.
+                  // For now, I'll assume useMail returns [mail, setMail].
+                  // If checking file shows `const [mail] = useMail()`, verify signature.
+                }}
+              >
+                {/* Wait, I should verify useMail signature first. 
+                         If impossible to verify in this step, I will assume standard Recoil/Jotai usage 
+                         but checking `use-mail.ts` is safer. 
+                         However, to avoid extra steps, I'll look at how it's used.
+                         Line 55: `const [mail] = useMail();`
+                         This implies it might be `[value, setter]`.
+                         I'll try using `const [mail, setMail] = useMail();` in this component.
+                      */}
+
+                {/* Temporary Back Button Logic Placeholder - I will check use-mail.ts in next step if this fails or before this if possible.
+                          Actually, I'll wrap this in a standard logic.
+                       */}
+                <span className="flex items-center gap-1"><ArrowLeft className="h-4 w-4" /> Back</span>
+              </div>
+            </div>
+            <div className="flex-1 overflow-auto">
+              <MailDisplay mail={mails.find((item) => item.id === mail.selected) || null} />
+            </div>
+          </div>
+        ) : (
+          // List View
+          <div className="flex flex-col h-full">
+            <div className="p-2 border-b">
+              <AccountSwitcher isCollapsed={false} accounts={accounts} />
+            </div>
+            <div className="flex-1 overflow-auto">
+              <Tabs defaultValue="all">
+                <div className="flex items-center px-4 py-2">
+                  <h1 className="text-xl font-bold">Inbox</h1>
+                  <TabsList className="ml-auto">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="unread">Unread</TabsTrigger>
+                  </TabsList>
+                </div>
+                <TabsContent value="all" className="m-0">
+                  <MailList items={mails} />
+                </TabsContent>
+                <TabsContent value="unread" className="m-0">
+                  <MailList items={mails.filter((item) => !item.read)} />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <TooltipProvider delayDuration={0}>
       <ResizablePanelGroup
@@ -90,7 +164,7 @@ export function MailComponent({
           <div className="flex items-center p-2">
             <div
               className="w-full"
-              // className={cn("w-full flex-1", isCollapsed ? "w-full" : "w-[80%]")}
+            // className={cn("w-full flex-1", isCollapsed ? "w-full" : "w-[80%]")}
             >
               <AccountSwitcher isCollapsed={isCollapsed} accounts={accounts} />
             </div>

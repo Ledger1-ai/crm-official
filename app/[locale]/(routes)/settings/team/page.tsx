@@ -30,7 +30,7 @@ export default async function TeamSettingsPage() {
 
     return (
         <Container title="Team Settings" description="Manage your team preferences.">
-            <div className="space-y-6">
+            <div className="space-y-8">
                 <TeamAiSettings teamId={user.assigned_team.id} />
             </div>
         </Container>

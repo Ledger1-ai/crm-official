@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, MessageSquare } from "lucide-react";
 
 import Container from "@/app/[locale]/(routes)/components/ui/Container";
 import {
@@ -16,6 +16,7 @@ import { getTeam } from "@/actions/teams/get-team";
 import { getPlans } from "@/actions/plans/plan-actions";
 import TeamSettingsForm from "./_components/TeamSettingsForm";
 import TeamMembersTable from "./_components/TeamMembersTable";
+import SmsConfigForm from "./_components/SmsConfigForm";
 
 const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }> }) => {
     const resolvedParams = await params;
@@ -43,7 +44,12 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
                 <TabsList>
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="members">Members</TabsTrigger>
-                    {/* <TabsTrigger value="settings">Settings</TabsTrigger> */}
+                    {currentUserInfo?.isGlobalAdmin && (
+                        <TabsTrigger value="sms-config" className="flex items-center gap-1">
+                            <MessageSquare className="w-4 h-4" />
+                            SMS Config
+                        </TabsTrigger>
+                    )}
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
                     <TeamSettingsForm team={team} availablePlans={plans as any} />
@@ -56,6 +62,11 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
                         isSuperAdmin={currentUserInfo?.isGlobalAdmin}
                     />
                 </TabsContent>
+                {currentUserInfo?.isGlobalAdmin && (
+                    <TabsContent value="sms-config" className="space-y-4">
+                        <SmsConfigForm teamId={team.id} teamName={team.name} />
+                    </TabsContent>
+                )}
             </Tabs>
         </div>
     );

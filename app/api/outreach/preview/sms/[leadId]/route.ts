@@ -112,7 +112,10 @@ async function basicCompanyResearchFromEmail(email?: string | null): Promise<str
     }
 }
 
-export async function POST(req: Request, { params }: any) {
+export async function POST(
+    req: Request,
+    { params }: { params: Promise<{ leadId: string }> }
+) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) return new NextResponse("Unauthorized", { status: 401 });

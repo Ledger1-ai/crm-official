@@ -33,8 +33,13 @@ import { ensureContactForLead } from "@/actions/crm/lead-conversions";
 type RequestBody = {
   leadIds: string[];
   test?: boolean;
+  testEmail?: string;
   promptOverride?: string;
   meetingLinkOverride?: string;
+  // Pre-generated content to skip AI regeneration (for test sends using preview)
+  preGeneratedSubject?: string;
+  preGeneratedBody?: string;
+  preGeneratedHtml?: string;
 };
 
 const DEFAULT_TEST_EMAIL = "founders@theutilitycompany.co";
@@ -242,8 +247,14 @@ export async function POST(req: Request) {
     const signatureHtml = user.signature_html || undefined;
 
     const testMode = !!body.test;
+    const testEmailOverride = body.testEmail?.trim();
     const meetingLinkOverride = body.meetingLinkOverride?.trim();
     const promptOverride = body.promptOverride?.trim();
+
+    // Pre-generated content (skip AI if provided)
+    const preGeneratedSubject = body.preGeneratedSubject?.trim();
+    const preGeneratedBody = body.preGeneratedBody?.trim();
+    const preGeneratedHtml = body.preGeneratedHtml;
 
     const results: Array<{
       leadId: string;
@@ -256,7 +267,9 @@ export async function POST(req: Request) {
 
     for (const lead of leads) {
       // Basic validation
-      const toEmail = testMode ? (process.env.TEST_EMAIL || DEFAULT_TEST_EMAIL) : (lead.email || "");
+      const toEmail = testMode
+        ? (testEmailOverride || process.env.TEST_EMAIL || DEFAULT_TEST_EMAIL)
+        : (lead.email || "");
       if (!toEmail) {
         results.push({ leadId: lead.id, status: "skipped", reason: "No lead email" });
         continue;
@@ -292,45 +305,54 @@ export async function POST(req: Request) {
         meetingLink,
       });
 
-      // Call OpenAI / Azure OpenAI, enforce JSON object
-      let subject = "Exploring Partnership Opportunities";
-      let bodyText = "Hello,\n\nI'd like to explore how PortalPay could align with your investment thesis.\n\nThanks.";
-      try {
-        const { object } = await generateObject({
-          model,
-          schema: z.object({
-            subject: z.string(),
-            body: z.string(),
-          }),
-          messages: [
-            { role: "system", content: systemInstruction() },
-            { role: "user", content: userPrompt },
-          ],
-        });
+      // Use pre-generated content if provided (skips AI call - faster for test sends)
+      let subject = preGeneratedSubject || "Exploring Partnership Opportunities";
+      let bodyText = preGeneratedBody || "Hello,\n\nI'd like to explore how PortalPay could align with your investment thesis.\n\nThanks.";
 
-        subject = object.subject || subject;
-        bodyText = object.body || bodyText;
+      // Only call AI if no pre-generated content provided
+      if (!preGeneratedSubject || !preGeneratedBody) {
+        try {
+          const { object } = await generateObject({
+            model,
+            schema: z.object({
+              subject: z.string(),
+              body: z.string(),
+            }),
+            messages: [
+              { role: "system", content: systemInstruction() },
+              { role: "user", content: userPrompt },
+            ],
+          });
 
-      } catch (err: any) {
-        // Keep defaults on failure
-        // eslint-disable-next-line no-console
-        console.error("[OUTREACH_SEND][AI_ERROR]", err?.message || err);
+          subject = object.subject || subject;
+          bodyText = object.body || bodyText;
+
+        } catch (err: any) {
+          // Keep defaults on failure
+          // eslint-disable-next-line no-console
+          console.error("[OUTREACH_SEND][AI_ERROR]", err?.message || err);
+        }
       }
 
-      // Render HTML template
-      const html = await render(
-        React.createElement(OutreachTemplate, {
-          subjectPreview: subject,
-          bodyText,
-          resources,
-          signatureHtml,
-          trackingPixelUrl,
-          brand: {
-            accentColor: "#F54029",
-            primaryText: "#1f2937",
-          },
-        }),
-      );
+      // Use pre-generated HTML or render new
+      let html: string;
+      if (preGeneratedHtml) {
+        html = preGeneratedHtml;
+      } else {
+        html = await render(
+          React.createElement(OutreachTemplate, {
+            subjectPreview: subject,
+            bodyText,
+            resources,
+            signatureHtml,
+            trackingPixelUrl,
+            brand: {
+              accentColor: "#F54029",
+              primaryText: "#1f2937",
+            },
+          }),
+        );
+      }
 
       // Prepare plaintext fallback (use the LLM plain text body)
       const text = stripHtml(bodyText);

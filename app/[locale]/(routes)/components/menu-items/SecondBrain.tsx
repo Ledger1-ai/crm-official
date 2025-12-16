@@ -1,31 +1,28 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Lightbulb, ServerIcon, UserIcon } from "lucide-react";
-import Link from "next/link";
 
-import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import { Lightbulb } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
+  isMobile?: boolean;
 };
 
-const SecondBrainModuleMenu = ({ open }: Props) => {
+const SecondBrainModuleMenu = ({ open, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("secondBrain");
+  const isPath = /^\/([a-z]{2}\/)?secondBrain(\/|$)/.test(pathname);
+
   return (
-    <div className="flex flex-row items-center mx-auto p-2 w-auto md:w-full">
-      <Link href={"/secondBrain"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-        <Lightbulb className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>Second brain</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/secondBrain"
+      icon={Lightbulb}
+      title="Second Brain"
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

@@ -1,27 +1,27 @@
-import { FileBarChart } from "lucide-react";
-import Link from "next/link";
-
-import { usePathname } from "next/navigation";
 import React from "react";
+import { FileBarChart } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
   title: string;
+  isMobile?: boolean;
 };
 
-const ReportsModuleMenu = ({ open, title }: Props) => {
+const ReportsModuleMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("reports");
+  const isPath = /^\/([a-z]{2}\/)?reports(\/|$)/.test(pathname);
+
   return (
-    <div className={`flex flex-row items-center mx-auto p-2 w-auto md:w-full`}>
-      <Link
-        href={"/reports"}
-        className={`menu-item ${isPath ? "menu-item-active" : ""}`}
-      >
-        <FileBarChart className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>{title}</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/reports"
+      icon={FileBarChart}
+      title={title}
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 

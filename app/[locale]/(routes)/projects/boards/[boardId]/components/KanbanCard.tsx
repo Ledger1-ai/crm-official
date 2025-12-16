@@ -1,6 +1,6 @@
 "use client";
 
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import { Check, EyeIcon, Pencil, TrashIcon, AlertTriangle, Calendar } from "lucide-react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import moment from "moment";

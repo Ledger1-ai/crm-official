@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, Coins, ChevronLeft, ChevronRight } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 import ProjectModuleMenu from "./menu-items/Projects";
 import SecondBrainModuleMenu from "./menu-items/SecondBrain";
@@ -11,24 +16,51 @@ import ChatGPTModuleMenu from "./menu-items/ChatGPT";
 import EmployeesModuleMenu from "./menu-items/Employees";
 import DataboxModuleMenu from "./menu-items/Databoxes";
 import CrmModuleMenu from "./menu-items/Crm";
-
+import MessagesModuleMenu from "./menu-items/Messages";
 import AdministrationMenu from "./menu-items/Administration";
 import PartnerMenu from "./menu-items/Partner";
 import DashboardMenu from "./menu-items/Dashboard";
 import EmailsModuleMenu from "./menu-items/Emails";
-import { cn } from "@/lib/utils";
-import { Menu, Coins } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-
 
 type Props = {
   modules: any;
   dict: any;
-  features: string[]; // Replaced subscriptionPlan
+  features: string[];
   isPartnerAdmin: boolean;
 };
 
 const AnyMenu = Menu as any;
+
+const sidebarVariants = {
+  expanded: {
+    width: "18rem", // w-72
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 25,
+      staggerChildren: 0.05,
+    } as const,
+  },
+  collapsed: {
+    width: "6rem", // w-24
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 25,
+      staggerChildren: 0.05,
+    } as const,
+  },
+};
+
+const logoVariants = {
+  expanded: { opacity: 1, x: 0, display: "block" },
+  collapsed: { opacity: 0, x: -20, transitionEnd: { display: "none" } },
+};
+
+const compactLogoVariants = {
+  expanded: { opacity: 0, x: -20, display: "none" },
+  collapsed: { opacity: 1, x: 0, display: "block" },
+};
 
 const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
   const [open, setOpen] = useState(true);
@@ -52,194 +84,169 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin }: Props) => {
     return null;
   }
 
+  const toggleSidebar = () => {
+    const next = !open;
+    setOpen(next);
+    try {
+      localStorage.setItem("sidebar-open", String(next));
+    } catch (_) { }
+  };
+
   return (
-
     <>
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex flex-col h-screen sticky top-0">
-        <div
-          className={` ${open ? "w-72" : "w-24 "
-            }  h-full p-5 pt-8 relative duration-300 sidebar border-r bg-background`}
-          data-open={open ? "true" : "false"}
+      <div className="hidden md:flex h-screen sticky top-0 z-50">
+        <motion.div
+          initial={open ? "expanded" : "collapsed"}
+          animate={open ? "expanded" : "collapsed"}
+          variants={sidebarVariants}
+          className={cn(
+            "relative h-full flex flex-col border-r shadow-xl group", // Removed overflow-hidden
+            // Glassmorphism & Premium Aesthetics
+            "bg-gradient-to-b from-background/95 via-background/90 to-background/95", // Subtle gradient
+            "backdrop-blur-xl", // Heavy blur for glass effect
+            "border-white/5" // Subtle border
+          )}
         >
-          <div className={cn(
-            "flex items-center",
-            open ? "flex-row gap-x-4" : "flex-col gap-y-2"
-          )}>
-            <button
-              aria-label="Toggle sidebar"
-              aria-expanded={open}
-              aria-controls="app-sidebar"
-              className={cn(
-                "sidebar-toggle transition-transform duration-300",
-                open ? "rotate-0" : "",
-                !open && "flex justify-center w-full"
-              )}
-              onClick={() => {
-                const next = !open;
-                setOpen(next);
-                try {
-                  localStorage.setItem("sidebar-open", String(next));
-                } catch (_) { }
-              }}
-            >
-              <AnyMenu className="w-5 h-5" />
-            </button>
+          {/* Ambient Background Glow */}
+          <div className="absolute inset-0 z-[-1] overflow-hidden pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-40 h-40 bg-primary/10 rounded-full blur-3xl opacity-50" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-40 h-40 bg-blue-500/10 rounded-full blur-3xl opacity-50" />
+          </div>
 
-            {/* Logo - Full logo when open, compact logo when closed */}
-            {open ? (
+          {/* Header / Logo Area */}
+          <div className="flex items-center justify-center h-20 mb-2 relative shrink-0">
+            {/* Full Logo (Expanded) */}
+            <motion.div variants={logoVariants} className="absolute left-6">
               <img
                 src="/logo.png"
                 alt="App logo"
-                className="h-8 w-auto origin-left duration-200"
+                className="h-8 w-auto object-contain"
               />
-            ) : (
+            </motion.div>
+
+            {/* Compact Logo (Collapsed) - Centered */}
+            <motion.div variants={compactLogoVariants} className="absolute">
               <img
                 src="/crmlogo.png"
                 alt="App logo compact"
-                className="h-8 w-auto duration-200"
+                className="h-8 w-auto object-contain"
               />
+            </motion.div>
+          </div>
+
+          {/* Toggle Button - Floating on the border, visible on hover */}
+          <button
+            onClick={toggleSidebar}
+            className={cn(
+              "absolute -right-3 top-20 z-[100]", // Positioned lower (next to dashboard approx) and higher z-index
+              "h-6 w-6 rounded-full flex items-center justify-center",
+              "bg-primary text-primary-foreground shadow-md transition-all duration-200",
+              "opacity-0 group-hover:opacity-100", // Hidden until hover
+              "hover:scale-110 focus:outline-none ring-2 ring-background"
             )}
-          </div>
-          <div id="app-sidebar" className="pt-6 sidebar-list overflow-y-auto h-[calc(100vh-100px)]">
-            <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
-            {modules.find(
-              (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
-            ) && hasFeature("crm") ? (
-              <div className="flex flex-row items-center p-2 w-auto md:w-full">
-                <button
-                  className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""} w-full`}
-                  onClick={() => router.push("/crm")}
-                >
-                  <Coins className="w-6 icon" />
-                  <span className={open ? "" : "hidden"}>{dict.ModuleMenu.crm.title}</span>
-                </button>
-              </div>
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "projects" && menuItem.enabled
-            ) && hasFeature("projects") ? (
-              <ProjectModuleMenu open={open} title={dict.ModuleMenu.projects} />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "emails" && menuItem.enabled
-            ) && hasFeature("emails") ? (
-              <EmailsModuleMenu open={open} title={dict.ModuleMenu.emails} />
-            ) : null}
-            {/* {modules.find(
-            (menuItem: any) =>
-              menuItem.name === "secondBrain" && menuItem.enabled
-          ) ? (
-            <SecondBrainModuleMenu open={open} />
-          ) : null} */}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "employee" && menuItem.enabled
-            ) && hasFeature("employee") ? (
-              <EmployeesModuleMenu open={open} />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "invoice" && menuItem.enabled
-            ) && hasFeature("invoices") ? (
-              <InvoicesModuleMenu open={open} title={dict.ModuleMenu.invoices} />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "reports" && menuItem.enabled
-            ) && hasFeature("reports") ? (
-              <ReportsModuleMenu open={open} title={dict.ModuleMenu.reports} />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "documents" && menuItem.enabled
-            ) && hasFeature("documents") ? (
-              <DocumentsModuleMenu
-                open={open}
-                title={dict.ModuleMenu.documents}
-              />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "databox" && menuItem.enabled
-            ) && hasFeature("databox") ? (
-              <DataboxModuleMenu open={open} />
-            ) : null}
-            {modules.find(
-              (menuItem: any) => menuItem.name === "openai" && menuItem.enabled
-            ) && hasFeature("openai") ? (
-              <ChatGPTModuleMenu open={open} />
-            ) : null}
-            <AdministrationMenu open={open} title={dict.ModuleMenu.settings} />
-            {isPartnerAdmin && <PartnerMenu open={open} />}
-          </div>
-          <div
-            className={cn("flex justify-center items-center w-full mt-auto", {
-              hidden: !open,
-            })}
           >
-            <span className="microtext text-gray-500 pb-2">
+            {open ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+          </button>
+
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 custom-scrollbar">
+            <div className="flex flex-col gap-1 px-3">
+              <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
+
+              {/* Separator for clarity */}
+              <div className="my-2 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent opacity-50 mx-2" />
+
+              {modules.find(
+                (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
+              ) && hasFeature("crm") && (
+                  <CrmModuleMenu open={open} localizations={dict.ModuleMenu.crm} />
+                )}
+
+              {/* Other Modules */}
+              {/* Note: I am not refactoring EVERY component separately yet, but passing 'open' creates re-renders. 
+                    Ideally, these sub-menus should also be wrapped or updated. 
+                    For now, I rely on their internal rendering but the container gives the width constraint. */}
+
+              {modules.find((m: any) => m.name === "projects" && m.enabled) && hasFeature("projects") && (
+                <ProjectModuleMenu open={open} title={dict.ModuleMenu.projects} />
+              )}
+              {modules.find((m: any) => m.name === "emails" && m.enabled) && hasFeature("emails") && (
+                <EmailsModuleMenu open={open} title={dict.ModuleMenu.emails} />
+              )}
+              {modules.find((m: any) => m.name === "messages" && m.enabled) && hasFeature("messages") && (
+                <MessagesModuleMenu open={open} title={dict.ModuleMenu.messages || "Messages"} />
+              )}
+              {modules.find((m: any) => m.name === "employee" && m.enabled) && hasFeature("employee") && (
+                <EmployeesModuleMenu open={open} />
+              )}
+              {modules.find((m: any) => m.name === "invoice" && m.enabled) && hasFeature("invoices") && (
+                <InvoicesModuleMenu open={open} title={dict.ModuleMenu.invoices} />
+              )}
+              {modules.find((m: any) => m.name === "reports" && m.enabled) && hasFeature("reports") && (
+                <ReportsModuleMenu open={open} title={dict.ModuleMenu.reports} />
+              )}
+              {modules.find((m: any) => m.name === "documents" && m.enabled) && hasFeature("documents") && (
+                <DocumentsModuleMenu open={open} title={dict.ModuleMenu.documents} />
+              )}
+              {modules.find((m: any) => m.name === "databox" && m.enabled) && hasFeature("databox") && (
+                <DataboxModuleMenu open={open} />
+              )}
+              {modules.find((m: any) => m.name === "openai" && m.enabled) && hasFeature("openai") && (
+                <ChatGPTModuleMenu open={open} />
+              )}
+              <AdministrationMenu open={open} title={dict.ModuleMenu.settings} />
+              {isPartnerAdmin && <PartnerMenu open={open} />}
+            </div>
+          </div>
+
+          {/* Footer / Version */}
+          <motion.div
+            animate={{ opacity: open ? 1 : 0 }}
+            className="p-4 flex justify-center shrink-0"
+          >
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">
               v{process.env.NEXT_PUBLIC_APP_VERSION}
             </span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex flex-row overflow-x-auto items-center justify-between px-4 py-2 gap-4 no-scrollbar">
-        <DashboardMenu open={false} title={dict.ModuleMenu.dashboard} />
-        {modules.find(
-          (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
-        ) && hasFeature("crm") ? (
-          <div className="flex flex-row items-center p-2 w-auto md:w-full">
-            <button
-              className={`menu-item ${pathname.includes("crm") ? "menu-item-active" : ""}`}
-              onClick={() => router.push("/crm")}
-            >
-              <Coins className="w-6 icon" />
-            </button>
-          </div>
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "projects" && menuItem.enabled
-        ) && hasFeature("projects") ? (
-          <ProjectModuleMenu open={false} title={dict.ModuleMenu.projects} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "emails" && menuItem.enabled
-        ) && hasFeature("emails") ? (
-          <EmailsModuleMenu open={false} title={dict.ModuleMenu.emails} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "employee" && menuItem.enabled
-        ) && hasFeature("employee") ? (
-          <EmployeesModuleMenu open={false} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "invoice" && menuItem.enabled
-        ) && hasFeature("invoices") ? (
-          <InvoicesModuleMenu open={false} title={dict.ModuleMenu.invoices} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "reports" && menuItem.enabled
-        ) && hasFeature("reports") ? (
-          <ReportsModuleMenu open={false} title={dict.ModuleMenu.reports} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "documents" && menuItem.enabled
-        ) && hasFeature("documents") ? (
-          <DocumentsModuleMenu
-            open={false}
-            title={dict.ModuleMenu.documents}
-          />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "databox" && menuItem.enabled
-        ) && hasFeature("databox") ? (
-          <DataboxModuleMenu open={false} />
-        ) : null}
-        {modules.find(
-          (menuItem: any) => menuItem.name === "openai" && menuItem.enabled
-        ) && hasFeature("openai") ? (
-          <ChatGPTModuleMenu open={false} />
-        ) : null}
-        <AdministrationMenu open={false} title={dict.ModuleMenu.settings} />
-        {isPartnerAdmin && <PartnerMenu open={false} />}
+      {/* Mobile Bottom Navigation (Preserved/Minimally Touched) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-background/95 via-background/90 to-background/95 backdrop-blur-xl border-t border-white/5 flex flex-row overflow-x-auto items-center justify-between px-4 py-2 gap-4 no-scrollbar safe-area-pb">
+        <DashboardMenu open={false} title={dict.ModuleMenu.dashboard} isMobile />
+        {modules.find((m: any) => m.name === "crm" && m.enabled) && hasFeature("crm") && (
+          <CrmModuleMenu open={false} localizations={dict.ModuleMenu.crm} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "projects" && m.enabled) && hasFeature("projects") && (
+          <ProjectModuleMenu open={false} title={dict.ModuleMenu.projects} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "emails" && m.enabled) && hasFeature("emails") && (
+          <EmailsModuleMenu open={false} title={dict.ModuleMenu.emails} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "messages" && m.enabled) && hasFeature("messages") && (
+          <MessagesModuleMenu open={false} title={dict.ModuleMenu.messages || "Messages"} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "employee" && m.enabled) && hasFeature("employee") && (
+          <EmployeesModuleMenu open={false} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "invoice" && m.enabled) && hasFeature("invoices") && (
+          <InvoicesModuleMenu open={false} title={dict.ModuleMenu.invoices} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "reports" && m.enabled) && hasFeature("reports") && (
+          <ReportsModuleMenu open={false} title={dict.ModuleMenu.reports} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "documents" && m.enabled) && hasFeature("documents") && (
+          <DocumentsModuleMenu open={false} title={dict.ModuleMenu.documents} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "databox" && m.enabled) && hasFeature("databox") && (
+          <DataboxModuleMenu open={false} isMobile />
+        )}
+        {modules.find((m: any) => m.name === "openai" && m.enabled) && hasFeature("openai") && (
+          <ChatGPTModuleMenu open={false} isMobile />
+        )}
+        <AdministrationMenu open={false} title={dict.ModuleMenu.settings} isMobile />
+        {isPartnerAdmin && <PartnerMenu open={false} isMobile />}
       </div>
     </>
   );

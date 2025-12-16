@@ -166,12 +166,15 @@ async function basicCompanyResearchFromEmail(email?: string | null): Promise<str
     }
 }
 
-export async function POST(req: Request, { params }: any) {
+export async function POST(
+    req: Request,
+    { params }: { params: Promise<{ leadId: string }> }
+) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) return new NextResponse("Unauthorized", { status: 401 });
 
-        const leadId = params?.leadId;
+        const { leadId } = await params;
         if (!leadId) return new NextResponse("Missing leadId", { status: 400 });
 
         const body = (await req.json().catch(() => ({}))) as RequestBody;

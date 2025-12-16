@@ -78,3 +78,30 @@ export async function sendSmsEUM(opts: SendSmsEUMOptions): Promise<{ messageId?:
         throw new Error(`[EUM_SMS_FAILED] ${reasonCode ?? msg}`);
     }
 }
+
+/**
+ * Send a portal notification SMS using the 10DLC-registered phone number
+ * This is specifically for "You have a new message" notifications with portal links
+ * 
+ * Uses environment variables:
+ * - EUM_PORTAL_PHONE_ARN: The ARN of the 10DLC registered phone number
+ * - EUM_REGION: AWS region (defaults to us-east-1)
+ */
+export async function sendPortalNotificationSms(
+    to: string,
+    message: string
+): Promise<{ messageId?: string }> {
+    const portalPhoneArn = getEnv("EUM_PORTAL_PHONE_ARN");
+
+    if (!portalPhoneArn) {
+        console.warn("[Portal SMS] EUM_PORTAL_PHONE_ARN not configured - SMS will not be sent");
+        return { messageId: undefined };
+    }
+
+    return sendSmsEUM({
+        to,
+        body: message,
+        originationIdentityArn: portalPhoneArn,
+        messageType: "TRANSACTIONAL",
+    });
+}

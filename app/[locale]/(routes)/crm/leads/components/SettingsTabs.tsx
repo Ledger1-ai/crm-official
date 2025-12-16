@@ -6,9 +6,10 @@ import CalendarIntegrationPanel from "./CalendarIntegrationPanel";
 import CalendarAvailabilityPanel from "./CalendarAvailabilityPanel";
 import CalendarEventsPanel from "./CalendarEventsPanel";
 import SignaturesResourcesPanel from "./SignaturesResourcesPanel";
+import PortalSettingsPanel from "./PortalSettingsPanel";
 
 type SettingsTabsProps = {
-    defaultTab?: "integration" | "availability" | "events" | "signatures";
+    defaultTab?: "integration" | "availability" | "events" | "signatures" | "portal";
 };
 
 export default function SettingsTabs({ defaultTab = "integration" }: SettingsTabsProps) {
@@ -22,6 +23,7 @@ export default function SettingsTabs({ defaultTab = "integration" }: SettingsTab
                             <TabsTrigger value="availability" className="justify-center py-1 px-2 text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap">Availability</TabsTrigger>
                             <TabsTrigger value="events" className="justify-center py-1 px-2 text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap">Events</TabsTrigger>
                             <TabsTrigger value="signatures" className="justify-center py-1 px-2 text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap">Signatures</TabsTrigger>
+                            <TabsTrigger value="portal" className="justify-center py-1 px-2 text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap">SMS Portal</TabsTrigger>
                         </TabsList>
                     </div>
                 </div>
@@ -47,6 +49,12 @@ export default function SettingsTabs({ defaultTab = "integration" }: SettingsTab
                 <TabsContent value="signatures" className="overflow-auto flex-1">
                     <div className="space-y-6">
                         <SignaturesResourcesPanel />
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="portal" className="overflow-auto flex-1">
+                    <div className="space-y-6">
+                        <PortalSettingsPanel />
                     </div>
                 </TabsContent>
             </Tabs>

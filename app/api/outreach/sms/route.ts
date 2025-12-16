@@ -29,6 +29,9 @@ type RequestBody = {
   promptOverride?: string;
   senderId?: string;
   test?: boolean;
+  testPhone?: string; // Override test phone number
+  // Pre-generated SMS body to skip AI regeneration
+  preGeneratedBody?: string;
 };
 
 const DEFAULT_TEST_PHONE = process.env.TEST_PHONE_NUMBER || "+15555550100"; // replace as needed
@@ -110,11 +113,15 @@ export async function POST(req: Request) {
 
     const senderId = body.senderId?.trim() || undefined;
     const testMode = !!body.test;
+    const testPhoneOverride = body.testPhone?.trim();
+    const preGeneratedBody = body.preGeneratedBody?.trim();
 
     const results: Array<{ leadId: string; status: "skipped" | "sent" | "error"; reason?: string; to?: string; body?: string; messageId?: string; }> = [];
 
     for (const lead of leads) {
-      const toNumber = testMode ? DEFAULT_TEST_PHONE : (lead.phone || "").trim();
+      const toNumber = testMode
+        ? (testPhoneOverride || DEFAULT_TEST_PHONE)
+        : (lead.phone || "").trim();
       if (!toNumber) { results.push({ leadId: lead.id, status: "skipped", reason: "No lead phone" }); continue; }
 
       // TODO: honor sms opt-out when schema field is added
@@ -128,22 +135,27 @@ export async function POST(req: Request) {
         meetingLink: lead.outreach_meeting_link || user.meeting_link || null,
       });
 
-      let smsBody = "Hi there — quick intro to PortalPay: crypto checkout, instant settlement, lower fees. Can I send a link for details?";
-      try {
-        const { object } = await generateObject({
-          model,
-          schema: z.object({
-            body: z.string(),
-          }),
-          messages: [
-            { role: "system", content: systemInstructionSms() },
-            { role: "user", content: userPrompt },
-          ],
-        });
-        smsBody = sanitizeSmsBody(object.body || smsBody);
-      } catch (err: any) {
-        // keep default
-        console.error("[SMS][AI_ERROR]", err?.message || err);
+      // Use pre-generated body if provided (skip AI call)
+      let smsBody = preGeneratedBody || "Hi there — quick intro to PortalPay: crypto checkout, instant settlement, lower fees. Can I send a link for details?";
+
+      // Only call AI if no pre-generated body provided
+      if (!preGeneratedBody) {
+        try {
+          const { object } = await generateObject({
+            model,
+            schema: z.object({
+              body: z.string(),
+            }),
+            messages: [
+              { role: "system", content: systemInstructionSms() },
+              { role: "user", content: userPrompt },
+            ],
+          });
+          smsBody = sanitizeSmsBody(object.body || smsBody);
+        } catch (err: any) {
+          // keep default
+          console.error("[SMS][AI_ERROR]", err?.message || err);
+        }
       }
 
       // Compliance footer (basic)

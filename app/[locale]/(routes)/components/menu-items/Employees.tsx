@@ -1,23 +1,28 @@
-import { Users } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+"use client";
 
 import React from "react";
+import { Users } from "lucide-react";
+import { usePathname } from "next/navigation";
+import MenuItem from "./MenuItem";
 
 type Props = {
   open: boolean;
+  isMobile?: boolean;
 };
 
-const EmployeesModuleMenu = ({ open }: Props) => {
+const EmployeesModuleMenu = ({ open, isMobile = false }: Props) => {
   const pathname = usePathname();
-  const isPath = pathname.includes("employees");
+  const isPath = /^\/([a-z]{2}\/)?employees(\/|$)/.test(pathname);
+
   return (
-    <div className="flex flex-row items-center mx-auto p-2 w-auto md:w-full">
-      <Link href={"/employees"} className={`menu-item ${isPath ? "menu-item-active" : ""}`}>
-        <Users className="w-6 icon" />
-        <span className={open ? "" : "hidden"}>Employees</span>
-      </Link>
-    </div>
+    <MenuItem
+      href="/employees"
+      icon={Users}
+      title="Employees"
+      isOpen={open}
+      isActive={isPath}
+      isMobile={isMobile}
+    />
   );
 };
 
