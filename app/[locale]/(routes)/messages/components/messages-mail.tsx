@@ -24,26 +24,16 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { MessagesMailList } from "./messages-mail-list";
-import { MessagesMailDisplay } from "./messages-mail-display";
-import { MessagesComposeDialog } from "./messages-compose-dialog";
+import { MessageList } from "./message-list";
+import { MessageDisplay } from "./message-display";
+import { ComposeDialog } from "./compose-dialog";
 import { useRouter } from "next/navigation";
 import { atom, useAtom } from "jotai";
-import Link from "next/link";
+import { InternalMessageData, TeamMember } from "./messages";
 
-export interface MessageMail {
-    id: string;
-    name: string;
-    email: string;
-    subject: string;
-    text: string;
-    date: string;
-    read: boolean;
-    labels: string[];
-    isImportant?: boolean;
-    toUserId?: string;
-    fromUserId?: string;
-}
+// Atom for message selection state
+const messageSelectedAtom = atom<string | null>(null);
+export const useMessageMail = () => useAtom(messageSelectedAtom);
 
 interface MessagesMailProps {
     accounts: {
@@ -51,17 +41,13 @@ interface MessagesMailProps {
         email: string;
         icon: React.ReactNode;
     }[];
-    mails: MessageMail[];
+    mails: InternalMessageData[];
     defaultLayout: number[] | undefined;
     defaultCollapsed?: boolean;
     navCollapsedSize: number;
     currentUserId: string;
-    teamMembers: any[];
+    teamMembers: TeamMember[];
 }
-
-// Atom for message selection state
-const messageSelectedAtom = atom<string | null>(null);
-export const useMessageMail = () => useAtom(messageSelectedAtom);
 
 export function MessagesMailComponent({
     accounts,
@@ -86,19 +72,25 @@ export function MessagesMailComponent({
         // Filter by nav
         switch (activeNav) {
             case "inbox":
-                filtered = mails.filter(m => m.toUserId === currentUserId);
+                filtered = mails.filter(m =>
+                    m.recipients.some(r => r.recipient_id === currentUserId && !r.is_archived && !r.is_deleted)
+                );
                 break;
             case "sent":
-                filtered = mails.filter(m => m.fromUserId === currentUserId);
+                filtered = mails.filter(m => m.sender_id === currentUserId);
                 break;
             case "drafts":
                 filtered = mails.filter(m => m.labels?.includes("draft"));
                 break;
             case "trash":
-                filtered = mails.filter(m => m.labels?.includes("trash"));
+                filtered = mails.filter(m =>
+                    m.recipients.some(r => r.recipient_id === currentUserId && r.is_deleted)
+                );
                 break;
             case "archive":
-                filtered = mails.filter(m => m.labels?.includes("archive"));
+                filtered = mails.filter(m =>
+                    m.recipients.some(r => r.recipient_id === currentUserId && r.is_archived)
+                );
                 break;
             default:
                 break;
@@ -110,16 +102,21 @@ export function MessagesMailComponent({
             filtered = filtered.filter(
                 m =>
                     m.subject.toLowerCase().includes(query) ||
-                    m.text.toLowerCase().includes(query) ||
-                    m.name.toLowerCase().includes(query)
+                    m.body_text?.toLowerCase().includes(query) ||
+                    m.sender_name?.toLowerCase().includes(query)
             );
         }
 
         return filtered;
     }, [mails, activeNav, searchQuery, currentUserId]);
 
-    const inboxCount = mails.filter(m => m.toUserId === currentUserId && !m.read).length;
-    const sentCount = mails.filter(m => m.fromUserId === currentUserId).length;
+    const inboxCount = mails.filter(m =>
+        m.recipients.some(r => r.recipient_id === currentUserId && !r.is_read && !r.is_archived && !r.is_deleted)
+    ).length;
+
+    const sentCount = mails.filter(m => m.sender_id === currentUserId).length;
+
+    const selectedMessage = filteredMails.find(item => item.id === selectedMail) || null;
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -265,32 +262,36 @@ export function MessagesMailComponent({
                             </form>
                         </div>
                         <TabsContent value="all" className="m-0">
-                            <MessagesMailList
+                            <MessageList
                                 items={filteredMails}
                                 selectedId={selectedMail}
                                 onSelect={setSelectedMail}
+                                currentUserId={currentUserId}
                             />
                         </TabsContent>
                         <TabsContent value="unread" className="m-0">
-                            <MessagesMailList
-                                items={filteredMails.filter(item => !item.read)}
+                            <MessageList
+                                items={filteredMails.filter(m =>
+                                    m.recipients.some(r => r.recipient_id === currentUserId && !r.is_read)
+                                )}
                                 selectedId={selectedMail}
                                 onSelect={setSelectedMail}
+                                currentUserId={currentUserId}
                             />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={defaultLayout[2]}>
-                    <MessagesMailDisplay
-                        mail={filteredMails.find(item => item.id === selectedMail) || null}
+                    <MessageDisplay
+                        message={selectedMessage}
                         currentUserId={currentUserId}
                         teamMembers={teamMembers}
                     />
                 </ResizablePanel>
             </ResizablePanelGroup>
 
-            <MessagesComposeDialog
+            <ComposeDialog
                 open={composeOpen}
                 onOpenChange={setComposeOpen}
                 teamMembers={teamMembers}

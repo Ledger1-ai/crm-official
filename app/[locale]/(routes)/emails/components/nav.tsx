@@ -18,6 +18,8 @@ interface NavProps {
     label?: string;
     icon: LucideIcon;
     variant: "default" | "ghost";
+    onClick?: () => void;
+    href?: string;
   }[];
 }
 
@@ -33,12 +35,13 @@ export function Nav({ links, isCollapsed }: NavProps) {
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href={link.href || "#"}
+                  onClick={link.onClick}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
                     "h-8 w-8",
                     link.variant === "default" &&
-                      "dark:bg-muted dark:text-muted-foreground"
+                    "dark:bg-muted dark:text-muted-foreground"
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -57,7 +60,8 @@ export function Nav({ links, isCollapsed }: NavProps) {
           ) : (
             <Link
               key={index}
-              href="#"
+              href={link.href || "#"}
+              onClick={link.onClick}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" && "dark:bg-muted dark:text-white",
@@ -71,7 +75,7 @@ export function Nav({ links, isCollapsed }: NavProps) {
                   className={cn(
                     "ml-auto",
                     link.variant === "default" &&
-                      "text-background dark:text-white"
+                    "text-background dark:text-white"
                   )}
                 >
                   {link.label}

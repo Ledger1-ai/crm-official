@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadbCrm as prisma } from "@/lib/prisma-crm";
+import { OutreachItemStatus } from "@prisma/client";
 
 // PUT - Update an existing campaign (used for draft auto-save)
 export async function PUT(req: Request) {
@@ -65,7 +66,7 @@ export async function PUT(req: Request) {
                 channels: channels || existingCampaign.channels,
                 total_leads: leadIds?.length ?? existingCampaign.total_leads,
                 // Store wizard config as JSON in signature_meta field (reusing available JSON field)
-                signature_meta: config ? JSON.stringify(config) : existingCampaign.signature_meta,
+                signature_meta: config ?? existingCampaign.signature_meta,
                 updatedAt: new Date(),
             },
         });
@@ -85,7 +86,7 @@ export async function PUT(req: Request) {
                         campaign: id,
                         lead: leadId,
                         channel,
-                        status: "PENDING",
+                        status: OutreachItemStatus.PENDING,
                         retry_count: 0,
                     });
                 }
@@ -184,7 +185,7 @@ export async function POST(req: Request) {
                     campaign: campaign.id,
                     lead: leadId,
                     channel,
-                    status: "PENDING",
+                    status: OutreachItemStatus.PENDING,
                     retry_count: 0,
                 });
             }
