@@ -8,15 +8,27 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return new NextResponse("Unauthenticated", { status: 401 });
   try {
+    const teamInfo = await getCurrentUserTeamId();
+    const teamId = teamInfo?.teamId;
+
+    const orConditions: any[] = [
+      { user: session.user.id },
+      { sharedWith: { has: session.user.id } },
+    ];
+
+    if (teamId) {
+      orConditions.push({
+        team_id: teamId,
+        visibility: "public"
+      });
+    }
+
     // Return projects (boards) accessible to the user
     const boards = await prismadb.boards.findMany({
       where: {
-        OR: [
-          { user: session.user.id },
-          { sharedWith: { has: session.user.id } },
-        ],
+        OR: orConditions,
       },
-      select: { id: true, title: true, description: true },
+      select: { id: true, title: true, description: true, visibility: true, brand_logo_url: true, user: true, assigned_user: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ projects: boards }, { status: 200 });

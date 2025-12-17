@@ -26,13 +26,16 @@ export async function GET() {
     // Team Members see pools assigned to their team
     const teamId = teamInfo?.teamId;
 
-    if (!teamId && !isGlobalAdmin) {
-      return NextResponse.json({ pools: [] }, { status: 200 });
-    }
-
     const whereClause: any = {};
     if (!isGlobalAdmin) {
-      whereClause.team_id = teamId;
+      if (teamId) {
+        whereClause.OR = [
+          { team_id: teamId },
+          { user: session.user.id }
+        ];
+      } else {
+        whereClause.user = session.user.id;
+      }
     }
 
     const pools = await (prismadbCrm as any).crm_Lead_Pools.findMany({
