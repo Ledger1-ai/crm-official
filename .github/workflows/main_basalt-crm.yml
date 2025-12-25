@@ -31,7 +31,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: latest
 
       - name: pnpm install, build, and test
         env:
@@ -42,7 +42,7 @@ jobs:
         run: |
           pnpm install
           npx prisma generate
-          pnpm add -D @types/react@npm:types-react@19.0.0-alpha.3 @types/react-dom@npm:types-react-dom@19.0.0-alpha.3
+          pnpm add -D @types/react@latest @types/react-dom@latest
           pnpm run build
           pnpm run test
 
