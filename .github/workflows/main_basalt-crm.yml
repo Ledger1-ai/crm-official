@@ -42,6 +42,7 @@ jobs:
         run: |
           pnpm install
           npx prisma generate
+          cp tsconfig.json jsconfig.json
           rm tsconfig.json
           pnpm run build
           pnpm run test
