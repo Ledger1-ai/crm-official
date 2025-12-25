@@ -26,6 +26,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
   },
+  output: "standalone",
 };
 
 module.exports = withNextIntl(nextConfig);
