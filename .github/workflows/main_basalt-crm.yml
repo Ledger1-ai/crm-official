@@ -56,8 +56,11 @@ jobs:
           cp -rL node_modules/styled-jsx .next/standalone/node_modules/
           rm -rf .next/standalone/node_modules/@swc
           cp -rL node_modules/@swc .next/standalone/node_modules/
-          rm -rf .next/standalone/node_modules/@next
           cp -rL node_modules/@next .next/standalone/node_modules/
+
+          echo "Debugging: Listing .next/standalone contents"
+          ls -R .next/standalone
+
 
           # Manually copy generated Prisma client (dynamically locate it)
           PRISMA_DIR=$(find node_modules -type d -name ".prisma" | head -n 1)
