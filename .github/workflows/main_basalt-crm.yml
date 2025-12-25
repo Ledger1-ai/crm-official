@@ -58,6 +58,13 @@ jobs:
           cp -rL node_modules/@swc .next/standalone/node_modules/
           cp -rL node_modules/@next .next/standalone/node_modules/
 
+          cd deployment
+          # Compress node_modules to tar.gz (flat archive) 
+          # We cd into node_modules so the tarball doesn't contain the 'node_modules' folder itself, but just its contents.
+          # Azure extracts this into /node_modules, so we want the contents directly there.
+          cd node_modules && tar -czf ../node_modules.tar.gz . && cd ..
+          rm -rf node_modules
+
           zip -r ../release.zip .
           cd ..
       - name: Upload artifact for deployment job
