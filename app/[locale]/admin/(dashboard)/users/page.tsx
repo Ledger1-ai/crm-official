@@ -24,7 +24,7 @@ const AdminUsersPage = async () => {
     const session = await getServerSession(authOptions);
     const teamInfo = await getCurrentUserTeamId();
 
-    // Allow access if Global Admin OR Team Admin
+    // Allow access if Global Admin OR Team Admin-
     const isGlobalAdmin = session?.user?.isAdmin;
     const isTeamAdmin = teamInfo?.teamRole === "ADMIN" || teamInfo?.teamRole === "OWNER";
 
