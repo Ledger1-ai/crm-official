@@ -38,9 +38,9 @@ jobs:
       #   uses: actions/cache@v4
       #   with:
       #     path: ${{ github.workspace }}/.next/cache
-      #     key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+      #     key: ${{ runner.os }}-nextjs-${{ #hashFiles('**/pnpm-lock.yaml') }}-${{ #hashFiles('**.[jt]s', '**.[jt]sx') }}
       #     restore-keys: |
-      #       ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+      #       ${{ runner.os }}-nextjs-${{ #hashFiles('**/pnpm-lock.yaml') }}-
 
       - name: pnpm install, build, and test
         env:
@@ -117,6 +117,15 @@ jobs:
 
           zip -r ../release.zip .
           cd ..
+
+          # Verify the manifest is in the zip
+          echo "========================================="
+          echo "Contents of release.zip (top-level files):"
+          unzip -l release.zip | head -30
+          echo "========================================="
+          echo "Checking specifically for oryx-manifest.toml:"
+          unzip -l release.zip | grep -i oryx || echo "WARNING: oryx-manifest.toml NOT FOUND IN ZIP!"
+          echo "========================================="
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
