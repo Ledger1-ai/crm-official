@@ -128,8 +128,8 @@
     "@types/mailparser": "^3.4.6",
     "@types/node": "^24.10.1",
     "@types/nodemailer": "^7.0.4",
-    "@types/react": "npm:types-react@19.0.0-alpha.3",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.22",
     "cypress": "^15.7.1",
     "dotenv": "^17.2.3",
@@ -141,10 +141,6 @@
     "typescript": "^5.9.3"
   },
   "pnpm": {
-    "overrides": {
-      "@types/react": "npm:types-react@19.0.0-alpha.3",
-      "@types/react-dom": "npm:types-react-dom@19.0.0-alpha.3"
-    },
     "peerDependencyRules": {
       "allowedVersions": {
         "react": "19",

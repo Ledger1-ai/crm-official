@@ -58,6 +58,8 @@ jobs:
           cp -rL node_modules/@swc .next/standalone/node_modules/
           rm -rf .next/standalone/node_modules/@next
           cp -rL node_modules/@next .next/standalone/node_modules/
+          # Copy @next/env directly from pnpm store (wildcard for version toggle)
+          cp -r node_modules/.pnpm/@next+env*/node_modules/@next/env .next/standalone/node_modules/@next/
 
 
           # Manually copy generated Prisma client (dynamically locate it)
