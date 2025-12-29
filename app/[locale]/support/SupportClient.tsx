@@ -98,7 +98,7 @@ export default function SupportClient() {
                             <label htmlFor="message" className="text-sm font-medium text-gray-300">Message</label>
                             <textarea name="message" id="message" rows={5} required className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors" placeholder="Describe your issue..." />
                         </div>
-                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg rounded-full shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]">
+                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg rounded-full-button-frame shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]">
                             Send Message
                         </Button>
                     </form>

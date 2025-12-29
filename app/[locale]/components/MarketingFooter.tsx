@@ -175,7 +175,7 @@ export default async function MarketingFooter() {
                                 alt="BasaltHQ Logo"
                                 width={150}
                                 height={40}
-                                className="object-contain h-8 w-auto brightness-200 contrast-125"
+                                className="object-contain h-12 w-auto brightness-200 contrast-125"
                             />
                         </Link>
                         <p className="text-sm text-center lg:text-left leading-relaxed max-w-[200px]">

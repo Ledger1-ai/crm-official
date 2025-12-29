@@ -46,9 +46,9 @@ export default function MarketingHeader() {
                         <Image
                             src="/BasaltCRMWide.png"
                             alt="Basalt CRM Logo"
-                            width={180}
-                            height={50}
-                            className="object-contain h-10 w-auto brightness-200 contrast-125"
+                            width={224}
+                            height={64}
+                            className="object-contain h-16 w-auto brightness-200 contrast-125"
                             priority
                         />
                     </Link>
@@ -69,12 +69,12 @@ export default function MarketingHeader() {
                     {/* Desktop Actions */}
                     <div className="hidden lg:flex items-center gap-4">
                         <Link href="/dashboard">
-                            <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full">
+                            <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 rounded-full-button-frame">
                                 Login
                             </Button>
                         </Link>
                         <Link href="/register">
-                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all rounded-full">
+                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all rounded-full-button-frame">
                                 Get Started
                             </Button>
                         </Link>
@@ -107,12 +107,12 @@ export default function MarketingHeader() {
                         ))}
                         <div className="w-full h-px bg-white/10 my-4" />
                         <Link href="/dashboard" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button variant="ghost" className="w-full text-lg h-12 text-gray-300 hover:text-white hover:bg-white/10 rounded-full">
+                            <Button variant="ghost" className="w-full text-lg h-12 text-gray-300 hover:text-white hover:bg-white/10 rounded-full-button-frame">
                                 Login
                             </Button>
                         </Link>
                         <Link href="/register" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button className="w-full text-lg h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] rounded-full">
+                            <Button className="w-full text-lg h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] rounded-full-button-frame">
                                 Get Started
                             </Button>
                         </Link>

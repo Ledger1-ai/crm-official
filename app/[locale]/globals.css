@@ -412,3 +412,13 @@
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
+
+.rounded-full-button-frame {
+  border-radius: 10px;
+}
+
+.md\:h-32 {
+  @media (min-width: 768px) {
+    height: 8rem;
+  }
+}

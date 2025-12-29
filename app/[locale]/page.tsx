@@ -98,7 +98,7 @@ export default function LandingPage() {
                     <div className="container px-4 md:px-6 relative z-10">
                         <div className="flex flex-col items-center space-y-8 text-center">
                             <div className="space-y-6 max-w-4xl">
-                                <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm">
+                                <div className="inline-flex items-center rounded-full-button-frame border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm">
                                     <Sparkles className="mr-2 h-4 w-4" />
                                     <span>AI-Assisted software empowering merchants with enterprise grade software</span>
                                 </div>
@@ -112,13 +112,13 @@ export default function LandingPage() {
                             </div>
                             <div className="flex flex-col sm:flex-row gap-6 min-w-[300px] justify-center pt-4">
                                 <Link href={demoLink} target="_blank">
-                                    <Button size="lg" className="h-14 px-10 text-lg w-full sm:w-auto shadow-[0_0_30px_rgba(6,182,212,0.6)] hover:shadow-[0_0_50px_rgba(6,182,212,0.8)] transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full">
+                                    <Button size="lg" className="h-14 px-10 text-lg w-full sm:w-auto shadow-[0_0_30px_rgba(6,182,212,0.6)] hover:shadow-[0_0_50px_rgba(6,182,212,0.8)] transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full-button-frame">
                                         Schedule a Demo
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button variant="outline" size="lg" className="h-14 px-10 text-lg w-full sm:w-auto border-white/20 hover:bg-white/10 hover:text-white rounded-full backdrop-blur-sm">
+                                    <Button variant="outline" size="lg" className="h-14 px-10 text-lg w-full sm:w-auto border-white/20 hover:bg-white/10 hover:text-white rounded-full-button-frame backdrop-blur-sm">
                                         Get Started Free
                                     </Button>
                                 </Link>
@@ -183,10 +183,10 @@ export default function LandingPage() {
                     <div className="container px-4 md:px-6 relative z-10">
                         {/* Header */}
                         <div className="flex flex-col items-center text-center space-y-8 mb-20 animate-in fade-in slide-in-from-bottom-5 duration-1000 ease-out">
-                            <div className="inline-flex items-center rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm font-medium text-cyan-400 backdrop-blur-sm shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                            <div className="inline-flex items-center rounded-full-button-frame border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm font-medium text-cyan-400 backdrop-blur-sm shadow-[0_0_20px_rgba(6,182,212,0.3)]">
                                 <span className="relative flex h-2 w-2 mr-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full-button-frame bg-cyan-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full-button-frame h-2 w-2 bg-cyan-500"></span>
                                 </span>
                                 Live on Mainnet
                             </div>
@@ -196,14 +196,14 @@ export default function LandingPage() {
                                 Voice Conversations on <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Ethereum</span>
                             </h2>
 
-                            <p className="max-w-[800px] text-lg md:text-xl text-slate-400 font-light leading-relaxed">
+                            <p className="max-w-[900px] text-lg md:text-xl text-slate-400 font-light leading-relaxed">
                                 Professional-grade, ultra-low latency voice AI powered by the world's most advanced real-time models.
                                 <span className="block mt-2">Pay per second with ETH. No subscriptions.</span>
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-6 pt-4">
                                 <Link href="https://echo.basalthq.com">
-                                    <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-[0_0_40px_rgba(6,182,212,0.4)] hover:shadow-[0_0_60px_rgba(6,182,212,0.6)] transition-all duration-300">
+                                    <Button size="lg" className="h-14 px-10 text-lg rounded-full-button-frame bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-[0_0_40px_rgba(6,182,212,0.4)] hover:shadow-[0_0_60px_rgba(6,182,212,0.6)] transition-all duration-300">
                                         Explore BasaltEcho
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
@@ -218,7 +218,7 @@ export default function LandingPage() {
                                 { title: "Next-Gen Voice AI", icon: Sparkles, desc: "Powered by state-of-the-art LLMs & cutting-edge TTS models", color: "text-cyan-400", border: "hover:border-cyan-500/50" },
                                 { title: "Pay-Per-Use ETH Billing", icon: Zap, desc: "Stream payments in real-time. Zero commitment.", color: "text-purple-400", border: "hover:border-purple-500/50" }
                             ].map((card, i) => (
-                                <div key={i} className={`p-8 rounded-3xl bg-slate-900/50 border border-slate-800 backdrop-blur-xl hover:bg-slate-800/50 transition-all duration-500 group ${card.border}`}>
+                                <div key={i} className={`p-8 rounded-full-button-frame bg-slate-900/50 border border-slate-800 backdrop-blur-xl hover:bg-slate-800/50 transition-all duration-500 group ${card.border}`}>
                                     <card.icon className={`h-10 w-10 mb-4 ${card.color}`} />
                                     <h3 className="text-xl font-bold text-white mb-2">{card.title}</h3>
                                     <p className="text-slate-400 leading-relaxed">{card.desc}</p>
@@ -275,7 +275,7 @@ export default function LandingPage() {
                                 src="https://echo.basalthq.com/BasaltEchoWide.png"
                                 alt="BasaltEcho Logo"
                                 loading="lazy"
-                                className="h-12 md:h-16 w-auto"
+                                className="h-12 md:h-32 w-auto"
                             />
                         </div>
                     </div>
@@ -352,13 +352,13 @@ export default function LandingPage() {
                             </div>
                             <div className="flex flex-col sm:flex-row gap-6">
                                 <Link href={demoLink} target="_blank">
-                                    <Button size="lg" className="h-14 px-10 text-lg font-semibold shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] bg-primary hover:bg-primary/90 text-primary-foreground rounded-full transition-all">
+                                    <Button size="lg" className="h-14 px-10 text-lg font-semibold shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] bg-primary hover:bg-primary/90 text-primary-foreground rounded-full-button-frame transition-all">
                                         <Calendar className="mr-2 h-5 w-5" />
                                         Schedule a Demo
                                     </Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white/20 hover:bg-white/10 hover:text-white rounded-full backdrop-blur-sm">
+                                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg border-white/20 hover:bg-white/10 hover:text-white rounded-full-button-frame backdrop-blur-sm">
                                         Start Free Trial
                                     </Button>
                                 </Link>

@@ -134,10 +134,10 @@ export default function PricingClient() {
 
                 {/* Tabs */}
                 <div className="flex justify-center mb-8">
-                    <div className="bg-white/5 p-1 rounded-full inline-flex">
+                    <div className="bg-white/5 p-1 rounded-full-button-frame inline-flex">
                         <button
                             onClick={() => setActiveTab("individual")}
-                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === "individual"
+                            className={`px-6 py-2 rounded-full-button-frame text-sm font-medium transition-all duration-300 ${activeTab === "individual"
                                 ? "bg-primary text-primary-foreground shadow-lg"
                                 : "text-gray-400 hover:text-white"
                                 }`}
@@ -146,7 +146,7 @@ export default function PricingClient() {
                         </button>
                         <button
                             onClick={() => setActiveTab("professional")}
-                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === "professional"
+                            className={`px-6 py-2 rounded-full-button-frame text-sm font-medium transition-all duration-300 ${activeTab === "professional"
                                 ? "bg-primary text-primary-foreground shadow-lg"
                                 : "text-gray-400 hover:text-white"
                                 }`}
