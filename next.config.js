@@ -26,6 +26,15 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
   },
+  async redirects() {
+    return [
+      {
+        source: "/voicehub",
+        destination: "/echo",
+        permanent: true,
+      },
+    ];
+  },
   output: "standalone",
 };
 

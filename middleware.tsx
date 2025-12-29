@@ -8,5 +8,5 @@ export default createMiddleware({
 export const config = {
   // Skip all paths that should not be internationalized
   // portal - public SMS message portal (outside locale)
-  matcher: ["/((?!api|_next|voicehub|portal|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|echo|portal|.*\\..*).*)"],
 };
