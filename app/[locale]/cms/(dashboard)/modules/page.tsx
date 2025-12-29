@@ -29,7 +29,7 @@ const AdminModulesPage = async () => {
   return (
     <Container
       title="Modules administration"
-      description={"Here you can manage your Ledger1CRM modules"}
+      description={"Here you can manage your BasaltCRM modules"}
     >
       {modules && modules.length > 0 ? (
         <DataTable columns={columns} data={modules} search="name" />

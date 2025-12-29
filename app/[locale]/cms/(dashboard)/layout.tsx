@@ -37,8 +37,8 @@ export default async function AdminDashboardLayout({
                 <div className="p-6 border-b border-white/10 flex flex-col items-center justify-center gap-3">
                     <div className="relative w-36 h-12">
                         <Image
-                            src="/crmlogowhite.png"
-                            alt="Ledger1 CRM"
+                            src="/BasaltCRMWideD.png"
+                            alt="BasaltCRM"
                             fill
                             className="object-contain"
                             priority

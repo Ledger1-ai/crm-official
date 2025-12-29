@@ -171,7 +171,7 @@ export default function OAuthPage() {
             <div className="bg-slate-900/50 p-4 border border-white/5 rounded-lg text-center">
                 <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
                     <ShieldCheck className="h-3 w-3" />
-                    All connections are end-to-end encrypted and managed via Ledger1 IAM.
+                    All connections are end-to-end encrypted and managed via BasaltCRM IAM.
                 </p>
             </div>
         </div>

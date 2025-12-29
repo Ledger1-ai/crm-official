@@ -6,7 +6,7 @@ import { LayoutDashboard, FileText, Briefcase, BookOpen, Settings, LogOut, Globe
 import { headers } from "next/headers";
 
 export const metadata = {
-    title: "Ledger1 CMS Admin",
+    title: "BasaltCMS Admin",
     description: "Content Management System",
 };
 
