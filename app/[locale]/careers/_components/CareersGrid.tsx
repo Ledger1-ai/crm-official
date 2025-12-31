@@ -59,7 +59,7 @@ export function CareersGrid({ jobs }: CareersGridProps) {
                                         </div>
                                     </div>
 
-                                    <Button variant="outline" className="border-white/10 hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:scale-105">
+                                    <Button variant="outline" className="border-white/10 hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:scale-105 rounded-[10px]">
                                         View Details
                                     </Button>
                                 </div>

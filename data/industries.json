@@ -4,8 +4,8 @@
         "name": "Real Estate",
         "use_case": "Property Tracking & Client Matching",
         "hero_title": "The AI Realtor Assistant",
-        "description": "Automate property inquiries, schedule viewings, and match clients to listings instantly with Ledger1CRM's predictive engine.",
-        "meta_title": "Best AI CRM for Real Estate | Ledger1CRM",
+        "description": "Automate property inquiries, schedule viewings, and match clients to listings instantly with BasaltCRM's predictive engine.",
+        "meta_title": "Best AI CRM for Real Estate | BasaltCRM",
         "meta_description": "Real Estate CRM for agents and brokerages with automated lead capture, property-matching AI, tour scheduling, workflows, and compliance tooling.",
         "keywords": [
             "Real Estate CRM",
@@ -151,7 +151,7 @@
             "migration_guide": [
                 "Export data from legacy CRM",
                 "Normalize and validate schemas",
-                "Import into Ledger1CRM with mappings",
+                "Import into BasaltCRM with mappings",
                 "Recreate pipelines and automations",
                 "User training and parallel run",
                 "Cutover and decommission legacy"
@@ -186,7 +186,7 @@
         "use_case": "Patient Engagement & HIPAA Compliance",
         "hero_title": "Secure Patient Relationship Management",
         "description": "Manage patient intake, appointment reminders, and follow-ups with bank-grade security and HIPAA-compliant infrastructure.",
-        "meta_title": "Best AI CRM for Healthcare | Ledger1CRM",
+        "meta_title": "Best AI CRM for Healthcare | BasaltCRM",
         "meta_description": "Healthcare CRM with HIPAA-aware workflows, patient intake automation, appointment reminders, secure messaging, and audit trails.",
         "keywords": [
             "Healthcare CRM",
@@ -206,7 +206,7 @@
         "use_case": "Case Management & Client Intake",
         "hero_title": "Automate Your Law Practice",
         "description": "From client intake to case updates, let AI handle the administrative burden so you can focus on winning cases.",
-        "meta_title": "Best AI CRM for Law Firms | Ledger1CRM",
+        "meta_title": "Best AI CRM for Law Firms | BasaltCRM",
         "meta_description": "Legal CRM for intake, case tracking, document automation, deadlines, and client communication in one secure platform.",
         "keywords": [
             "Legal CRM",
@@ -226,7 +226,7 @@
         "use_case": "Wealth Management & Client Onboarding",
         "hero_title": "Smart Wealth Management CRM",
         "description": "Predict client needs, automate onboarding, and ensure compliance with a CRM built for the modern financial advisor.",
-        "meta_title": "Best AI CRM for Financial Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Financial Services | BasaltCRM",
         "meta_description": "Financial CRM for wealth advisory and banking with onboarding automation, compliance logging, and predictive analytics.",
         "keywords": [
             "Finance CRM",
@@ -244,8 +244,8 @@
         "name": "E-commerce",
         "use_case": "Customer Support & Order Recovery",
         "hero_title": "Turn Support into Sales",
-        "description": "Recover abandoned carts and solve support tickets instantly. Ledger1CRM integrates with your store to drive revenue 24/7.",
-        "meta_title": "Best AI CRM for E-commerce | Ledger1CRM",
+        "description": "Recover abandoned carts and solve support tickets instantly. BasaltCRM integrates with your store to drive revenue 24/7.",
+        "meta_title": "Best AI CRM for E-commerce | BasaltCRM",
         "meta_description": "E-commerce CRM with order recovery, support automation, personalized campaigns, and predictive product recommendations.",
         "keywords": [
             "E-commerce CRM",
@@ -263,8 +263,8 @@
         "name": "SaaS",
         "use_case": "Customer Success & Churn Prevention",
         "hero_title": "Reduce Churn with AI",
-        "description": "Identify at-risk customers before they leave. Ledger1CRM predicts churn and automates proactive outreach to keep them engaged.",
-        "meta_title": "Best AI CRM for SaaS | Ledger1CRM",
+        "description": "Identify at-risk customers before they leave. BasaltCRM predicts churn and automates proactive outreach to keep them engaged.",
+        "meta_title": "Best AI CRM for SaaS | BasaltCRM",
         "meta_description": "SaaS CRM with health scoring, expansion playbooks, renewal pipelines, and proactive success automation.",
         "keywords": [
             "SaaS CRM",
@@ -283,7 +283,7 @@
         "use_case": "Supply Chain & B2B Sales",
         "hero_title": "Streamline B2B Operations",
         "description": "Manage complex B2B relationships, track orders, and predict inventory needs with industry-specific AI.",
-        "meta_title": "Best AI CRM for Manufacturing | Ledger1CRM",
+        "meta_title": "Best AI CRM for Manufacturing | BasaltCRM",
         "meta_description": "Manufacturing CRM for B2B accounts, orders, supplier management, and predictive inventory workflows.",
         "keywords": [
             "Manufacturing CRM",
@@ -302,7 +302,7 @@
         "use_case": "Project Tracking & Client Billing",
         "hero_title": "All-in-One Consulting CRM",
         "description": "Track projects, automate invoicing, and nurture client relationships without switching between tools.",
-        "meta_title": "Best AI CRM for Consulting | Ledger1CRM",
+        "meta_title": "Best AI CRM for Consulting | BasaltCRM",
         "meta_description": "Consulting CRM with project pipelines, billing automation, client portals, and AI-based engagement.",
         "keywords": [
             "Consulting CRM",
@@ -321,7 +321,7 @@
         "use_case": "Policy Management & Claims Processing",
         "hero_title": "Accelerate Policy Sales",
         "description": "Automate policy recommendations and claims follow-ups, giving your agents more time to build trust with clients.",
-        "meta_title": "Best AI CRM for Insurance | Ledger1CRM",
+        "meta_title": "Best AI CRM for Insurance | BasaltCRM",
         "meta_description": "Insurance CRM for policies, claims, renewals, and agent productivity with predictive recommendations.",
         "keywords": [
             "Insurance CRM",
@@ -340,7 +340,7 @@
         "use_case": "Student Enrollment & Alumni Engagement",
         "hero_title": "Manage the Student Journey",
         "description": "From prospective students to proud alumni, nurture every relationship with personalized AI-driven communication.",
-        "meta_title": "Best AI CRM for Education | Ledger1CRM",
+        "meta_title": "Best AI CRM for Education | BasaltCRM",
         "meta_description": "Education CRM for recruitment, enrollment, engagement, and alumni relations with predictive outreach.",
         "keywords": [
             "Education CRM",
@@ -359,7 +359,7 @@
         "use_case": "Guest Management & Reservations",
         "hero_title": "Deliver 5-Star Guest Experiences",
         "description": "Predict guest preferences, automate upsells, and ensure every stay is memorable with AI-powered hospitality.",
-        "meta_title": "Best AI CRM for Hospitality | Ledger1CRM",
+        "meta_title": "Best AI CRM for Hospitality | BasaltCRM",
         "meta_description": "Hospitality CRM for reservations, upsells, loyalty, and guest engagement with predictive personalization.",
         "keywords": [
             "Hospitality CRM",
@@ -378,7 +378,7 @@
         "use_case": "Lead Tracking & Service Scheduling",
         "hero_title": "Drive More Test Drives",
         "description": "Convert online browsers into showroom visitors with predictive lead scoring and automated follow-up.",
-        "meta_title": "Best AI CRM for Automotive | Ledger1CRM",
+        "meta_title": "Best AI CRM for Automotive | BasaltCRM",
         "meta_description": "Automotive CRM for dealership sales, service scheduling, and customer retention with predictive scoring.",
         "keywords": [
             "Automotive CRM",
@@ -397,7 +397,7 @@
         "use_case": "Donor Management & Campaign Tracking",
         "hero_title": "Maximize Donor Impact",
         "description": "Identify major donors, automate thank-you campaigns, and increase giving with AI-driven stewardship.",
-        "meta_title": "Best AI CRM for Non-Profits | Ledger1CRM",
+        "meta_title": "Best AI CRM for Non-Profits | BasaltCRM",
         "meta_description": "Non-profit CRM with donor management, campaigns, stewardship automation, and impact reporting.",
         "keywords": [
             "Non-profit CRM",
@@ -416,7 +416,7 @@
         "use_case": "Project Bidding & Client Relations",
         "hero_title": "Win More Bids",
         "description": "Track project pipelines, manage subcontractor relationships, and never miss a bid deadline.",
-        "meta_title": "Best AI CRM for Construction | Ledger1CRM",
+        "meta_title": "Best AI CRM for Construction | BasaltCRM",
         "meta_description": "Construction CRM for bid management, subcontractors, project pipelines, and service workflows.",
         "keywords": [
             "Construction CRM",
@@ -435,7 +435,7 @@
         "use_case": "Customer Loyalty & Inventory",
         "hero_title": "Omnichannel Retail Excellence",
         "description": "Unify in-store and online customer data to deliver personalized experiences that drive loyalty.",
-        "meta_title": "Best AI CRM for Retail | Ledger1CRM",
+        "meta_title": "Best AI CRM for Retail | BasaltCRM",
         "meta_description": "Retail CRM for loyalty programs, personalized outreach, omnichannel service, and inventory-aware campaigns.",
         "keywords": [
             "Retail CRM",
@@ -454,7 +454,7 @@
         "use_case": "Buyer Relations & Supply Management",
         "hero_title": "Grow Your Agribusiness",
         "description": "Manage crop buyers, distributors, and suppliers with a CRM built for the agriculture industry.",
-        "meta_title": "Best AI CRM for Agriculture | Ledger1CRM",
+        "meta_title": "Best AI CRM for Agriculture | BasaltCRM",
         "meta_description": "Agriculture CRM for buyer relations, distributors, supplier management, and seasonal operations.",
         "keywords": [
             "Agriculture CRM",
@@ -473,7 +473,7 @@
         "use_case": "Account Management & Service Requests",
         "hero_title": "Power Customer Relationships",
         "description": "Handle service requests, manage accounts, and reduce churn with predictive analytics for utilities.",
-        "meta_title": "Best AI CRM for Energy & Utilities | Ledger1CRM",
+        "meta_title": "Best AI CRM for Energy & Utilities | BasaltCRM",
         "meta_description": "Energy CRM for service requests, account operations, and predictive analytics to reduce churn.",
         "keywords": [
             "Energy CRM",
@@ -492,7 +492,7 @@
         "use_case": "Subscription Management & Support",
         "hero_title": "Reduce Telecom Churn",
         "description": "Predict which subscribers are at risk and automate retention campaigns to keep them connected.",
-        "meta_title": "Best AI CRM for Telecom | Ledger1CRM",
+        "meta_title": "Best AI CRM for Telecom | BasaltCRM",
         "meta_description": "Telecom CRM for subscriptions, support automation, retention campaigns, and usage insights.",
         "keywords": [
             "Telecom CRM",
@@ -511,7 +511,7 @@
         "use_case": "Advertising Sales & Audience Engagement",
         "hero_title": "Monetize Your Audience",
         "description": "Track advertiser relationships, manage campaigns, and maximize ad revenue with intelligent CRM.",
-        "meta_title": "Best AI CRM for Media | Ledger1CRM",
+        "meta_title": "Best AI CRM for Media | BasaltCRM",
         "meta_description": "Media CRM for advertising sales, audience engagement, campaign tracking, and revenue analytics.",
         "keywords": [
             "Media CRM",
@@ -530,7 +530,7 @@
         "use_case": "Client Shipping & Route Optimization",
         "hero_title": "Ship Smarter",
         "description": "Manage client accounts, optimize routes, and ensure on-time delivery with logistics-focused CRM.",
-        "meta_title": "Best AI CRM for Logistics | Ledger1CRM",
+        "meta_title": "Best AI CRM for Logistics | BasaltCRM",
         "meta_description": "Logistics CRM for shipment, routing, ETAs, client accounts, and predictive delivery performance.",
         "keywords": [
             "Logistics CRM",
@@ -549,7 +549,7 @@
         "use_case": "Member Management & Class Scheduling",
         "hero_title": "Grow Your Gym",
         "description": "Automate class bookings, track member engagement, and reduce cancellations with predictive outreach.",
-        "meta_title": "Best AI CRM for Fitness & Wellness | Ledger1CRM",
+        "meta_title": "Best AI CRM for Fitness & Wellness | BasaltCRM",
         "meta_description": "Fitness CRM for memberships, class schedules, outreach, and retention automation.",
         "keywords": [
             "Fitness CRM",
@@ -568,7 +568,7 @@
         "use_case": "Booking Management & Customer Loyalty",
         "hero_title": "Create Unforgettable Journeys",
         "description": "Manage bookings, personalize travel recommendations, and build lifelong customer relationships.",
-        "meta_title": "Best AI CRM for Travel | Ledger1CRM",
+        "meta_title": "Best AI CRM for Travel | BasaltCRM",
         "meta_description": "Travel CRM with bookings, personalization, loyalty programs, and upsell automation.",
         "keywords": [
             "Travel CRM",
@@ -587,7 +587,7 @@
         "use_case": "Physician Relations & Sample Tracking",
         "hero_title": "Accelerate Drug Sales",
         "description": "Track physician relationships, manage sample distribution, and comply with industry regulations.",
-        "meta_title": "Best AI CRM for Pharmaceutical | Ledger1CRM",
+        "meta_title": "Best AI CRM for Pharmaceutical | BasaltCRM",
         "meta_description": "Pharma CRM for physician relations, samples, compliance logs, and predictive outreach.",
         "keywords": [
             "Pharmaceutical CRM",
@@ -606,7 +606,7 @@
         "use_case": "Candidate Tracking & Client Placement",
         "hero_title": "Fill Roles Faster",
         "description": "Match candidates to jobs with AI, automate outreach, and streamline the entire hiring process.",
-        "meta_title": "Best AI CRM for Recruitment | Ledger1CRM",
+        "meta_title": "Best AI CRM for Recruitment | BasaltCRM",
         "meta_description": "Recruitment CRM for candidate pipelines, client placement, automation, and interview scheduling.",
         "keywords": [
             "Recruitment CRM",
@@ -625,7 +625,7 @@
         "use_case": "Tenant Relations & Lease Management",
         "hero_title": "Simplify Property Management",
         "description": "Track tenants, automate rent reminders, and handle maintenance requests all in one place.",
-        "meta_title": "Best AI CRM for Property Management | Ledger1CRM",
+        "meta_title": "Best AI CRM for Property Management | BasaltCRM",
         "meta_description": "Property management CRM for tenants, leases, reminders, maintenance, and inspections.",
         "keywords": [
             "Property Management CRM",
@@ -644,7 +644,7 @@
         "use_case": "Client Projects & Design Collaboration",
         "hero_title": "Build Better Client Relationships",
         "description": "Manage design projects, track client feedback, and streamline approvals with visual CRM.",
-        "meta_title": "Best AI CRM for Architecture | Ledger1CRM",
+        "meta_title": "Best AI CRM for Architecture | BasaltCRM",
         "meta_description": "Architecture CRM for projects, client feedback cycles, approvals, and document collaboration.",
         "keywords": [
             "Architecture CRM",
@@ -663,7 +663,7 @@
         "use_case": "Client Billing & Tax Season Management",
         "hero_title": "Grow Your Practice",
         "description": "Track client engagements, automate invoice reminders, and never miss a filing deadline.",
-        "meta_title": "Best AI CRM for Accounting | Ledger1CRM",
+        "meta_title": "Best AI CRM for Accounting | BasaltCRM",
         "meta_description": "Accounting CRM for engagements, invoicing, reminders, document requests, and seasonal workflows.",
         "keywords": [
             "Accounting CRM",
@@ -682,7 +682,7 @@
         "use_case": "Vendor Management & Client Coordination",
         "hero_title": "Plan Flawless Events",
         "description": "Coordinate vendors, manage client expectations, and ensure every event is a success.",
-        "meta_title": "Best AI CRM for Event Planning | Ledger1CRM",
+        "meta_title": "Best AI CRM for Event Planning | BasaltCRM",
         "meta_description": "Event planning CRM for vendors, timelines, budgets, RSVPs, and post-event follow-ups.",
         "keywords": [
             "Event Planning CRM",
@@ -701,7 +701,7 @@
         "use_case": "Contract Management & Incident Tracking",
         "hero_title": "Protect and Serve",
         "description": "Manage security contracts, track incidents, and ensure client safety with intelligent CRM.",
-        "meta_title": "Best AI CRM for Security Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Security Services | BasaltCRM",
         "meta_description": "Security CRM for contracts, patrol schedules, incident tracking, and client reporting.",
         "keywords": [
             "Security CRM",
@@ -720,7 +720,7 @@
         "use_case": "Scheduling & Customer Retention",
         "hero_title": "Keep Clients Coming Back",
         "description": "Automate scheduling, send service reminders, and build a loyal customer base.",
-        "meta_title": "Best AI CRM for Cleaning Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Cleaning Services | BasaltCRM",
         "meta_description": "Cleaning CRM for scheduling, reminders, crew assignments, invoicing, and repeat bookings.",
         "keywords": [
             "Cleaning CRM",
@@ -739,7 +739,7 @@
         "use_case": "Booking Management & Portfolio Sharing",
         "hero_title": "Capture More Clients",
         "description": "Manage bookings, share portfolios, and automate follow-ups to grow your photography business.",
-        "meta_title": "Best AI CRM for Photographers | Ledger1CRM",
+        "meta_title": "Best AI CRM for Photographers | BasaltCRM",
         "meta_description": "Photography CRM for bookings, portfolio sharing, contracts, proofs, and follow-ups.",
         "keywords": [
             "Photography CRM",
@@ -758,7 +758,7 @@
         "use_case": "Pet Records & Appointment Reminders",
         "hero_title": "Care for Pets and Owners",
         "description": "Track pet health records, send vaccination reminders, and build lasting relationships with pet owners.",
-        "meta_title": "Best AI CRM for Veterinary Clinics | Ledger1CRM",
+        "meta_title": "Best AI CRM for Veterinary Clinics | BasaltCRM",
         "meta_description": "Veterinary CRM for records, reminders, bookings, and owner communication.",
         "keywords": [
             "Veterinary CRM",
@@ -777,7 +777,7 @@
         "use_case": "Appointment Booking & Product Sales",
         "hero_title": "Beautify Your Business",
         "description": "Manage appointments, track product preferences, and increase retail sales with salon CRM.",
-        "meta_title": "Best AI CRM for Beauty & Salon | Ledger1CRM",
+        "meta_title": "Best AI CRM for Beauty & Salon | BasaltCRM",
         "meta_description": "Salon CRM for bookings, product sales, memberships, promotions, and retention.",
         "keywords": [
             "Salon CRM",
@@ -796,7 +796,7 @@
         "use_case": "Catering & Customer Loyalty",
         "hero_title": "Serve Up Success",
         "description": "Manage catering orders, track customer preferences, and build a database of loyal diners.",
-        "meta_title": "Best AI CRM for Food Service | Ledger1CRM",
+        "meta_title": "Best AI CRM for Food Service | BasaltCRM",
         "meta_description": "Food service CRM for catering, reservations, preferences, promotions, and loyalty.",
         "keywords": [
             "Food Service CRM",
@@ -815,7 +815,7 @@
         "use_case": "Service Calls & Emergency Dispatch",
         "hero_title": "Fix Leaks, Build Relationships",
         "description": "Dispatch technicians, track service history, and automate follow-ups for repeat business.",
-        "meta_title": "Best AI CRM for Plumbing | Ledger1CRM",
+        "meta_title": "Best AI CRM for Plumbing | BasaltCRM",
         "meta_description": "Plumbing CRM for dispatch, scheduling, history, invoicing, and maintenance contracts.",
         "keywords": [
             "Plumbing CRM",
@@ -834,7 +834,7 @@
         "use_case": "Project Bidding & Safety Compliance",
         "hero_title": "Power Your Business Growth",
         "description": "Manage electrical projects, track compliance, and win more bids with intelligent CRM.",
-        "meta_title": "Best AI CRM for Electrical Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Electrical Services | BasaltCRM",
         "meta_description": "Electrical CRM for bids, projects, compliance, scheduling, and documentation.",
         "keywords": [
             "Electrical CRM",
@@ -853,7 +853,7 @@
         "use_case": "Maintenance Contracts & Seasonal Campaigns",
         "hero_title": "Stay Top of Mind",
         "description": "Automate seasonal maintenance reminders and convert one-time repairs into annual contracts.",
-        "meta_title": "Best AI CRM for HVAC | Ledger1CRM",
+        "meta_title": "Best AI CRM for HVAC | BasaltCRM",
         "meta_description": "HVAC CRM for seasonal campaigns, dispatch, service history, and contract renewals.",
         "keywords": [
             "HVAC CRM",
@@ -872,7 +872,7 @@
         "use_case": "Property Management & Seasonal Services",
         "hero_title": "Grow Your Green Business",
         "description": "Manage property accounts, track seasonal services, and automate renewal campaigns.",
-        "meta_title": "Best AI CRM for Landscaping | Ledger1CRM",
+        "meta_title": "Best AI CRM for Landscaping | BasaltCRM",
         "meta_description": "Landscaping CRM for properties, schedules, crews, invoicing, and renewals.",
         "keywords": [
             "Landscaping CRM",
@@ -891,7 +891,7 @@
         "use_case": "Treatment Scheduling & Follow-Up",
         "hero_title": "Eliminate Pests, Not Customers",
         "description": "Schedule treatments, send follow-up reminders, and ensure customer satisfaction with every visit.",
-        "meta_title": "Best AI CRM for Pest Control | Ledger1CRM",
+        "meta_title": "Best AI CRM for Pest Control | BasaltCRM",
         "meta_description": "Pest control CRM for treatments, schedules, reminders, and follow-up automation.",
         "keywords": [
             "Pest Control CRM",
@@ -910,7 +910,7 @@
         "use_case": "Quote Management & Logistics",
         "hero_title": "Move Relationships Forward",
         "description": "Manage quotes, coordinate logistics, and turn one-time movers into referral sources.",
-        "meta_title": "Best AI CRM for Moving Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Moving Services | BasaltCRM",
         "meta_description": "Moving CRM for quotes, bookings, logistics, crew assignments, and follow-up.",
         "keywords": [
             "Moving CRM",
@@ -929,7 +929,7 @@
         "use_case": "Vendor Coordination & Timeline Management",
         "hero_title": "Create Perfect Weddings",
         "description": "Coordinate all wedding vendors, manage timelines, and ensure every couple's dream comes true.",
-        "meta_title": "Best AI CRM for Wedding Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Wedding Services | BasaltCRM",
         "meta_description": "Wedding CRM for vendors, timelines, budgets, RSVPs, and post-event galleries.",
         "keywords": [
             "Wedding CRM",
@@ -948,7 +948,7 @@
         "use_case": "Order Tracking & Design Approval",
         "hero_title": "Print More, Stress Less",
         "description": "Manage print orders, track design approvals, and automate reorder reminders for repeat clients.",
-        "meta_title": "Best AI CRM for Printing Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Printing Services | BasaltCRM",
         "meta_description": "Printing CRM for orders, design approvals, proofs, production, and reorders.",
         "keywords": [
             "Printing CRM",
@@ -967,7 +967,7 @@
         "use_case": "Client Inventory & Billing",
         "hero_title": "Store Smarter",
         "description": "Track client inventory, automate billing cycles, and optimize warehouse operations.",
-        "meta_title": "Best AI CRM for Warehousing | Ledger1CRM",
+        "meta_title": "Best AI CRM for Warehousing | BasaltCRM",
         "meta_description": "Warehousing CRM for client inventory, billing cycles, SLAs, and operations analytics.",
         "keywords": [
             "Warehousing CRM",
@@ -986,7 +986,7 @@
         "use_case": "Project Management & Linguist Coordination",
         "hero_title": "Translate to Success",
         "description": "Manage translation projects, coordinate linguists, and deliver on time, every time.",
-        "meta_title": "Best AI CRM for Translation Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for Translation Services | BasaltCRM",
         "meta_description": "Translation CRM for projects, linguist assignment, QA, deliveries, and billing.",
         "keywords": [
             "Translation CRM",
@@ -1005,7 +1005,7 @@
         "use_case": "Campaign Management & Client Reporting",
         "hero_title": "Scale Your Agency",
         "description": "Track client campaigns, automate reporting, and demonstrate ROI with data-driven insights.",
-        "meta_title": "Best AI CRM for Marketing Agencies | Ledger1CRM",
+        "meta_title": "Best AI CRM for Marketing Agencies | BasaltCRM",
         "meta_description": "Agency CRM for campaigns, assets, approvals, client reporting, and upsell motions.",
         "keywords": [
             "Agency CRM",
@@ -1024,7 +1024,7 @@
         "use_case": "Ticket Management & SLA Tracking",
         "hero_title": "Resolve Issues, Build Trust",
         "description": "Manage support tickets, track SLAs, and ensure every client stays operational.",
-        "meta_title": "Best AI CRM for IT Services | Ledger1CRM",
+        "meta_title": "Best AI CRM for IT Services | BasaltCRM",
         "meta_description": "IT services CRM for tickets, SLAs, asset records, change logs, and client communication.",
         "keywords": [
             "IT Services CRM",
@@ -1043,7 +1043,7 @@
         "use_case": "Project Milestones & Client Feedback",
         "hero_title": "Build Better Websites",
         "description": "Track development milestones, collect client feedback, and deliver projects on time.",
-        "meta_title": "Best AI CRM for Web Development | Ledger1CRM",
+        "meta_title": "Best AI CRM for Web Development | BasaltCRM",
         "meta_description": "Web development CRM for sprints, milestones, feedback loops, approvals, and handover.",
         "keywords": [
             "Web Development CRM",
@@ -1062,7 +1062,7 @@
         "use_case": "Constituent Services & Case Management",
         "hero_title": "Serve the Public Better",
         "description": "Track constituent requests, manage case files, and improve public service delivery.",
-        "meta_title": "Best AI CRM for Government | Ledger1CRM",
+        "meta_title": "Best AI CRM for Government | BasaltCRM",
         "meta_description": "Government CRM for case management, services, audit logs, and citizen engagement tooling.",
         "keywords": [
             "Government CRM",
@@ -1081,7 +1081,7 @@
         "use_case": "Flight Scheduling & Passenger Relations",
         "hero_title": "Clear for Takeoff",
         "description": "Manage flight schedules, track passenger preferences, and ensure smooth operations.",
-        "meta_title": "Best AI CRM for Aviation | Ledger1CRM",
+        "meta_title": "Best AI CRM for Aviation | BasaltCRM",
         "meta_description": "Aviation CRM for scheduling, passenger profiles, operations messaging, and service SLAs.",
         "keywords": [
             "Aviation CRM",
@@ -1100,7 +1100,7 @@
         "use_case": "Supplier Relations & Safety Compliance",
         "hero_title": "Extract More Value",
         "description": "Manage supplier contracts, track safety compliance, and optimize mining operations.",
-        "meta_title": "Best AI CRM for Mining | Ledger1CRM",
+        "meta_title": "Best AI CRM for Mining | BasaltCRM",
         "meta_description": "Mining CRM for suppliers, compliance logs, projects, and operational analytics.",
         "keywords": [
             "Mining CRM",

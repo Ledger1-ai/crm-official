@@ -107,9 +107,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       images: ["https://crm.basalthq.com/social-preview.jpg"],
     },
     icons: {
-      icon: "/favicon.ico",
-      shortcut: "/favicon-16x16.png",
-      apple: "/apple-touch-icon.png",
+      icon: "/icon.png",
+      shortcut: "/icon.png",
+      apple: "/icon.png",
     },
     manifest: "/site.webmanifest",
     alternates: {
@@ -140,8 +140,9 @@ export default async function RootLayout(props: Props) {
           name="viewport"
           content="width=device-width, height=device-height, initial-scale=1"
         />
+        <link rel="stylesheet" href="https://use.typekit.net/eur3bvn.css" />
       </head>
-      <body className={inter.className + " h-screen overflow-hidden"} suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <NextTopLoader color="#2563EB" showSpinner={false} />
         <AnalyticsTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>

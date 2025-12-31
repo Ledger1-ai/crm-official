@@ -1,8 +1,9 @@
 // @ts-nocheck
 export const dynamic = "force-dynamic";
 import React from "react";
-import MarketingHeader from "../components/MarketingHeader";
-import MarketingFooter from "../components/MarketingFooter";
+import BasaltNavbar from "@/components/basaltcrm-landing/BasaltNavbar";
+import BasaltFooter from "@/components/basaltcrm-landing/BasaltFooter";
+import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 
 import { ArrowRight } from "lucide-react";
 import { prismadb } from "@/lib/prisma";
@@ -22,34 +23,37 @@ export default async function BlogPage() {
     });
 
     return (
-        <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
-            <MarketingHeader />
+        <div className="min-h-screen text-white font-sans selection:bg-cyan-500/30">
+            <div className="fixed inset-0 z-0">
+                <GeometricBackground />
+            </div>
 
-            <main className="py-20 md:py-32">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-                            The BasaltHQ <span className="text-primary">Blog</span>
-                        </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            Insights on AI, sales automation, and the future of work.
-                        </p>
-                    </div>
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <BasaltNavbar />
 
-                    {posts.length === 0 ? (
-                        <div className="text-center text-gray-500 py-20">
-                            No posts found. Check back soon!
+                <main className="py-20 md:py-32">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-20">
+                            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+                                The BasaltHQ <span className="text-primary">Blog</span>
+                            </h1>
+                            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                                Insights on AI, sales automation, and the future of work.
+                            </p>
                         </div>
-                    ) : (
-                        <BlogGrid posts={posts} />
-                    )}
-                </div>
-            </main>
 
-            <MarketingFooter />
+                        {posts.length === 0 ? (
+                            <div className="text-center text-gray-500 py-20">
+                                No posts found. Check back soon!
+                            </div>
+                        ) : (
+                            <BlogGrid posts={posts} />
+                        )}
+                    </div>
+                </main>
+
+                <BasaltFooter />
+            </div>
         </div>
     );
 }
-
-
-

@@ -5,14 +5,14 @@
         "country": "USA",
         "context": "The business capital of the world",
         "hero_title": "New York's Top Rated AI CRM",
-        "description": "Join thousands of NYC businesses using Ledger1CRM to stay ahead in the most competitive market on earth.",
-        "meta_title": "Top Rated AI CRM in New York | Ledger1CRM",
+        "description": "Join thousands of NYC businesses using BasaltCRM to stay ahead in the most competitive market on earth.",
+        "meta_title": "Top Rated AI CRM in New York | BasaltCRM",
         "meta_description": "AI-driven CRM for New York businesses. NYDFS-aware compliance, SOC 2 Type II, and multilingual support for global operations.",
         "keywords": [
             "New York CRM",
             "NYC CRM",
             "AI CRM New York",
-            "Ledger1CRM New York",
+            "BasaltCRM New York",
             "NYDFS compliant CRM"
         ],
         "subheading": "Local expertise, global scale",
@@ -58,8 +58,8 @@
         ],
         "faqs": [
             {
-                "q": "Does Ledger1CRM support NYDFS compliance requirements?",
-                "a": "Yes. Ledger1CRM offers audit logs, role-based access, encryption-at-rest and in-transit, and configurable retention policies aligned with NYDFS."
+                "q": "Does BasaltCRM support NYDFS compliance requirements?",
+                "a": "Yes. BasaltCRM offers audit logs, role-based access, encryption-at-rest and in-transit, and configurable retention policies aligned with NYDFS."
             },
             {
                 "q": "Can we run multi-language campaigns in NYC?",
@@ -71,7 +71,7 @@
                 "name": "A. Cohen",
                 "role": "VP Sales",
                 "company": "Hudson Capital",
-                "quote": "We replaced complex legacy systems with Ledger1CRM and cut cycle times by 37% in Manhattan and Brooklyn."
+                "quote": "We replaced complex legacy systems with BasaltCRM and cut cycle times by 37% in Manhattan and Brooklyn."
             }
         ],
         "ctas": [
@@ -88,7 +88,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM New York",
+            "name": "BasaltCRM New York",
             "address": {
                 "addressLocality": "New York",
                 "addressCountry": "US"
@@ -106,15 +106,15 @@
         "country": "UK",
         "context": "Europe's tech hub",
         "hero_title": "The #1 AI CRM in London",
-        "description": "From Shoreditch startups to City financial firms, London businesses trust Ledger1CRM for GDPR-compliant growth.",
-        "meta_title": "Best AI CRM in London | Ledger1CRM",
+        "description": "From Shoreditch startups to City financial firms, London businesses trust BasaltCRM for GDPR-compliant growth.",
+        "meta_title": "Best AI CRM in London | BasaltCRM",
         "meta_description": "GDPR-compliant CRM for London. Advanced AI for sales, marketing, and customer success.",
         "keywords": [
             "London CRM",
             "AI CRM London",
             "GDPR CRM",
             "UK CRM",
-            "Ledger1CRM London"
+            "BasaltCRM London"
         ],
         "subheading": "GDPR-first, innovation-forward",
         "highlights": [
@@ -159,8 +159,8 @@
         ],
         "faqs": [
             {
-                "q": "Is Ledger1CRM GDPR compliant?",
-                "a": "Yes. Ledger1CRM provides DPA, data subject rights tooling, and EU/UK data residency options."
+                "q": "Is BasaltCRM GDPR compliant?",
+                "a": "Yes. BasaltCRM provides DPA, data subject rights tooling, and EU/UK data residency options."
             },
             {
                 "q": "Do you integrate with HMRC-compatible invoicing?",
@@ -172,7 +172,7 @@
                 "name": "S. Patel",
                 "role": "COO",
                 "company": "FinTech London",
-                "quote": "Ledger1CRM is our GDPR-first platform with unbeatable automation."
+                "quote": "BasaltCRM is our GDPR-first platform with unbeatable automation."
             }
         ],
         "ctas": [
@@ -189,7 +189,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM London",
+            "name": "BasaltCRM London",
             "address": {
                 "addressLocality": "London",
                 "addressCountry": "GB"
@@ -208,13 +208,13 @@
         "context": "Canada's innovation center",
         "hero_title": "Toronto's Choice for Sales AI",
         "description": "Scale your Canadian business with the CRM that understands the local market. Local support, global power.",
-        "meta_title": "AI CRM in Toronto | Ledger1CRM",
+        "meta_title": "AI CRM in Toronto | BasaltCRM",
         "meta_description": "PIPEDA-aware CRM with bilingual support for Canadian enterprises in GTA.",
         "keywords": [
             "Toronto CRM",
             "AI CRM Canada",
             "PIPEDA CRM",
-            "Ledger1CRM Toronto"
+            "BasaltCRM Toronto"
         ],
         "subheading": "Bilingual, compliant, powerful",
         "highlights": [
@@ -272,7 +272,7 @@
                 "name": "M. Tremblay",
                 "role": "Director of CX",
                 "company": "GTA Retail Group",
-                "quote": "Ledger1CRM accelerated our bilingual outreach and improved retention."
+                "quote": "BasaltCRM accelerated our bilingual outreach and improved retention."
             }
         ],
         "ctas": [
@@ -289,7 +289,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Toronto",
+            "name": "BasaltCRM Toronto",
             "address": {
                 "addressLocality": "Toronto",
                 "addressCountry": "CA"
@@ -308,12 +308,12 @@
         "context": "APAC's leading market",
         "hero_title": "Accelerate Growth in Sydney",
         "description": "Dominate the Australian market with predictive sales tools designed for high-growth SMEs in NSW.",
-        "meta_title": "AI CRM in Sydney | Ledger1CRM",
+        "meta_title": "AI CRM in Sydney | BasaltCRM",
         "meta_description": "Australian businesses scale with AI-first CRM. Privacy Act and spam compliance supported.",
         "keywords": [
             "Sydney CRM",
             "AI CRM Australia",
-            "Ledger1CRM Sydney",
+            "BasaltCRM Sydney",
             "Australian Privacy Act"
         ],
         "subheading": "Built for APAC growth",
@@ -383,7 +383,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Sydney",
+            "name": "BasaltCRM Sydney",
             "address": {
                 "addressLocality": "Sydney",
                 "addressCountry": "AU"
@@ -401,14 +401,14 @@
         "country": "Singapore",
         "context": "Asia's financial gateway",
         "hero_title": "Smart CRM for Singapore",
-        "description": "Leverage the power of AI in the heart of Asia. Ledger1CRM helps Singaporean enterprises scale efficiently.",
-        "meta_title": "AI CRM in Singapore | Ledger1CRM",
+        "description": "Leverage the power of AI in the heart of Asia. BasaltCRM helps Singaporean enterprises scale efficiently.",
+        "meta_title": "AI CRM in Singapore | BasaltCRM",
         "meta_description": "PDPA-ready CRM for Singapore enterprises. Advanced analytics and multilingual AI agents.",
         "keywords": [
             "Singapore CRM",
             "PDPA CRM",
             "AI CRM Singapore",
-            "Ledger1CRM Singapore"
+            "BasaltCRM Singapore"
         ],
         "subheading": "Precision and speed, built-in",
         "highlights": [
@@ -460,7 +460,7 @@
                 "name": "L. Tan",
                 "role": "Head of Growth",
                 "company": "SEA Fintech",
-                "quote": "Ledger1CRM gives us predictive insights that outperform legacy CRMs."
+                "quote": "BasaltCRM gives us predictive insights that outperform legacy CRMs."
             }
         ],
         "ctas": [
@@ -477,7 +477,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Singapore",
+            "name": "BasaltCRM Singapore",
             "address": {
                 "addressLocality": "Singapore",
                 "addressCountry": "SG"
@@ -495,14 +495,14 @@
         "country": "USA",
         "context": "The tech capital",
         "hero_title": "Built for Silicon Valley",
-        "description": "From SoMa to South Bay, SF-based companies choose Ledger1CRM for rapid scaling and innovation-first culture.",
-        "meta_title": "AI CRM in San Francisco | Ledger1CRM",
+        "description": "From SoMa to South Bay, SF-based companies choose BasaltCRM for rapid scaling and innovation-first culture.",
+        "meta_title": "AI CRM in San Francisco | BasaltCRM",
         "meta_description": "Valley-grade AI CRM with SOC 2, open APIs, and developer-first workflows.",
         "keywords": [
             "San Francisco CRM",
             "Bay Area CRM",
             "AI CRM Silicon Valley",
-            "Ledger1CRM SF"
+            "BasaltCRM SF"
         ],
         "subheading": "Developer-first, AI-native",
         "highlights": [
@@ -570,7 +570,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM San Francisco",
+            "name": "BasaltCRM San Francisco",
             "address": {
                 "addressLocality": "San Francisco",
                 "addressCountry": "US"
@@ -588,14 +588,14 @@
         "country": "Germany",
         "context": "Europe's startup hub",
         "hero_title": "Berlin's Startup CRM",
-        "description": "Join the fastest-growing startups in Berlin using Ledger1CRM to disrupt their industries with AI.",
-        "meta_title": "AI CRM in Berlin | Ledger1CRM",
+        "description": "Join the fastest-growing startups in Berlin using BasaltCRM to disrupt their industries with AI.",
+        "meta_title": "AI CRM in Berlin | BasaltCRM",
         "meta_description": "GDPR-ready AI CRM with multilingual support and open APIs for Berlin startups.",
         "keywords": [
             "Berlin CRM",
             "AI CRM Germany",
             "GDPR CRM Berlin",
-            "Ledger1CRM Berlin"
+            "BasaltCRM Berlin"
         ],
         "subheading": "Startups scale here",
         "highlights": [
@@ -661,7 +661,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Berlin",
+            "name": "BasaltCRM Berlin",
             "address": {
                 "addressLocality": "Berlin",
                 "addressCountry": "DE"
@@ -679,13 +679,13 @@
         "country": "USA",
         "context": "The emerging tech hub",
         "hero_title": "Keep Austin Innovative",
-        "description": "Austin businesses are booming. Ledger1CRM helps you manage hypergrowth with intelligent automation.",
-        "meta_title": "AI CRM in Austin | Ledger1CRM",
+        "description": "Austin businesses are booming. BasaltCRM helps you manage hypergrowth with intelligent automation.",
+        "meta_title": "AI CRM in Austin | BasaltCRM",
         "meta_description": "AI-first CRM for Austin tech and services businesses with flexible workflows.",
         "keywords": [
             "Austin CRM",
             "AI CRM Texas",
-            "Ledger1CRM Austin"
+            "BasaltCRM Austin"
         ],
         "subheading": "Hypergrowth made manageable",
         "highlights": [
@@ -750,7 +750,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Austin",
+            "name": "BasaltCRM Austin",
             "address": {
                 "addressLocality": "Austin",
                 "addressCountry": "US"
@@ -769,13 +769,13 @@
         "context": "MENA's business center",
         "hero_title": "Dominate MENA Markets",
         "description": "Scale across the Middle East and North Africa with a CRM built for ambition and speed.",
-        "meta_title": "AI CRM in Dubai | Ledger1CRM",
+        "meta_title": "AI CRM in Dubai | BasaltCRM",
         "meta_description": "Arabic/English CRM with flexible hosting and compliance for MENA enterprises.",
         "keywords": [
             "Dubai CRM",
             "UAE CRM",
             "AI CRM Dubai",
-            "Ledger1CRM Dubai"
+            "BasaltCRM Dubai"
         ],
         "subheading": "Ambition meets automation",
         "highlights": [
@@ -840,7 +840,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Dubai",
+            "name": "BasaltCRM Dubai",
             "address": {
                 "addressLocality": "Dubai",
                 "addressCountry": "AE"
@@ -858,13 +858,13 @@
         "country": "Japan",
         "context": "Asia's innovation powerhouse",
         "hero_title": "AI CRM for Tokyo",
-        "description": "Japanese businesses demand precision. Ledger1CRM delivers with meticulous AI and world-class support.",
-        "meta_title": "AI CRM in Tokyo | Ledger1CRM",
+        "description": "Japanese businesses demand precision. BasaltCRM delivers with meticulous AI and world-class support.",
+        "meta_title": "AI CRM in Tokyo | BasaltCRM",
         "meta_description": "Privacy-conscious CRM for Japanese enterprises with multilingual templates and robust automations.",
         "keywords": [
             "Tokyo CRM",
             "AI CRM Japan",
-            "Ledger1CRM Tokyo"
+            "BasaltCRM Tokyo"
         ],
         "subheading": "Precision, security, speed",
         "highlights": [
@@ -929,7 +929,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Tokyo",
+            "name": "BasaltCRM Tokyo",
             "address": {
                 "addressLocality": "Tokyo",
                 "addressCountry": "JP"
@@ -946,13 +946,13 @@
         "country": "USA",
         "context": "Entertainment and tech convergence",
         "hero_title": "LA's Smartest CRM",
-        "description": "From Hollywood to Silicon Beach, LA businesses choose Ledger1CRM for creative and technical excellence.",
-        "meta_title": "AI CRM in Los Angeles | Ledger1CRM",
+        "description": "From Hollywood to Silicon Beach, LA businesses choose BasaltCRM for creative and technical excellence.",
+        "meta_title": "AI CRM in Los Angeles | BasaltCRM",
         "meta_description": "LA-focused CRM for media, tech, and services with predictive outreach and support.",
         "keywords": [
             "Los Angeles CRM",
             "AI CRM LA",
-            "Ledger1CRM Los Angeles"
+            "BasaltCRM Los Angeles"
         ],
         "subheading": "Creative industries meet AI",
         "highlights": [
@@ -1017,7 +1017,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Los Angeles",
+            "name": "BasaltCRM Los Angeles",
             "address": {
                 "addressLocality": "Los Angeles",
                 "addressCountry": "US"
@@ -1035,12 +1035,12 @@
         "context": "America's industrial heartland",
         "hero_title": "Chicago's Business Engine",
         "description": "Power your Chicago business with the CRM that understands the Midwest work ethic.",
-        "meta_title": "AI CRM in Chicago | Ledger1CRM",
+        "meta_title": "AI CRM in Chicago | BasaltCRM",
         "meta_description": "Industrial-strength CRM for Midwest manufacturing and services with predictive AI.",
         "keywords": [
             "Chicago CRM",
             "AI CRM Chicago",
-            "Ledger1CRM Chicago"
+            "BasaltCRM Chicago"
         ],
         "subheading": "Manufacturing-grade reliability",
         "highlights": [
@@ -1106,7 +1106,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Chicago",
+            "name": "BasaltCRM Chicago",
             "address": {
                 "addressLocality": "Chicago",
                 "addressCountry": "US"
@@ -1123,13 +1123,13 @@
         "country": "USA",
         "context": "Education and biotech hub",
         "hero_title": "Boston's Innovation CRM",
-        "description": "From universities to biotech startups, Boston businesses trust Ledger1CRM for intelligent growth.",
-        "meta_title": "AI CRM in Boston | Ledger1CRM",
+        "description": "From universities to biotech startups, Boston businesses trust BasaltCRM for intelligent growth.",
+        "meta_title": "AI CRM in Boston | BasaltCRM",
         "meta_description": "Biotech and education-focused CRM with HIPAA-aware workflows and grant tracking.",
         "keywords": [
             "Boston CRM",
             "AI CRM Boston",
-            "Ledger1CRM Boston",
+            "BasaltCRM Boston",
             "Biotech CRM"
         ],
         "subheading": "Built for research and growth",
@@ -1194,7 +1194,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Boston",
+            "name": "BasaltCRM Boston",
             "address": {
                 "addressLocality": "Boston",
                 "addressCountry": "US"
@@ -1212,12 +1212,12 @@
         "context": "Pacific Northwest tech leader",
         "hero_title": "Seattle's Scale-Up CRM",
         "description": "Join Amazon, Microsoft, and thousands of Seattle businesses using AI to dominate their markets.",
-        "meta_title": "AI CRM in Seattle | Ledger1CRM",
+        "meta_title": "AI CRM in Seattle | BasaltCRM",
         "meta_description": "Cloud-native CRM with deep integrations for the Pacific Northwest tech ecosystem.",
         "keywords": [
             "Seattle CRM",
             "AI CRM Seattle",
-            "Ledger1CRM Seattle"
+            "BasaltCRM Seattle"
         ],
         "subheading": "Cloud-native, integration-rich",
         "highlights": [
@@ -1280,7 +1280,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Seattle",
+            "name": "BasaltCRM Seattle",
             "address": {
                 "addressLocality": "Seattle",
                 "addressCountry": "US"
@@ -1299,12 +1299,12 @@
         "context": "Gateway to Latin America",
         "hero_title": "Miami's Growth CRM",
         "description": "Bridge North and South America with a CRM designed for Miami's unique international business environment.",
-        "meta_title": "AI CRM in Miami | Ledger1CRM",
+        "meta_title": "AI CRM in Miami | BasaltCRM",
         "meta_description": "Bilingual CRM with LATAM-friendly workflows and global compliance.",
         "keywords": [
             "Miami CRM",
             "AI CRM Miami",
-            "Ledger1CRM Miami",
+            "BasaltCRM Miami",
             "LATAM CRM"
         ],
         "subheading": "Bilingual and borderless",
@@ -1370,7 +1370,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Miami",
+            "name": "BasaltCRM Miami",
             "address": {
                 "addressLocality": "Miami",
                 "addressCountry": "US"
@@ -1387,14 +1387,14 @@
         "country": "France",
         "context": "European cultural and business capital",
         "hero_title": "Le CRM Parisien",
-        "description": "Elegance meets efficiency. Paris businesses choose Ledger1CRM for sophistication and intelligence.",
-        "meta_title": "AI CRM à Paris | Ledger1CRM",
+        "description": "Elegance meets efficiency. Paris businesses choose BasaltCRM for sophistication and intelligence.",
+        "meta_title": "AI CRM à Paris | BasaltCRM",
         "meta_description": "CRM intelligent pour Paris avec conformité RGPD et automations avancées.",
         "keywords": [
             "Paris CRM",
             "AI CRM Paris",
             "RGPD CRM",
-            "Ledger1CRM Paris"
+            "BasaltCRM Paris"
         ],
         "subheading": "Élégance et performance",
         "highlights": [
@@ -1458,7 +1458,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Paris",
+            "name": "BasaltCRM Paris",
             "address": {
                 "addressLocality": "Paris",
                 "addressCountry": "FR"
@@ -1476,12 +1476,12 @@
         "context": "Europe's logistics and tech hub",
         "hero_title": "Amsterdam's Smart CRM",
         "description": "Navigate European markets with the CRM trusted by Amsterdam's most innovative companies.",
-        "meta_title": "AI CRM in Amsterdam | Ledger1CRM",
+        "meta_title": "AI CRM in Amsterdam | BasaltCRM",
         "meta_description": "GDPR-ready CRM for logistics and tech in the Netherlands.",
         "keywords": [
             "Amsterdam CRM",
             "AI CRM Netherlands",
-            "Ledger1CRM Amsterdam"
+            "BasaltCRM Amsterdam"
         ],
         "subheading": "Logistics and tech perfected",
         "highlights": [
@@ -1544,7 +1544,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Amsterdam",
+            "name": "BasaltCRM Amsterdam",
             "address": {
                 "addressLocality": "Amsterdam",
                 "addressCountry": "NL"
@@ -1561,13 +1561,13 @@
         "country": "Spain",
         "context": "Mediterranean tech and tourism",
         "hero_title": "Barcelona's Business CRM",
-        "description": "From tourism to tech, Barcelona businesses scale faster with Ledger1CRM's AI platform.",
-        "meta_title": "AI CRM in Barcelona | Ledger1CRM",
+        "description": "From tourism to tech, Barcelona businesses scale faster with BasaltCRM's AI platform.",
+        "meta_title": "AI CRM in Barcelona | BasaltCRM",
         "meta_description": "Tourism and tech-focused CRM with multilingual campaigns and predictive analytics.",
         "keywords": [
             "Barcelona CRM",
             "AI CRM Spain",
-            "Ledger1CRM Barcelona"
+            "BasaltCRM Barcelona"
         ],
         "subheading": "Mediterranean growth, automated",
         "highlights": [
@@ -1632,7 +1632,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Barcelona",
+            "name": "BasaltCRM Barcelona",
             "address": {
                 "addressLocality": "Barcelona",
                 "addressCountry": "ES"
@@ -1650,12 +1650,12 @@
         "context": "India's financial capital",
         "hero_title": "Mumbai's Enterprise CRM",
         "description": "Power your Indian business with the CRM that understands the complexities of the Mumbai market.",
-        "meta_title": "AI CRM in Mumbai | Ledger1CRM",
+        "meta_title": "AI CRM in Mumbai | BasaltCRM",
         "meta_description": "Indian enterprises scale with multilingual CRM, GST-aware pipelines, and predictive automations.",
         "keywords": [
             "Mumbai CRM",
             "AI CRM India",
-            "Ledger1CRM Mumbai"
+            "BasaltCRM Mumbai"
         ],
         "subheading": "Enterprise-ready for India",
         "highlights": [
@@ -1704,7 +1704,7 @@
                 "name": "S. Rao",
                 "role": "Head of Sales",
                 "company": "Mumbai FinServ",
-                "quote": "Ledger1CRM manages complex enterprise cycles efficiently."
+                "quote": "BasaltCRM manages complex enterprise cycles efficiently."
             }
         ],
         "ctas": [
@@ -1721,7 +1721,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Mumbai",
+            "name": "BasaltCRM Mumbai",
             "address": {
                 "addressLocality": "Mumbai",
                 "addressCountry": "IN"
@@ -1739,13 +1739,13 @@
         "country": "India",
         "context": "India's Silicon Valley",
         "hero_title": "Bangalore's Tech CRM",
-        "description": "Join India's tech elite using Ledger1CRM to scale globally from Bangalore.",
-        "meta_title": "AI CRM in Bangalore | Ledger1CRM",
+        "description": "Join India's tech elite using BasaltCRM to scale globally from Bangalore.",
+        "meta_title": "AI CRM in Bangalore | BasaltCRM",
         "meta_description": "Tech-first CRM for Bangalore startups and enterprises with open APIs and predictive engines.",
         "keywords": [
             "Bangalore CRM",
             "AI CRM India",
-            "Ledger1CRM Bangalore"
+            "BasaltCRM Bangalore"
         ],
         "subheading": "Tech-native, scale-ready",
         "highlights": [
@@ -1811,7 +1811,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Bangalore",
+            "name": "BasaltCRM Bangalore",
             "address": {
                 "addressLocality": "Bangalore",
                 "addressCountry": "IN"
@@ -1830,12 +1830,12 @@
         "context": "Asia's financial center",
         "hero_title": "Hong Kong's Premier CRM",
         "description": "Navigate Asia-Pacific markets with the CRM built for Hong Kong's fast-paced business environment.",
-        "meta_title": "AI CRM in Hong Kong | Ledger1CRM",
+        "meta_title": "AI CRM in Hong Kong | BasaltCRM",
         "meta_description": "Financial-grade CRM for Hong Kong with multilingual outreach and predictive analytics.",
         "keywords": [
             "Hong Kong CRM",
             "AI CRM HK",
-            "Ledger1CRM Hong Kong"
+            "BasaltCRM Hong Kong"
         ],
         "subheading": "Finance-grade automation",
         "highlights": [
@@ -1901,7 +1901,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Hong Kong",
+            "name": "BasaltCRM Hong Kong",
             "address": {
                 "addressLocality": "Hong Kong",
                 "addressCountry": "HK"
@@ -1919,12 +1919,12 @@
         "context": "China's commercial capital",
         "hero_title": "Shanghai's Growth CRM",
         "description": "Scale across China with the CRM that understands Shanghai's unique market dynamics.",
-        "meta_title": "AI CRM in Shanghai | Ledger1CRM",
+        "meta_title": "AI CRM in Shanghai | BasaltCRM",
         "meta_description": "Multilingual CRM with local compliance awareness and AI-driven sales for China.",
         "keywords": [
             "Shanghai CRM",
             "AI CRM China",
-            "Ledger1CRM Shanghai"
+            "BasaltCRM Shanghai"
         ],
         "subheading": "Built for China-scale",
         "highlights": [
@@ -1989,7 +1989,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Shanghai",
+            "name": "BasaltCRM Shanghai",
             "address": {
                 "addressLocality": "Shanghai",
                 "addressCountry": "CN"
@@ -2007,12 +2007,12 @@
         "context": "Latin America's largest market",
         "hero_title": "CDMX's Business CRM",
         "description": "Dominate Latin American markets with the CRM trusted by Mexico City's leading enterprises.",
-        "meta_title": "AI CRM in Mexico City | Ledger1CRM",
+        "meta_title": "AI CRM in Mexico City | BasaltCRM",
         "meta_description": "Spanish/English CRM with multi-currency support and CASL/GDPR-aware patterns for LATAM expansion.",
         "keywords": [
             "Mexico City CRM",
             "AI CRM Mexico",
-            "Ledger1CRM CDMX"
+            "BasaltCRM CDMX"
         ],
         "subheading": "LATAM expansion engine",
         "highlights": [
@@ -2077,7 +2077,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Mexico City",
+            "name": "BasaltCRM Mexico City",
             "address": {
                 "addressLocality": "Mexico City",
                 "addressCountry": "MX"
@@ -2096,12 +2096,12 @@
         "context": "Brazil's economic powerhouse",
         "hero_title": "São Paulo's Scale CRM",
         "description": "Power your Brazilian business with AI-driven CRM built for São Paulo's competitive market.",
-        "meta_title": "AI CRM em São Paulo | Ledger1CRM",
+        "meta_title": "AI CRM em São Paulo | BasaltCRM",
         "meta_description": "CRM com IA para empresas brasileiras com campanhas multilíngues e automações avançadas.",
         "keywords": [
             "São Paulo CRM",
             "AI CRM Brasil",
-            "Ledger1CRM São Paulo"
+            "BasaltCRM São Paulo"
         ],
         "subheading": "Crescimento com IA",
         "highlights": [
@@ -2167,7 +2167,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM São Paulo",
+            "name": "BasaltCRM São Paulo",
             "address": {
                 "addressLocality": "São Paulo",
                 "addressCountry": "BR"
@@ -2185,12 +2185,12 @@
         "context": "Argentina's business center",
         "hero_title": "Buenos Aires CRM",
         "description": "Navigate South American markets with the CRM designed for Buenos Aires entrepreneurs.",
-        "meta_title": "AI CRM en Buenos Aires | Ledger1CRM",
+        "meta_title": "AI CRM en Buenos Aires | BasaltCRM",
         "meta_description": "CRM con IA para Argentina, campañas multilingües y flujos B2B.",
         "keywords": [
             "Buenos Aires CRM",
             "AI CRM Argentina",
-            "Ledger1CRM Buenos Aires"
+            "BasaltCRM Buenos Aires"
         ],
         "subheading": "El crecimiento inteligente",
         "highlights": [
@@ -2255,7 +2255,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Buenos Aires",
+            "name": "BasaltCRM Buenos Aires",
             "address": {
                 "addressLocality": "Buenos Aires",
                 "addressCountry": "AR"
@@ -2272,13 +2272,13 @@
         "country": "South Africa",
         "context": "Africa's tech hub",
         "hero_title": "Cape Town's Innovation CRM",
-        "description": "Lead the African tech revolution with Ledger1CRM's AI-powered platform.",
-        "meta_title": "AI CRM in Cape Town | Ledger1CRM",
+        "description": "Lead the African tech revolution with BasaltCRM's AI-powered platform.",
+        "meta_title": "AI CRM in Cape Town | BasaltCRM",
         "meta_description": "South African CRM with multilingual support, predictive analytics, and robust integrations.",
         "keywords": [
             "Cape Town CRM",
             "AI CRM South Africa",
-            "Ledger1CRM Cape Town"
+            "BasaltCRM Cape Town"
         ],
         "subheading": "Innovation at the Cape",
         "highlights": [
@@ -2343,7 +2343,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Cape Town",
+            "name": "BasaltCRM Cape Town",
             "address": {
                 "addressLocality": "Cape Town",
                 "addressCountry": "ZA"
@@ -2362,12 +2362,12 @@
         "context": "Africa's largest economy",
         "hero_title": "Lagos's Growth CRM",
         "description": "Scale your Nigerian business with the CRM built for Lagos's dynamic market.",
-        "meta_title": "AI CRM in Lagos | Ledger1CRM",
+        "meta_title": "AI CRM in Lagos | BasaltCRM",
         "meta_description": "CRM for Nigeria with multilingual outreach, multi-currency, and predictive analytics.",
         "keywords": [
             "Lagos CRM",
             "AI CRM Nigeria",
-            "Ledger1CRM Lagos"
+            "BasaltCRM Lagos"
         ],
         "subheading": "Scale across West Africa",
         "highlights": [
@@ -2432,7 +2432,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Lagos",
+            "name": "BasaltCRM Lagos",
             "address": {
                 "addressLocality": "Lagos",
                 "addressCountry": "NG"
@@ -2449,13 +2449,13 @@
         "country": "Turkey",
         "context": "Bridge between continents",
         "hero_title": "Istanbul's Business CRM",
-        "description": "Connect Europe, Asia, and the Middle East with Ledger1CRM's global platform.",
-        "meta_title": "AI CRM in Istanbul | Ledger1CRM",
+        "description": "Connect Europe, Asia, and the Middle East with BasaltCRM's global platform.",
+        "meta_title": "AI CRM in Istanbul | BasaltCRM",
         "meta_description": "Multilingual CRM for Turkey with EU-aware patterns and predictive AI.",
         "keywords": [
             "Istanbul CRM",
             "AI CRM Turkey",
-            "Ledger1CRM Istanbul"
+            "BasaltCRM Istanbul"
         ],
         "subheading": "Where markets meet",
         "highlights": [
@@ -2521,7 +2521,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Istanbul",
+            "name": "BasaltCRM Istanbul",
             "address": {
                 "addressLocality": "Istanbul",
                 "addressCountry": "TR"
@@ -2539,12 +2539,12 @@
         "context": "Startup Nation capital",
         "hero_title": "Tel Aviv's Startup CRM",
         "description": "Join Israel's innovation ecosystem with the CRM designed for high-growth tech companies.",
-        "meta_title": "AI CRM in Tel Aviv | Ledger1CRM",
+        "meta_title": "AI CRM in Tel Aviv | BasaltCRM",
         "meta_description": "Startup-grade CRM for Israel with developer tooling and predictive AI.",
         "keywords": [
             "Tel Aviv CRM",
             "AI CRM Israel",
-            "Ledger1CRM Tel Aviv"
+            "BasaltCRM Tel Aviv"
         ],
         "subheading": "Built for rapid iteration",
         "highlights": [
@@ -2609,7 +2609,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Tel Aviv",
+            "name": "BasaltCRM Tel Aviv",
             "address": {
                 "addressLocality": "Tel Aviv",
                 "addressCountry": "IL"
@@ -2627,12 +2627,12 @@
         "context": "Canada's Pacific gateway",
         "hero_title": "Vancouver's Scale CRM",
         "description": "Bridge North America and Asia with the CRM trusted by Vancouver's international businesses.",
-        "meta_title": "AI CRM in Vancouver | Ledger1CRM",
+        "meta_title": "AI CRM in Vancouver | BasaltCRM",
         "meta_description": "PIPEDA-aware CRM with bilingual support and APAC-friendly workflows.",
         "keywords": [
             "Vancouver CRM",
             "AI CRM Canada",
-            "Ledger1CRM Vancouver"
+            "BasaltCRM Vancouver"
         ],
         "subheading": "Pacific gateway growth",
         "highlights": [
@@ -2700,7 +2700,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Vancouver",
+            "name": "BasaltCRM Vancouver",
             "address": {
                 "addressLocality": "Vancouver",
                 "addressCountry": "CA"
@@ -2717,13 +2717,13 @@
         "country": "Canada",
         "context": "Canada's cultural capital",
         "hero_title": "Montreal's Bilingual CRM",
-        "description": "Serve anglophone and francophone markets with Ledger1CRM's flexible platform.",
-        "meta_title": "AI CRM in Montreal | Ledger1CRM",
+        "description": "Serve anglophone and francophone markets with BasaltCRM's flexible platform.",
+        "meta_title": "AI CRM in Montreal | BasaltCRM",
         "meta_description": "Bilingual CRM with EN/FR templates, CASL-aware outreach, and predictive analytics.",
         "keywords": [
             "Montreal CRM",
             "AI CRM Canada",
-            "Ledger1CRM Montreal",
+            "BasaltCRM Montreal",
             "Bilingual CRM"
         ],
         "subheading": "Bilingual growth engine",
@@ -2790,7 +2790,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Montreal",
+            "name": "BasaltCRM Montreal",
             "address": {
                 "addressLocality": "Montreal",
                 "addressCountry": "CA"
@@ -2808,12 +2808,12 @@
         "context": "Australia's cultural hub",
         "hero_title": "Melbourne's Smart CRM",
         "description": "Power your Australian business with the CRM that understands Melbourne's creative economy.",
-        "meta_title": "AI CRM in Melbourne | Ledger1CRM",
+        "meta_title": "AI CRM in Melbourne | BasaltCRM",
         "meta_description": "CRM for Melbourne with Privacy Act compliance, predictive analytics, and visual workflows.",
         "keywords": [
             "Melbourne CRM",
             "AI CRM Australia",
-            "Ledger1CRM Melbourne"
+            "BasaltCRM Melbourne"
         ],
         "subheading": "Creative workflows, automated",
         "highlights": [
@@ -2877,7 +2877,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Melbourne",
+            "name": "BasaltCRM Melbourne",
             "address": {
                 "addressLocality": "Melbourne",
                 "addressCountry": "AU"
@@ -2895,12 +2895,12 @@
         "context": "New Zealand's business center",
         "hero_title": "Auckland's Growth CRM",
         "description": "Scale across Oceania with the CRM built for Auckland's innovative businesses.",
-        "meta_title": "AI CRM in Auckland | Ledger1CRM",
+        "meta_title": "AI CRM in Auckland | BasaltCRM",
         "meta_description": "CRM for New Zealand with privacy awareness, AI agents, and open integrations.",
         "keywords": [
             "Auckland CRM",
             "AI CRM New Zealand",
-            "Ledger1CRM Auckland"
+            "BasaltCRM Auckland"
         ],
         "subheading": "Oceania-ready automation",
         "highlights": [
@@ -2965,7 +2965,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Auckland",
+            "name": "BasaltCRM Auckland",
             "address": {
                 "addressLocality": "Auckland",
                 "addressCountry": "NZ"
@@ -2982,13 +2982,13 @@
         "country": "Ireland",
         "context": "Europe's tech talent hub",
         "hero_title": "Dublin's Tech CRM",
-        "description": "Join Europe's fastest-growing tech ecosystem with Ledger1CRM's AI platform.",
-        "meta_title": "AI CRM in Dublin | Ledger1CRM",
+        "description": "Join Europe's fastest-growing tech ecosystem with BasaltCRM's AI platform.",
+        "meta_title": "AI CRM in Dublin | BasaltCRM",
         "meta_description": "GDPR-compliant CRM tailored for Ireland with EU hosting and predictive AI.",
         "keywords": [
             "Dublin CRM",
             "AI CRM Ireland",
-            "Ledger1CRM Dublin"
+            "BasaltCRM Dublin"
         ],
         "subheading": "EU-ready and talent-friendly",
         "highlights": [
@@ -3052,7 +3052,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Dublin",
+            "name": "BasaltCRM Dublin",
             "address": {
                 "addressLocality": "Dublin",
                 "addressCountry": "IE"
@@ -3069,13 +3069,13 @@
         "country": "Switzerland",
         "context": "Swiss precision and finance",
         "hero_title": "Zurich's Premium CRM",
-        "description": "Swiss businesses demand excellence. Ledger1CRM delivers with precision and security.",
-        "meta_title": "AI CRM in Zurich | Ledger1CRM",
+        "description": "Swiss businesses demand excellence. BasaltCRM delivers with precision and security.",
+        "meta_title": "AI CRM in Zurich | BasaltCRM",
         "meta_description": "Swiss-grade security and precision with predictive AI and multilingual support.",
         "keywords": [
             "Zurich CRM",
             "AI CRM Switzerland",
-            "Ledger1CRM Zurich"
+            "BasaltCRM Zurich"
         ],
         "subheading": "Precision meets intelligence",
         "highlights": [
@@ -3144,7 +3144,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Zurich",
+            "name": "BasaltCRM Zurich",
             "address": {
                 "addressLocality": "Zurich",
                 "addressCountry": "CH"
@@ -3162,12 +3162,12 @@
         "context": "Scandinavian innovation",
         "hero_title": "Stockholm's Startup CRM",
         "description": "Join unicorns like Spotify and Klarna using AI to dominate global markets.",
-        "meta_title": "AI CRM in Stockholm | Ledger1CRM",
+        "meta_title": "AI CRM in Stockholm | BasaltCRM",
         "meta_description": "Nordic-grade CRM with GDPR compliance, multilingual workflows, and predictive analytics.",
         "keywords": [
             "Stockholm CRM",
             "AI CRM Sweden",
-            "Ledger1CRM Stockholm"
+            "BasaltCRM Stockholm"
         ],
         "subheading": "Nordic innovation engine",
         "highlights": [
@@ -3232,7 +3232,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Stockholm",
+            "name": "BasaltCRM Stockholm",
             "address": {
                 "addressLocality": "Stockholm",
                 "addressCountry": "SE"
@@ -3250,12 +3250,12 @@
         "context": "Nordic design and tech",
         "hero_title": "Copenhagen's Smart CRM",
         "description": "Combine Danish design principles with AI intelligence for business growth.",
-        "meta_title": "AI CRM in Copenhagen | Ledger1CRM",
+        "meta_title": "AI CRM in Copenhagen | BasaltCRM",
         "meta_description": "Design-forward CRM with predictive AI and EU-compliant workflows.",
         "keywords": [
             "Copenhagen CRM",
             "AI CRM Denmark",
-            "Ledger1CRM Copenhagen"
+            "BasaltCRM Copenhagen"
         ],
         "subheading": "Design meets intelligence",
         "highlights": [
@@ -3320,7 +3320,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Copenhagen",
+            "name": "BasaltCRM Copenhagen",
             "address": {
                 "addressLocality": "Copenhagen",
                 "addressCountry": "DK"
@@ -3338,12 +3338,12 @@
         "context": "Norway's business capital",
         "hero_title": "Oslo's Business CRM",
         "description": "Navigate Nordic markets with the CRM built for Oslo's innovative companies.",
-        "meta_title": "AI CRM in Oslo | Ledger1CRM",
+        "meta_title": "AI CRM in Oslo | BasaltCRM",
         "meta_description": "CRM with predictive analytics, EU-aware compliance, and multilingual workflows for Norway.",
         "keywords": [
             "Oslo CRM",
             "AI CRM Norway",
-            "Ledger1CRM Oslo"
+            "BasaltCRM Oslo"
         ],
         "subheading": "Nordic workflows perfected",
         "highlights": [
@@ -3408,7 +3408,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Oslo",
+            "name": "BasaltCRM Oslo",
             "address": {
                 "addressLocality": "Oslo",
                 "addressCountry": "NO"
@@ -3425,13 +3425,13 @@
         "country": "Finland",
         "context": "Finnish tech excellence",
         "hero_title": "Helsinki's Tech CRM",
-        "description": "Join Finland's tech leaders using Ledger1CRM to scale globally.",
-        "meta_title": "AI CRM in Helsinki | Ledger1CRM",
+        "description": "Join Finland's tech leaders using BasaltCRM to scale globally.",
+        "meta_title": "AI CRM in Helsinki | BasaltCRM",
         "meta_description": "CRM for Finnish tech with EU-compliant workflows and predictive AI.",
         "keywords": [
             "Helsinki CRM",
             "AI CRM Finland",
-            "Ledger1CRM Helsinki"
+            "BasaltCRM Helsinki"
         ],
         "subheading": "Built for Finnish excellence",
         "highlights": [
@@ -3496,7 +3496,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Helsinki",
+            "name": "BasaltCRM Helsinki",
             "address": {
                 "addressLocality": "Helsinki",
                 "addressCountry": "FI"
@@ -3513,13 +3513,13 @@
         "country": "Austria",
         "context": "Central European hub",
         "hero_title": "Vienna's Enterprise CRM",
-        "description": "Connect Central and Eastern Europe with Ledger1CRM's intelligent platform.",
-        "meta_title": "AI CRM in Vienna | Ledger1CRM",
+        "description": "Connect Central and Eastern Europe with BasaltCRM's intelligent platform.",
+        "meta_title": "AI CRM in Vienna | BasaltCRM",
         "meta_description": "Enterprise-ready CRM for Austria with GDPR compliance and predictive AI.",
         "keywords": [
             "Vienna CRM",
             "AI CRM Austria",
-            "Ledger1CRM Vienna"
+            "BasaltCRM Vienna"
         ],
         "subheading": "Central Europe scalability",
         "highlights": [
@@ -3583,7 +3583,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Vienna",
+            "name": "BasaltCRM Vienna",
             "address": {
                 "addressLocality": "Vienna",
                 "addressCountry": "AT"
@@ -3601,12 +3601,12 @@
         "context": "CEE's startup hub",
         "hero_title": "Prague's Innovation CRM",
         "description": "Lead Central Europe's tech revolution with AI-powered CRM.",
-        "meta_title": "AI CRM in Prague | Ledger1CRM",
+        "meta_title": "AI CRM in Prague | BasaltCRM",
         "meta_description": "CEE-focused CRM with EU compliance and predictive analytics.",
         "keywords": [
             "Prague CRM",
             "AI CRM Czech Republic",
-            "Ledger1CRM Prague"
+            "BasaltCRM Prague"
         ],
         "subheading": "Central Europe innovation",
         "highlights": [
@@ -3671,7 +3671,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Prague",
+            "name": "BasaltCRM Prague",
             "address": {
                 "addressLocality": "Prague",
                 "addressCountry": "CZ"
@@ -3689,12 +3689,12 @@
         "context": "Poland's economic center",
         "hero_title": "Warsaw's Growth CRM",
         "description": "Power your Polish business with the CRM designed for Warsaw's dynamic market.",
-        "meta_title": "AI CRM in Warsaw | Ledger1CRM",
+        "meta_title": "AI CRM in Warsaw | BasaltCRM",
         "meta_description": "CRM for Poland with GDPR compliance, predictive analytics, and multilingual support.",
         "keywords": [
             "Warsaw CRM",
             "AI CRM Poland",
-            "Ledger1CRM Warsaw"
+            "BasaltCRM Warsaw"
         ],
         "subheading": "Polish growth engine",
         "highlights": [
@@ -3759,7 +3759,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Warsaw",
+            "name": "BasaltCRM Warsaw",
             "address": {
                 "addressLocality": "Warsaw",
                 "addressCountry": "PL"
@@ -3776,13 +3776,13 @@
         "country": "Portugal",
         "context": "Europe's rising tech hub",
         "hero_title": "Lisbon's Startup CRM",
-        "description": "Join Europe's fastest-growing tech scene with Ledger1CRM's AI platform.",
-        "meta_title": "AI CRM in Lisbon | Ledger1CRM",
+        "description": "Join Europe's fastest-growing tech scene with BasaltCRM's AI platform.",
+        "meta_title": "AI CRM in Lisbon | BasaltCRM",
         "meta_description": "CRM for Portugal with EU compliance and predictive analytics.",
         "keywords": [
             "Lisbon CRM",
             "AI CRM Portugal",
-            "Ledger1CRM Lisbon"
+            "BasaltCRM Lisbon"
         ],
         "subheading": "Rise with AI",
         "highlights": [
@@ -3846,7 +3846,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Lisbon",
+            "name": "BasaltCRM Lisbon",
             "address": {
                 "addressLocality": "Lisbon",
                 "addressCountry": "PT"
@@ -3864,12 +3864,12 @@
         "context": "Mediterranean business gateway",
         "hero_title": "Athens's Business CRM",
         "description": "Navigate Southern European and Mediterranean markets with intelligent CRM.",
-        "meta_title": "AI CRM in Athens | Ledger1CRM",
+        "meta_title": "AI CRM in Athens | BasaltCRM",
         "meta_description": "CRM for Greece with EU compliance, multilingual support, and predictive AI.",
         "keywords": [
             "Athens CRM",
             "AI CRM Greece",
-            "Ledger1CRM Athens"
+            "BasaltCRM Athens"
         ],
         "subheading": "Gateway to Mediterranean growth",
         "highlights": [
@@ -3933,7 +3933,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Athens",
+            "name": "BasaltCRM Athens",
             "address": {
                 "addressLocality": "Athens",
                 "addressCountry": "GR"
@@ -3951,12 +3951,12 @@
         "context": "European Union capital",
         "hero_title": "Brussels's Enterprise CRM",
         "description": "Navigate EU regulations and markets with GDPR-compliant AI CRM.",
-        "meta_title": "AI CRM in Brussels | Ledger1CRM",
+        "meta_title": "AI CRM in Brussels | BasaltCRM",
         "meta_description": "EU-focused CRM for Brussels with GDPR compliance and predictive analytics.",
         "keywords": [
             "Brussels CRM",
             "AI CRM Belgium",
-            "Ledger1CRM Brussels"
+            "BasaltCRM Brussels"
         ],
         "subheading": "EU-grade compliance, AI-grade growth",
         "highlights": [
@@ -4021,7 +4021,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Brussels",
+            "name": "BasaltCRM Brussels",
             "address": {
                 "addressLocality": "Brussels",
                 "addressCountry": "BE"
@@ -4039,12 +4039,12 @@
         "context": "Scotland's financial center",
         "hero_title": "Edinburgh's Finance CRM",
         "description": "Power your Scottish business with the CRM trusted by Edinburgh's financial sector.",
-        "meta_title": "AI CRM in Edinburgh | Ledger1CRM",
+        "meta_title": "AI CRM in Edinburgh | BasaltCRM",
         "meta_description": "Finance-focused CRM for Scotland with GDPR compliance and predictive analytics.",
         "keywords": [
             "Edinburgh CRM",
             "AI CRM Scotland",
-            "Ledger1CRM Edinburgh"
+            "BasaltCRM Edinburgh"
         ],
         "subheading": "Finance-grade automation",
         "highlights": [
@@ -4107,7 +4107,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Edinburgh",
+            "name": "BasaltCRM Edinburgh",
             "address": {
                 "addressLocality": "Edinburgh",
                 "addressCountry": "GB"
@@ -4125,12 +4125,12 @@
         "context": "Northern England's tech hub",
         "hero_title": "Manchester's Growth CRM",
         "description": "Join the Northern Powerhouse with AI-driven business intelligence.",
-        "meta_title": "AI CRM in Manchester | Ledger1CRM",
+        "meta_title": "AI CRM in Manchester | BasaltCRM",
         "meta_description": "Tech-focused CRM for Manchester with predictive analytics and open integrations.",
         "keywords": [
             "Manchester CRM",
             "AI CRM UK",
-            "Ledger1CRM Manchester"
+            "BasaltCRM Manchester"
         ],
         "subheading": "Northern Powerhouse automation",
         "highlights": [
@@ -4193,7 +4193,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Manchester",
+            "name": "BasaltCRM Manchester",
             "address": {
                 "addressLocality": "Manchester",
                 "addressCountry": "GB"
@@ -4211,12 +4211,12 @@
         "context": "Europe's financial capital",
         "hero_title": "Frankfurt's Finance CRM",
         "description": "Navigate European finance with the CRM built for Frankfurt's banking sector.",
-        "meta_title": "AI CRM in Frankfurt | Ledger1CRM",
+        "meta_title": "AI CRM in Frankfurt | BasaltCRM",
         "meta_description": "Finance-grade CRM with GDPR compliance, EU data residency, and predictive analytics.",
         "keywords": [
             "Frankfurt CRM",
             "AI CRM Germany",
-            "Ledger1CRM Frankfurt"
+            "BasaltCRM Frankfurt"
         ],
         "subheading": "Banking-grade intelligence",
         "highlights": [
@@ -4280,7 +4280,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Frankfurt",
+            "name": "BasaltCRM Frankfurt",
             "address": {
                 "addressLocality": "Frankfurt",
                 "addressCountry": "DE"
@@ -4298,12 +4298,12 @@
         "context": "German innovation center",
         "hero_title": "Munich's Enterprise CRM",
         "description": "Power your German business with precision-engineered AI CRM.",
-        "meta_title": "AI CRM in Munich | Ledger1CRM",
+        "meta_title": "AI CRM in Munich | BasaltCRM",
         "meta_description": "CRM for German enterprises with GDPR compliance and predictive AI.",
         "keywords": [
             "Munich CRM",
             "AI CRM Germany",
-            "Ledger1CRM Munich"
+            "BasaltCRM Munich"
         ],
         "subheading": "Precision-engineered growth",
         "highlights": [
@@ -4367,7 +4367,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Munich",
+            "name": "BasaltCRM Munich",
             "address": {
                 "addressLocality": "Munich",
                 "addressCountry": "DE"
@@ -4384,13 +4384,13 @@
         "country": "Spain",
         "context": "Spain's business capital",
         "hero_title": "Madrid's Business CRM",
-        "description": "Dominate Spanish and Latin American markets with Ledger1CRM.",
-        "meta_title": "AI CRM in Madrid | Ledger1CRM",
+        "description": "Dominate Spanish and Latin American markets with BasaltCRM.",
+        "meta_title": "AI CRM in Madrid | BasaltCRM",
         "meta_description": "CRM with ES/EN localization, EU compliance, and predictive AI for Spain.",
         "keywords": [
             "Madrid CRM",
             "AI CRM Spain",
-            "Ledger1CRM Madrid"
+            "BasaltCRM Madrid"
         ],
         "subheading": "Spain and LATAM expansion",
         "highlights": [
@@ -4454,7 +4454,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Madrid",
+            "name": "BasaltCRM Madrid",
             "address": {
                 "addressLocality": "Madrid",
                 "addressCountry": "ES"
@@ -4472,12 +4472,12 @@
         "context": "Historic capital and modern business",
         "hero_title": "Rome's Modern AI CRM",
         "description": "Italian enterprises modernize operations with predictive AI and GDPR-compliant CRM.",
-        "meta_title": "AI CRM in Rome | Ledger1CRM",
+        "meta_title": "AI CRM in Rome | BasaltCRM",
         "meta_description": "CRM for Italy with GDPR compliance, multilingual campaigns, and predictive automations.",
         "keywords": [
             "Rome CRM",
             "AI CRM Italy",
-            "Ledger1CRM Rome"
+            "BasaltCRM Rome"
         ],
         "subheading": "Tradition meets innovation",
         "highlights": [
@@ -4541,7 +4541,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Rome",
+            "name": "BasaltCRM Rome",
             "address": {
                 "addressLocality": "Rome",
                 "addressCountry": "IT"
@@ -4559,12 +4559,12 @@
         "context": "Italy's business and fashion capital",
         "hero_title": "Milan's Enterprise CRM",
         "description": "From fashion to finance, Milan businesses run on predictive AI CRM.",
-        "meta_title": "AI CRM in Milan | Ledger1CRM",
+        "meta_title": "AI CRM in Milan | BasaltCRM",
         "meta_description": "CRM for Milan with GDPR compliance, multilingual campaigns, and predictive analytics.",
         "keywords": [
             "Milan CRM",
             "AI CRM Italy",
-            "Ledger1CRM Milan"
+            "BasaltCRM Milan"
         ],
         "subheading": "Fashion and finance workflows",
         "highlights": [
@@ -4628,7 +4628,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Milan",
+            "name": "BasaltCRM Milan",
             "address": {
                 "addressLocality": "Milan",
                 "addressCountry": "IT"
@@ -4646,12 +4646,12 @@
         "context": "Global tech leader",
         "hero_title": "Seoul's AI-First CRM",
         "description": "Korean enterprises accelerate growth with multilingual, predictive AI CRM.",
-        "meta_title": "AI CRM in Seoul | Ledger1CRM",
+        "meta_title": "AI CRM in Seoul | BasaltCRM",
         "meta_description": "CRM for Korea with KR localization, multilingual campaigns, and predictive analytics.",
         "keywords": [
             "Seoul CRM",
             "AI CRM Korea",
-            "Ledger1CRM Seoul"
+            "BasaltCRM Seoul"
         ],
         "subheading": "K-tech growth engine",
         "highlights": [
@@ -4716,7 +4716,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Seoul",
+            "name": "BasaltCRM Seoul",
             "address": {
                 "addressLocality": "Seoul",
                 "addressCountry": "KR"
@@ -4734,12 +4734,12 @@
         "context": "Gateway to Southeast Asia",
         "hero_title": "KL's Growth CRM",
         "description": "Scale across SEA with multilingual CRM and predictive AI.",
-        "meta_title": "AI CRM in Kuala Lumpur | Ledger1CRM",
+        "meta_title": "AI CRM in Kuala Lumpur | BasaltCRM",
         "meta_description": "CRM for Malaysia with MY localization, multi-currency, and predictive analytics.",
         "keywords": [
             "Kuala Lumpur CRM",
             "AI CRM Malaysia",
-            "Ledger1CRM KL"
+            "BasaltCRM KL"
         ],
         "subheading": "SEA regional expansion",
         "highlights": [
@@ -4806,7 +4806,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Kuala Lumpur",
+            "name": "BasaltCRM Kuala Lumpur",
             "address": {
                 "addressLocality": "Kuala Lumpur",
                 "addressCountry": "MY"
@@ -4824,12 +4824,12 @@
         "context": "Indonesia's economic engine",
         "hero_title": "Jakarta's AI CRM",
         "description": "Automate growth with multilingual CRM built for Indonesia's scale.",
-        "meta_title": "AI CRM in Jakarta | Ledger1CRM",
+        "meta_title": "AI CRM in Jakarta | BasaltCRM",
         "meta_description": "CRM for Indonesia with ID localization, multi-currency, and predictive analytics.",
         "keywords": [
             "Jakarta CRM",
             "AI CRM Indonesia",
-            "Ledger1CRM Jakarta"
+            "BasaltCRM Jakarta"
         ],
         "subheading": "Built for scale",
         "highlights": [
@@ -4894,7 +4894,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Jakarta",
+            "name": "BasaltCRM Jakarta",
             "address": {
                 "addressLocality": "Jakarta",
                 "addressCountry": "ID"
@@ -4912,12 +4912,12 @@
         "context": "BPO and tech hub",
         "hero_title": "Manila's CRM for BPO & Tech",
         "description": "Run BPO and tech operations with predictive CRM and multilingual outreach.",
-        "meta_title": "AI CRM in Manila | Ledger1CRM",
+        "meta_title": "AI CRM in Manila | BasaltCRM",
         "meta_description": "CRM for the Philippines with EN/Tagalog localization and predictive analytics.",
         "keywords": [
             "Manila CRM",
             "AI CRM Philippines",
-            "Ledger1CRM Manila"
+            "BasaltCRM Manila"
         ],
         "subheading": "BPO-grade automation",
         "highlights": [
@@ -4982,7 +4982,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Manila",
+            "name": "BasaltCRM Manila",
             "address": {
                 "addressLocality": "Manila",
                 "addressCountry": "PH"
@@ -5000,12 +5000,12 @@
         "context": "SEA commerce powerhouse",
         "hero_title": "Bangkok's Commerce CRM",
         "description": "Drive retail and services growth with multilingual, predictive CRM.",
-        "meta_title": "AI CRM in Bangkok | Ledger1CRM",
+        "meta_title": "AI CRM in Bangkok | BasaltCRM",
         "meta_description": "CRM for Thailand with TH/EN localization, multi-currency, and predictive analytics.",
         "keywords": [
             "Bangkok CRM",
             "AI CRM Thailand",
-            "Ledger1CRM Bangkok"
+            "BasaltCRM Bangkok"
         ],
         "subheading": "SEA commerce automation",
         "highlights": [
@@ -5070,7 +5070,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Bangkok",
+            "name": "BasaltCRM Bangkok",
             "address": {
                 "addressLocality": "Bangkok",
                 "addressCountry": "TH"
@@ -5088,12 +5088,12 @@
         "context": "Emerging tech and manufacturing",
         "hero_title": "Hanoi's Growth CRM",
         "description": "Scale with AI-driven CRM for Vietnam's emerging tech and manufacturing sectors.",
-        "meta_title": "AI CRM in Hanoi | Ledger1CRM",
+        "meta_title": "AI CRM in Hanoi | BasaltCRM",
         "meta_description": "CRM for Vietnam with VI/EN localization, predictive analytics, and B2B workflows.",
         "keywords": [
             "Hanoi CRM",
             "AI CRM Vietnam",
-            "Ledger1CRM Hanoi"
+            "BasaltCRM Hanoi"
         ],
         "subheading": "Emerging market engine",
         "highlights": [
@@ -5158,7 +5158,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Hanoi",
+            "name": "BasaltCRM Hanoi",
             "address": {
                 "addressLocality": "Hanoi",
                 "addressCountry": "VN"
@@ -5176,12 +5176,12 @@
         "context": "GCC growth hub",
         "hero_title": "Riyadh's Enterprise CRM",
         "description": "Enterprise-grade CRM for GCC markets with Arabic/English localization and predictive AI.",
-        "meta_title": "AI CRM in Riyadh | Ledger1CRM",
+        "meta_title": "AI CRM in Riyadh | BasaltCRM",
         "meta_description": "CRM for Saudi Arabia with AR/EN localization, mega-project workflows, and predictive analytics.",
         "keywords": [
             "Riyadh CRM",
             "AI CRM Saudi Arabia",
-            "Ledger1CRM Riyadh"
+            "BasaltCRM Riyadh"
         ],
         "subheading": "GCC enterprise workflows",
         "highlights": [
@@ -5246,7 +5246,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Riyadh",
+            "name": "BasaltCRM Riyadh",
             "address": {
                 "addressLocality": "Riyadh",
                 "addressCountry": "SA"
@@ -5264,12 +5264,12 @@
         "context": "North Africa's business center",
         "hero_title": "Cairo's AI CRM",
         "description": "Scale across North Africa with multilingual CRM and predictive AI.",
-        "meta_title": "AI CRM in Cairo | Ledger1CRM",
+        "meta_title": "AI CRM in Cairo | BasaltCRM",
         "meta_description": "CRM for Egypt with AR/EN localization, multi-currency, and predictive analytics.",
         "keywords": [
             "Cairo CRM",
             "AI CRM Egypt",
-            "Ledger1CRM Cairo"
+            "BasaltCRM Cairo"
         ],
         "subheading": "North Africa growth engine",
         "highlights": [
@@ -5334,7 +5334,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Cairo",
+            "name": "BasaltCRM Cairo",
             "address": {
                 "addressLocality": "Cairo",
                 "addressCountry": "EG"
@@ -5352,12 +5352,12 @@
         "context": "East Africa's innovation hub",
         "hero_title": "Nairobi's Tech CRM",
         "description": "Run East Africa operations with mobile-first, predictive CRM.",
-        "meta_title": "AI CRM in Nairobi | Ledger1CRM",
+        "meta_title": "AI CRM in Nairobi | BasaltCRM",
         "meta_description": "CRM for Kenya with mobile-first workflows, multi-currency, and predictive analytics.",
         "keywords": [
             "Nairobi CRM",
             "AI CRM Kenya",
-            "Ledger1CRM Nairobi"
+            "BasaltCRM Nairobi"
         ],
         "subheading": "Mobile-first innovation",
         "highlights": [
@@ -5422,7 +5422,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Nairobi",
+            "name": "BasaltCRM Nairobi",
             "address": {
                 "addressLocality": "Nairobi",
                 "addressCountry": "KE"
@@ -5440,12 +5440,12 @@
         "context": "South Africa's financial hub",
         "hero_title": "Johannesburg's Enterprise CRM",
         "description": "Finance and services growth powered by AI-native CRM.",
-        "meta_title": "AI CRM in Johannesburg | Ledger1CRM",
+        "meta_title": "AI CRM in Johannesburg | BasaltCRM",
         "meta_description": "CRM for South Africa with POPIA compliance, multilingual support, and predictive analytics.",
         "keywords": [
             "Johannesburg CRM",
             "AI CRM South Africa",
-            "Ledger1CRM Johannesburg"
+            "BasaltCRM Johannesburg"
         ],
         "subheading": "Finance-grade automation",
         "highlights": [
@@ -5511,7 +5511,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Johannesburg",
+            "name": "BasaltCRM Johannesburg",
             "address": {
                 "addressLocality": "Johannesburg",
                 "addressCountry": "ZA"
@@ -5529,12 +5529,12 @@
         "context": "Mining and energy center",
         "hero_title": "Perth's Industry CRM",
         "description": "Manage mining and energy accounts with predictive workflows and rugged reliability.",
-        "meta_title": "AI CRM in Perth | Ledger1CRM",
+        "meta_title": "AI CRM in Perth | BasaltCRM",
         "meta_description": "Industry-grade CRM for mining and energy with predictive analytics and project workflows.",
         "keywords": [
             "Perth CRM",
             "AI CRM Australia",
-            "Ledger1CRM Perth",
+            "BasaltCRM Perth",
             "Mining CRM"
         ],
         "subheading": "Rugged reliability",
@@ -5599,7 +5599,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Perth",
+            "name": "BasaltCRM Perth",
             "address": {
                 "addressLocality": "Perth",
                 "addressCountry": "AU"
@@ -5617,12 +5617,12 @@
         "context": "Queensland's growth hub",
         "hero_title": "Brisbane's Growth CRM",
         "description": "AI-first CRM for Brisbane services, construction, and tech.",
-        "meta_title": "AI CRM in Brisbane | Ledger1CRM",
+        "meta_title": "AI CRM in Brisbane | BasaltCRM",
         "meta_description": "CRM for Brisbane with Privacy Act compliance, predictive analytics, and open integrations.",
         "keywords": [
             "Brisbane CRM",
             "AI CRM Australia",
-            "Ledger1CRM Brisbane"
+            "BasaltCRM Brisbane"
         ],
         "subheading": "Queensland growth engine",
         "highlights": [
@@ -5685,7 +5685,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Brisbane",
+            "name": "BasaltCRM Brisbane",
             "address": {
                 "addressLocality": "Brisbane",
                 "addressCountry": "AU"
@@ -5703,12 +5703,12 @@
         "context": "Energy and services",
         "hero_title": "Calgary's Industry CRM",
         "description": "Energy, services, and logistics unified by predictive CRM.",
-        "meta_title": "AI CRM in Calgary | Ledger1CRM",
+        "meta_title": "AI CRM in Calgary | BasaltCRM",
         "meta_description": "CRM for Alberta with PIPEDA compliance, predictive analytics, and bilingual workflows.",
         "keywords": [
             "Calgary CRM",
             "AI CRM Canada",
-            "Ledger1CRM Calgary"
+            "BasaltCRM Calgary"
         ],
         "subheading": "Alberta industry workflows",
         "highlights": [
@@ -5774,7 +5774,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Calgary",
+            "name": "BasaltCRM Calgary",
             "address": {
                 "addressLocality": "Calgary",
                 "addressCountry": "CA"
@@ -5792,12 +5792,12 @@
         "context": "Mountain region growth",
         "hero_title": "Denver's Growth CRM",
         "description": "Mountain West services and tech powered by predictive AI CRM.",
-        "meta_title": "AI CRM in Denver | Ledger1CRM",
+        "meta_title": "AI CRM in Denver | BasaltCRM",
         "meta_description": "CRM for Colorado with predictive analytics, open integrations, and strong security.",
         "keywords": [
             "Denver CRM",
             "AI CRM Colorado",
-            "Ledger1CRM Denver"
+            "BasaltCRM Denver"
         ],
         "subheading": "Mountain West automation",
         "highlights": [
@@ -5861,7 +5861,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Denver",
+            "name": "BasaltCRM Denver",
             "address": {
                 "addressLocality": "Denver",
                 "addressCountry": "US"
@@ -5879,12 +5879,12 @@
         "context": "Southwest services and construction",
         "hero_title": "Phoenix's Service CRM",
         "description": "Automate field services, construction, and customer engagement with predictive AI.",
-        "meta_title": "AI CRM in Phoenix | Ledger1CRM",
+        "meta_title": "AI CRM in Phoenix | BasaltCRM",
         "meta_description": "CRM for the Southwest with field services workflows, predictive analytics, and open integrations.",
         "keywords": [
             "Phoenix CRM",
             "AI CRM Arizona",
-            "Ledger1CRM Phoenix"
+            "BasaltCRM Phoenix"
         ],
         "subheading": "Field services automation",
         "highlights": [
@@ -5948,7 +5948,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Phoenix",
+            "name": "BasaltCRM Phoenix",
             "address": {
                 "addressLocality": "Phoenix",
                 "addressCountry": "US"
@@ -5966,12 +5966,12 @@
         "context": "Metroplex enterprise hub",
         "hero_title": "Dallas's Enterprise CRM",
         "description": "Enterprise workflows and predictive AI for the Dallas-Fort Worth metroplex.",
-        "meta_title": "AI CRM in Dallas | Ledger1CRM",
+        "meta_title": "AI CRM in Dallas | BasaltCRM",
         "meta_description": "CRM for Texas with enterprise-grade security, predictive analytics, and open integrations.",
         "keywords": [
             "Dallas CRM",
             "AI CRM Texas",
-            "Ledger1CRM Dallas"
+            "BasaltCRM Dallas"
         ],
         "subheading": "Enterprise-grade automation",
         "highlights": [
@@ -6035,7 +6035,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Dallas",
+            "name": "BasaltCRM Dallas",
             "address": {
                 "addressLocality": "Dallas",
                 "addressCountry": "US"
@@ -6053,12 +6053,12 @@
         "context": "Energy and logistics",
         "hero_title": "Houston's Industry CRM",
         "description": "Energy, logistics, and services unified by predictive AI CRM.",
-        "meta_title": "AI CRM in Houston | Ledger1CRM",
+        "meta_title": "AI CRM in Houston | BasaltCRM",
         "meta_description": "CRM for Houston with project workflows, predictive analytics, and field services support.",
         "keywords": [
             "Houston CRM",
             "AI CRM Texas",
-            "Ledger1CRM Houston"
+            "BasaltCRM Houston"
         ],
         "subheading": "Industry-grade workflows",
         "highlights": [
@@ -6122,7 +6122,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Houston",
+            "name": "BasaltCRM Houston",
             "address": {
                 "addressLocality": "Houston",
                 "addressCountry": "US"
@@ -6140,12 +6140,12 @@
         "context": "Northeast enterprise hub",
         "hero_title": "Philadelphia's Enterprise CRM",
         "description": "Enterprise workflows and predictive AI with strong compliance and security.",
-        "meta_title": "AI CRM in Philadelphia | Ledger1CRM",
+        "meta_title": "AI CRM in Philadelphia | BasaltCRM",
         "meta_description": "CRM for Philadelphia with SOC 2, HIPAA-aware patterns, and predictive analytics.",
         "keywords": [
             "Philadelphia CRM",
             "AI CRM Pennsylvania",
-            "Ledger1CRM Philadelphia"
+            "BasaltCRM Philadelphia"
         ],
         "subheading": "Enterprise automation",
         "highlights": [
@@ -6209,7 +6209,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Philadelphia",
+            "name": "BasaltCRM Philadelphia",
             "address": {
                 "addressLocality": "Philadelphia",
                 "addressCountry": "US"
@@ -6227,12 +6227,12 @@
         "context": "Southeast logistics and media",
         "hero_title": "Atlanta's Growth CRM",
         "description": "Logistics and media operations unified by predictive AI CRM.",
-        "meta_title": "AI CRM in Atlanta | Ledger1CRM",
+        "meta_title": "AI CRM in Atlanta | BasaltCRM",
         "meta_description": "CRM for Georgia with logistics workflows, predictive analytics, and media pipelines.",
         "keywords": [
             "Atlanta CRM",
             "AI CRM Georgia",
-            "Ledger1CRM Atlanta"
+            "BasaltCRM Atlanta"
         ],
         "subheading": "Southeast growth engine",
         "highlights": [
@@ -6295,7 +6295,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Atlanta",
+            "name": "BasaltCRM Atlanta",
             "address": {
                 "addressLocality": "Atlanta",
                 "addressCountry": "US"
@@ -6313,12 +6313,12 @@
         "context": "Government and enterprise",
         "hero_title": "DC's Public & Enterprise CRM",
         "description": "Serve the public better with case management and constituent services while powering enterprise operations.",
-        "meta_title": "AI CRM in Washington, D.C. | Ledger1CRM",
+        "meta_title": "AI CRM in Washington, D.C. | BasaltCRM",
         "meta_description": "Government-ready CRM with case management, predictive analytics, and compliance tooling.",
         "keywords": [
             "Washington DC CRM",
             "AI CRM Government",
-            "Ledger1CRM DC"
+            "BasaltCRM DC"
         ],
         "subheading": "Public service and enterprise",
         "highlights": [
@@ -6381,7 +6381,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Washington, D.C.",
+            "name": "BasaltCRM Washington, D.C.",
             "address": {
                 "addressLocality": "Washington, D.C.",
                 "addressCountry": "US"
@@ -6399,12 +6399,12 @@
         "context": "Automotive and manufacturing",
         "hero_title": "Detroit's Industry CRM",
         "description": "Automotive and manufacturing workflows unified by predictive AI.",
-        "meta_title": "AI CRM in Detroit | Ledger1CRM",
+        "meta_title": "AI CRM in Detroit | BasaltCRM",
         "meta_description": "CRM for Detroit with supplier relationships, order tracking, and predictive analytics.",
         "keywords": [
             "Detroit CRM",
             "AI CRM Michigan",
-            "Ledger1CRM Detroit",
+            "BasaltCRM Detroit",
             "Automotive CRM"
         ],
         "subheading": "Industry automation",
@@ -6468,7 +6468,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Detroit",
+            "name": "BasaltCRM Detroit",
             "address": {
                 "addressLocality": "Detroit",
                 "addressCountry": "US"
@@ -6486,12 +6486,12 @@
         "context": "Midwest tech and services",
         "hero_title": "Minneapolis's Growth CRM",
         "description": "Midwest services and tech operations with predictive AI CRM.",
-        "meta_title": "AI CRM in Minneapolis | Ledger1CRM",
+        "meta_title": "AI CRM in Minneapolis | BasaltCRM",
         "meta_description": "CRM for Minnesota with predictive analytics, open integrations, and strong security.",
         "keywords": [
             "Minneapolis CRM",
             "AI CRM Minnesota",
-            "Ledger1CRM Minneapolis"
+            "BasaltCRM Minneapolis"
         ],
         "subheading": "Midwest automation",
         "highlights": [
@@ -6554,7 +6554,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Minneapolis",
+            "name": "BasaltCRM Minneapolis",
             "address": {
                 "addressLocality": "Minneapolis",
                 "addressCountry": "US"
@@ -6572,12 +6572,12 @@
         "context": "Pacific Northwest innovation",
         "hero_title": "Portland's Startup CRM",
         "description": "Tech and creative operations powered by AI-native CRM.",
-        "meta_title": "AI CRM in Portland | Ledger1CRM",
+        "meta_title": "AI CRM in Portland | BasaltCRM",
         "meta_description": "CRM for Oregon with predictive analytics, open integrations, and strong security.",
         "keywords": [
             "Portland CRM",
             "AI CRM Oregon",
-            "Ledger1CRM Portland"
+            "BasaltCRM Portland"
         ],
         "subheading": "Creative tech automation",
         "highlights": [
@@ -6640,7 +6640,7 @@
         ],
         "structured_data": {
             "@type": "LocalBusiness",
-            "name": "Ledger1CRM Portland",
+            "name": "BasaltCRM Portland",
             "address": {
                 "addressLocality": "Portland",
                 "addressCountry": "US"

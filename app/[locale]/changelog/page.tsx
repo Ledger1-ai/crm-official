@@ -1,6 +1,7 @@
 import React from "react";
-import MarketingHeader from "../components/MarketingHeader";
-import MarketingFooter from "../components/MarketingFooter";
+import BasaltNavbar from "@/components/basaltcrm-landing/BasaltNavbar";
+import BasaltFooter from "@/components/basaltcrm-landing/BasaltFooter";
+import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 
 export const metadata = {
     title: "Changelog - BasaltCRM",
@@ -11,61 +12,67 @@ export const dynamic = "force-dynamic";
 
 export default function ChangelogPage() {
     return (
-        <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
-            <MarketingHeader />
+        <div className="min-h-screen text-white font-sans selection:bg-cyan-500/30">
+            <div className="fixed inset-0 z-0">
+                <GeometricBackground />
+            </div>
 
-            <main className="py-20 md:py-32">
-                <div className="container mx-auto px-4 max-w-4xl">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-12 text-center">
-                        Changelog
-                    </h1>
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <BasaltNavbar />
 
-                    <div className="space-y-12 relative border-l border-white/10 ml-4 md:ml-0 pl-8 md:pl-0">
-                        {/* Update 1 */}
-                        <ChangelogItem
-                            date="December 1, 2025"
-                            version="v2.1.0"
-                            title="New AI Agents & Mobile App"
-                            description="We've completely overhauled our autonomous agents with improved reasoning capabilities. Plus, the new mobile app is now available on iOS and Android."
-                            changes={[
-                                "Added 'Agent Smith' for customer support",
-                                "Released iOS and Android mobile apps",
-                                "Improved dashboard load times by 40%",
-                                "Fixed issue with email sync",
-                            ]}
-                        />
+                <main className="py-20 md:py-32">
+                    <div className="container mx-auto px-4 max-w-4xl">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-12 text-center">
+                            Changelog
+                        </h1>
 
-                        {/* Update 2 */}
-                        <ChangelogItem
-                            date="November 15, 2025"
-                            version="v2.0.5"
-                            title="Advanced Reporting Dashboard"
-                            description="Get deeper insights into your sales pipeline with our new customizable reporting dashboard."
-                            changes={[
-                                "Customizable widgets for dashboard",
-                                "Export reports to PDF and CSV",
-                                "New 'Sales Velocity' metric",
-                            ]}
-                        />
+                        <div className="space-y-12 relative border-l border-white/10 ml-4 md:ml-0 pl-8 md:pl-0">
+                            {/* Update 1 */}
+                            <ChangelogItem
+                                date="December 1, 2025"
+                                version="v2.1.0"
+                                title="New AI Agents & Mobile App"
+                                description="We've completely overhauled our autonomous agents with improved reasoning capabilities. Plus, the new mobile app is now available on iOS and Android."
+                                changes={[
+                                    "Added 'Agent Smith' for customer support",
+                                    "Released iOS and Android mobile apps",
+                                    "Improved dashboard load times by 40%",
+                                    "Fixed issue with email sync",
+                                ]}
+                            />
 
-                        {/* Update 3 */}
-                        <ChangelogItem
-                            date="October 28, 2025"
-                            version="v2.0.0"
-                            title="BasaltCRM 2.0 Launch"
-                            description="The biggest update yet. A complete redesign of the UI, new branding, and a powerful new API."
-                            changes={[
-                                "Complete UI redesign",
-                                "Public API v2 release",
-                                "Dark mode enabled by default",
-                                "Integrated Zapier support",
-                            ]}
-                        />
+                            {/* Update 2 */}
+                            <ChangelogItem
+                                date="November 15, 2025"
+                                version="v2.0.5"
+                                title="Advanced Reporting Dashboard"
+                                description="Get deeper insights into your sales pipeline with our new customizable reporting dashboard."
+                                changes={[
+                                    "Customizable widgets for dashboard",
+                                    "Export reports to PDF and CSV",
+                                    "New 'Sales Velocity' metric",
+                                ]}
+                            />
+
+                            {/* Update 3 */}
+                            <ChangelogItem
+                                date="October 28, 2025"
+                                version="v2.0.0"
+                                title="BasaltCRM 2.0 Launch"
+                                description="The biggest update yet. A complete redesign of the UI, new branding, and a powerful new API."
+                                changes={[
+                                    "Complete UI redesign",
+                                    "Public API v2 release",
+                                    "Dark mode enabled by default",
+                                    "Integrated Zapier support",
+                                ]}
+                            />
+                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
 
-            <MarketingFooter />
+                <BasaltFooter />
+            </div>
         </div>
     );
 }

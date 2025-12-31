@@ -1,8 +1,9 @@
 // @ts-nocheck
 export const dynamic = "force-dynamic";
 import React from "react";
-import MarketingHeader from "../components/MarketingHeader";
-import MarketingFooter from "../components/MarketingFooter";
+import BasaltNavbar from "@/components/basaltcrm-landing/BasaltNavbar";
+import BasaltFooter from "@/components/basaltcrm-landing/BasaltFooter";
+import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import {
     Accordion,
     AccordionContent,
@@ -68,34 +69,40 @@ export default function FAQPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
-            <MarketingHeader />
+        <div className="min-h-screen text-white font-sans selection:bg-cyan-500/30">
+            <div className="fixed inset-0 z-0">
+                <GeometricBackground />
+            </div>
 
-            <main className="py-20 md:py-32">
-                <div className="container mx-auto px-4 max-w-3xl">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-center">
-                        Frequently Asked <span className="text-primary">Questions</span>
-                    </h1>
-                    <p className="text-xl text-gray-400 text-center mb-16">
-                        Everything you need to know about BasaltCRM.
-                    </p>
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <BasaltNavbar />
 
-                    <Accordion type="single" collapsible className="w-full space-y-4">
-                        {faqs.map((faq, index) => (
-                            <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-white/5 rounded-xl px-4 data-[state=open]:border-primary/50 transition-colors">
-                                <AccordionTrigger className="text-lg font-medium hover:text-primary hover:no-underline py-6">
-                                    {faq.question}
-                                </AccordionTrigger>
-                                <AccordionContent className="text-gray-400 text-base pb-6 leading-relaxed">
-                                    {faq.answer}
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
-                </div>
-            </main>
+                <main className="py-20 md:py-32">
+                    <div className="container mx-auto px-4 max-w-3xl">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-center">
+                            Frequently Asked <span className="text-primary">Questions</span>
+                        </h1>
+                        <p className="text-xl text-gray-400 text-center mb-16">
+                            Everything you need to know about BasaltCRM.
+                        </p>
 
-            <MarketingFooter />
+                        <Accordion type="single" collapsible className="w-full space-y-4">
+                            {faqs.map((faq, index) => (
+                                <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-white/5 rounded-xl px-4 data-[state=open]:border-primary/50 transition-colors">
+                                    <AccordionTrigger className="text-lg font-medium hover:text-primary hover:no-underline py-6">
+                                        {faq.question}
+                                    </AccordionTrigger>
+                                    <AccordionContent className="text-gray-400 text-base pb-6 leading-relaxed">
+                                        {faq.answer}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </div>
+                </main>
+
+                <BasaltFooter />
+            </div>
         </div>
     );
 }

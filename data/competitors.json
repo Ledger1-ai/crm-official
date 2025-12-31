@@ -5,7 +5,7 @@
         "weakness": "High cost and complexity",
         "strength": "Enterprise-grade features",
         "comparison_title": "The Affordable Salesforce Alternative",
-        "comparison_text": "Salesforce is powerful, but it's built for giants. Ledger1CRM gives you the same predictive AI power without the six-figure price tag or the need for a dedicated admin team."
+        "comparison_text": "Salesforce is powerful, but it's built for giants. BasaltCRM gives you the same predictive AI power without the six-figure price tag or the need for a dedicated admin team."
     },
     {
         "slug": "hubspot",
@@ -13,7 +13,7 @@
         "weakness": "Expensive scaling tiers",
         "strength": "Marketing automation",
         "comparison_title": "Stop Paying for Contacts",
-        "comparison_text": "HubSpot gets expensive fast as you grow. Ledger1CRM offers unlimited contacts and flat pricing, so your success isn't punished with higher bills."
+        "comparison_text": "HubSpot gets expensive fast as you grow. BasaltCRM offers unlimited contacts and flat pricing, so your success isn't punished with higher bills."
     },
     {
         "slug": "zoho",
@@ -21,7 +21,7 @@
         "weakness": "Clunky UI/UX",
         "strength": "Broad suite of apps",
         "comparison_title": "A CRM You'll Actually Enjoy Using",
-        "comparison_text": "Zoho does a lot, but it feels like software from 2010. Ledger1CRM offers a modern, beautiful interface that your team will love, not loathe."
+        "comparison_text": "Zoho does a lot, but it feels like software from 2010. BasaltCRM offers a modern, beautiful interface that your team will love, not loathe."
     },
     {
         "slug": "pipedrive",
@@ -29,7 +29,7 @@
         "weakness": "Limited AI capabilities",
         "strength": "Visual pipeline",
         "comparison_title": "Beyond Just a Pipeline",
-        "comparison_text": "Pipedrive is great for visualization, but it lacks the autonomous brain. Ledger1CRM doesn't just show you the pipeline; it moves deals through it for you."
+        "comparison_text": "Pipedrive is great for visualization, but it lacks the autonomous brain. BasaltCRM doesn't just show you the pipeline; it moves deals through it for you."
     },
     {
         "slug": "monday",
@@ -37,7 +37,7 @@
         "weakness": "Jack of all trades, master of none",
         "strength": "Project management",
         "comparison_title": "Dedicated Sales Intelligence",
-        "comparison_text": "Monday is a great project tool, but sales requires specialized intelligence. Ledger1CRM is purpose-built for closing deals and supporting customers."
+        "comparison_text": "Monday is a great project tool, but sales requires specialized intelligence. BasaltCRM is purpose-built for closing deals and supporting customers."
     },
     {
         "slug": "freshsales",
@@ -45,7 +45,7 @@
         "weakness": "Limited customization",
         "strength": "Easy onboarding",
         "comparison_title": "Flexible and Powerful",
-        "comparison_text": "Freshsales is simple but rigid. Ledger1CRM adapts to your unique workflows with open-source flexibility and unlimited customization."
+        "comparison_text": "Freshsales is simple but rigid. BasaltCRM adapts to your unique workflows with open-source flexibility and unlimited customization."
     },
     {
         "slug": "zendesk-sell",
@@ -53,7 +53,7 @@
         "weakness": "Support-focused, not sales-native",
         "strength": "Zendesk integration",
         "comparison_title": "Sales-First Intelligence",
-        "comparison_text": "Zendesk Sell is great if you're already on Zendesk, but it's not AI-native. Ledger1CRM combines sales and support in one unified AI brain."
+        "comparison_text": "Zendesk Sell is great if you're already on Zendesk, but it's not AI-native. BasaltCRM combines sales and support in one unified AI brain."
     },
     {
         "slug": "microsoft-dynamics",
@@ -61,7 +61,7 @@
         "weakness": "Steep learning curve",
         "strength": "Microsoft ecosystem",
         "comparison_title": "Easy to Use, Easy to Scale",
-        "comparison_text": "Dynamics is powerful but overwhelming. Ledger1CRM offers enterprise power with a consumer-grade user experience."
+        "comparison_text": "Dynamics is powerful but overwhelming. BasaltCRM offers enterprise power with a consumer-grade user experience."
     },
     {
         "slug": "insightly",
@@ -69,7 +69,7 @@
         "weakness": "Basic reporting",
         "strength": "Project management",
         "comparison_title": "Advanced Analytics Included",
-        "comparison_text": "Insightly's analytics are basic. Ledger1CRM gives you predictive insights out of the box, no add-ons required."
+        "comparison_text": "Insightly's analytics are basic. BasaltCRM gives you predictive insights out of the box, no add-ons required."
     },
     {
         "slug": "copper",
@@ -77,7 +77,7 @@
         "weakness": "Google-only ecosystem",
         "strength": "Gmail integration",
         "comparison_title": "Works with Any Stack",
-        "comparison_text": "Copper locks you into Google Workspace. Ledger1CRM integrates with everything: Gmail, Outlook, Slack, and 5000+ apps."
+        "comparison_text": "Copper locks you into Google Workspace. BasaltCRM integrates with everything: Gmail, Outlook, Slack, and 5000+ apps."
     },
     {
         "slug": "activecampaign",
@@ -85,7 +85,7 @@
         "weakness": "Marketing-first, CRM second",
         "strength": "Email automation",
         "comparison_title": "Built for Sales, Not Just Marketing",
-        "comparison_text": "ActiveCampaign is great for email but lacks true sales intelligence. Ledger1CRM is purpose-built for revenue growth."
+        "comparison_text": "ActiveCampaign is great for email but lacks true sales intelligence. BasaltCRM is purpose-built for revenue growth."
     },
     {
         "slug": "keap",
@@ -93,7 +93,7 @@
         "weakness": "Dated interface",
         "strength": "All-in-one platform",
         "comparison_title": "Modern AI vs. Legacy Automation",
-        "comparison_text": "Keap's automation is powerful but manual. Ledger1CRM's AI learns and adapts without constant configuration."
+        "comparison_text": "Keap's automation is powerful but manual. BasaltCRM's AI learns and adapts without constant configuration."
     },
     {
         "slug": "nimble",
@@ -101,7 +101,7 @@
         "weakness": "Limited enterprise features",
         "strength": "Social CRM",
         "comparison_title": "Social + Sales Intelligence",
-        "comparison_text": "Nimble tracks social but lacks predictive AI. Ledger1CRM combines social insights with autonomous deal-closing."
+        "comparison_text": "Nimble tracks social but lacks predictive AI. BasaltCRM combines social insights with autonomous deal-closing."
     },
     {
         "slug": "capsule",
@@ -109,7 +109,7 @@
         "weakness": "Basic features",
         "strength": "Simple interface",
         "comparison_title": "Simple Yet Powerful",
-        "comparison_text": "Capsule is easy but limited. Ledger1CRM is just as intuitive with 10x the intelligence under the hood."
+        "comparison_text": "Capsule is easy but limited. BasaltCRM is just as intuitive with 10x the intelligence under the hood."
     },
     {
         "slug": "less-annoying-crm",
@@ -117,7 +117,7 @@
         "weakness": "No AI or automation",
         "strength": "Affordability",
         "comparison_title": "AI Without the Annoyance",
-        "comparison_text": "Less Annoying is cheap but manual. Ledger1CRM automates everything while remaining affordable."
+        "comparison_text": "Less Annoying is cheap but manual. BasaltCRM automates everything while remaining affordable."
     },
     {
         "slug": "agile-crm",
@@ -125,7 +125,7 @@
         "weakness": "Cluttered interface",
         "strength": "Feature-rich",
         "comparison_title": "Clean, Modern, Intelligent",
-        "comparison_text": "Agile CRM has features but feels bloated. Ledger1CRM delivers power with elegance."
+        "comparison_text": "Agile CRM has features but feels bloated. BasaltCRM delivers power with elegance."
     },
     {
         "slug": "close",
@@ -133,7 +133,7 @@
         "weakness": "Limited reporting",
         "strength": "Built-in calling",
         "comparison_title": "Calls + Predictive Intelligence",
-        "comparison_text": "Close is great for calling but lacks deep analytics. Ledger1CRM adds AI-driven forecasting to your outreach."
+        "comparison_text": "Close is great for calling but lacks deep analytics. BasaltCRM adds AI-driven forecasting to your outreach."
     },
     {
         "slug": "nutshell",
@@ -141,7 +141,7 @@
         "weakness": "Mid-tier pricing",
         "strength": "Ease of use",
         "comparison_title": "Premium Features, Fair Price",
-        "comparison_text": "Nutshell is decent but overpriced. Ledger1CRM gives you enterprise AI at SME pricing."
+        "comparison_text": "Nutshell is decent but overpriced. BasaltCRM gives you enterprise AI at SME pricing."
     },
     {
         "slug": "streak",
@@ -149,7 +149,7 @@
         "weakness": "Gmail-only",
         "strength": "Email integration",
         "comparison_title": "Beyond the Inbox",
-        "comparison_text": "Streak lives in Gmail but can't escape it. Ledger1CRM works everywhere and integrates with everything."
+        "comparison_text": "Streak lives in Gmail but can't escape it. BasaltCRM works everywhere and integrates with everything."
     },
     {
         "slug": "sugarcrm",
@@ -157,7 +157,7 @@
         "weakness": "Complex setup",
         "strength": "Customization",
         "comparison_title": "Open Source Without the Hassle",
-        "comparison_text": "SugarCRM is open but hard to configure. Ledger1CRM is open-source with enterprise-grade setup ease."
+        "comparison_text": "SugarCRM is open but hard to configure. BasaltCRM is open-source with enterprise-grade setup ease."
     },
     {
         "slug": "vtiger",
@@ -165,7 +165,7 @@
         "weakness": "Outdated UI",
         "strength": "Open source",
         "comparison_title": "Modern Open Source",
-        "comparison_text": "Vtiger is open but feels old. Ledger1CRM combines open-source freedom with cutting-edge design."
+        "comparison_text": "Vtiger is open but feels old. BasaltCRM combines open-source freedom with cutting-edge design."
     },
     {
         "slug": "bitrix24",
@@ -173,7 +173,7 @@
         "weakness": "Feature overload",
         "strength": "All-in-one",
         "comparison_title": "Focused, Not Bloated",
-        "comparison_text": "Bitrix24 does everything poorly. Ledger1CRM does CRM exceptionally well."
+        "comparison_text": "Bitrix24 does everything poorly. BasaltCRM does CRM exceptionally well."
     },
     {
         "slug": "ontraport",
@@ -181,7 +181,7 @@
         "weakness": "Steep learning curve",
         "strength": "Marketing automation",
         "comparison_title": "AI That Works Out of the Box",
-        "comparison_text": "Ontraport requires a consultant. Ledger1CRM's AI works from day one."
+        "comparison_text": "Ontraport requires a consultant. BasaltCRM's AI works from day one."
     },
     {
         "slug": "pipeliner",
@@ -189,7 +189,7 @@
         "weakness": "Niche appeal",
         "strength": "Visual tools",
         "comparison_title": "Visual + Intelligent",
-        "comparison_text": "Pipeliner visualizes but doesn't predict. Ledger1CRM shows you the future, not just the present."
+        "comparison_text": "Pipeliner visualizes but doesn't predict. BasaltCRM shows you the future, not just the present."
     },
     {
         "slug": "creatio",
@@ -197,6 +197,6 @@
         "weakness": "Enterprise complexity",
         "strength": "No-code platform",
         "comparison_title": "No-Code Meets AI",
-        "comparison_text": "Creatio is powerful but overkill. Ledger1CRM is right-sized for growth-stage companies."
+        "comparison_text": "Creatio is powerful but overkill. BasaltCRM is right-sized for growth-stage companies."
     }
 ]

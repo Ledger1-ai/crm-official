@@ -1,6 +1,7 @@
 import React from "react";
-import MarketingHeader from "../components/MarketingHeader";
-import MarketingFooter from "../components/MarketingFooter";
+import BasaltNavbar from "@/components/basaltcrm-landing/BasaltNavbar";
+import BasaltFooter from "@/components/basaltcrm-landing/BasaltFooter";
+import GeometricBackground from "@/app/[locale]/components/GeometricBackground";
 import { CheckCircle2, Circle, Clock } from "lucide-react";
 
 export const metadata = {
@@ -10,77 +11,83 @@ export const metadata = {
 
 export default function RoadmapPage() {
     return (
-        <div className="min-h-screen bg-[#0F0F1A] text-white font-sans selection:bg-primary/30">
-            <MarketingHeader />
+        <div className="min-h-screen text-white font-sans selection:bg-cyan-500/30">
+            <div className="fixed inset-0 z-0">
+                <GeometricBackground />
+            </div>
 
-            <main className="py-20 md:py-32">
-                <div className="container mx-auto px-4 max-w-4xl">
-                    <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-                            Product <span className="text-primary">Roadmap</span>
-                        </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            We&apos;re building the future of AI-driven customer relationship management. Here&apos;s what we&apos;ve done and where we&apos;re going.
-                        </p>
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <BasaltNavbar />
+
+                <main className="py-20 md:py-32">
+                    <div className="container mx-auto px-4 max-w-4xl">
+                        <div className="text-center mb-20">
+                            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+                                Product <span className="text-primary">Roadmap</span>
+                            </h1>
+                            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                                We&apos;re building the future of AI-driven customer relationship management. Here&apos;s what we&apos;ve done and where we&apos;re going.
+                            </p>
+                        </div>
+
+                        <div className="space-y-12 relative border-l-2 border-white/10 ml-4 md:ml-0 pl-8 md:pl-0">
+                            {/* Q4 2025 - Completed */}
+                            <RoadmapItem
+                                quarter="Q4 2025"
+                                status="completed"
+                                title="Autonomous Agents & Mobile"
+                                items={[
+                                    "Launch of 'Agent Smith' for autonomous support",
+                                    "iOS and Android mobile applications",
+                                    "Real-time voice transcription for calls",
+                                    "Advanced role-based access control (RBAC)",
+                                ]}
+                            />
+
+                            {/* Q1 2026 - In Progress */}
+                            <RoadmapItem
+                                quarter="Q1 2026"
+                                status="in-progress"
+                                title="Deep Integration & Intelligence"
+                                items={[
+                                    "Native integration with Microsoft Teams",
+                                    "Sentiment analysis for email threads",
+                                    "Predictive churn modeling",
+                                    "Self-hosted Docker container registry",
+                                ]}
+                            />
+
+                            {/* Q2 2026 - Planned */}
+                            <RoadmapItem
+                                quarter="Q2 2026"
+                                status="planned"
+                                title="Global Scale & Customization"
+                                items={[
+                                    "Multi-currency support for deals",
+                                    "Custom AI model fine-tuning interface",
+                                    "White-labeling for Enterprise clients",
+                                    "API v3 with GraphQL support",
+                                ]}
+                            />
+
+                            {/* Q3 2026 - Planned */}
+                            <RoadmapItem
+                                quarter="Q3 2026"
+                                status="planned"
+                                title="The Next Frontier"
+                                items={[
+                                    "Autonomous sales outreach agents",
+                                    "AR/VR meeting integration",
+                                    "Blockchain-based contract verification",
+                                    "Marketplace for third-party plugins",
+                                ]}
+                            />
+                        </div>
                     </div>
+                </main>
 
-                    <div className="space-y-12 relative border-l-2 border-white/10 ml-4 md:ml-0 pl-8 md:pl-0">
-                        {/* Q4 2025 - Completed */}
-                        <RoadmapItem
-                            quarter="Q4 2025"
-                            status="completed"
-                            title="Autonomous Agents & Mobile"
-                            items={[
-                                "Launch of 'Agent Smith' for autonomous support",
-                                "iOS and Android mobile applications",
-                                "Real-time voice transcription for calls",
-                                "Advanced role-based access control (RBAC)",
-                            ]}
-                        />
-
-                        {/* Q1 2026 - In Progress */}
-                        <RoadmapItem
-                            quarter="Q1 2026"
-                            status="in-progress"
-                            title="Deep Integration & Intelligence"
-                            items={[
-                                "Native integration with Microsoft Teams",
-                                "Sentiment analysis for email threads",
-                                "Predictive churn modeling",
-                                "Self-hosted Docker container registry",
-                            ]}
-                        />
-
-                        {/* Q2 2026 - Planned */}
-                        <RoadmapItem
-                            quarter="Q2 2026"
-                            status="planned"
-                            title="Global Scale & Customization"
-                            items={[
-                                "Multi-currency support for deals",
-                                "Custom AI model fine-tuning interface",
-                                "White-labeling for Enterprise clients",
-                                "API v3 with GraphQL support",
-                            ]}
-                        />
-
-                        {/* Q3 2026 - Planned */}
-                        <RoadmapItem
-                            quarter="Q3 2026"
-                            status="planned"
-                            title="The Next Frontier"
-                            items={[
-                                "Autonomous sales outreach agents",
-                                "AR/VR meeting integration",
-                                "Blockchain-based contract verification",
-                                "Marketplace for third-party plugins",
-                            ]}
-                        />
-                    </div>
-                </div>
-            </main>
-
-            <MarketingFooter />
+                <BasaltFooter />
+            </div>
         </div>
     );
 }

@@ -353,7 +353,7 @@ export default function PricingClient() {
                             <div className="text-center pt-4">
                                 <Button
                                     type="submit"
-                                    className="bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white px-10 py-6 text-lg rounded-full shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] transition-all duration-300 font-semibold"
+                                    className="bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white px-10 py-6 text-lg rounded-[10px] shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.6)] transition-all duration-300 font-semibold"
                                 >
                                     Send Message
                                 </Button>
@@ -425,7 +425,7 @@ function PricingCard({
 
             <Link href="/dashboard" className="w-full mt-auto">
                 <Button
-                    className={`w-full py-6 text-lg rounded-full font-semibold transition-all duration-300 ${buttonVariant === "primary"
+                    className={`w-full py-6 text-lg rounded-[10px] font-semibold transition-all duration-300 ${buttonVariant === "primary"
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
                         : "bg-transparent border border-white/20 hover:bg-white/10 text-white"
                         }`}

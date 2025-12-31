@@ -174,7 +174,7 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string, jobTitle: 
             </div>
 
             <div className="pt-4">
-                <Button type="submit" disabled={isSubmitting || uploading} className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg shadow-blue-500/20">
+                <Button type="submit" disabled={isSubmitting || uploading} className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg shadow-blue-500/20 rounded-[10px]">
                     {isSubmitting || uploading ? (
                         <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> {uploading ? "Uploading Resume..." : "Submitting Application..."}</>
                     ) : (

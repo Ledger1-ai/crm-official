@@ -117,7 +117,7 @@ function SupportCard({ icon, title, description, actionText, href }: { icon: Rea
             <h3 className="text-xl font-bold mb-3">{title}</h3>
             <p className="text-gray-400 mb-8 flex-1">{description}</p>
             <Link href={href}>
-                <Button variant="outline" className="border-white/20 hover:bg-white/10 text-white">
+                <Button variant="outline" className="border-white/20 hover:bg-white/10 text-white rounded-[10px]">
                     {actionText}
                 </Button>
             </Link>
