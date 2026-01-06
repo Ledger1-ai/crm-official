@@ -43,7 +43,7 @@ const ContractsView = ({ data, crmData, accountId }: any) => {
             Contracts
           </CardTitle>
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 items-center">
             <CreateContractForm
               users={users}
               accounts={accounts}
@@ -67,7 +67,10 @@ const ContractsView = ({ data, crmData, accountId }: any) => {
           (data.length === 0 ? (
             "No assigned contracts found"
           ) : (
-            <ContractsDataTable data={data} columns={columns} />
+            <ContractsDataTable
+              data={data}
+              columns={columns}
+            />
           ))}
       </CardContent>
     </Card>

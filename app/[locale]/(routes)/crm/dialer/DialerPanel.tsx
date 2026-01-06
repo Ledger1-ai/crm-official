@@ -290,9 +290,7 @@ export default function DialerPanel() {
 
   return (
     <div className="w-full px-1 py-2 space-y-4">
-      <div className="microtext text-muted-foreground">
-        Dialer uses Amazon Connect CCP (Streams SDK) for outbound calls. BasaltCRM controls dialing and sequencing.
-      </div>
+
 
       {/* Connect CCP Softphone */}
       <section className="rounded-md border bg-card p-4">

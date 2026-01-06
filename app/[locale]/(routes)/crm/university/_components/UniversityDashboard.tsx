@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Video, Trophy, Calculator, GraduationCap, PlayCircle, FileText } from "lucide-react";
+import Heading from "@/components/ui/heading";
+import { Separator } from "@/components/ui/separator";
 
 // Mirror the weights from get-team-analytics for transparency
 const STAGE_WEIGHTS: Record<string, number> = {
@@ -59,11 +61,12 @@ export default function UniversityDashboard() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">University & LMS</h1>
-                <p className="text-muted-foreground">
-                    Master the CRM, track your performance, and level up your sales game.
-                </p>
+            <div className="flex flex-col">
+                <Heading
+                    title="University & LMS"
+                    description="Master the CRM, track your performance, and level up your sales game."
+                />
+                <Separator className="mt-4" />
             </div>
 
             {/* Navigation Tabs */}

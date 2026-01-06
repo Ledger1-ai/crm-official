@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { SlidersHorizontal } from 'lucide-react';
 
 export type ViewMode = 'table' | 'compact' | 'card';
 
@@ -22,10 +21,7 @@ export function ViewToggle({ value, onChange, className }: ViewToggleProps) {
     return (
         <div className={cn("flex items-center gap-1", className)}>
             {/* View Label with Icon */}
-            <div className="flex items-center gap-1.5 px-2 py-1.5 text-muted-foreground">
-                <SlidersHorizontal className="h-4 w-4" />
-                <span className="text-[11px] uppercase tracking-wider font-semibold">View</span>
-            </div>
+
 
             {/* Toggle Buttons Container */}
             <div className="flex items-center bg-muted/50 border border-border/50 rounded-md p-1 gap-0.5">

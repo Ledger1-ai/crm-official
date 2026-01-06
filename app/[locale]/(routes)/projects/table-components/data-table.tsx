@@ -84,6 +84,8 @@ export function ProjectsDataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    columnResizeMode: "onChange",
+    enableColumnResizing: true,
   });
 
   // Force card view on mobile, map viewMode to display logic
@@ -248,13 +250,21 @@ export function ProjectsDataTable<TData, TValue>({
                         <TableHead className="w-[50px]"></TableHead>
                         {headerGroup.headers.map((header) => {
                           return (
-                            <TableHead key={header.id}>
+                            <TableHead key={header.id} className="relative" style={{ width: header.getSize() }}>
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
                                   header.column.columnDef.header,
                                   header.getContext()
                                 )}
+                              {header.column.getCanResize() && (
+                                <div
+                                  onMouseDown={header.getResizeHandler()}
+                                  onTouchStart={header.getResizeHandler()}
+                                  className={`absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none ${header.column.getIsResizing() ? "bg-primary" : "bg-border opacity-0 hover:opacity-100"
+                                    }`}
+                                />
+                              )}
                             </TableHead>
                           );
                         })}

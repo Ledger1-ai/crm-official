@@ -82,6 +82,7 @@ const AccountsView = ({ data, crmData }: any) => {
           <CardContent>No assigned accounts found</CardContent>
         ) : (
           <CardContent>
+            {/* Pass viewMode to data table or handle view switching */}
             <AccountDataTable
               data={data}
               columns={columns}

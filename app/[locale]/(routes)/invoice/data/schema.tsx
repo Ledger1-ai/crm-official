@@ -6,6 +6,7 @@ export const taskSchema = z.object({
   id: z.string(),
   date_created: z.date(),
   date_due: z.date().nullable(),
+  variable_symbol: z.string().nullable().optional(),
   invoice_amount: z.string().nullable(),
   invoice_currency: z.string().nullable(),
   partner: z.string().nullable(),

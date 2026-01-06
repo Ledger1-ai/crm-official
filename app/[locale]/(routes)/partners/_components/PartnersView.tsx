@@ -63,12 +63,31 @@ type Props = {
     availablePlans: any[];
 };
 
+import { ViewToggle, type ViewMode } from "@/components/ViewToggle";
+import { useIsMobile } from "@/hooks/use-is-mobile";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+
 const LinkHref = Link as any;
 
 const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
     const router = useRouter();
     const [teams, setTeams] = useState<Team[]>(initialTeams);
     const [isLoading, setIsLoading] = useState(false);
+    const [viewMode, setViewMode] = useState<ViewMode>("card");
+    const isMobile = useIsMobile();
+
+    useEffect(() => {
+        if (isMobile) {
+            setViewMode("card");
+        }
+    }, [isMobile]);
 
     // Create Modal State
     const [open, setOpen] = useState(false);
@@ -307,90 +326,146 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
                         </DialogContent>
                     </Dialog>
                 </div>
+                {/* View Toggle */}
+                <div className="flex items-center ml-2">
+                    <ViewToggle value={viewMode === "grid" ? "card" : viewMode} onChange={(v) => setViewMode(v === "grid" ? "card" : v)} />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {teams.map((team) => {
-                    const effectiveStatus = getEffectiveStatus(team);
-                    return (
-                        <Card
-                            key={team.id}
-                            className="transition-all duration-300 border-2"
-                            style={getStatusStyle(effectiveStatus)}
-                        >
-                            <CardHeader className="pb-2">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <CardTitle className="leading-tight">{team.name}</CardTitle>
-                                            {effectiveStatus === "PENDING" && (
-                                                <Badge variant="destructive" className="animate-pulse">Pending</Badge>
-                                            )}
-                                            {effectiveStatus === "SUSPENDED" && (
-                                                <Badge variant="destructive">Suspended</Badge>
-                                            )}
-                                            {effectiveStatus === "OVERDUE" && (
-                                                <Badge className="bg-pink-500 hover:bg-pink-600 animate-pulse text-white border-none">Overdue</Badge>
-                                            )}
-                                        </div>
-                                        <CardDescription className="font-mono text-xs mt-1 text-muted-foreground/70">{team.slug}</CardDescription>
-                                    </div>
-                                    <Badge variant="outline" className="shrink-0">{team.members.length} Users</Badge>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex -space-x-2 overflow-hidden py-2">
-                                    {team.members.slice(0, 5).map((member) => (
-                                        <div key={member.id} className="h-8 w-8 rounded-full ring-2 ring-background bg-slate-200 flex items-center justify-center overflow-hidden" title={member.name || member.email}>
-                                            {member.avatar ? (
-                                                <img src={member.avatar} alt={member.name || "User"} className="h-full w-full object-cover" />
-                                            ) : (
-                                                <span className="text-xs font-semibold text-slate-500">{(member.name || member.email)[0].toUpperCase()}</span>
-                                            )}
-                                        </div>
-                                    ))}
-                                    {team.members.length > 5 && (
-                                        <div className="h-8 w-8 rounded-full ring-2 ring-background bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-500">
-                                            +{team.members.length - 5}
-                                        </div>
-                                    )}
-                                    {team.members.length === 0 && (
-                                        <span className="text-sm text-muted-foreground italic pl-2">No members yet</span>
-                                    )}
-                                </div>
-                            </CardContent>
-                            <CardFooter className="flex justify-between items-center border-t p-4 bg-muted/20">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground flex flex-col">
-                                        <span>Since {new Date(team.created_at).toLocaleDateString()}</span>
-                                        {team.renewal_date && (
-                                            <span className="text-muted-foreground/70">
-                                                Refreshes: {new Date(team.renewal_date).toLocaleDateString()}
-                                            </span>
-                                        )}
-                                    </span>
-                                    {team.assigned_plan && (
-                                        <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-xs shadow-sm border border-slate-200 dark:border-slate-700">
-                                            {team.assigned_plan.name}
+            {viewMode === "table" ? (
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Members</TableHead>
+                                <TableHead>Renewal</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {teams.map((team) => (
+                                <TableRow key={team.id}>
+                                    <TableCell className="font-medium">
+                                        <div>{team.name}</div>
+                                        <div className="text-xs text-muted-foreground">{team.slug}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant={team.status === "ACTIVE" ? "default" : "secondary"}>
+                                            {team.status || "ACTIVE"}
                                         </Badge>
-                                    )}
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openRenewalDialog(team)}>
-                                        <CalendarClock className="h-4 w-4 text-muted-foreground" />
-                                    </Button>
-                                    <LinkHref href={`/partners/${team.id}`}>
-                                        <Button variant="ghost" size="sm">
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Manage
+                                    </TableCell>
+                                    <TableCell>{team.members.length} Users</TableCell>
+                                    <TableCell>
+                                        {team.renewal_date ? new Date(team.renewal_date).toLocaleDateString() : "N/A"}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openRenewalDialog(team)}>
+                                                <CalendarClock className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                            <LinkHref href={`/partners/${team.id}`}>
+                                                <Button variant="ghost" size="sm">Manage</Button>
+                                            </LinkHref>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {teams.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-24 text-center">
+                                        No teams found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {teams.map((team) => {
+                        const effectiveStatus = getEffectiveStatus(team);
+                        return (
+                            <Card
+                                key={team.id}
+                                className="transition-all duration-300 border-2"
+                                style={getStatusStyle(effectiveStatus)}
+                            >
+                                <CardHeader className="pb-2">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <CardTitle className="leading-tight">{team.name}</CardTitle>
+                                                {effectiveStatus === "PENDING" && (
+                                                    <Badge variant="destructive" className="animate-pulse">Pending</Badge>
+                                                )}
+                                                {effectiveStatus === "SUSPENDED" && (
+                                                    <Badge variant="destructive">Suspended</Badge>
+                                                )}
+                                                {effectiveStatus === "OVERDUE" && (
+                                                    <Badge className="bg-pink-500 hover:bg-pink-600 animate-pulse text-white border-none">Overdue</Badge>
+                                                )}
+                                            </div>
+                                            <CardDescription className="font-mono text-xs mt-1 text-muted-foreground/70">{team.slug}</CardDescription>
+                                        </div>
+                                        <Badge variant="outline" className="shrink-0">{team.members.length} Users</Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex -space-x-2 overflow-hidden py-2">
+                                        {team.members.slice(0, 5).map((member) => (
+                                            <div key={member.id} className="h-8 w-8 rounded-full ring-2 ring-background bg-slate-200 flex items-center justify-center overflow-hidden" title={member.name || member.email}>
+                                                {member.avatar ? (
+                                                    <img src={member.avatar} alt={member.name || "User"} className="h-full w-full object-cover" />
+                                                ) : (
+                                                    <span className="text-xs font-semibold text-slate-500">{(member.name || member.email)[0].toUpperCase()}</span>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {team.members.length > 5 && (
+                                            <div className="h-8 w-8 rounded-full ring-2 ring-background bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-500">
+                                                +{team.members.length - 5}
+                                            </div>
+                                        )}
+                                        {team.members.length === 0 && (
+                                            <span className="text-sm text-muted-foreground italic pl-2">No members yet</span>
+                                        )}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex justify-between items-center border-t p-4 bg-muted/20">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-muted-foreground flex flex-col">
+                                            <span>Since {new Date(team.created_at).toLocaleDateString()}</span>
+                                            {team.renewal_date && (
+                                                <span className="text-muted-foreground/70">
+                                                    Refreshes: {new Date(team.renewal_date).toLocaleDateString()}
+                                                </span>
+                                            )}
+                                        </span>
+                                        {team.assigned_plan && (
+                                            <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-xs shadow-sm border border-slate-200 dark:border-slate-700">
+                                                {team.assigned_plan.name}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openRenewalDialog(team)}>
+                                            <CalendarClock className="h-4 w-4 text-muted-foreground" />
                                         </Button>
-                                    </LinkHref>
-                                </div>
-                            </CardFooter>
-                        </Card>
-                    );
-                })}
-            </div>
+                                        <LinkHref href={`/partners/${team.id}`}>
+                                            <Button variant="ghost" size="sm">
+                                                <Edit className="w-4 h-4 mr-2" />
+                                                Manage
+                                            </Button>
+                                        </LinkHref>
+                                    </div>
+                                </CardFooter>
+                            </Card>
+                        );
+                    })}
+                </div>
+            )}
             {teams.length === 0 && (
                 <div className="text-center py-10">
                     <h3 className="text-lg font-medium">No teams found</h3>

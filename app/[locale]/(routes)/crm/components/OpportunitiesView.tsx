@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { columns } from "../opportunities/table-components/columns";
 import { NewOpportunityForm } from "../opportunities/components/NewOpportunityForm";
 import { OpportunitiesDataTable } from "../opportunities/table-components/data-table";
+
 const OpportunitiesView = ({
   data,
   crmData,
@@ -97,7 +98,10 @@ const OpportunitiesView = ({
           (data.length === 0 ? (
             "No assigned opportunities found"
           ) : (
-            <OpportunitiesDataTable data={data} columns={columns} />
+            <OpportunitiesDataTable
+              data={data}
+              columns={columns}
+            />
           ))}
       </CardContent>
     </Card>

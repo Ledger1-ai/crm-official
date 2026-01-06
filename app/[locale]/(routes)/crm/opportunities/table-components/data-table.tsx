@@ -33,6 +33,8 @@ import { OpportunityCard } from "./opportunity-card";
 import { Opportunity } from "../table-data/schema";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 
+import { ViewToggle, ViewMode } from "@/components/ViewToggle";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -49,8 +51,8 @@ export function OpportunitiesDataTable<TData, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [view, setView] = React.useState<"table" | "compact" | "grid">("table");
   const [hide, setHide] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<ViewMode>("table");
 
   // Mobile detection using shared hook
   const isMobile = useIsMobile();
@@ -73,12 +75,20 @@ export function OpportunitiesDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    columnResizeMode: "onChange",
+    enableColumnResizing: true,
   });
 
   // Force grid view on mobile
-  const currentView = isMobile ? "grid" : view;
+  React.useEffect(() => {
+    if (isMobile) {
+      setViewMode("card");
+    }
+  }, [isMobile]);
+
+  // Map "card" viewMode to internal "grid" layout
+  const currentView = isMobile ? "grid" : (viewMode === "card" ? "grid" : viewMode);
 
   return (
     <div className="space-y-4">
@@ -90,29 +100,7 @@ export function OpportunitiesDataTable<TData, TValue>({
         <div className="flex items-center gap-2 self-end md:self-auto">
           {/* Layout Toggles (Desktop Only) */}
           {!isMobile && (
-            <div className="flex items-center border rounded-md p-1 bg-muted/50">
-              <button
-                onClick={() => setView("table")}
-                className={`p-1.5 rounded-sm transition-all ${view === "table" ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                title="Table View"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /><rect width="18" height="18" x="3" y="3" rx="2" /></svg>
-              </button>
-              <button
-                onClick={() => setView("compact")}
-                className={`p-1.5 rounded-sm transition-all ${view === "compact" ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                title="Compact View"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3z" /><path d="M21 9H3" /><path d="M21 15H3" /><path d="M12 3v18" /></svg>
-              </button>
-              <button
-                onClick={() => setView("grid")}
-                className={`p-1.5 rounded-sm transition-all ${view === "grid" ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                title="Grid View"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>
-              </button>
-            </div>
+            <ViewToggle value={viewMode} onChange={setViewMode} />
           )}
 
           {hide ? (
@@ -157,13 +145,20 @@ export function OpportunitiesDataTable<TData, TValue>({
                       <TableRow key={headerGroup.id}>
                         {headerGroup.headers.map((header) => {
                           return (
-                            <TableHead key={header.id} className={view === "compact" ? "h-8 py-1" : ""}>
+                            <TableHead key={header.id} className={`${currentView === "compact" ? "h-8 py-1" : ""} relative`} style={{ width: header.getSize() }}>
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
                                   header.column.columnDef.header,
                                   header.getContext()
                                 )}
+                              {header.column.getCanResize() && (
+                                <div
+                                  onMouseDown={header.getResizeHandler()}
+                                  onTouchStart={header.getResizeHandler()}
+                                  className={`absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none ${header.column.getIsResizing() ? "bg-primary" : "bg-border opacity-0 hover:opacity-100"}`}
+                                />
+                              )}
                             </TableHead>
                           );
                         })}
@@ -178,7 +173,7 @@ export function OpportunitiesDataTable<TData, TValue>({
                           data-state={row.getIsSelected() && "selected"}
                         >
                           {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id} className={view === "compact" ? "py-1" : ""}>
+                            <TableCell key={cell.id} className={currentView === "compact" ? "py-1" : ""}>
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext()

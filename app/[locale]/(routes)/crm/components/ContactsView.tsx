@@ -62,7 +62,7 @@ const ContactsView = ({ data, crmData }: any) => {
               </Button>
               <SheetContent className="min-w-[1000px] space-y-2">
                 <SheetHeader>
-                  <SheetTitle>Create new Account</SheetTitle>
+                  <SheetTitle>Create new Contact</SheetTitle> {/* Fixed Title from "Create new Account" to "Create new Contact" */}
                 </SheetHeader>
                 <div className="h-full overflow-y-auto">
                   <NewContactForm
@@ -82,7 +82,10 @@ const ContactsView = ({ data, crmData }: any) => {
         {!data || data.length === 0 ? (
           "No assigned contacts found"
         ) : (
-          <ContactsDataTable data={data} columns={columns} />
+          <ContactsDataTable
+            data={data}
+            columns={columns}
+          />
         )}
       </CardContent>
     </Card>

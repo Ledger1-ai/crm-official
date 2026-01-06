@@ -44,7 +44,8 @@ const DocumentsView = ({ data }: DocumentsViewProps) => {
             </CardTitle>
             <CardDescription></CardDescription>
           </div>
-          <div className="flex space-x-2"></div>
+          <div className="flex space-x-2">
+          </div>
         </div>
         <Separator />
       </CardHeader>
@@ -52,10 +53,13 @@ const DocumentsView = ({ data }: DocumentsViewProps) => {
         {!data || data.length === 0 ? (
           "No assigned documents found"
         ) : (
-          <DocumentsDataTable data={data} columns={columns} />
+          <DocumentsDataTable
+            data={data}
+            columns={columns}
+          />
         )}
       </CardContent>
-    </Card>
+    </Card >
   );
 };
 
