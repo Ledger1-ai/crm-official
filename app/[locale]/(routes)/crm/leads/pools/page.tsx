@@ -8,6 +8,7 @@ import {
   Trash2,
   Target,
   Users,
+  UserPlus,
   Calendar,
   TrendingUp,
   Building2,
@@ -33,6 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import AssignPoolMembersModal from "../components/AssignPoolMembersModal";
 
 type LeadPool = {
   id: string;
@@ -80,6 +82,7 @@ export default function LeadPoolsPage() {
   const [wizardLeadIds, setWizardLeadIds] = useState<string[]>([]);
   const [loadingOutreach, setLoadingOutreach] = useState<string | null>(null);
   const [assigningProject, setAssigningProject] = useState<string | null>(null);
+  const [assignModalPool, setAssignModalPool] = useState<LeadPool | null>(null);
 
   // Button set presets per project (Boards)
   const [buttonSets, setButtonSets] = useState<Record<string, { sets: any[] }>>({});
@@ -300,6 +303,13 @@ export default function LeadPoolsPage() {
                     title="Delete pool"
                   >
                     <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="rounded border px-2 py-1 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950"
+                    onClick={() => setAssignModalPool(pool)}
+                    title="Assign team members to this pool"
+                  >
+                    <UserPlus className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -667,6 +677,16 @@ export default function LeadPoolsPage() {
             </div>
           </div>
         </div>
+      )}
+      {/* Assign Pool Members Modal */}
+      {assignModalPool && (
+        <AssignPoolMembersModal
+          poolId={assignModalPool.id}
+          poolName={assignModalPool.name}
+          isOpen={true}
+          onClose={() => setAssignModalPool(null)}
+          onUpdate={() => mutate()}
+        />
       )}
       {/* First Contact Wizard */}
       <FirstContactWizard

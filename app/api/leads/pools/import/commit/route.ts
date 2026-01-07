@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadbCrm } from "@/lib/prisma-crm";
+import { prismadb } from "@/lib/prisma";
 import { z } from "zod";
 import { getCurrentUserTeamId } from "@/lib/team-utils";
 
@@ -147,6 +148,28 @@ export async function POST(req: Request) {
       return new NextResponse(parsed.error.message, { status: 400 });
     }
     const { poolId, newPool, creates, updates } = parsed.data;
+
+    // If creating a new pool, check if user is admin
+    if (newPool && !poolId) {
+      const user = await prismadb.users.findUnique({
+        where: { id: session.user.id },
+        select: {
+          is_admin: true,
+          is_account_admin: true,
+          assigned_role: { select: { name: true } },
+        },
+      });
+
+      const isSuperAdmin = user?.assigned_role?.name === "SuperAdmin";
+      const isAdmin = user?.is_admin || user?.is_account_admin;
+
+      if (!isSuperAdmin && !isAdmin) {
+        return NextResponse.json(
+          { error: "Only admins can create lead pools" },
+          { status: 403 }
+        );
+      }
+    }
 
     // Resolve target pool: verify ownership if existing, or create new pool
     let targetPoolId: string;

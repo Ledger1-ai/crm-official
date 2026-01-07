@@ -113,7 +113,7 @@ export function MermaidDiagram({ chart, mobileChart, className }: MermaidDiagram
             {/* Mobile: vertical chart or scrollable horizontal */}
             {mobileSvg ? (
                 <div
-                    className="block md:hidden [&_svg]:w-full [&_svg]:h-auto"
+                    className="block md:hidden flex justify-center items-center [&_svg]:w-full [&_svg]:max-w-[350px] [&_svg]:h-auto"
                     dangerouslySetInnerHTML={{ __html: mobileSvg }}
                 />
             ) : (

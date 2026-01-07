@@ -3,7 +3,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { FolderKanban, BarChart2, Settings, ChevronLeft, ChevronRight, FileText } from "lucide-react";
+import { FolderKanban, BarChart2, Settings, ChevronLeft, ChevronRight, FileText, Users } from "lucide-react";
 import Heading from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 
@@ -15,10 +15,11 @@ type Props = {
     ganttSlot: React.ReactNode;
     settingsSlot: React.ReactNode;
     documentsSlot?: React.ReactNode;
+    membersSlot?: React.ReactNode;
     headerSlot?: React.ReactNode;
 };
 
-export default function BoardTabsContainer({ title, description, visibility, kanbanSlot, ganttSlot, settingsSlot, documentsSlot, headerSlot }: Props) {
+export default function BoardTabsContainer({ title, description, visibility, kanbanSlot, ganttSlot, settingsSlot, documentsSlot, membersSlot, headerSlot }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const selected = searchParams.get("view") || "kanban";
@@ -64,6 +65,7 @@ export default function BoardTabsContainer({ title, description, visibility, kan
         { id: "kanban", label: "Kanban", icon: FolderKanban },
         { id: "gantt", label: "Gantt", icon: BarChart2 },
         { id: "documents", label: "Documents", icon: FileText },
+        { id: "members", label: "Members", icon: Users },
         { id: "settings", label: "Settings", icon: Settings },
     ];
 
@@ -205,6 +207,7 @@ export default function BoardTabsContainer({ title, description, visibility, kan
                     {selected === "kanban" && kanbanSlot}
                     {selected === "gantt" && ganttSlot}
                     {selected === "documents" && documentsSlot}
+                    {selected === "members" && membersSlot}
                     {selected === "settings" && settingsSlot}
                 </div>
             </div>

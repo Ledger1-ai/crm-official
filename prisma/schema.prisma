@@ -202,6 +202,7 @@ model crm_campaigns {
 // Outreach Campaigns for Email/SMS tracking
 enum OutreachCampaignStatus {
   DRAFT
+  PENDING_APPROVAL
   ACTIVE
   PAUSED
   COMPLETED
@@ -418,6 +419,14 @@ enum crm_Contracts_Status {
   SIGNED
 }
 
+enum ProjectStatus {
+  DRAFT
+  READY
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
 model Boards {
   id                String    @id @default(auto()) @map("_id") @db.ObjectId
   v                 Int       @map("__v")
@@ -439,7 +448,21 @@ model Boards {
   brand_logo_url     String?
   brand_primary_color String?
 
-  //Create watchers field for board. It will be array of users
+  // Project Status & Workflow
+  status              ProjectStatus  @default(DRAFT)
+  require_approval    Boolean        @default(false)
+
+  // Project Context for Campaigns
+  target_industries   String[]
+  target_geos         String[]
+  target_titles       String[]
+  campaign_brief      String?
+  messaging_tone      String?  // formal, casual, technical
+  key_value_props     String[]
+  meeting_link        String?
+  signature_template  String?
+
+  // Watchers
   watchers       String[] @db.ObjectId
   assigned_user  Users?   @relation(name: "assigned_user", fields: [user], references: [id])
   watchers_users Users[]  @relation(name: "watching_users", fields: [watchers], references: [id])
@@ -448,9 +471,22 @@ model Boards {
   assigned_leads      crm_Leads[]            @relation(name: "LeadsAssignedProject")
   outreach_campaigns  crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsProject")
   message_portals     crm_Message_Portal[]   @relation(name: "PortalProject")
+  project_members     ProjectMember[]        @relation(name: "ProjectMembers")
 
   team_id             String?                @db.ObjectId
   assigned_team       Team?                  @relation(fields: [team_id], references: [id])
+}
+
+model ProjectMember {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  project     String   @db.ObjectId
+  user        String   @db.ObjectId
+  role        String   @default("MEMBER") // LEAD, MEMBER
+  assignedAt  DateTime @default(now()) @db.Date
+  assignedBy  String   @db.ObjectId
+
+  board       Boards   @relation(name: "ProjectMembers", fields: [project], references: [id])
+  member      Users    @relation(name: "ProjectMemberUser", fields: [user], references: [id])
 }
 
 model Employees {
@@ -818,6 +854,7 @@ model Users {
   lead_activities      crm_Lead_Activities[] @relation(name: "LeadActivitiesToUser")
   system_activities    SystemActivity[]      @relation(name: "UserSystemActivities")
   outreach_campaigns   crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsUser")
+  project_memberships  ProjectMember[]          @relation(name: "ProjectMemberUser")
 
   // Outreach, signature, resources, and prompt settings
   meeting_link               String?
@@ -1195,6 +1232,9 @@ model crm_Lead_Pools {
 
   team_id       String?           @db.ObjectId
   assigned_team Team?             @relation(fields: [team_id], references: [id])
+
+  // Members assigned to work on this pool
+  assigned_members String[]       @db.ObjectId
 }
 
 model crm_Lead_Gen_Jobs {

@@ -8,7 +8,7 @@ import {
     Plus, Mail, MessageSquare, Phone, TrendingUp, Users,
     Eye, Calendar, BarChart3, Filter,
     Search, MoreVertical, Play, Pause, Archive, Edit, Copy,
-    Loader2, RefreshCw, Trash2
+    Loader2, RefreshCw, Trash2, CheckCircle2, XCircle, Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "react-hot-toast";
 
-type CampaignStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "COMPLETED" | "ARCHIVED";
+type CampaignStatus = "DRAFT" | "PENDING_APPROVAL" | "ACTIVE" | "PAUSED" | "COMPLETED" | "ARCHIVED";
 type CampaignChannel = "EMAIL" | "SMS" | "PHONE";
 
 interface Campaign {
@@ -74,6 +74,8 @@ export default function CampaignsView() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [projectFilter, setProjectFilter] = useState<string>("all");
+    const [poolFilter, setPoolFilter] = useState<string>("all");
 
     // Fetch campaigns from API
     const fetchCampaigns = async () => {
@@ -105,6 +107,8 @@ export default function CampaignsView() {
         switch (status) {
             case "ACTIVE":
                 return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
+            case "PENDING_APPROVAL":
+                return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
             case "PAUSED":
                 return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20";
             case "COMPLETED":
@@ -133,8 +137,29 @@ export default function CampaignsView() {
         const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             campaign.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesProject = projectFilter === "all" || campaign.assigned_project?.id === projectFilter;
+        const matchesPool = poolFilter === "all" || campaign.assigned_pool?.id === poolFilter;
+        return matchesSearch && matchesStatus && matchesProject && matchesPool;
     });
+
+    // Get unique projects and pools for filter dropdowns
+    const uniqueProjects = campaigns
+        .filter(c => c.assigned_project)
+        .reduce((acc, c) => {
+            if (c.assigned_project && !acc.find(p => p.id === c.assigned_project?.id)) {
+                acc.push(c.assigned_project);
+            }
+            return acc;
+        }, [] as { id: string; title: string }[]);
+
+    const uniquePools = campaigns
+        .filter(c => c.assigned_pool)
+        .reduce((acc, c) => {
+            if (c.assigned_pool && !acc.find(p => p.id === c.assigned_pool?.id)) {
+                acc.push(c.assigned_pool);
+            }
+            return acc;
+        }, [] as { id: string; name: string }[]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -179,6 +204,40 @@ export default function CampaignsView() {
             fetchCampaigns();
         } catch (error) {
             toast.error("Failed to update campaign status");
+        }
+    };
+
+    // Admin approve/reject campaign
+    const handleApproveCampaign = async (campaignId: string) => {
+        try {
+            const res = await fetch(`/api/outreach/campaigns/${campaignId}/approve`, {
+                method: "POST",
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Failed to approve");
+            }
+            toast.success("Campaign approved and launched!");
+            fetchCampaigns();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to approve campaign");
+        }
+    };
+
+    const handleRejectCampaign = async (campaignId: string) => {
+        if (!confirm("Are you sure you want to reject this campaign? It will be returned to draft status.")) return;
+        try {
+            const res = await fetch(`/api/outreach/campaigns/${campaignId}/approve`, {
+                method: "DELETE",
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Failed to reject");
+            }
+            toast.success("Campaign rejected and sent back to draft");
+            fetchCampaigns();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to reject campaign");
         }
     };
 
@@ -302,12 +361,45 @@ export default function CampaignsView() {
                         <SelectContent>
                             <SelectItem value="all">All Statuses</SelectItem>
                             <SelectItem value="ACTIVE">Active</SelectItem>
+                            <SelectItem value="PENDING_APPROVAL">Pending Approval</SelectItem>
                             <SelectItem value="DRAFT">Draft</SelectItem>
                             <SelectItem value="PAUSED">Paused</SelectItem>
                             <SelectItem value="COMPLETED">Completed</SelectItem>
                             <SelectItem value="ARCHIVED">Archived</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    {uniqueProjects.length > 0 && (
+                        <Select value={projectFilter} onValueChange={setProjectFilter}>
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Filter by project" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Projects</SelectItem>
+                                {uniqueProjects.map((project) => (
+                                    <SelectItem key={project.id} value={project.id}>
+                                        {project.title}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+
+                    {uniquePools.length > 0 && (
+                        <Select value={poolFilter} onValueChange={setPoolFilter}>
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Filter by pool" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Pools</SelectItem>
+                                {uniquePools.map((pool) => (
+                                    <SelectItem key={pool.id} value={pool.id}>
+                                        {pool.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
                 </div>
             </div>
 
@@ -529,6 +621,32 @@ export default function CampaignsView() {
                                             <Play className="w-3 h-3 mr-2" />
                                             Launch Campaign
                                         </Button>
+                                    )}
+
+                                    {campaign.status === "PENDING_APPROVAL" && (
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                                                <Clock className="w-3 h-3 mr-1" />
+                                                Awaiting Approval
+                                            </Badge>
+                                            <Button
+                                                size="sm"
+                                                variant="default"
+                                                className="bg-green-600 hover:bg-green-500"
+                                                onClick={() => handleApproveCampaign(campaign.id)}
+                                            >
+                                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => handleRejectCampaign(campaign.id)}
+                                            >
+                                                <XCircle className="w-3 h-3 mr-1" />
+                                                Reject
+                                            </Button>
+                                        </div>
                                     )}
                                 </div>
                             </CardContent>

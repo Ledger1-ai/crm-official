@@ -135,6 +135,7 @@ export async function POST(req: Request) {
             resourceLinks,
             meetingLink,
             includeResearch,
+            status, // Accept status from request for approval workflow
         } = body;
 
         // Validation
@@ -151,12 +152,15 @@ export async function POST(req: Request) {
             select: { team_id: true },
         });
 
+        // Use provided status or default to DRAFT
+        const campaignStatus = status || "DRAFT";
+
         // Create the campaign
         const campaign = await prisma.crm_Outreach_Campaigns.create({
             data: {
                 name,
                 description: description || null,
-                status: "DRAFT",
+                status: campaignStatus,
                 user: session.user.id,
                 team_id: user?.team_id || null,
                 project: projectId || null,

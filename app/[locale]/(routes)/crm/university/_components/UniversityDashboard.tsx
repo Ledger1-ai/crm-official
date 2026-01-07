@@ -17,6 +17,7 @@ import {
     GitBranch,
     Layers,
     Workflow,
+    FolderKanban,
     BarChart3,
 } from "lucide-react";
 import Heading from "@/components/ui/heading";
@@ -30,6 +31,9 @@ import OutreachFlowView from "./OutreachFlowView";
 import { MermaidDiagram, CRM_FLOW_DIAGRAM, CONVERSION_FLOW_DIAGRAM, CRM_FLOW_DIAGRAM_MOBILE, CONVERSION_FLOW_DIAGRAM_MOBILE } from "./MermaidDiagram";
 import AutoConversionFlow from "./AutoConversionFlow";
 import FlowStatsCharts from "./FlowStatsCharts";
+import ProjectWorkflowGuide from "./ProjectWorkflowGuide";
+import { PROJECT_WORKFLOW_DESKTOP, PROJECT_WORKFLOW_MOBILE, PROJECT_WORKFLOW_LEGEND } from "./ProjectWorkflowDiagrams";
+import TabNavigationCard from "./TabNavigationCard";
 
 // Mirror the weights from get-team-analytics for transparency
 const STAGE_WEIGHTS: Record<string, number> = {
@@ -46,7 +50,7 @@ function clamp(min: number, val: number, max: number) {
     return Math.max(min, Math.min(max, val));
 }
 
-type TabId = "flow" | "reference" | "lms" | "gamification";
+type TabId = "flow" | "reference" | "project-workflow" | "lms" | "gamification";
 
 // Page transition variants
 const pageVariants = {
@@ -56,7 +60,7 @@ const pageVariants = {
 };
 
 export default function UniversityDashboard() {
-    const [activeTab, setActiveTab] = useState<TabId>("flow");
+    const [activeTab, setActiveTab] = useState<TabId>("project-workflow");
     const [activeStage, setActiveStage] = useState<string | undefined>(undefined);
 
     // Calculator state
@@ -92,10 +96,51 @@ export default function UniversityDashboard() {
     }, [stage, touches, daysToBooking]);
 
     const tabs = [
-        { id: "flow" as TabId, label: "Flow Architecture", icon: GitBranch },
-        { id: "reference" as TabId, label: "Quick Reference", icon: Layers },
-        { id: "lms" as TabId, label: "Learning Center", icon: BookOpen },
-        { id: "gamification" as TabId, label: "Gamification", icon: Trophy },
+        {
+            id: "project-workflow" as TabId,
+            label: "Project Workflow",
+            icon: FolderKanban,
+            color: "text-indigo-400 group-hover:text-indigo-300",
+            gradient: "from-indigo-600/30 via-indigo-500/10 to-transparent",
+            borderColor: "border-indigo-500/50 ring-indigo-500/20",
+            shadowColor: "shadow-indigo-500/20"
+        },
+        {
+            id: "flow" as TabId,
+            label: "Flow Architecture",
+            icon: GitBranch,
+            color: "text-blue-400 group-hover:text-blue-300",
+            gradient: "from-blue-600/30 via-blue-500/10 to-transparent",
+            borderColor: "border-blue-500/50 ring-blue-500/20",
+            shadowColor: "shadow-blue-500/20"
+        },
+        {
+            id: "reference" as TabId,
+            label: "Quick Reference",
+            icon: Layers,
+            color: "text-emerald-400 group-hover:text-emerald-300",
+            gradient: "from-emerald-600/30 via-emerald-500/10 to-transparent",
+            borderColor: "border-emerald-500/50 ring-emerald-500/20",
+            shadowColor: "shadow-emerald-500/20"
+        },
+        {
+            id: "lms" as TabId,
+            label: "Learning Center",
+            icon: BookOpen,
+            color: "text-violet-400 group-hover:text-violet-300",
+            gradient: "from-violet-600/30 via-violet-500/10 to-transparent",
+            borderColor: "border-violet-500/50 ring-violet-500/20",
+            shadowColor: "shadow-violet-500/20"
+        },
+        {
+            id: "gamification" as TabId,
+            label: "Gamification",
+            icon: Trophy,
+            color: "text-amber-400 group-hover:text-amber-300",
+            gradient: "from-amber-600/30 via-amber-500/10 to-transparent",
+            borderColor: "border-amber-500/50 ring-amber-500/20",
+            shadowColor: "shadow-amber-500/20"
+        },
     ];
 
     return (
@@ -114,32 +159,27 @@ export default function UniversityDashboard() {
                 <Separator className="mt-4" />
             </motion.div>
 
-            {/* Navigation Tabs with animation */}
+            {/* Navigation Cards Grid */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                className="flex items-center gap-1 border-b pb-2 overflow-x-auto"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-8 bg-transparent"
             >
-                {tabs.map((tab, index) => {
-                    const Icon = tab.icon;
-                    return (
-                        <motion.button
-                            key={tab.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.2, delay: 0.1 + index * 0.05 }}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all border-b-2 -mb-2.5 whitespace-nowrap ${activeTab === tab.id
-                                ? "border-primary text-primary"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                                }`}
-                        >
-                            <Icon className="w-4 h-4" />
-                            {tab.label}
-                        </motion.button>
-                    );
-                })}
+                {tabs.map((tab, index) => (
+                    <TabNavigationCard
+                        key={tab.id}
+                        id={tab.id}
+                        label={tab.label}
+                        icon={tab.icon}
+                        color={tab.color}
+                        gradient={tab.gradient}
+                        borderColor={tab.borderColor}
+                        shadowColor={tab.shadowColor}
+                        isActive={activeTab === tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                    />
+                ))}
             </motion.div>
 
             {/* Tab Content with AnimatePresence */}
@@ -345,6 +385,34 @@ export default function UniversityDashboard() {
                                 </motion.div>
                             </CardContent>
                         </Card>
+                    </motion.div>
+                )}
+
+                {/* Project Workflow Tab */}
+                {activeTab === "project-workflow" && (
+                    <motion.div
+                        key="project-workflow"
+                        variants={pageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={{ duration: 0.3 }}
+                    >
+                        <ProjectWorkflowGuide />
+
+                        <div className="mt-8">
+                            <FlowDiagramCard
+                                title="Visual Workflow: From Setup to Launch"
+                                description="How projects, pools, and campaigns allow for scalable outreach."
+                                accentColor="blue"
+                                legend={PROJECT_WORKFLOW_LEGEND}
+                            >
+                                <MermaidDiagram
+                                    chart={PROJECT_WORKFLOW_DESKTOP}
+                                    mobileChart={PROJECT_WORKFLOW_MOBILE}
+                                />
+                            </FlowDiagramCard>
+                        </div>
                     </motion.div>
                 )}
 

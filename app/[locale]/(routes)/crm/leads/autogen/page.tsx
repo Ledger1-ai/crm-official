@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bot, FileText, Settings, Sparkles, Wand2, Zap, Globe, Code, Loader2, Sliders } from "lucide-react";
+import { Bot, FileText, Settings, Sparkles, Wand2, Zap, Globe, Code, Loader2, Sliders, FolderKanban } from "lucide-react";
 import { toast } from "react-hot-toast";
+import useSWR from "swr";
+import fetcher from "@/lib/fetcher";
 import AIWriterModal from "../components/modals/AIWriterModal";
 
 type WizardMode = "ai-only" | "step-by-step" | "advanced";
@@ -22,6 +24,7 @@ type WizardState = {
   maxContactsPerCompany: number;
   serpFallback?: boolean; // Allow SERP to run only if AI finds 0 companies
   aiPrompt?: string; // For AI-only mode
+  projectId?: string; // Link pool to a project
 };
 
 export default function LeadGenWizardPage() {
@@ -31,6 +34,9 @@ export default function LeadGenWizardPage() {
   const [submitting, setSubmitting] = useState(false);
   const [aiWriterOpen, setAiWriterOpen] = useState(false);
   const [currentAiField, setCurrentAiField] = useState<keyof WizardState | null>(null);
+
+  // Fetch projects for selector
+  const { data: projectsData } = useSWR<{ projects: { id: string; title: string }[] }>("/api/projects", fetcher);
 
   // Common State (Top Level)
   const [state, setState] = useState<WizardState>({
@@ -47,6 +53,7 @@ export default function LeadGenWizardPage() {
     maxContactsPerCompany: 3,
     serpFallback: true, // Default to true per plan
     aiPrompt: "",
+    projectId: "",
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -168,6 +175,7 @@ export default function LeadGenWizardPage() {
                 maxCompanies: state.maxCompanies,
                 maxContactsPerCompany: state.maxContactsPerCompany,
               },
+              projectId: state.projectId || undefined,
             };
 
             const res = await fetch("/api/leads/autogen", {
@@ -215,6 +223,7 @@ export default function LeadGenWizardPage() {
           maxCompanies: state.maxCompanies,
           maxContactsPerCompany: state.maxContactsPerCompany,
         },
+        projectId: state.projectId || undefined,
       };
 
       const res = await fetch("/api/leads/autogen", {
@@ -268,7 +277,27 @@ export default function LeadGenWizardPage() {
   ];
 
   const renderTopConfiguration = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {/* Project Selector */}
+      <div className="relative group overflow-hidden rounded-xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-4 backdrop-blur-md shadow-sm transition-all hover:border-indigo-500/40">
+        <label className="text-[10px] uppercase tracking-wider font-semibold text-indigo-400 mb-1.5 block flex items-center gap-1.5">
+          <FolderKanban className="w-3 h-3" /> Link to Project
+        </label>
+        <select
+          name="projectId"
+          value={state.projectId}
+          onChange={(e) => setState(prev => ({ ...prev, projectId: e.target.value }))}
+          className="w-full bg-transparent border-none text-sm font-medium focus:ring-0 px-0 cursor-pointer"
+        >
+          <option value="">— No Project —</option>
+          {(projectsData?.projects || []).map(p => (
+            <option key={p.id} value={p.id}>{p.title}</option>
+          ))}
+        </select>
+        <div className="text-[10px] text-muted-foreground mt-1">Pool will inherit project ICP</div>
+      </div>
+
+      {/* Campaign Name */}
       <div className="md:col-span-2 relative group overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-sm transition-all hover:bg-white/10">
         <label className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5 block">
           Campaign Name (Pool)
@@ -283,6 +312,7 @@ export default function LeadGenWizardPage() {
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent to-background/10" />
       </div>
 
+      {/* Leads Limit */}
       <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-sm transition-all hover:bg-white/10">
         <label className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5 block">
           Leads Limit (Max 100)

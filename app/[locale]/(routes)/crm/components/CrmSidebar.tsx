@@ -13,7 +13,7 @@ import {
     Target,
     FileText,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
 } from "lucide-react";
 
 export default function CrmSidebar() {
@@ -52,8 +52,6 @@ export default function CrmSidebar() {
         { label: "Leads Manager", href: "/crm/leads", icon: Users },
         { label: "Opportunities", href: "/crm/opportunities", icon: Target },
     ];
-
-
 
     // Hide CrmSidebar on /crm/university as it has its own layout
     const isUniversityPage = pathname.includes("/crm/university");

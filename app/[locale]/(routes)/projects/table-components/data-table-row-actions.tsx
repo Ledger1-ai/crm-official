@@ -25,6 +25,7 @@ import {
   Magnet,
   Pencil,
   Trash,
+  Users,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/sheet";
 
 import UpdateProjectForm from "../forms/UpdateProject";
+import AssignMembersModal from "../dialogs/AssignMembersModal";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -49,6 +51,7 @@ export function DataTableRowActions<TData>({
 
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
@@ -130,6 +133,14 @@ export function DataTableRowActions<TData>({
         </SheetContent>
       </Sheet>
 
+      <AssignMembersModal
+        projectId={project.id}
+        projectTitle={project.title}
+        isOpen={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        onUpdate={() => router.refresh()}
+      />
+
       <Button
         variant="ghost"
         size="icon"
@@ -148,6 +159,16 @@ export function DataTableRowActions<TData>({
         title="Edit"
       >
         <Pencil className="h-4 w-4" />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-indigo-500"
+        onClick={() => setAssignOpen(true)}
+        title="Assign Members"
+      >
+        <Users className="h-4 w-4" />
       </Button>
 
       <Button

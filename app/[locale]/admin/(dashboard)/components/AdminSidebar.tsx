@@ -10,8 +10,10 @@ import {
     Package,
     Bot,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    MessageSquare
 } from "lucide-react";
+import { useUnreadMessages } from "@/hooks/use-unread-messages";
 
 interface AdminSidebarProps {
     showModules?: boolean;
@@ -44,9 +46,12 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
         localStorage.setItem("admin-sidebar-collapsed", String(newState));
     };
 
+    const { unreadCount } = useUnreadMessages();
+
     const navItems = [
         { label: "Overview", href: "/admin", icon: LayoutDashboard, exact: true },
         { label: "Users", href: "/admin/users", icon: Users },
+        { label: "Messages", href: "/messages", icon: MessageSquare },
 
         ...(showModules ? [{ label: "Modules", href: "/admin/modules", icon: Package }] : []),
         { label: "AI Settings", href: "/admin/ai-setup", icon: Bot },
@@ -75,6 +80,8 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
                             ? pathname === item.href || pathname === `/en${item.href}` || pathname === `/de${item.href}` || pathname === `/cz${item.href}`
                             : pathname.includes(item.href);
 
+                        const isMessages = item.label === "Messages";
+
                         return (
                             <button
                                 key={item.label}
@@ -88,8 +95,27 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
                                 )}
                                 title={isCollapsed ? item.label : undefined}
                             >
-                                <item.icon className="w-4 h-4 shrink-0" />
-                                {!isCollapsed && <span className="truncate">{item.label}</span>}
+                                <div className="relative">
+                                    <item.icon className="w-4 h-4 shrink-0" />
+                                    {isMessages && unreadCount > 0 && (
+                                        <span className={cn(
+                                            "absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center rounded-full bg-red-600 text-[8px] font-bold text-white",
+                                            isCollapsed && "right-0 top-0"
+                                        )}>
+                                            {unreadCount > 9 ? "9+" : unreadCount}
+                                        </span>
+                                    )}
+                                </div>
+                                {!isCollapsed && (
+                                    <div className="flex-1 flex items-center justify-between">
+                                        <span className="truncate">{item.label}</span>
+                                        {isMessages && unreadCount > 0 && (
+                                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </button>
                         );
                     })}

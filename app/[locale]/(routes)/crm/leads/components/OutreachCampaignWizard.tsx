@@ -260,6 +260,10 @@ export default function OutreachCampaignWizard({
         description: string;
         brand_logo_url?: string;
         brand_primary_color?: string;
+        require_approval?: boolean;
+        campaign_brief?: string;
+        meeting_link?: string;
+        key_value_props?: string[];
     } | null>(null);
 
     useEffect(() => {
@@ -315,8 +319,27 @@ export default function OutreachCampaignWizard({
                             setCampaignName(`${data.title} - ${monthYear} Outreach`);
                         }
                     }
-                    if (data.description) {
+
+                    // Use campaign_brief if available, otherwise fall back to description
+                    if (data.campaign_brief) {
+                        setProjectBriefing(data.campaign_brief);
+                    } else if (data.description) {
                         setProjectBriefing(data.description);
+                    }
+
+                    // Auto-populate meeting link if available
+                    if (data.meeting_link) {
+                        const meetingPref = `- Book a meeting: ${data.meeting_link}\n- I'm available for remote meetings.`;
+                        setMeetingPreferences(meetingPref);
+                    }
+
+                    // If key_value_props are available, enrich the briefing
+                    if (data.key_value_props && data.key_value_props.length > 0) {
+                        const currentBriefing = data.campaign_brief || data.description || "";
+                        const valuePropsText = `\n\nKey Value Props:\n${data.key_value_props.map((p: string) => `• ${p}`).join("\n")}`;
+                        if (!currentBriefing.includes("Key Value Props")) {
+                            setProjectBriefing(currentBriefing + valuePropsText);
+                        }
                     }
                 }
             } catch (error) {
@@ -642,6 +665,10 @@ export default function OutreachCampaignWizard({
     const launchCampaign = async () => {
         setLoading(true);
         try {
+            // Determine campaign status based on project approval requirement
+            const requiresApproval = fetchedProject?.require_approval ?? false;
+            const campaignStatus = requiresApproval ? "PENDING_APPROVAL" : "ACTIVE";
+
             const res = await fetch("/api/outreach/campaigns", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -654,6 +681,7 @@ export default function OutreachCampaignWizard({
                     projectId,
                     promptOverride: promptTemplate,
                     includeResearch,
+                    status: campaignStatus, // Pass status based on approval setting
                 }),
             });
 
@@ -662,7 +690,11 @@ export default function OutreachCampaignWizard({
                 throw new Error(data.message || "Failed to create campaign");
             }
 
-            toast.success("Campaign created successfully!");
+            if (requiresApproval) {
+                toast.success("Campaign submitted for approval! Your admin will review it.");
+            } else {
+                toast.success("Campaign launched successfully!");
+            }
             if (onClose) onClose();
         } catch (error: any) {
             toast.error(error.message || "Failed to create campaign");

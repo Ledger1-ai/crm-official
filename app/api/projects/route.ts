@@ -41,7 +41,23 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   const body = await req.json();
-  const { title, description, visibility, brand_logo_url, brand_primary_color } = body as any;
+  const {
+    title,
+    description,
+    visibility,
+    brand_logo_url,
+    brand_primary_color,
+    // New context fields
+    target_industries,
+    target_geos,
+    target_titles,
+    campaign_brief,
+    messaging_tone,
+    key_value_props,
+    meeting_link,
+    signature_template,
+    require_approval,
+  } = body as any;
 
   if (!session) {
     return new NextResponse("Unauthenticated", { status: 401 });
@@ -72,9 +88,22 @@ export async function POST(req: Request) {
         visibility: visibility,
         sharedWith: [session.user.id],
         createdBy: session.user.id,
+        // Status starts as DRAFT
+        status: "DRAFT",
         // Branding (optional)
         brand_logo_url: typeof brand_logo_url === "string" ? brand_logo_url : undefined,
         brand_primary_color: typeof brand_primary_color === "string" ? brand_primary_color : undefined,
+        // Context fields
+        target_industries: Array.isArray(target_industries) ? target_industries : [],
+        target_geos: Array.isArray(target_geos) ? target_geos : [],
+        target_titles: Array.isArray(target_titles) ? target_titles : [],
+        campaign_brief: typeof campaign_brief === "string" ? campaign_brief : undefined,
+        messaging_tone: typeof messaging_tone === "string" ? messaging_tone : undefined,
+        key_value_props: Array.isArray(key_value_props) ? key_value_props : [],
+        meeting_link: typeof meeting_link === "string" ? meeting_link : undefined,
+        signature_template: typeof signature_template === "string" ? signature_template : undefined,
+        // Workflow settings
+        require_approval: require_approval === true,
       },
     });
 

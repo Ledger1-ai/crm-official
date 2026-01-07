@@ -33,6 +33,8 @@ export const LeadGenWizardSchema = z.object({
       maxContactsPerCompany: z.number().int().positive().max(50).default(3).optional(),
     })
     .optional(),
+  // Link to a project (optional)
+  projectId: z.string().optional(),
 });
 
 export type LeadGenWizardInput = z.infer<typeof LeadGenWizardSchema>;
@@ -77,6 +79,7 @@ export async function startLeadGenJob(
       icpConfig: {
         ...parsed.data.icp,
         limits: parsed.data.limits ?? {},
+        assignedProjectId: parsed.data.projectId || undefined,
       },
       // status defaults to "ACTIVE"
     },

@@ -20,6 +20,7 @@ import { Users } from "@prisma/client";
 import AiAssistantProject from "./components/AiAssistantProject";
 import { Lock } from "lucide-react";
 import BoardTabsContainer from "./components/BoardTabsContainer";
+import ProjectMembersPanel from "./components/ProjectMembersPanel";
 
 interface BoardDetailProps {
   params: Promise<{ boardId: string }>;
@@ -95,6 +96,9 @@ const BoardPage = async (props: BoardDetailProps) => {
         }
         documentsSlot={
           <ProjectDocumentsPanel boardId={boardId} />
+        }
+        membersSlot={
+          <ProjectMembersPanel boardId={boardId} />
         }
         settingsSlot={
           <>

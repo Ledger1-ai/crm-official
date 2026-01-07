@@ -45,7 +45,7 @@ const ProjectsView = async () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 flex-shrink-0 sticky top-0 z-40 bg-background/95 backdrop-blur pb-4 pt-4 -mt-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 flex-shrink-0 sticky top-0 z-40 pb-4 pt-4 -mt-4">
         <NewProjectDialog
           customTrigger={<ProjectCard card={cards[0]} />}
         />

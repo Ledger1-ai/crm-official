@@ -69,7 +69,7 @@ export default function SettingsTabs({ defaultTab = "integration" }: SettingsTab
     return (
         <div className="w-full h-full flex flex-col">
             <Tabs defaultValue={defaultTab} className="w-full h-full flex flex-col">
-                <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4 h-auto">
+                <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4 h-auto bg-transparent p-0">
                     {cards.map((card) => (
                         <TabsTrigger
                             key={card.value}
@@ -81,7 +81,7 @@ export default function SettingsTabs({ defaultTab = "integration" }: SettingsTab
                                 h-full w-full justify-start text-left
                             `}
                         >
-                            <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 data-[state=active]:opacity-20 group-hover:opacity-10 transition-opacity duration-300`} />
+                            <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-100 transition-opacity duration-300`} />
 
                             <div className="relative z-10 flex flex-col items-center justify-center space-y-2 text-center w-full">
                                 <div className={`p-2 rounded-full bg-gradient-to-br ${card.color} border border-white/10 shadow-sm ${card.iconColor}`}>

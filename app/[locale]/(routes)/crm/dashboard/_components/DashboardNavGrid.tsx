@@ -12,7 +12,8 @@ import {
     Target,
     LayoutDashboard,
     Wand2,
-    Megaphone
+    Megaphone,
+    FolderKanban
 } from "lucide-react";
 
 // Alphabetical: Companies, Contacts, Contracts, Dashboard, Dialer, Leads, Leads Manager, Opportunities
@@ -72,6 +73,14 @@ const navItems = [
         icon: Target,
         color: "from-indigo-500/20 to-violet-500/20",
         iconColor: "text-indigo-400",
+    },
+    {
+        title: "My Projects",
+        description: "Your assigned projects & pools",
+        href: "/crm/my-projects",
+        icon: FolderKanban,
+        color: "from-amber-500/20 to-orange-500/20",
+        iconColor: "text-amber-400",
     },
     {
         title: "Leads Manager",

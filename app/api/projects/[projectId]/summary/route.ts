@@ -3,14 +3,8 @@ import { prismadb } from "@/lib/prisma";
 
 /**
  * GET /api/projects/[projectId]/summary
- * Returns project (Board) summary fields for composing prompts:
- * {
- *   id: string,
- *   title: string,
- *   description: string,
- *   brand_logo_url?: string,
- *   brand_primary_color?: string
- * }
+ * Returns project (Board) summary fields for composing prompts and campaigns:
+ * Includes all context fields for campaign auto-population
  */
 export async function GET(_req: Request, props: { params: Promise<{ projectId: string }> }) {
     try {
@@ -29,6 +23,17 @@ export async function GET(_req: Request, props: { params: Promise<{ projectId: s
                 description: true,
                 brand_logo_url: true,
                 brand_primary_color: true,
+                // New project context fields
+                target_industries: true,
+                target_geos: true,
+                target_titles: true,
+                campaign_brief: true,
+                messaging_tone: true,
+                key_value_props: true,
+                meeting_link: true,
+                signature_template: true,
+                require_approval: true,
+                status: true,
             },
         });
 
@@ -43,11 +48,22 @@ export async function GET(_req: Request, props: { params: Promise<{ projectId: s
                 description: String(board.description || ""),
                 brand_logo_url: board.brand_logo_url || "",
                 brand_primary_color: board.brand_primary_color || "",
+                // New context fields for campaigns
+                target_industries: board.target_industries || [],
+                target_geos: board.target_geos || [],
+                target_titles: board.target_titles || [],
+                campaign_brief: board.campaign_brief || "",
+                messaging_tone: board.messaging_tone || "",
+                key_value_props: board.key_value_props || [],
+                meeting_link: board.meeting_link || "",
+                signature_template: board.signature_template || "",
+                require_approval: board.require_approval || false,
+                status: board.status || "DRAFT",
             },
             { status: 200 },
         );
     } catch (error) {
-         
+
         console.error("[PROJECT_SUMMARY_GET]", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
