@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import fetcher from '@/lib/fetcher';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,8 +13,9 @@ import { STAGE_BADGE_CLASS, formatStageLabel, type PipelineStage } from '@/compo
 import OutreachCampaignWizard from './OutreachCampaignWizard';
 import StageProgressBar, { type StageDatum } from '@/components/StageProgressBar';
 import FollowUpWizard from '@/components/modals/FollowUpWizard';
+import AIWriterModal from './modals/AIWriterModal';
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle';
-import { ExternalLink, Mail, TrendingUp, Target, X, User, Phone, FileText, Info, Activity, Calendar, Building2 } from 'lucide-react';
+import { ExternalLink, Mail, TrendingUp, Target, X, User, Phone, FileText, Info, Activity, Calendar, Building2, Sparkles, Wand2, PenTool } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -106,6 +107,29 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 export default function LeadsView({ data }: Props) {
+  // Fetch active projects for assignment
+  const { data: projectsData } = useSWR('/api/projects', fetcher);
+  const projects = useMemo(() => projectsData?.projects || [], [projectsData]);
+
+  async function assignPoolProject(projectId: string) {
+    if (!selectedPoolId || !projectId) return;
+    try {
+      const res = await fetch(`/api/leads/pools/${encodeURIComponent(selectedPoolId)}/assign-project`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId }),
+      });
+      if (res.ok) {
+        toast.success('Project assigned to pool');
+        mutate('/api/leads/pools');
+      } else {
+        const txt = await res.text();
+        toast.error(`Assignment failed: ${txt}`);
+      }
+    } catch (e: any) {
+      toast.error(`Assignment failed: ${e?.message || e}`);
+    }
+  }
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [testMode, setTestMode] = useState(false);
   const [meetingLinkOverride, setMeetingLinkOverride] = useState('');
@@ -115,6 +139,7 @@ export default function LeadsView({ data }: Props) {
   const [wizardInitialPrompt, setWizardInitialPrompt] = useState<string>("");
   const [brandLogoUrl, setBrandLogoUrl] = useState<string>("");
   const [expandedLeadId, setExpandedLeadId] = useState<string>("");
+  const [aiWriterOpen, setAiWriterOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,19 +157,63 @@ export default function LeadsView({ data }: Props) {
   const { data: poolsResponse, error: poolsError } = useSWR('/api/leads/pools', fetcher);
   const pools = useMemo(() => Array.isArray(poolsResponse?.pools) ? poolsResponse.pools : [], [poolsResponse]);
 
+  // Column resizing logic
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({
+    lead: 250,
+    email: 200,
+    company: 150,
+    title: 150,
+    stage: 120,
+    status: 120,
+    progress: 200,
+    actions: 180,
+    project: 100
+  });
+  const resizingRef = useRef<{ col: string; startX: number; startWidth: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizingRef.current) return;
+      const { col, startX, startWidth } = resizingRef.current;
+      const diff = e.pageX - startX;
+      setColumnWidths((prev) => ({ ...prev, [col]: Math.max(50, startWidth + diff) }));
+    };
+    const handleMouseUp = () => {
+      if (resizingRef.current) {
+        resizingRef.current = null;
+        document.body.style.cursor = '';
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  const startResize = (e: React.MouseEvent, col: string) => {
+    e.preventDefault();
+    e.stopPropagation(); // Critical to prevent table sorting triggers
+    resizingRef.current = { col, startX: e.pageX, startWidth: columnWidths[col] || 100 };
+    document.body.style.cursor = 'col-resize';
+  };
+
   useEffect(() => {
     if (poolsError) {
       toast.error("Failed to load pools: " + (poolsError.message || "Unknown error"));
     }
   }, [poolsError]);
 
-  // Outreach eligibility: only when a pool is selected AND that pool has an assigned project
+  // Outreach eligibility: needed for "Push to Outreach"
   const projectAssignedForSelectedPool = useMemo(() => {
     if (!selectedPoolId) return undefined;
     const p = pools.find((x: any) => x.id === selectedPoolId);
     return p?.icpConfig?.assignedProjectId;
   }, [selectedPoolId, pools]);
-  const canBatchSelect = Boolean(selectedPoolId && projectAssignedForSelectedPool);
+
+  // Batch select is enabled as long as a pool is selected (e.g. for Reset Pool)
+  const canBatchSelect = Boolean(selectedPoolId);
 
 
 
@@ -279,6 +348,10 @@ export default function LeadsView({ data }: Props) {
   };
 
   async function pushToOutreachBatch() {
+    if (!projectAssignedForSelectedPool) {
+      toast.error('Selected pool has no assigned project');
+      return;
+    }
     if (!someSelected) {
       toast.error('Select at least one lead');
       return;
@@ -363,15 +436,18 @@ export default function LeadsView({ data }: Props) {
     <div className="space-y-4">
       {/* Bulk toolbar */}
       <div className="rounded-md border bg-card p-3">
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-col gap-4">
+
+          {/* Row 1: Filter & Settings */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* Left Group: Selection & Pool */}
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Switch
                   checked={allSelected}
                   onCheckedChange={(c) => toggleAll()}
                   disabled={!canBatchSelect}
-                  title={!canBatchSelect ? "Select a pool with an assigned project to enable batch selection" : undefined}
+                  title={!canBatchSelect ? "Select a pool to enable batch selection" : undefined}
                 />
                 <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Select All</span>
               </div>
@@ -413,8 +489,12 @@ export default function LeadsView({ data }: Props) {
                     }}
                   >Reset Pool</button>
                 )}
-              </div>
 
+              </div>
+            </div>
+
+            {/* Right Group: View Settings */}
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Switch
                   checked={testMode}
@@ -439,44 +519,92 @@ export default function LeadsView({ data }: Props) {
 
               <ViewToggle value={viewMode} onChange={setViewMode} />
             </div>
+          </div>
 
-            <div className="flex flex-1 flex-col sm:flex-row gap-2 sm:justify-end">
+          {/* Row 2: Actions & Context */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
               <Input
-                className="h-8 text-xs"
+                className="h-8 text-xs w-72" // Increased width to fit placeholder
                 placeholder="Meeting link override (optional)"
                 value={meetingLinkOverride}
                 onChange={(e) => setMeetingLinkOverride(e.target.value)}
               />
               <Button
                 size="sm"
-                className="h-8 text-[10px] uppercase tracking-wider font-semibold"
+                className="h-8 text-[10px] uppercase tracking-wider font-semibold whitespace-nowrap"
                 onClick={() => setFirstContactOpen(true)}
-                disabled={!canBatchSelect || selectedInPoolIds.length === 0}
-                title={!canBatchSelect ? "Select a pool with an assigned project to enable outreach" : (selectedInPoolIds.length === 0 ? "Select at least one lead in the chosen pool" : undefined)}
+                disabled={!canBatchSelect || !projectAssignedForSelectedPool || selectedInPoolIds.length === 0}
+                title={!canBatchSelect ? "Select a pool with an assigned project to enable outreach" : (!projectAssignedForSelectedPool ? "Selected pool has no assigned project" : (selectedInPoolIds.length === 0 ? "Select at least one lead in the chosen pool" : undefined))}
               >
                 Push to Outreach
               </Button>
             </div>
+
+            {selectedPoolId && (
+              <div className="flex items-center gap-2">
+                {!projectAssignedForSelectedPool ? (
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-destructive">No Project Assigned:</span>
+                ) : (
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Project:</span>
+                )}
+                <select
+                  className={`h-8 rounded border px-2 text-[10px] uppercase tracking-wider font-semibold bg-background ${!projectAssignedForSelectedPool ? 'border-destructive/50' : 'border-input'}`}
+                  value={projectAssignedForSelectedPool || ""}
+                  onChange={(e) => assignPoolProject(e.target.value)}
+                >
+                  <option value="" disabled>Select a project...</option>
+                  {projects.map((p: any) => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {!selectedPoolId && (
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                Select a pool to enable outreach
+              </div>
+            )}
           </div>
 
-          {!canBatchSelect && (
-            <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground text-right">
-              Select a pool with an assigned project to enable outreach
-            </div>
-          )}
-
-          <div className="mt-1">
+          {/* Row 3: Prompt Override */}
+          <div className="w-full">
             <label className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Prompt override (optional)</label>
-            <Textarea
-              className="mt-1 text-xs"
-              rows={2}
-              placeholder="Override the default outreach prompt for this batch..."
-              value={promptOverride}
-              onChange={(e) => setPromptOverride(e.target.value)}
-            />
+            <div className="flex gap-2 mt-1 min-w-0">
+              <Textarea
+                className="text-xs resize-none flex-1"
+                rows={2}
+                placeholder="Override the default outreach prompt for this batch..."
+                value={promptOverride}
+                onChange={(e) => setPromptOverride(e.target.value)}
+              />
+              <div className="flex flex-col gap-2 shrink-0 w-[120px]">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-full flex-1 text-[10px] uppercase tracking-wider gap-1.5 text-indigo-500 hover:text-indigo-600 border-indigo-200 dark:border-indigo-800"
+                  onClick={() => toast.success('Enhance AI coming soon!')}
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Enhance AI
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-full flex-1 text-[10px] uppercase tracking-wider gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-sm"
+                  onClick={() => setAiWriterOpen(true)}
+                >
+                  <Wand2 className="w-3.5 h-3.5" /> Write AI
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <AIWriterModal
+        isOpen={aiWriterOpen}
+        onClose={() => setAiWriterOpen(false)}
+        onInsert={(text) => setPromptOverride(text)}
+      />
       {firstContactOpen && (
         <OutreachCampaignWizard
 
@@ -496,22 +624,49 @@ export default function LeadsView({ data }: Props) {
       {viewMode === 'table' && (
         <>
           {/* Desktop Table View */}
-          <div className="hidden md:block rounded-md border">
-            <table className="min-w-full text-sm">
+          <div className="hidden md:block rounded-md border text-nowrap overflow-x-auto">
+            <table className="min-w-full text-sm table-fixed">
               <thead className="bg-muted">
                 <tr>
                   <th className="p-2 w-[40px]">
                     <Switch checked={allSelected} onCheckedChange={toggleAll} disabled={!canBatchSelect} />
                   </th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Lead</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Email</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Company</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Title</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Stage</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Status</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Progress</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Actions</th>
-                  <th className="p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider">Project</th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.lead }}>
+                    Lead
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'lead')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.email }}>
+                    Email
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'email')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.company }}>
+                    Company
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'company')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.title }}>
+                    Title
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'title')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.stage }}>
+                    Stage
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'stage')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.status }}>
+                    Status
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'status')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.progress }}>
+                    Progress
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'progress')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.actions }}>
+                    Actions
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'actions')} />
+                  </th>
+                  <th className="relative p-2 text-left font-medium text-muted-foreground text-xs uppercase tracking-wider overflow-hidden text-ellipsis select-none" style={{ width: columnWidths.project }}>
+                    Project
+                    <div className="absolute right-0 top-0 bottom-0 w-2 z-10 cursor-col-resize hover:bg-primary/50" onMouseDown={(e) => startResize(e, 'project')} />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -535,12 +690,12 @@ export default function LeadsView({ data }: Props) {
                             disabled={!canBatchSelect}
                           />
                         </td>
-                        <td className="p-2">
-                          <div className="font-medium">{name || (lead.company && lead.company.trim()) || lead.email || 'Lead'}</div>
+                        <td className="p-2 truncate" title={name || (lead.company && lead.company.trim()) || lead.email || 'Lead'}>
+                          <div className="font-medium truncate">{name || (lead.company && lead.company.trim()) || lead.email || 'Lead'}</div>
                         </td>
-                        <td className="p-2 text-muted-foreground">{lead.email || '-'}</td>
-                        <td className="p-2 text-muted-foreground">{lead.company || '-'}</td>
-                        <td className="p-2 text-muted-foreground">{lead.jobTitle || '-'}</td>
+                        <td className="p-2 text-muted-foreground truncate" title={lead.email || ''}>{lead.email || '-'}</td>
+                        <td className="p-2 text-muted-foreground truncate" title={lead.company || ''}>{lead.company || '-'}</td>
+                        <td className="p-2 text-muted-foreground truncate" title={lead.jobTitle || ''}>{lead.jobTitle || '-'}</td>
                         <td className="p-2">
                           <span className={
                             stageKey
@@ -553,7 +708,7 @@ export default function LeadsView({ data }: Props) {
                         <td className="p-2">
                           <StatusBadge status={lead.outreach_status} />
                         </td>
-                        <td className="p-2 w-48 align-top">
+                        <td className="p-2 align-top">
                           <StageProgressBar
                             stages={((): StageDatum[] => {
                               const cur: PipelineStage = stageKey || 'Identify';
@@ -572,16 +727,16 @@ export default function LeadsView({ data }: Props) {
                         </td>
                         <td className="p-2">
                           <div className="flex gap-1 flex-wrap">
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setDetailsLead(lead); }} title="View Details">
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-blue-500 hover:text-blue-600" onClick={(e) => { e.stopPropagation(); setDetailsLead(lead); }} title="View Details">
                               <Info className="h-3 w-3" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); openMeeting(lead.id); }} title="Meeting Link">
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-purple-500 hover:text-purple-600" onClick={(e) => { e.stopPropagation(); openMeeting(lead.id); }} title="Meeting Link">
                               <ExternalLink className="h-3 w-3" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); composeEmail(lead.email); }} disabled={!canSend} title="Send Email">
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-emerald-500 hover:text-emerald-600" onClick={(e) => { e.stopPropagation(); composeEmail(lead.email); }} disabled={!canSend} title="Send Email">
                               <Mail className="h-3 w-3" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-500 hover:text-indigo-600" onClick={(e) => { e.stopPropagation(); setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">
                               <TrendingUp className="h-3 w-3" />
                             </Button>
                             <Button size="icon" variant="ghost" className="h-6 w-6 text-amber-500 hover:text-amber-600" onClick={async (e) => { e.stopPropagation(); try { const res = await fetch(`/api/outreach/reset/${encodeURIComponent(lead.id)}`, { method: 'POST' }); if (res.ok) { toast.success('Lead reset'); } else { const t = await res.text(); toast.error(t || 'Failed to reset'); } } catch (err: any) { toast.error(err?.message || 'Failed to reset'); } }} title="Reset Lead">
@@ -707,22 +862,22 @@ export default function LeadsView({ data }: Props) {
 
                   <div className="pt-2 border-t flex items-center justify-between">
                     <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDetailsLead(lead)} title="View Details">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-blue-500 hover:text-blue-600" onClick={() => setDetailsLead(lead)} title="View Details">
                         <Info className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openMeeting(lead.id)} title="Meeting Link">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-purple-500 hover:text-purple-600" onClick={() => openMeeting(lead.id)} title="Meeting Link">
                         <ExternalLink className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => composeEmail(lead.email)} disabled={!canSend} title="Send Email">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-500 hover:text-emerald-600" onClick={() => composeEmail(lead.email)} disabled={!canSend} title="Send Email">
                         <Mail className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-indigo-500 hover:text-indigo-600" onClick={() => { setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">
                         <TrendingUp className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 text-amber-500" onClick={async () => { try { const res = await fetch(`/api/outreach/reset/${encodeURIComponent(lead.id)}`, { method: 'POST' }); if (res.ok) { toast.success('Lead reset'); } } catch (err: any) { toast.error(err?.message); } }} title="Reset Lead">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-amber-500 hover:text-amber-600" onClick={async () => { try { const res = await fetch(`/api/outreach/reset/${encodeURIComponent(lead.id)}`, { method: 'POST' }); if (res.ok) { toast.success('Lead reset'); } } catch (err: any) { toast.error(err?.message); } }} title="Reset Lead">
                         <Target className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => closeLead(lead.id)} title="Close">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => closeLead(lead.id)} title="Close">
                         <X className="h-4 w-4" />
                       </Button>
                     </div>

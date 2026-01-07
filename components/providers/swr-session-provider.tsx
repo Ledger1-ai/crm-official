@@ -19,8 +19,12 @@ export const SWRSessionProvider = ({ children }: { children: React.ReactNode }) 
 
             // Before unloading, save back to sessionStorage
             window.addEventListener("beforeunload", () => {
-                const appCache = JSON.stringify(Array.from(map.entries()));
-                sessionStorage.setItem(key, appCache);
+                try {
+                    const appCache = JSON.stringify(Array.from(map.entries()));
+                    sessionStorage.setItem(key, appCache);
+                } catch (e) {
+                    console.warn('Failed to save SWR cache to sessionStorage:', e);
+                }
             });
 
             return map;

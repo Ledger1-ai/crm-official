@@ -75,7 +75,8 @@ function LeadsManagerTabsContent({ leads: initialLeads, crmData, defaultTab }: P
   return (
     <div className="w-full h-full flex flex-col">
       {/* Navigation Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 flex-shrink-0 sticky top-0 z-40 bg-background/95 backdrop-blur pb-4 pt-4 -mt-2">
+      {/* Navigation Cards Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 flex-shrink-0 pb-4 pt-4 -mt-2">
         {navCards.map((card) => (
           <button
             key={card.id}

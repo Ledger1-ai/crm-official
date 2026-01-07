@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bot, FileText, Settings, Sparkles, CheckCircle, Building2, Globe, Code, Users, Target, Loader2 } from "lucide-react";
+import { Bot, FileText, Settings, Sparkles, Wand2, Zap, Globe, Code, Loader2, Sliders } from "lucide-react";
+import { toast } from "react-hot-toast";
+import AIWriterModal from "../components/modals/AIWriterModal";
 
 type WizardMode = "ai-only" | "step-by-step" | "advanced";
 
@@ -27,9 +29,10 @@ export default function LeadGenWizardPage() {
   const [mode, setMode] = useState<WizardMode>("ai-only");
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [parsing, setParsing] = useState(false);
-  const [result, setResult] = useState<{ poolId: string; jobId: string } | null>(null);
+  const [aiWriterOpen, setAiWriterOpen] = useState(false);
+  const [currentAiField, setCurrentAiField] = useState<keyof WizardState | null>(null);
 
+  // Common State (Top Level)
   const [state, setState] = useState<WizardState>({
     name: "",
     description: "",
@@ -42,7 +45,7 @@ export default function LeadGenWizardPage() {
     notes: "",
     maxCompanies: 100,
     maxContactsPerCompany: 3,
-    serpFallback: false,
+    serpFallback: true, // Default to true per plan
     aiPrompt: "",
   });
 
@@ -55,6 +58,67 @@ export default function LeadGenWizardPage() {
     }
   };
 
+  const handleWriteAi = (field: keyof WizardState) => {
+    setCurrentAiField(field);
+    setAiWriterOpen(true);
+  };
+
+  const handleAiInsert = (text: string) => {
+    if (currentAiField) {
+      if (currentAiField === 'maxCompanies' || currentAiField === 'maxContactsPerCompany') {
+        // ignore number fields
+      } else {
+        setState(prev => ({ ...prev, [currentAiField!]: text }));
+      }
+    } else {
+      setState(prev => ({ ...prev, aiPrompt: text }));
+    }
+  };
+
+  // --- Helper Components ---
+  const AIInputLabel = ({ label, field, className }: { label: string, field: keyof WizardState, className?: string }) => (
+    <div className={`flex items-center justify-between mb-2 ${className}`}>
+      <label className="text-sm font-medium text-foreground/90">{label}</label>
+      <div className="flex gap-2 scale-90 origin-right">
+        <button
+          type="button"
+          tabIndex={-1}
+          className="text-xs flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition-colors"
+          onClick={() => toast.success("Enhancing content... (Simulated)")}
+        >
+          <Zap className="w-3 h-3" /> Enhance AI
+        </button>
+      </div>
+    </div>
+  );
+
+  const InputWithAI = ({ label, name, placeholder }: { label: string, name: keyof WizardState, placeholder?: string }) => (
+    <div>
+      <AIInputLabel label={label} field={name} />
+      <input
+        name={name}
+        value={state[name] as string}
+        onChange={onChange}
+        className="w-full rounded-lg border border-white/10 bg-black/20 p-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+        placeholder={placeholder}
+      />
+    </div>
+  );
+
+  const TextAreaWithAI = ({ label, name, placeholder, rows = 3 }: { label: string, name: keyof WizardState, placeholder?: string, rows?: number }) => (
+    <div>
+      <AIInputLabel label={label} field={name} />
+      <textarea
+        name={name}
+        value={state[name] as string}
+        onChange={onChange}
+        rows={rows}
+        className="w-full rounded-lg border border-white/10 bg-black/20 p-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all resize-none"
+        placeholder={placeholder}
+      />
+    </div>
+  );
+
   const tags = (csv: string) =>
     csv
       .split(",")
@@ -63,8 +127,11 @@ export default function LeadGenWizardPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!state.name) {
+      toast.error("Please enter a campaign name");
+      return;
+    }
     setSubmitting(true);
-    setResult(null);
 
     try {
       // If in AI-only mode with a prompt, parse it first to populate fields
@@ -79,20 +146,7 @@ export default function LeadGenWizardPage() {
 
           if (parseRes.ok) {
             const parsed = await parseRes.json();
-            console.log("[AUTOGEN] Parsing successful:", parsed);
 
-            // Populate form fields with AI-generated data (for visual feedback if they switch to Advanced)
-            setState((prev) => ({
-              ...prev,
-              industries: parsed.industries?.join(", ") || prev.industries,
-              companySizes: parsed.companySizes?.join(", ") || prev.companySizes,
-              geos: parsed.geos?.join(", ") || prev.geos,
-              techStack: parsed.techStack?.join(", ") || prev.techStack,
-              titles: parsed.titles?.join(", ") || prev.titles,
-              notes: parsed.notes || prev.notes,
-            }));
-
-            // Use parsed data for payload
             const payload = {
               name: state.name || "AI Generated Pool",
               description: state.description,
@@ -108,7 +162,7 @@ export default function LeadGenWizardPage() {
               providers: {
                 agenticAI: true,
                 serp: true,
-                serpFallback: !!state.serpFallback,
+                serpFallback: true, // Always true as requested
               },
               limits: {
                 maxCompanies: state.maxCompanies,
@@ -116,43 +170,30 @@ export default function LeadGenWizardPage() {
               },
             };
 
-            console.log("[AUTOGEN] Creating job with payload:", payload);
-
             const res = await fetch("/api/leads/autogen", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
             });
 
-            if (!res.ok) {
-              const text = await res.text();
-              console.error("[AUTOGEN] Job creation failed:", text);
-              throw new Error(text || "Failed to start job");
-            }
+            if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
-            console.log("[AUTOGEN] Job created:", data);
-            setResult(data);
 
             // Auto-trigger pipeline
-            console.log("[AUTOGEN] Triggering pipeline for job:", data.jobId);
             try {
-              const runRes = await fetch(`/api/leads/autogen/run/${data.jobId}`, { method: "POST" });
-              console.log("[AUTOGEN] Pipeline triggered, status:", runRes.status);
-            } catch (_err) {
-              console.error("[AUTOGEN] Pipeline trigger failed:", _err);
-              // ignore - user can manually trigger
-            }
+              await fetch(`/api/leads/autogen/run/${data.jobId}`, { method: "POST" });
+            } catch (err) { console.error(err); }
+
+            toast.success("AI Agent started successfully!");
+            router.push("/crm/leads/pools");
             return;
-          } else {
-            console.error("[AUTOGEN] Parse failed with status:", parseRes.status);
           }
         } catch (parseErr) {
           console.error("[AUTOGEN] AI parsing error:", parseErr);
-          // Fall through to regular submission
         }
       }
 
-      // Regular submission for non-AI-only mode or if parsing failed
+      // Regular submission
       const payload = {
         name: state.name || "AI Generated Pool",
         description: state.description,
@@ -182,688 +223,326 @@ export default function LeadGenWizardPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to start job");
-      }
+      if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-      setResult(data);
 
-      // Auto-trigger pipeline
       try {
         await fetch(`/api/leads/autogen/run/${data.jobId}`, { method: "POST" });
-      } catch (_err) {
-        // ignore
-      }
+      } catch (err) { console.error(err); }
+
+      toast.success("Campaign started successfully!");
+      router.push("/crm/leads/pools");
+
     } catch (err: any) {
-      alert(err.message || "Failed to start job");
+      toast.error(err.message || "Failed to start job");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const renderModeSelector = () => (
-    <div className="flex flex-wrap gap-3 mb-6">
-      <button
-        type="button"
-        onClick={() => setMode("ai-only")}
-        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "ai-only"
-          ? "bg-primary text-primary-foreground shadow-lg"
-          : "border hover:bg-accent"
-          }`}
-      >
-        <Sparkles className="w-4 h-4" />
-        AI Only
-      </button>
-      <button
-        type="button"
-        onClick={() => { setMode("step-by-step"); setStep(1); }}
-        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "step-by-step"
-          ? "bg-primary text-primary-foreground shadow-lg"
-          : "border hover:bg-accent"
-          }`}
-      >
-        <FileText className="w-4 h-4" />
-        Step-by-Step
-      </button>
-      <button
-        type="button"
-        onClick={() => setMode("advanced")}
-        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${mode === "advanced"
-          ? "bg-primary text-primary-foreground shadow-lg"
-          : "border hover:bg-accent"
-          }`}
-      >
-        <Settings className="w-4 h-4" />
-        Advanced
-      </button>
-    </div>
-  );
+  const navCards = [
+    {
+      id: "ai-only",
+      title: "Full Auto AI",
+      description: "Describe your ideal customer, and let AI do the rest.",
+      icon: Bot,
+      color: "from-indigo-500/20 to-purple-500/20",
+      iconColor: "text-indigo-400",
+    },
+    {
+      id: "step-by-step",
+      title: "Guided Wizard",
+      description: "Step-by-step setup for precise targeting.",
+      icon: Wand2,
+      color: "from-cyan-500/20 to-sky-500/20",
+      iconColor: "text-cyan-400",
+    },
+    {
+      id: "advanced",
+      title: "Advanced Mode",
+      description: "Full control over every parameter and setting.",
+      icon: Sliders,
+      color: "from-amber-500/20 to-orange-500/20",
+      iconColor: "text-amber-400",
+    },
+  ];
 
-  const renderProgressBar = () => {
-    if (mode !== "step-by-step") return null;
-
-    const steps = [
-      { num: 1, label: "Basic Info", icon: FileText },
-      { num: 2, label: "Industry & Geo", icon: Globe },
-      { num: 3, label: "Tech & Roles", icon: Code },
-      { num: 4, label: "Settings", icon: Target }
-    ];
-
-    return (
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          {steps.map((s, idx) => {
-            const Icon = s.icon;
-            const isActive = step === s.num;
-            const isComplete = step > s.num;
-
-            return (
-              <div key={s.num} className="flex items-center flex-1">
-                <div className="flex flex-col items-center flex-1">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${isComplete
-                      ? "bg-primary border-primary text-primary-foreground"
-                      : isActive
-                        ? "bg-primary border-primary text-primary-foreground"
-                        : "border-muted-foreground/30 text-muted-foreground"
-                      }`}
-                  >
-                    {isComplete ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                  </div>
-                  <span className={`text-xs mt-2 text-center ${isActive ? "font-semibold" : "text-muted-foreground"}`}>
-                    {s.label}
-                  </span>
-                </div>
-                {idx < steps.length - 1 && (
-                  <div
-                    className={`h-0.5 flex-1 mx-2 transition-all ${step > s.num ? "bg-primary" : "bg-muted-foreground/20"
-                      }`}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const renderAIOnlyMode = () => (
-    <div className="space-y-6">
-      <div className="bg-card/50 backdrop-blur-sm border rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-2">
-          <Bot className="w-5 h-5" />
-          <h2 className="text-xl font-semibold">Tell the AI What You Need</h2>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Describe your target customers in natural language. AI will automatically analyze your prompt and complete all form fields when you click "Start AI Agent".
-        </p>
-        <textarea
-          name="aiPrompt"
-          value={state.aiPrompt}
+  const renderTopConfiguration = () => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="md:col-span-2 relative group overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-sm transition-all hover:bg-white/10">
+        <label className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5 block">
+          Campaign Name (Pool)
+        </label>
+        <input
+          name="name"
+          value={state.name}
           onChange={onChange}
-          className="w-full rounded-lg border-2 p-4 text-base min-h-[200px]"
-          placeholder={`Example: "I need to find restaurants in New Mexico" - AI will intelligently determine industries, geos, titles, company sizes, tech stack, and more!`}
-          required
+          className="w-full bg-transparent border-none text-lg font-medium placeholder:text-muted-foreground/50 focus:ring-0 px-0"
+          placeholder="e.g. Q1 SaaS Outreach Campaign..."
         />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent to-background/10" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Pool Name</label>
-          <input
-            name="name"
-            value={state.name}
-            onChange={onChange}
-            className="w-full rounded border p-3"
-            placeholder="e.g., Q1 2025 Campaign"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Max Companies</label>
+      <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-sm transition-all hover:bg-white/10">
+        <label className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5 block">
+          Leads Limit (Max 100)
+        </label>
+        <div className="flex items-center gap-2">
           <input
             type="number"
             name="maxCompanies"
             value={state.maxCompanies}
             onChange={onChange}
-            className="w-full rounded border p-3"
+            className="w-full bg-transparent border-none text-lg font-medium focus:ring-0 px-0"
             min={1}
-            max={500}
+            max={100}
+          />
+          <div className="text-xs text-muted-foreground whitespace-nowrap">companies</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderModeSelector = () => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      {navCards.map((card) => (
+        <button
+          key={card.id}
+          type="button"
+          onClick={() => { setMode(card.id as WizardMode); if (card.id === 'step-by-step') setStep(1); }}
+          className={`group relative overflow-hidden rounded-xl border p-5 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] text-left ${mode === card.id
+            ? "border-primary/50 bg-white/10 ring-2 ring-primary/30"
+            : "border-white/10 bg-white/5 hover:bg-white/10"
+            }`}
+        >
+          {/* Gradient Background */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${card.color} ${mode === card.id ? 'opacity-100' : 'opacity-10 group-hover:opacity-60'} transition-opacity duration-300`} />
+
+          <div className="relative z-10 flex flex-col items-start gap-4">
+            <div className={`p-2.5 rounded-lg bg-gradient-to-br ${card.color} border border-white/10 shadow-lg ${card.iconColor} ring-1 ring-white/10`}>
+              <card.icon className="w-6 h-6" strokeWidth={1.5} />
+            </div>
+            <div>
+              <span className={`block text-base font-semibold transition-colors ${mode === card.id ? 'text-white' : 'text-foreground group-hover:text-white'}`}>
+                {card.title}
+              </span>
+              <span className={`block text-xs mt-1 transition-colors ${mode === card.id ? 'text-white/80' : 'text-muted-foreground group-hover:text-white/80'}`}>
+                {card.description}
+              </span>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+
+  const renderAIOnlyMode = () => (
+    <div className="space-y-6">
+      <div className="relative group rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-1 backdrop-blur-xl shadow-2xl">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-50" />
+
+        <div className="bg-card/40 rounded-xl p-5 min-h-[140px] flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+              <Sparkles className="w-4 h-4" /> AI Agent Instructions
+            </h3>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition-colors"
+                onClick={() => toast.success("Enhancement triggered (simulated)")}
+              >
+                <Zap className="w-3.5 h-3.5" /> Enhance AI
+              </button>
+              <button
+                type="button"
+                className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 transition-all shadow-lg shadow-indigo-500/20"
+                onClick={() => { setCurrentAiField(null); setAiWriterOpen(true); }}
+              >
+                <Wand2 className="w-3.5 h-3.5" /> Write AI
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            name="aiPrompt"
+            value={state.aiPrompt}
+            onChange={onChange}
+            className="w-full flex-1 bg-transparent border-none resize-none focus:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/30 min-h-[100px]"
+            placeholder="Describe your ideal customer profile in detail. For example: 'I'm looking for B2B SaaS companies in the US with 50-200 employees that use HubSpot and Stripe. They should be in the Fintech or Healthcare sectors...'"
           />
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <input
-          id="serpFallback_ai"
-          type="checkbox"
-          checked={!!state.serpFallback}
-          onChange={(e) => setState((prev) => ({ ...prev, serpFallback: e.target.checked }))}
-        />
-        <label htmlFor="serpFallback_ai" className="text-sm">
-          Allow SERP fallback if AI finds 0 companies
-        </label>
-      </div>
 
+      <div className="flex justify-end p-2">
+        <button
+          type="submit"
+          disabled={submitting || !state.name || (mode === 'ai-only' && !state.aiPrompt)}
+          className="group relative px-8 py-4 rounded-xl font-semibold text-white shadow-2xl transition-all hover:scale-[1.02] disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 w-full md:w-auto"
+        >
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-gradient" />
+          <span className="relative flex items-center justify-center gap-2">
+            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Bot className="w-5 h-5" />}
+            {submitting ? "Deploying Agent..." : "Launch AI Agent"}
+          </span>
+        </button>
+      </div>
     </div>
   );
 
   const renderStepByStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Step 1: Basic Information</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Campaign Name *</label>
-                  <input
-                    name="name"
-                    value={state.name}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="e.g., Q1 2025 SaaS Outreach"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
-                  <input
-                    name="description"
-                    value={state.description}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="What is this campaign for?"
-                  />
-                </div>
+    return (
+      <div className="space-y-6">
+        <div className="rounded-xl border border-white/10 bg-card/10 p-6 backdrop-blur-xl shadow-2xl">
+          {/* Step 1 */}
+          {step === 1 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400"><FileText className="w-5 h-5" /></div>
+                <h3 className="text-lg font-semibold">Campaign Details</h3>
+              </div>
+
+              <TextAreaWithAI label="Description" name="description" placeholder="e.g. We are targeting B2B SaaS companies..." rows={4} />
+
+              <div className="flex justify-end pt-4">
+                <button type="button" onClick={() => setStep(2)} className="px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-opacity">Next Step</button>
               </div>
             </div>
-            <div className="flex justify-between">
-              <div></div>
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium"
-              >
-                Next: Target Industry →
-              </button>
-            </div>
-          </div>
-        );
+          )}
+          {/* Step 2 */}
+          {step === 2 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-pink-500/20 text-pink-400"><Globe className="w-5 h-5" /></div>
+                <h3 className="text-lg font-semibold">Targeting</h3>
+              </div>
 
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Step 2: Target Industry & Geography</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Industries *</label>
-                  <input
-                    name="industries"
-                    value={state.industries}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="SaaS, Fintech, E-commerce, Healthcare"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Separate multiple with commas</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Geographies *</label>
-                  <input
-                    name="geos"
-                    value={state.geos}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="United States, United Kingdom, Germany"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Separate multiple with commas</p>
-                </div>
+              <div className="grid gap-6">
+                <InputWithAI label="Industries" name="industries" placeholder="e.g. SaaS, Fintech, Healthcare" />
+                <InputWithAI label="Locations" name="geos" placeholder="e.g. United States, Canada, UK" />
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <button type="button" onClick={() => setStep(1)} className="px-6 py-2.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">Back</button>
+                <button type="button" onClick={() => setStep(3)} className="px-6 py-2.5 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-opacity">Next Step</button>
               </div>
             </div>
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="px-6 py-3 border-2 rounded-lg font-medium"
-              >
-                ← Back
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(3)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium"
-              >
-                Next: Tech & Roles →
-              </button>
-            </div>
-          </div>
-        );
+          )}
+          {/* Step 3 */}
+          {step === 3 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400"><Code className="w-5 h-5" /></div>
+                <h3 className="text-lg font-semibold">Roles & Tech</h3>
+              </div>
 
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Step 3: Technology & Target Roles</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Tech Stack</label>
-                  <input
-                    name="techStack"
-                    value={state.techStack}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="React, AWS, Shopify, Stripe"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Technologies they use</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Target Job Titles *</label>
-                  <input
-                    name="titles"
-                    value={state.titles}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="CEO, CTO, VP Engineering, Head of Sales"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Who you want to reach</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Company Sizes</label>
-                  <input
-                    name="companySizes"
-                    value={state.companySizes}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="10-50, 50-200, 200-500"
-                  />
-                </div>
+              <div className="grid gap-6">
+                <InputWithAI label="Job Titles" name="titles" placeholder="e.g. CEO, CTO, VP Sales" />
+                <InputWithAI label="Tech Stack" name="techStack" placeholder="e.g. HubSpot, Salesforce, AWS" />
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <button type="button" onClick={() => setStep(2)} className="px-6 py-2.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">Back</button>
+                <button type="submit" disabled={submitting} className="px-8 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:shadow-indigo-500/25 transition-all">
+                  {submitting ? "Launching..." : "Launch Campaign"}
+                </button>
               </div>
             </div>
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="px-6 py-3 border-2 rounded-lg font-medium"
-              >
-                ← Back
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(4)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium"
-              >
-                Next: Settings →
-              </button>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Step 4: Additional Settings</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Additional Notes (Optional)</label>
-                  <textarea
-                    name="notes"
-                    value={state.notes}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="Any special requirements for the AI..."
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Exclude Domains</label>
-                  <input
-                    name="excludeDomains"
-                    value={state.excludeDomains}
-                    onChange={onChange}
-                    className="w-full rounded border p-3 text-base"
-                    placeholder="competitor.com, existing-customer.com"
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Max Companies</label>
-                    <input
-                      type="number"
-                      name="maxCompanies"
-                      value={state.maxCompanies}
-                      onChange={onChange}
-                      className="w-full rounded border p-3 text-base"
-                      min={1}
-                      max={500}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Max Contacts/Company</label>
-                    <input
-                      type="number"
-                      name="maxContactsPerCompany"
-                      value={state.maxContactsPerCompany}
-                      onChange={onChange}
-                      className="w-full rounded border p-3 text-base"
-                      min={1}
-                      max={20}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    id="serpFallback_adv"
-                    type="checkbox"
-                    checked={!!state.serpFallback}
-                    onChange={(e) => setState((prev) => ({ ...prev, serpFallback: e.target.checked }))}
-                  />
-                  <label htmlFor="serpFallback_adv" className="text-sm">
-                    Allow SERP fallback if AI finds 0 companies
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => setStep(3)}
-                className="px-6 py-3 border-2 rounded-lg font-medium"
-              >
-                ← Back
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium disabled:opacity-50 hover:shadow-lg"
-              >
-                {submitting ? "Launching AI..." : "Start Generation"}
-              </button>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderAdvancedMode = () => (
-    <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-      <div className="space-y-6 pb-20">
-        <div className="border rounded-lg p-4 sm:p-6 space-y-4 bg-muted/30">
-          <h2 className="text-lg font-semibold">Pool Information</h2>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Pool Name *</label>
-              <input
-                name="name"
-                value={state.name}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="e.g., Q1 2025 Campaign"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Description</label>
-              <input
-                name="description"
-                value={state.description}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="Campaign description"
-              />
-            </div>
-          </div>
+    <div className="space-y-6">
+      <div className="rounded-xl border border-white/10 bg-card/10 p-6 backdrop-blur-xl shadow-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center gap-3 pb-2 border-b border-white/5">
+          <Settings className="w-5 h-5 text-muted-foreground" />
+          <h3 className="text-lg font-semibold">Full Configuration</h3>
         </div>
 
-        <div className="border rounded-lg p-4 sm:p-6 space-y-4 bg-blue-50 dark:bg-blue-950/30">
-          <div className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            <h2 className="text-lg font-semibold">ICP Criteria</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Industries (comma-separated)</label>
-              <input
-                name="industries"
-                value={state.industries}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="SaaS, Fintech, E-commerce"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Geographies (comma-separated)</label>
-              <input
-                name="geos"
-                value={state.geos}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="United States, UK, Canada"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Tech Stack (comma-separated)</label>
-              <input
-                name="techStack"
-                value={state.techStack}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="React, AWS, Stripe"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Target Titles (comma-separated)</label>
-              <input
-                name="titles"
-                value={state.titles}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="CEO, CTO, VP Engineering"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Company Sizes (comma-separated)</label>
-              <input
-                name="companySizes"
-                value={state.companySizes}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="10-50, 50-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Exclude Domains</label>
-              <input
-                name="excludeDomains"
-                value={state.excludeDomains}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="competitor.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Additional Notes</label>
-              <textarea
-                name="notes"
-                value={state.notes}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                placeholder="Special requirements..."
-                rows={3}
-              />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputWithAI label="Industries" name="industries" />
+          <InputWithAI label="Locations" name="geos" />
+          <InputWithAI label="Job Titles" name="titles" />
+          <InputWithAI label="Tech Stack" name="techStack" />
+          <InputWithAI label="Company Sizes" name="companySizes" />
+          <InputWithAI label="Exclude Domains" name="excludeDomains" />
         </div>
 
-        <div className="border rounded-lg p-4 sm:p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Limits</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Max Companies</label>
-              <input
-                type="number"
-                name="maxCompanies"
-                value={state.maxCompanies}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                min={1}
-                max={500}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Max Contacts/Company</label>
-              <input
-                type="number"
-                name="maxContactsPerCompany"
-                value={state.maxContactsPerCompany}
-                onChange={onChange}
-                className="w-full rounded border p-3 text-base"
-                min={1}
-                max={20}
-              />
-            </div>
-          </div>
+        <div className="pt-2">
+          <TextAreaWithAI label="Additional Notes" name="notes" placeholder="Any specific requirements..." />
         </div>
 
-        {/* Submit buttons inside scroll area for advanced mode */}
-        <div className="flex flex-wrap gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex-1 sm:flex-none rounded bg-primary px-6 py-2 text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                AI Agent Working...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                Start AI Agent
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            className="rounded border px-4 py-2 hover:bg-accent transition-all"
-            onClick={() => router.push("/crm/leads/pools")}
-          >
-            View Pools
-          </button>
+        <div className="pt-4 flex items-center gap-3">
+          <input
+            id="serpFallback_adv"
+            type="checkbox"
+            checked={!!state.serpFallback}
+            onChange={(e) => setState((prev) => ({ ...prev, serpFallback: e.target.checked }))}
+            className="rounded border-white/20 bg-white/5 text-primary focus:ring-primary w-4 h-4"
+          />
+          <label htmlFor="serpFallback_adv" className="text-sm text-muted-foreground select-none cursor-pointer">
+            Allow SERP fallback if AI finds 0 companies (Recommended)
+          </label>
         </div>
+      </div>
 
-        <div className="bg-card border rounded-lg p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Bot className="w-4 h-4" />
-            <p className="text-sm font-semibold">Autonomous AI Agent</p>
-          </div>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>✓ Searches intelligently for companies</li>
-            <li>✓ Visits websites and extracts all data</li>
-            <li>✓ Finds contacts (emails, phones, LinkedIn)</li>
-            <li>✓ Qualifies based on your ICP</li>
-            <li>✓ Refines strategy if needed</li>
-            <li>✓ Works completely autonomously</li>
-          </ul>
-        </div>
+      <div className="flex justify-end p-2">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="group relative px-8 py-4 rounded-xl font-semibold text-white shadow-2xl transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 w-full md:w-auto"
+        >
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-zinc-600 via-slate-600 to-zinc-600 bg-[length:200%_auto] animate-gradient" />
+          <span className="relative flex items-center justify-center gap-2">
+            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
+            {submitting ? "Starting..." : "Start Campaign"}
+          </span>
+        </button>
       </div>
     </div>
   );
 
+  // Icon for fallback
+  const Play = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+    </svg>
+  );
+
   return (
-    <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">AI Lead Generation</h1>
-          <p className="text-sm text-muted-foreground">
-            Autonomous AI agent finds, qualifies, and extracts contacts from your ideal customers.
+    <div className="p-4 md:p-8 max-w-5xl mx-auto min-h-screen">
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
+            AI Lead Generation
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Deploy autonomous agents to find, qualify, and engage your ideal customers.
           </p>
         </div>
 
-        {renderModeSelector()}
-        {renderProgressBar()}
+        <form onSubmit={onSubmit}>
+          {renderTopConfiguration()}
 
-        <form onSubmit={onSubmit} className="space-y-6">
-          {mode === "ai-only" && renderAIOnlyMode()}
-          {mode === "step-by-step" && renderStepByStep()}
-          {mode === "advanced" && renderAdvancedMode()}
+          {renderModeSelector()}
 
-          {mode !== "step-by-step" && (
-            <div className="flex flex-wrap gap-3 pt-4">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 sm:flex-none rounded bg-primary px-6 py-2 text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    AI Agent Working...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Start AI Agent
-                  </>
-                )}
-              </button>
-              <button
-                type="button"
-                className="rounded border px-4 py-2 hover:bg-accent transition-all"
-                onClick={() => router.push("/crm/leads/pools")}
-              >
-                View Pools
-              </button>
-            </div>
-          )}
-
-          <div className="bg-card border rounded-lg p-4 sm:p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Bot className="w-4 h-4" />
-              <p className="text-sm font-semibold">Autonomous AI Agent</p>
-            </div>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>✓ Searches intelligently for companies</li>
-              <li>✓ Visits websites and extracts all data</li>
-              <li>✓ Finds contacts (emails, phones, LinkedIn)</li>
-              <li>✓ Qualifies based on your ICP</li>
-              <li>✓ Refines strategy if needed</li>
-              <li>✓ Works completely autonomously</li>
-            </ul>
+          <div className="relative">
+            {mode === "ai-only" && renderAIOnlyMode()}
+            {mode === "step-by-step" && renderStepByStep()}
+            {mode === "advanced" && renderAdvancedMode()}
           </div>
         </form>
-
-        {result && (
-          <div className="border bg-card rounded-lg p-4 sm:p-6">
-            <h2 className="text-lg font-semibold mb-3">✓ Job Started Successfully!</h2>
-            <div className="space-y-2 text-sm">
-              <p><span className="font-medium">Pool ID:</span> {result.poolId}</p>
-              <p><span className="font-medium">Job ID:</span> {result.jobId}</p>
-            </div>
-            <div className="flex flex-wrap gap-3 mt-4">
-              <button
-                className="rounded bg-primary px-4 py-2 text-primary-foreground"
-                onClick={() => router.push(`/crm/leads/jobs/${result.jobId}`)}
-              >
-                Monitor Progress
-              </button>
-              <button
-                className="rounded border px-4 py-2"
-                onClick={() => router.push(`/crm/leads/pools/${result.poolId}`)}
-              >
-                Go to Pool
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+
+      <AIWriterModal
+        isOpen={aiWriterOpen}
+        onClose={() => { setAiWriterOpen(false); setCurrentAiField(null); }}
+        onInsert={handleAiInsert}
+      />
     </div>
   );
 }

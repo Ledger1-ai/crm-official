@@ -44,9 +44,10 @@ export async function PATCH(req: Request, context: { params: Promise<{ poolId: s
     if (!pool) return new NextResponse("Pool not found", { status: 404 });
 
     const isPoolOwner = pool.user === session.user.id;
-    const isPoolTeamAdmin = Boolean(isTeamAdmin && teamId && pool.team_id === teamId);
+    // Allow any team member to assign project if pool belongs to team OR is orphaned (null)
+    const isPoolTeamMember = Boolean(teamId && (pool.team_id === teamId || pool.team_id === null));
 
-    if (!isPoolOwner && !isPoolTeamAdmin) return new NextResponse("Forbidden", { status: 403 });
+    if (!isPoolOwner && !isPoolTeamMember) return new NextResponse("Forbidden", { status: 403 });
 
     const nextConfig = { ...(pool.icpConfig || {}), assignedProjectId: projectId };
     await (prismadbCrm as any).crm_Lead_Pools.update({
