@@ -48,9 +48,10 @@ import { z } from "zod";
 type Props = {
   users: any;
   boards: any;
+  customTrigger?: React.ReactNode;
 };
 
-const NewTaskDialog = ({ users, boards }: Props) => {
+const NewTaskDialog = ({ users, boards, customTrigger }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -116,7 +117,11 @@ const NewTaskDialog = ({ users, boards }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="px-2">Create task</Button>
+        {customTrigger ? (
+          <div className="cursor-pointer" onClick={() => setOpen(true)}>{customTrigger}</div>
+        ) : (
+          <Button className="px-2">Create task</Button>
+        )}
       </DialogTrigger>
       <DialogContent className="">
         {/*        <div>

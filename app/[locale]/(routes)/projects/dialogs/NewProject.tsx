@@ -37,7 +37,11 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const NewProjectDialog = () => {
+type Props = {
+  customTrigger?: React.ReactNode;
+}
+
+const NewProjectDialog = ({ customTrigger }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,7 +106,11 @@ const NewProjectDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="px-2">New project</Button>
+        {customTrigger ? (
+          <div className="cursor-pointer" onClick={() => setOpen(true)}>{customTrigger}</div>
+        ) : (
+          <Button className="px-2">New project</Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>

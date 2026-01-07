@@ -107,9 +107,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       images: ["https://crm.basalthq.com/social-preview.jpg"],
     },
     icons: {
-      icon: "/icon.png",
-      shortcut: "/icon.png",
-      apple: "/icon.png",
+      icon: "/favicon-32x32.png",
+      shortcut: "/favicon-32x32.png",
+      apple: "/apple-touch-icon.png",
     },
     manifest: "/site.webmanifest",
     alternates: {

@@ -10,11 +10,11 @@ import { authOptions } from "@/lib/auth";
 import NewTaskDialog from "../dialogs/NewTask";
 import NewProjectDialog from "../dialogs/NewProject";
 
-import H2Title from "@/components/typography/h2";
-
 import { ProjectsDataTable } from "../table-components/data-table";
 import { columns } from "../table-components/columns";
-import AiAssistant from "./AiAssistant";
+import { FolderPlus, CheckSquare } from "lucide-react";
+import { ProjectCard, ProjectCardData } from "./ProjectCard";
+import AiAssistantCardWrapper from "./AiAssistantCardWrapper";
 
 const ProjectsView = async () => {
   const session = await getServerSession(authOptions);
@@ -25,12 +25,36 @@ const ProjectsView = async () => {
   const boards: any = await getBoards(session.user.id!);
   const stats = await getProjectStats();
 
+  // We only define data for the first two cards here as AiAssistantCardWrapper handles its own card data
+  const cards: ProjectCardData[] = [
+    {
+      title: "New Project",
+      description: "Create a new project board",
+      icon: FolderPlus,
+      color: "from-emerald-500/20 to-green-500/20",
+      iconColor: "text-emerald-400"
+    },
+    {
+      title: "New Task",
+      description: "Add a task to a board",
+      icon: CheckSquare,
+      color: "from-orange-500/20 to-red-500/20",
+      iconColor: "text-orange-400"
+    }
+  ];
+
   return (
     <>
-      <div className="flex gap-2 pb-6">
-        <NewProjectDialog />
-        <NewTaskDialog users={users} boards={boards} />
-        <AiAssistant session={session} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 flex-shrink-0">
+        <NewProjectDialog
+          customTrigger={<ProjectCard card={cards[0]} />}
+        />
+        <NewTaskDialog
+          users={users}
+          boards={boards}
+          customTrigger={<ProjectCard card={cards[1]} />}
+        />
+        <AiAssistantCardWrapper session={session} />
       </div>
       <div className="pt-2 space-y-3">
         <ProjectsDataTable data={boards} columns={columns} stats={stats} />

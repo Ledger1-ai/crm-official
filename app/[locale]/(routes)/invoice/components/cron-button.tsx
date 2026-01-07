@@ -7,7 +7,11 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-const CronButton = () => {
+type Props = {
+  customTrigger?: (loading: boolean) => React.ReactNode;
+};
+
+const CronButton = ({ customTrigger }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,16 +29,24 @@ const CronButton = () => {
   };
 
   return (
-    <Button onClick={runCron}>
-      {isLoading ? (
-        <div className="flex gap-2">
-          Checking ....
-          <Loader2 className="animate-spin" />
+    <>
+      {customTrigger ? (
+        <div onClick={runCron} className="cursor-pointer">
+          {customTrigger(isLoading)}
         </div>
       ) : (
-        "Check for new invoices"
+        <Button onClick={runCron}>
+          {isLoading ? (
+            <div className="flex gap-2">
+              Checking ....
+              <Loader2 className="animate-spin" />
+            </div>
+          ) : (
+            "Check for new invoices"
+          )}
+        </Button>
       )}
-    </Button>
+    </>
   );
 };
 

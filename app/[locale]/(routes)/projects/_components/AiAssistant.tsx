@@ -8,7 +8,7 @@ import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-const AiAssistant = ({ session }: { session: any }) => {
+const AiAssistant = ({ session, customTrigger }: { session: any, customTrigger?: (loading: boolean) => React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
@@ -34,15 +34,23 @@ const AiAssistant = ({ session }: { session: any }) => {
   };
 
   return (
-    <Button onClick={handleAiAssistant} disabled={loading}>
-      {loading ? (
-        <span className="flex items-center gap-2">
-          Creating report <Icons.spinner className="animate-spin" />
-        </span>
+    <>
+      {customTrigger ? (
+        <div onClick={handleAiAssistant} className="cursor-pointer">
+          {customTrigger(loading)}
+        </div>
       ) : (
-        "AI Assistant"
+        <Button onClick={handleAiAssistant} disabled={loading}>
+          {loading ? (
+            <span className="flex items-center gap-2">
+              Creating report <Icons.spinner className="animate-spin" />
+            </span>
+          ) : (
+            "AI Assistant"
+          )}
+        </Button>
       )}
-    </Button>
+    </>
   );
 };
 
