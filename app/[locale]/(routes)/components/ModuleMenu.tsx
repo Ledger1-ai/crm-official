@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, Coins, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { ThemedLogo } from "@/components/ThemedLogo";
 
 import ProjectModuleMenu from "./menu-items/Projects";
 import SecondBrainModuleMenu from "./menu-items/SecondBrain";
@@ -119,18 +120,16 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
           <div className="flex items-center justify-center h-20 mb-2 relative shrink-0">
             {/* Full Logo (Expanded) */}
             <motion.div variants={logoVariants} className="absolute left-6">
-              <img
-                src="/BasaltCRMWide.png"
-                alt="App logo"
+              <ThemedLogo
+                variant="wide"
                 className="h-12 w-auto object-contain"
               />
             </motion.div>
 
             {/* Compact Logo (Collapsed) - Centered */}
             <motion.div variants={compactLogoVariants} className="absolute">
-              <img
-                src="/BasaltCRM.png"
-                alt="App logo compact"
+              <ThemedLogo
+                variant="compact"
                 className="h-10 w-auto object-contain"
               />
             </motion.div>

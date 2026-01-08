@@ -7,14 +7,14 @@ export const ToastProvider = () => {
     <Toaster
       toastOptions={{
         style: {
-          background: "#1f2937", // Dark gray/slate similar to --card in dark mode
-          color: "#fff",
-          border: "1px solid #06b6d4", // --basalt-cyan
+          background: "hsl(var(--card))",
+          color: "hsl(var(--card-foreground))",
+          border: "1px solid hsl(var(--primary))",
         },
         success: {
           iconTheme: {
-            primary: "#06b6d4",
-            secondary: "#fff",
+            primary: "hsl(var(--primary))",
+            secondary: "hsl(var(--primary-foreground))",
           },
         },
         error: {

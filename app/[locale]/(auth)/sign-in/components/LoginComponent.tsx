@@ -185,10 +185,10 @@ export function LoginComponent() {
   }
 
   return (
-    <Card className="shadow-lg my-5 w-full max-w-md sm:max-w-lg mx-auto">
+    <Card className="shadow-lg my-5 w-full max-w-md sm:max-w-lg mx-auto bg-transparent border-border/40 backdrop-blur-sm">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>Click here to login with: </CardDescription>
+        <CardTitle className="text-2xl text-white">Login</CardTitle>
+        <CardDescription className="text-gray-300">Click here to login with: </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="grid grid-cols-2 gap-6">
@@ -214,7 +214,7 @@ export function LoginComponent() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
+            <span className="bg-transparent px-2 text-gray-400">
               Or continue with
             </span>
           </div>
@@ -227,7 +227,7 @@ export function LoginComponent() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail</FormLabel>
+                    <FormLabel className="text-white">E-mail</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -245,7 +245,7 @@ export function LoginComponent() {
                   name="password"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-white">Password</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -290,13 +290,13 @@ export function LoginComponent() {
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-5">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-300">
           Need account? Register{" "}
           <Link href={"/register"} className="text-primary">
             here
           </Link>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-300">
           Need password reset? Click
           {/* Dialog start */}
           <Dialog open={open} onOpenChange={setOpen}>

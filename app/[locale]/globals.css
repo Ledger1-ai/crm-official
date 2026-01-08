@@ -262,95 +262,369 @@
 }
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+  /* ========================================
+     Theme Presets - 8 Dark Mode Palettes
+     ======================================== */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+  /* Obsidian Gold - Luxury without noise (DEFAULT) */
+  [data-theme='obsidian-gold'] {
+    --background: 20 10% 5%;
+    --foreground: 45 10% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --muted: 20 15% 12%;
+    --muted-foreground: 45 10% 65%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --popover: 20 10% 5%;
+    --popover-foreground: 45 10% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --card: 20 12% 8%;
+    --card-foreground: 45 10% 98%;
 
-    /* BasaltCRM: Turquoise primary accent */
-    --primary: 191 65% 58%;
-    --primary-foreground: 0 0% 100%;
+    --border: 45 90% 50% / 0.2;
+    --input: 20 15% 15%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 45 90% 50%;
+    --primary-foreground: 20 10% 5%;
 
-    /* Use brand accent and focus ring */
-    --accent: 191 100% 92%;
-    --accent-foreground: 191 50% 20%;
+    --secondary: 20 15% 12%;
+    --secondary-foreground: 45 10% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 45 90% 20%;
+    --accent-foreground: 45 10% 98%;
 
-    --ring: 191 65% 58%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
 
+    --ring: 45 90% 50%;
     --radius: 0.5rem;
-    /* Microtext font stack */
-    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-    /* BasaltCRM theming variables */
-    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(77, 191, 217, 0.22), transparent 52%),
-      radial-gradient(720px circle at 92% 18%, rgba(42, 169, 199, 0.18), transparent 58%),
-      radial-gradient(780px circle at 18% 88%, rgba(77, 191, 217, 0.16), transparent 58%),
-      linear-gradient(to bottom, #ffffff, #ffffff);
-    --glass-bg: hsla(0, 0%, 100%, 0.65);
-    --glass-border: hsla(191, 60%, 58%, 0.25);
-    --glass-shadow: 0 8px 30px hsla(191, 65%, 46%, 0.18), inset 0 1px 0 hsla(0, 0%, 100%, 0.4);
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(234, 179, 8, 0.15), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(202, 138, 4, 0.12), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(234, 179, 8, 0.10), transparent 58%),
+      linear-gradient(to bottom, #0d0906, #000000);
+    --glass-bg: hsla(20, 10%, 5%, 0.55);
+    --glass-border: hsla(45, 90%, 50%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(45, 90%, 50%, 0.15), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
-  .dark {
-    /* Unified cyber-turquoise surfaces for dark mode */
-    --background: 0 0% 0%;
-    /* true black */
-    --foreground: 210 40% 98%;
+  /* Midnight Protocol - Quiet power. Maximum clarity. */
+  [data-theme='midnight-protocol'] {
+    --background: 220 15% 8%;
+    --foreground: 191 10% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 191 10% 65%;
 
-    --popover: 0 0% 0%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 15% 8%;
+    --popover-foreground: 191 10% 98%;
 
-    --card: 0 0% 0%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 18% 10%;
+    --card-foreground: 191 10% 98%;
 
-    --border: 198 30% 18%;
-    --input: 198 30% 18%;
+    --border: 191 65% 58% / 0.15;
+    --input: 220 20% 15%;
 
-    /* BasaltCRM: Turquoise primary accent */
     --primary: 191 65% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 191 10% 98%;
 
-    /* Use brand accent and focus ring in dark */
-    --accent: 191 60% 38%;
-    /* brighter turquoise accent */
-    --accent-foreground: 0 0% 100%;
+    --accent: 191 65% 20%;
+    --accent-foreground: 191 10% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 85.7% 97.3%;
 
     --ring: 191 65% 58%;
+    --radius: 0.5rem;
 
-    /* BasaltCRM dark theming variables */
     --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(77, 191, 217, 0.24), transparent 48%),
       radial-gradient(720px circle at 92% 18%, rgba(42, 169, 199, 0.20), transparent 52%),
       radial-gradient(780px circle at 18% 88%, rgba(77, 191, 217, 0.18), transparent 52%),
-      linear-gradient(to bottom, #000000, #000000);
-    --glass-bg: hsla(0, 0%, 0%, 0.55);
+      linear-gradient(to bottom, #05161a, #000000);
+    --glass-bg: hsla(220, 15%, 8%, 0.55);
     --glass-border: hsla(191, 85%, 60%, 0.25);
     --glass-shadow: 0 10px 40px hsla(191, 65%, 46%, 0.28), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Neon Circuit - Fast edges, bright intent. */
+  [data-theme='neon-circuit'] {
+    --background: 260 20% 5%;
+    --foreground: 300 10% 98%;
+
+    --muted: 260 25% 12%;
+    --muted-foreground: 300 10% 65%;
+
+    --popover: 260 20% 5%;
+    --popover-foreground: 300 10% 98%;
+
+    --card: 260 22% 8%;
+    --card-foreground: 300 10% 98%;
+
+    --border: 300 100% 50% / 0.2;
+    --input: 260 25% 15%;
+
+    --primary: 300 100% 50%;
+    --primary-foreground: 260 20% 5%;
+
+    --secondary: 260 25% 12%;
+    --secondary-foreground: 300 10% 98%;
+
+    --accent: 300 100% 20%;
+    --accent-foreground: 300 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 300 100% 50%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(255, 0, 255, 0.18), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(200, 0, 200, 0.15), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(255, 0, 255, 0.12), transparent 58%),
+      linear-gradient(to bottom, #1a051a, #000000);
+    --glass-bg: hsla(260, 20%, 5%, 0.55);
+    --glass-border: hsla(300, 100%, 50%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(300, 100%, 50%, 0.20), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Prismatic Aurora - Color that breathes. */
+  [data-theme='prismatic-aurora'] {
+    --background: 230 15% 10%;
+    --foreground: 270 10% 98%;
+
+    --muted: 230 20% 15%;
+    --muted-foreground: 270 10% 65%;
+
+    --popover: 230 15% 10%;
+    --popover-foreground: 270 10% 98%;
+
+    --card: 230 18% 12%;
+    --card-foreground: 270 10% 98%;
+
+    --border: 270 70% 60% / 0.2;
+    --input: 230 20% 18%;
+
+    --primary: 270 70% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 20% 15%;
+    --secondary-foreground: 270 10% 98%;
+
+    --accent: 270 70% 25%;
+    --accent-foreground: 270 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 270 70% 60%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(168, 85, 247, 0.20), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(139, 92, 246, 0.18), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(192, 132, 252, 0.15), transparent 58%),
+      linear-gradient(to bottom, #120b1e, #000000);
+    --glass-bg: hsla(230, 15%, 10%, 0.55);
+    --glass-border: hsla(270, 70%, 60%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(270, 70%, 60%, 0.22), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Deep Ocean - Calm depths, clear focus. */
+  [data-theme='deep-ocean'] {
+    --background: 210 20% 7%;
+    --foreground: 200 10% 98%;
+
+    --muted: 210 25% 12%;
+    --muted-foreground: 200 10% 65%;
+
+    --popover: 210 20% 7%;
+    --popover-foreground: 200 10% 98%;
+
+    --card: 210 22% 10%;
+    --card-foreground: 200 10% 98%;
+
+    --border: 200 100% 40% / 0.2;
+    --input: 210 25% 15%;
+
+    --primary: 200 100% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 25% 12%;
+    --secondary-foreground: 200 10% 98%;
+
+    --accent: 200 100% 15%;
+    --accent-foreground: 200 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 200 100% 40%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(14, 165, 233, 0.18), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(2, 132, 199, 0.15), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(56, 189, 248, 0.12), transparent 58%),
+      linear-gradient(to bottom, #05101a, #000000);
+    --glass-bg: hsla(210, 20%, 7%, 0.55);
+    --glass-border: hsla(200, 100%, 40%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(200, 100%, 40%, 0.22), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Crimson Night - Edge with warmth. */
+  [data-theme='crimson-night'] {
+    --background: 0 10% 5%;
+    --foreground: 0 10% 98%;
+
+    --muted: 0 15% 12%;
+    --muted-foreground: 0 10% 65%;
+
+    --popover: 0 10% 5%;
+    --popover-foreground: 0 10% 98%;
+
+    --card: 0 12% 8%;
+    --card-foreground: 0 10% 98%;
+
+    --border: 0 80% 50% / 0.2;
+    --input: 0 15% 15%;
+
+    --primary: 0 80% 50%;
+    --primary-foreground: 0 10% 98%;
+
+    --secondary: 0 15% 12%;
+    --secondary-foreground: 0 10% 98%;
+
+    --accent: 0 80% 15%;
+    --accent-foreground: 0 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 0 80% 50%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(239, 68, 68, 0.18), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(220, 38, 38, 0.15), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(248, 113, 113, 0.12), transparent 58%),
+      linear-gradient(to bottom, #1a0505, #000000);
+    --glass-bg: hsla(0, 10%, 5%, 0.55);
+    --glass-border: hsla(0, 80%, 50%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(0, 80%, 50%, 0.22), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Monochrome Studio - Focus mode for serious work. */
+  [data-theme='monochrome-studio'] {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 98%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --border: 0 0% 100% / 0.2;
+    --input: 0 0% 15%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 0 0% 100%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(255, 255, 255, 0.08), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(200, 200, 200, 0.06), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(255, 255, 255, 0.05), transparent 58%),
+      linear-gradient(to bottom, #111111, #000000);
+    --glass-bg: hsla(0, 0%, 5%, 0.55);
+    --glass-border: hsla(0, 0%, 100%, 0.20);
+    --glass-shadow: 0 10px 40px hsla(0, 0%, 100%, 0.10), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Forest Spectrum - Natural energy, grounded calm. */
+  [data-theme='forest-spectrum'] {
+    --background: 160 15% 5%;
+    --foreground: 150 10% 98%;
+
+    --muted: 160 20% 12%;
+    --muted-foreground: 150 10% 65%;
+
+    --popover: 160 15% 5%;
+    --popover-foreground: 150 10% 98%;
+
+    --card: 160 18% 8%;
+    --card-foreground: 150 10% 98%;
+
+    --border: 150 60% 50% / 0.2;
+    --input: 160 20% 15%;
+
+    --primary: 150 60% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 20% 12%;
+    --secondary-foreground: 150 10% 98%;
+
+    --accent: 150 60% 15%;
+    --accent-foreground: 150 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+
+    --ring: 150 60% 50%;
+    --radius: 0.5rem;
+
+    --osiris-gradient: radial-gradient(900px circle at 8% 12%, rgba(34, 197, 94, 0.18), transparent 52%),
+      radial-gradient(720px circle at 92% 18%, rgba(22, 163, 74, 0.15), transparent 58%),
+      radial-gradient(780px circle at 18% 88%, rgba(74, 222, 128, 0.12), transparent 58%),
+      linear-gradient(to bottom, #051a10, #000000);
+    --glass-bg: hsla(160, 15%, 5%, 0.55);
+    --glass-border: hsla(150, 60%, 50%, 0.25);
+    --glass-shadow: 0 10px 40px hsla(150, 60%, 50%, 0.22), inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
+
+    --microtext-font: "Geist Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* ========================================
+     Accessibility Utilities
+     ======================================== */
+  :root.reduced-motion *,
+  :root.reduced-motion *::before,
+  :root.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  :root.high-contrast {
+    --border: 0 0% 100% / 0.6;
+    --glass-border: hsla(0, 0%, 100%, 0.6);
   }
 }
 
@@ -365,6 +639,29 @@
     background: var(--osiris-gradient);
     background-attachment: fixed;
     background-size: cover;
+  }
+
+  /* Force dark input backgrounds - NO WHITE CONTAINERS */
+  input,
+  textarea,
+  select {
+    background-color: hsl(var(--input)) !important;
+    color: hsl(var(--foreground)) !important;
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Override Chrome autofill white background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px hsl(var(--input)) inset !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    box-shadow: 0 0 0 1000px hsl(var(--input)) inset !important;
+    background-color: hsl(var(--input)) !important;
+    caret-color: hsl(var(--foreground)) !important;
   }
 }
 
@@ -383,6 +680,55 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ========================================
+   Theme-Aware Logo Coloring
+   Shifts the cyan base logo to match each theme's primary color
+   ======================================== */
+.themed-logo {
+  transition: filter 0.3s ease;
+}
+
+/* Obsidian Gold - Shift to warm gold #EAB308 */
+[data-theme='obsidian-gold'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(72%) sepia(98%) saturate(500%) hue-rotate(5deg) brightness(105%);
+}
+
+/* Midnight Protocol - Keep original cyan (default) */
+[data-theme='midnight-protocol'] .themed-logo {
+  filter: none;
+  /* Original cyan matches this theme */
+}
+
+/* Neon Circuit - Shift to magenta #FF00FF */
+[data-theme='neon-circuit'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(7500%) hue-rotate(290deg) brightness(115%);
+}
+
+/* Prismatic Aurora - Shift to purple #A855F7 */
+[data-theme='prismatic-aurora'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(1500%) hue-rotate(250deg) brightness(100%);
+}
+
+/* Deep Ocean - Shift to blue #0EA5E9 */
+[data-theme='deep-ocean'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(55%) sepia(85%) saturate(600%) hue-rotate(175deg) brightness(100%);
+}
+
+/* Crimson Night - Shift to red #EF4444 */
+[data-theme='crimson-night'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(2000%) hue-rotate(340deg) brightness(110%);
+}
+
+/* Monochrome Studio - White/Gray */
+[data-theme='monochrome-studio'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(100%) brightness(95%);
+}
+
+/* Forest Spectrum - Shift to green #22C55E */
+[data-theme='forest-spectrum'] .themed-logo {
+  filter: brightness(0) saturate(100%) invert(60%) sepia(70%) saturate(600%) hue-rotate(85deg) brightness(105%);
 }
 
 /* Sidebar: hamburger toggle and menu item glassmorphism */

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
+import { ThemedLogo } from "@/components/ThemedLogo";
 const Footer = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -40,7 +40,7 @@ const Footer = () => {
       <footer className="hidden md:flex rounded-t-xl relative bottom-0 z-40 h-10 items-center justify-end px-5 text-xs text-muted-foreground bg-background/60 backdrop-blur-xl border-t border-border/30 shadow-lg">
         <div className="flex items-center gap-2">
           <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
-          <img src="/BasaltCRMWide.png" alt="BasaltCRM logo" className="h-5 w-auto opacity-70" />
+          <ThemedLogo variant="wide" className="h-5 w-auto opacity-70" />
         </div>
       </footer>
     </>

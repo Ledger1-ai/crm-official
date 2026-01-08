@@ -147,7 +147,7 @@ export default async function RootLayout(props: Props) {
         <AnalyticsTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SessionProvider session={session}>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider>
               {children}
               {/* Team Suspension Check */}
               <SuspensionCheck />
