@@ -1,5 +1,18 @@
 "use client";
 import React from "react";
+import {
+  Building2,
+  Users,
+  Target,
+  Zap,
+  FileText,
+  Receipt,
+  CheckSquare,
+  LayoutDashboard,
+  UserCircle,
+  File
+} from "lucide-react";
+import { ResultsSection } from "./ResultsSection";
 
 type Props = {
   results: any;
@@ -7,70 +20,142 @@ type Props = {
 };
 
 const ResultPage = ({ results, search }: Props) => {
+  const data = results?.data || {};
+
+  // If no results found at all
+  const hasResults = Object.values(data).some(
+    (arr: any) => Array.isArray(arr) && arr.length > 0
+  );
+
   return (
-    <div className="flex flex-col w-full h-full p-2">
-      {/*       <pre>
-        {JSON.stringify(
-          {
-            results,
-            search,
-          },
-          null,
-          2
-        )}
-      </pre> */}
-      <div className="flex flex-row gap-2">
-        <h1>Search query: </h1>
-        <pre>{JSON.stringify(search, null, 2)}</pre>
+    <div className="flex flex-col w-full h-full p-6 space-y-8 overflow-y-auto pb-20">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-bold tracking-tight">
+          Search Results
+        </h1>
+        <p className="text-muted-foreground">
+          Showing results for <span className="font-semibold text-foreground">"{search}"</span>
+        </p>
       </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in CRM Opportunities: </h1>
-        <p>{results?.data?.opportunities?.length}</p>
-      </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in CRM Acocunts: </h1>
-        <p>{results?.data?.accounts?.length}</p>
-      </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in CRM contacts: </h1>
-        <p>{results?.data?.contacts?.length}</p>
-      </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in Local users: </h1>
-        <p>{results?.data?.users?.length}</p>
-      </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in Local Tasks: </h1>
-        <p>{results?.data?.tasks?.length}</p>
-      </div>
-      <div className="flex flex-row gap-2">
-        <h1>Search results in Local Projects: </h1>
-        <p>{results?.data?.projects?.length}</p>
-      </div>
-      {/*   {results?.results?.opportunities?.length > 0 && (
-        <div>
-          <OppsResults data={results?.results?.opportunities} />
+
+      {!hasResults && (
+        <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg bg-muted/20">
+          <p className="text-lg font-medium text-muted-foreground">No matches found</p>
+          <p className="text-sm text-muted-foreground mt-1">Try adjusting your search terms or filters.</p>
         </div>
       )}
-      {results?.results?.accounts?.length > 0 && (
-        <div>
-          <AccountsResults data={results?.results?.accounts} />
-        </div>
-      )}
-      {results?.results?.contacts?.length > 0 && (
-        <div>
-          <ContactsResults data={results?.results?.contacts} />
-        </div>
-      )}
-      {results?.results?.users?.length > 0 && (
-        <div>
-          <UsersResults data={results?.results?.users} />
-        </div>
-      )} */}
-      {/* <div>
-          <h1>Search results: </h1>
-          <pre>{JSON.stringify(results, null, 2)}</pre>
-        </div> */}
+
+      {/* CRM Section */}
+      <ResultsSection
+        title="Opportunities"
+        data={data.opportunities}
+        icon={Target}
+        renderItem={(item) => ({
+          title: item.name,
+          subtitle: item.description,
+          href: `/crm/opportunities/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Accounts"
+        data={data.accounts}
+        icon={Building2}
+        renderItem={(item) => ({
+          title: item.name,
+          subtitle: item.email || item.description,
+          href: `/crm/accounts/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Contacts"
+        data={data.contacts}
+        icon={Users}
+        renderItem={(item) => ({
+          title: `${item.first_name || ""} ${item.last_name || ""}`,
+          subtitle: item.email,
+          href: `/crm/contacts/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Leads"
+        data={data.leads}
+        icon={Zap}
+        renderItem={(item) => ({
+          title: `${item.firstName || ""} ${item.lastName || ""}`,
+          subtitle: item.company || item.email,
+          href: `/crm/leads/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Contracts"
+        data={data.contracts}
+        icon={FileText}
+        renderItem={(item) => ({
+          title: item.title,
+          subtitle: item.description,
+          href: `/crm/contracts/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Documents"
+        data={data.documents}
+        icon={File}
+        renderItem={(item) => ({
+          title: item.document_name,
+          subtitle: item.description,
+          href: `/documents/view/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Invoices"
+        data={data.invoices}
+        icon={Receipt}
+        renderItem={(item) => ({
+          title: item.invoice_number,
+          subtitle: item.description || item.partner,
+          href: `/crm/invoices/${item.id}`,
+        })}
+      />
+
+      {/* Management Section */}
+      <ResultsSection
+        title="Projects"
+        data={data.projects}
+        icon={LayoutDashboard}
+        renderItem={(item) => ({
+          title: item.title,
+          subtitle: item.description,
+          href: `/projects/boards/${item.id}`,
+        })}
+      />
+
+      <ResultsSection
+        title="Tasks"
+        data={data.tasks}
+        icon={CheckSquare}
+        renderItem={(item) => ({
+          title: item.title,
+          subtitle: item.content,
+          href: `/crm/tasks`,
+        })}
+      />
+
+      <ResultsSection
+        title="Users"
+        data={data.users}
+        icon={UserCircle}
+        renderItem={(item) => ({
+          title: item.name || item.username,
+          subtitle: item.email,
+          href: `mailto:${item.email}`,
+        })}
+      />
     </div>
   );
 };
