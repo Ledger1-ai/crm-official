@@ -9,11 +9,11 @@ const dataFormatter = (number: number) => {
 
 export const BarChartDemo = ({ chartData, title }: any) => {
   return (
-    <Card className="rounded-md">
-      <Title>{title}</Title>
+    <Card className="rounded-lg bg-card text-card-foreground border-border ring-0 shadow-sm">
+      <Title className="text-foreground">{title}</Title>
 
       <BarChart
-        className="mt-6"
+        className="mt-6 text-foreground"
         data={chartData}
         index="name"
         categories={["Number"]}

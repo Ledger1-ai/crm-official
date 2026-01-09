@@ -7,6 +7,7 @@ interface ContainerProps {
     description?: string;
     visibility?: string;
     children: React.ReactNode;
+    action?: React.ReactNode;
 }
 
 const Container = ({
@@ -14,6 +15,7 @@ const Container = ({
     description,
     visibility,
     children,
+    action,
     sticky = false,
 }: ContainerProps & { sticky?: boolean }) => {
     if (sticky) {
@@ -22,11 +24,14 @@ const Container = ({
                 <div className="sticky top-0 z-10 bg-background p-4 md:px-6 lg:px-8 pb-2 shrink-0">
                     {(title || description) && (
                         <div>
-                            <Heading
-                                title={title || ""}
-                                description={description || ""}
-                                visibility={visibility}
-                            />
+                            <div className="flex items-start justify-between gap-4">
+                                <Heading
+                                    title={title || ""}
+                                    description={description || ""}
+                                    visibility={visibility}
+                                />
+                                {action && <div className="shrink-0">{action}</div>}
+                            </div>
                             <Separator className="mt-4" />
                         </div>
                     )}
@@ -44,11 +49,14 @@ const Container = ({
         <div className="space-y-4 p-4 md:p-6 lg:p-8 pt-6 md:border-l min-w-0 pb-48 md:pb-12">
             {(title || description) && (
                 <div className="shrink-0">
-                    <Heading
-                        title={title || ""}
-                        description={description || ""}
-                        visibility={visibility}
-                    />
+                    <div className="flex items-start justify-between gap-4">
+                        <Heading
+                            title={title || ""}
+                            description={description || ""}
+                            visibility={visibility}
+                        />
+                        {action && <div className="shrink-0">{action}</div>}
+                    </div>
                     <Separator className="mt-4" />
                 </div>
             )}

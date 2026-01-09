@@ -1,8 +1,8 @@
 "use client";
 
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import React, { ElementRef, useRef, useState } from "react";
+import { Loader2, Mail } from "lucide-react";
+import React, { ElementRef, useRef } from "react";
 
 import { sendMailToAll } from "@/actions/admin/send-mail-to-all";
 
@@ -37,13 +37,16 @@ const SendMailToAll = () => {
   return (
     <Sheet>
       <SheetTrigger ref={closeRef} asChild>
-        <Button>Send mail to all users</Button>
+        <Button size="sm" className="gap-2">
+          <Mail className="h-4 w-4" />
+          Send Mail To All Users
+        </Button>
       </SheetTrigger>
       <SheetContent>
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
             <h4 className="text-xl font-semibold tracking-tight">
-              Send mail to all users
+              Send Mail To All Users
             </h4>
             <p>This will send an email to all users with a message from you.</p>
             <form action={onSendMail} className="space-y-4">
@@ -64,7 +67,7 @@ const SendMailToAll = () => {
                 {isLoading ? (
                   <Loader2 className="h-6 w-6  animate-spin" />
                 ) : (
-                  "Send mail"
+                  "Send Mail"
                 )}
               </FormSubmit>
             </form>

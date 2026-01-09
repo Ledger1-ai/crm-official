@@ -7,10 +7,10 @@ const dataFormatter = (number: number) => {
 };
 
 export const AreaChartDemo = ({ chartData, title }: any) => (
-  <Card>
-    <Title>{title}</Title>
+  <Card className="rounded-lg bg-card text-card-foreground border-border ring-0 shadow-sm">
+    <Title className="text-foreground">{title}</Title>
     <AreaChart
-      className="h-72 mt-4"
+      className="h-72 mt-4 text-foreground"
       data={chartData}
       index="date"
       categories={["Number"]}

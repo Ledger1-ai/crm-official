@@ -31,7 +31,21 @@ const nextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
+    NEXT_PUBLIC_APP_VERSION: (() => {
+      try {
+        const { execSync } = require("child_process");
+        // Get latest commit message and extract version (e.g., "v1.0.9 - chore:" or "1.0.9 - feat:")
+        const commitMsg = execSync("git log -1 --format=%s", { encoding: "utf-8" }).trim();
+        const versionMatch = commitMsg.match(/^v?(\d+\.\d+\.\d+[a-zA-Z0-9-]*)/);
+        if (versionMatch) {
+          return versionMatch[1];
+        }
+        // Fallback to package.json version
+        return require("./package.json").version;
+      } catch {
+        return require("./package.json").version;
+      }
+    })(),
   },
   async redirects() {
     return [

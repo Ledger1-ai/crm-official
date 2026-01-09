@@ -48,10 +48,12 @@ export default function DailyTasksWidget({ tasks }: DailyTasksWidgetProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 bg-background/50 hover:bg-background/80 border-dashed">
-                    <CalendarIcon className="h-4 w-4 text-primary" />
-                    <span className="hidden sm:inline">Daily Tasks</span>
-                    <Badge variant="secondary" className="ml-1 px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center">
+                <Button variant="outline" className="gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border-emerald-500/20 hover:border-emerald-500/40 border-dashed w-full justify-between">
+                    <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span className="hidden sm:inline">Daily Tasks</span>
+                    </div>
+                    <Badge className="ml-1 px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 border-none text-white">
                         {tasks.length}
                     </Badge>
                 </Button>

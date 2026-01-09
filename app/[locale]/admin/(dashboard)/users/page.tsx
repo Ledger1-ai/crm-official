@@ -2,7 +2,6 @@ import { getUsers } from "@/actions/get-users";
 import React from "react";
 import Container from "@/app/[locale]/(routes)/components/ui/Container";
 import { InviteForm } from "@/app/[locale]/cms/(dashboard)/users/components/IviteForm";
-import { Separator } from "@/components/ui/separator";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,19 +11,13 @@ import { Users } from "@prisma/client";
 import SendMailToAll from "@/app/[locale]/cms/(dashboard)/users/components/send-mail-to-all";
 
 import { getCurrentUserTeamId } from "@/lib/team-utils";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-
-const AnyLink = Link as any;
-const AnyButton = Button as any;
 
 const AdminUsersPage = async () => {
     const users: Users[] = await getUsers();
     const session = await getServerSession(authOptions);
     const teamInfo = await getCurrentUserTeamId();
 
-    // Allow access if Global Admin OR Team Admin-
+    // Allow access if Global Admin OR Team Admin
     const isGlobalAdmin = session?.user?.isAdmin;
     const isTeamAdmin = teamInfo?.teamRole === "ADMIN" || teamInfo?.teamRole === "OWNER";
 
@@ -43,30 +36,32 @@ const AdminUsersPage = async () => {
 
     return (
         <Container
-            title="Users administration"
-            description={"Here you can manage your BasaltCRM users"}
+            title="Users Administration"
+            description="Manage users, invite new members, and configure user-specific module access."
+            action={<SendMailToAll />}
         >
-            <div className="mb-4">
-                <AnyLink href="/admin">
-                    <AnyButton variant="ghost" className="pl-0 hover:pl-2 transition-all">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back to Administration
-                    </AnyButton>
-                </AnyLink>
-            </div>
-            <div className="flex-col1">
-                <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                    Invite new user to BasaltCRM
-                </h4>
-                <InviteForm />
-            </div>
-            <Separator />
-            <div>
-                <SendMailToAll />
-            </div>
-            <Separator />
+            <div className="space-y-6">
+                {/* Invite Section */}
+                <div className="p-5 bg-card/50 border border-border rounded-xl">
+                    <h4 className="text-lg font-semibold mb-4">
+                        Invite New User
+                    </h4>
+                    <InviteForm />
+                </div>
 
-            <AdminUserDataTable columns={columns} data={users} />
+                {/* Users Table */}
+                <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
+                    <div className="p-5 border-b border-border">
+                        <h4 className="text-lg font-semibold">All Users</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Click the settings icon on any user row to configure their module access.
+                        </p>
+                    </div>
+                    <div className="p-4">
+                        <AdminUserDataTable columns={columns} data={users} />
+                    </div>
+                </div>
+            </div>
         </Container>
     );
 };

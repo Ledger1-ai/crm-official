@@ -207,7 +207,7 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
             animate={{ opacity: open ? 1 : 0 }}
             className="p-4 flex justify-center shrink-0"
           >
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
               v{process.env.NEXT_PUBLIC_APP_VERSION}
             </span>
           </motion.div>

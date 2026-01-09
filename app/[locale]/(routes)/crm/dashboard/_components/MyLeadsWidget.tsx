@@ -36,9 +36,11 @@ export default function MyLeadsWidget({ leads }: MyLeadsWidgetProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 border-indigo-500/20 hover:border-indigo-500/40 border-dashed">
-                    <UserPlus className="h-4 w-4" />
-                    <span className="hidden sm:inline">New Leads</span>
+                <Button variant="outline" className="gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 border-indigo-500/20 hover:border-indigo-500/40 border-dashed w-full justify-between">
+                    <div className="flex items-center gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        <span className="hidden sm:inline">New Leads</span>
+                    </div>
                     <Badge className="ml-1 px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 border-none">
                         {leads.length}
                     </Badge>

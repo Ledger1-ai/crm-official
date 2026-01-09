@@ -1,18 +1,12 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import { z } from "zod";
-
-import { prismadb } from "@/lib/prisma";
-
-import { revalidatePath } from "next/cache";
 import { Input } from "@/components/ui/input";
-import CopyKeyComponent from "./copy-key";
+import { z } from "zod";
+import { prismadb } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+import { Eye, EyeOff, Shield } from "lucide-react";
+
+// Client component for reveal toggle
+import MaskedKeyDisplay from "./MaskedKeyDisplay";
 
 const ResendCard = async () => {
   const setSMTP = async (formData: FormData) => {
@@ -25,9 +19,6 @@ const ResendCard = async () => {
       id: formData.get("id"),
       serviceKey: formData.get("serviceKey"),
     });
-
-    //console.log(parsed.id, "id");
-    //console.log(parsed.serviceKey, "serviceKey");
 
     if (!parsed.id) {
       await prismadb.systemServices.create({
@@ -57,48 +48,44 @@ const ResendCard = async () => {
     },
   });
 
+  const envKey = process.env.RESEND_API_KEY;
+  const dbKey = resend_key?.serviceKey;
+
   return (
-    <Card className="min-w-[350px] max-w-[450px]">
-      <CardHeader className="text-lg">
-        <CardTitle>Resend.com - API Key</CardTitle>
-        <div className="text-xs text-muted-foreground space-y-1">
-          <div>ENV API key:</div>
-          <div>
-            {process.env.RESEND_API_KEY ? (
-              <CopyKeyComponent
-                keyValue={process.env.RESEND_API_KEY}
-                message="Resend - API Key"
-              />
-            ) : (
-              "not enabled"
-            )}
-          </div>
-          <div>API key from DB:</div>
-          <div>
-            {resend_key?.serviceKey ? (
-              <CopyKeyComponent
-                keyValue={resend_key?.serviceKey}
-                message="Resend - API Key"
-              />
-            ) : (
-              "not enabled"
-            )}
-          </div>
+    <div className="space-y-4">
+      {/* Key Status Section */}
+      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <Shield className="w-4 h-4 text-primary" />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <form action={setSMTP}>
-          <div>
-            <input type="hidden" name="id" value={resend_key?.id} />
-            <Input type="text" name="serviceKey" placeholder="Your API key" />
-          </div>
-          <div className="flex justify-end pt-2 gap-2">
-            <Button type={"reset"}>Reset</Button>
-            <Button type="submit">Set Resend key</Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium">API Key Status</p>
+          <p className="text-xs text-muted-foreground">
+            {envKey ? "ENV key configured" : dbKey ? "DB key configured" : "Not configured"}
+          </p>
+        </div>
+        {(envKey || dbKey) && (
+          <MaskedKeyDisplay keyValue={envKey || dbKey || ""} />
+        )}
+      </div>
+
+      {/* Update Key Form */}
+      <form action={setSMTP} className="flex items-center gap-2">
+        <input type="hidden" name="id" value={resend_key?.id} />
+        <Input
+          type="password"
+          name="serviceKey"
+          placeholder="Enter new API key"
+          className="bg-background h-9 max-w-sm"
+        />
+        <Button type="reset" variant="outline" size="sm" className="min-w-[100px]">
+          Reset
+        </Button>
+        <Button type="submit" size="sm" className="min-w-[120px]">
+          Update Key
+        </Button>
+      </form>
+    </div>
   );
 };
 

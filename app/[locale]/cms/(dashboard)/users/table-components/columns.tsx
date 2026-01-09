@@ -1,9 +1,8 @@
 "use client";
 
-import moment from "moment";
-
 import { ColumnDef } from "@tanstack/react-table";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { statuses } from "../table-data/data";
 import { AdminUser } from "../table-data/schema";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -11,44 +10,28 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import { formatDistanceToNowStrict } from "date-fns";
 
 export const columns: ColumnDef<AdminUser>[] = [
-  /*   {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="id" />
-    ),
-    cell: ({ row }) => <div className="">{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  }, */
   {
-    accessorKey: "created_on",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[130px]">
-        {moment(row.getValue("created_on")).format("YYYY/MM/DD-HH:mm")}
-      </div>
-    ),
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
-    accessorKey: "lastLoginAt",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Last login" />
-    ),
-    cell: ({ row }) => (
-      <div className="min-w-[150px]">
-        {/*   {moment(row.getValue("lastLoginAt")).format("YYYY/MM/DD-HH:mm")} */}
-        {formatDistanceToNowStrict(
-          new Date(row.original.lastLoginAt || new Date()),
-          {
-            addSuffix: true,
-          }
-        )}
-      </div>
-    ),
+    accessorKey: "avatar",
+    header: "",
+    cell: ({ row }) => {
+      const name = row.original.name || "";
+      const avatar = row.original.avatar;
+      const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+      return (
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={avatar || ""} alt={name} />
+          <AvatarFallback className="text-xs bg-primary/10 text-primary">
+            {initials || "?"}
+          </AvatarFallback>
+        </Avatar>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -57,8 +40,9 @@ export const columns: ColumnDef<AdminUser>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-
-    cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("name")}</div>
+    ),
     enableSorting: true,
     enableHiding: true,
   },
@@ -67,24 +51,48 @@ export const columns: ColumnDef<AdminUser>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="E-mail" />
     ),
-
-    cell: ({ row }) => <div className="">{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="text-muted-foreground">{row.getValue("email")}</div>
+    ),
     enableSorting: true,
     enableHiding: true,
   },
-
   {
     accessorKey: "team_role",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team Role" />
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
+    cell: ({ row }) => {
+      const role = (row.getValue("team_role") as string) || "MEMBER";
+      const variant = role === "OWNER" ? "default" :
+        role === "ADMIN" ? "secondary" :
+          role === "VIEWER" ? "outline" : "outline";
+      return (
+        <Badge variant={variant} className="text-xs">
+          {role}
+        </Badge>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "lastLoginAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Login" />
     ),
     cell: ({ row }) => (
-      <div className="">{row.getValue("team_role") || "MEMBER"}</div>
+      <div className="text-sm text-muted-foreground">
+        {row.original.lastLoginAt
+          ? formatDistanceToNowStrict(new Date(row.original.lastLoginAt), {
+            addSuffix: true,
+          })
+          : "Never"}
+      </div>
     ),
     enableSorting: true,
     enableHiding: true,
   },
-
   {
     accessorKey: "userStatus",
     header: ({ column }) => (
@@ -112,15 +120,6 @@ export const columns: ColumnDef<AdminUser>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-  },
-  {
-    accessorKey: "userLanguage",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Language" />
-    ),
-
-    cell: ({ row }) => <div className="">{row.getValue("userLanguage")}</div>,
-    enableSorting: true,
     enableHiding: true,
   },
   {

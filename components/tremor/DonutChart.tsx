@@ -24,7 +24,7 @@ export const DonutChartDemo = ({
     }));
 
     return (
-        <Card className="rounded-md">
+        <Card className="rounded-lg bg-card text-card-foreground border-border ring-0 shadow-sm">
             <Title className="text-primary">{title}</Title>
             <DonutChart
                 className={chartClassName}

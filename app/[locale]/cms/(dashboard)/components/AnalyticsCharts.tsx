@@ -14,15 +14,15 @@ export default function AnalyticsCharts({ chartdata, topPages, kpiData, cities }
         <div className="space-y-6">
             <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6">
                 {kpiData.map((item) => (
-                    <Card key={item.title} decoration="top" decorationColor="emerald" className="bg-[#0F1115] ring-1 ring-white/10 shadow-sm border-none">
-                        <Text className="text-gray-400">{item.title}</Text>
+                    <Card key={item.title} decoration="top" decorationColor="emerald" className="bg-card ring-0 shadow-sm border-border text-card-foreground">
+                        <Text className="text-muted-foreground">{item.title}</Text>
                         <Flex justifyContent="start" alignItems="baseline" className="truncate space-x-3">
-                            <Metric className="text-white">{item.metric}</Metric>
+                            <Metric className="text-foreground">{item.metric}</Metric>
                             <BadgeDelta deltaType={item.deltaType as any}>{item.delta}</BadgeDelta>
                         </Flex>
                         <Flex justifyContent="start" className="space-x-2 mt-4">
-                            <Text className="truncate text-gray-500">
-                                Previous: <Bold className="text-gray-400">{item.metricPrev}</Bold>
+                            <Text className="truncate text-muted-foreground">
+                                Previous: <Bold className="text-muted-foreground">{item.metricPrev}</Bold>
                             </Text>
                         </Flex>
                     </Card>
@@ -30,11 +30,11 @@ export default function AnalyticsCharts({ chartdata, topPages, kpiData, cities }
             </Grid>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2 bg-[#0F1115] ring-1 ring-white/10 shadow-sm border-none">
-                    <Title className="text-white">Traffic Trends</Title>
-                    <Text className="text-gray-400">Daily unique visitors & page views</Text>
+                <Card className="lg:col-span-2 bg-card ring-0 shadow-sm border-border text-card-foreground">
+                    <Title className="text-foreground">Traffic Trends</Title>
+                    <Text className="text-muted-foreground">Daily unique visitors & page views</Text>
                     <AreaChart
-                        className="h-72 mt-4"
+                        className="h-72 mt-4 text-foreground"
                         data={chartdata}
                         index="date"
                         categories={["Visitors", "Page Views"]}
@@ -45,15 +45,15 @@ export default function AnalyticsCharts({ chartdata, topPages, kpiData, cities }
                 </Card>
 
                 <div className="space-y-6">
-                    <Card className="bg-[#0F1115] ring-1 ring-white/10 shadow-sm border-none">
-                        <Title className="text-white">Top Pages</Title>
-                        <Text className="text-gray-400">Most visited URLs this month</Text>
+                    <Card className="bg-card ring-0 shadow-sm border-border text-card-foreground">
+                        <Title className="text-foreground">Top Pages</Title>
+                        <Text className="text-muted-foreground">Most visited URLs this month</Text>
                         <BarList data={topPages} className="mt-4 stroke-emerald-500" color="emerald" />
                     </Card>
 
-                    <Card className="bg-[#0F1115] ring-1 ring-white/10 shadow-sm border-none">
-                        <Title className="text-white">Geographics</Title>
-                        <Text className="text-gray-400">Visitors by City</Text>
+                    <Card className="bg-card ring-0 shadow-sm border-border text-card-foreground">
+                        <Title className="text-foreground">Geographics</Title>
+                        <Text className="text-muted-foreground">Visitors by City</Text>
                         <div className="mt-6">
                             <DonutChart
                                 data={cities}
@@ -61,12 +61,12 @@ export default function AnalyticsCharts({ chartdata, topPages, kpiData, cities }
                                 index="name"
                                 colors={["cyan", "blue", "indigo", "violet", "fuchsia"]}
                                 variant="pie"
-                                className="h-40"
+                                className="h-40 text-foreground"
                             />
                             <Legend
                                 categories={cities.map(c => c.name)}
                                 colors={["cyan", "blue", "indigo", "violet", "fuchsia"]}
-                                className="mt-6"
+                                className="mt-6 text-foreground"
                             />
                         </div>
                     </Card>

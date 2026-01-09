@@ -2,6 +2,25 @@
 
 import React, { useEffect, useState } from "react";
 import { ThemedLogo } from "@/components/ThemedLogo";
+const Clock = () => {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    // Initial set
+    setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
+    const interval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!time) return null;
+
+  return <span className="font-mono font-medium text-foreground/80">{time}</span>;
+};
+
 const Footer = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -37,10 +56,16 @@ const Footer = () => {
       </div>
 
       {/* Desktop Footer - Sticky at Bottom with Glass Effect and Rounded Top Corners */}
-      <footer className="hidden md:flex rounded-t-xl relative bottom-0 z-40 h-10 items-center justify-end px-5 text-xs text-muted-foreground bg-background/60 backdrop-blur-xl border-t border-border/30 shadow-lg">
+      <footer className="hidden md:flex rounded-t-xl relative bottom-0 z-40 h-10 items-center justify-between px-5 text-xs text-muted-foreground bg-background/60 backdrop-blur-xl border-t border-border/30 shadow-lg">
+        {/* Left Side: Local Time */}
         <div className="flex items-center gap-2">
-          <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
-          <ThemedLogo variant="wide" className="h-5 w-auto opacity-70" />
+          <Clock />
+        </div>
+
+        {/* Right Side: Version & Logo */}
+        <div className="flex items-center gap-3">
+          <span className="font-medium text-foreground/80">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+          <ThemedLogo variant="wide" className="h-6 w-auto drop-shadow-sm" />
         </div>
       </footer>
     </>

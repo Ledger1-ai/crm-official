@@ -931,14 +931,14 @@ export function InternalMessagesComponent({
                                                     className={cn(
                                                         "w-full flex items-start gap-3 p-4 text-left hover:bg-muted/50 transition-colors",
                                                         selectedSubmissionId === submission.id && "bg-muted",
-                                                        submission.status === "NEW" && "bg-green-50 dark:bg-green-950/30"
+                                                        submission.status === "NEW" && "bg-muted/30"
                                                     )}
                                                 >
                                                     {submission.status === "NEW" && (
-                                                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                                                        <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5 shrink-0" />
                                                     )}
-                                                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                                                        <FormInput className="h-4 w-4 text-white" />
+                                                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                                                        <FormInput className="h-4 w-4 text-primary" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
@@ -948,7 +948,7 @@ export function InternalMessagesComponent({
                                                             )}>
                                                                 {name}
                                                             </span>
-                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                                                                 Form
                                                             </Badge>
                                                             {submission.converted_lead_id && (
@@ -1005,15 +1005,15 @@ export function InternalMessagesComponent({
                                                         "opacity-75"
                                                     )}
                                                 >
-                                                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center">
-                                                        <Trash2 className="h-4 w-4 text-white" />
+                                                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-gray-500/10 flex items-center justify-center">
+                                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-sm truncate">
                                                                 {name}
                                                             </span>
-                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
+                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                                                                 Deleted
                                                             </Badge>
                                                         </div>
@@ -1079,11 +1079,11 @@ export function InternalMessagesComponent({
                                                 className={cn(
                                                     "w-full flex items-start gap-3 p-4 text-left hover:bg-muted/50 transition-colors",
                                                     selectedMessageId === message.id && "bg-muted",
-                                                    !message.is_read && activeNav === "inbox" && "bg-blue-50 dark:bg-blue-950/30"
+                                                    !message.is_read && activeNav === "inbox" && "bg-muted/30"
                                                 )}
                                             >
                                                 {!message.is_read && activeNav === "inbox" && (
-                                                    <div className="h-2.5 w-2.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                                                    <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5 shrink-0" />
                                                 )}
                                                 <Avatar className="h-9 w-9 flex-shrink-0">
                                                     <AvatarFallback className="text-xs">
@@ -1136,7 +1136,7 @@ export function InternalMessagesComponent({
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
                                             <h3 className="font-semibold">{selectedSubmission.form.name}</h3>
-                                            <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                                            <Badge variant="secondary">
                                                 Form Submission
                                             </Badge>
                                         </div>
@@ -1238,8 +1238,8 @@ export function InternalMessagesComponent({
                                 </div>
                                 <div className="p-4 border-b bg-muted/30">
                                     <div className="flex items-start gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
-                                            <FormInput className="h-5 w-5 text-white" />
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                            <FormInput className="h-5 w-5 text-primary" />
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">

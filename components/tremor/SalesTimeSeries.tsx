@@ -76,7 +76,7 @@ export default function SalesTimeSeries() {
     }, [data]);
 
     return (
-        <Card className="rounded-md">
+        <Card className="rounded-lg bg-card text-card-foreground border-border ring-0 shadow-sm">
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:flex-wrap">
                 <Title className="text-primary">Sales Over Time</Title>
                 <div className="flex w-full flex-col sm:flex-row sm:flex-wrap items-center gap-2">

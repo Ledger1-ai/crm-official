@@ -48,8 +48,8 @@ function ChartCard({ title, children, delay = 0, className }: ChartCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay }}
         >
-            <Card className={cn("rounded-xl", className)}>
-                <Title className="text-sm font-semibold mb-4">{title}</Title>
+            <Card className={cn("rounded-xl bg-card text-card-foreground border-border ring-0 shadow-sm", className)}>
+                <Title className="text-sm font-semibold mb-4 text-foreground">{title}</Title>
                 {children}
             </Card>
         </motion.div>

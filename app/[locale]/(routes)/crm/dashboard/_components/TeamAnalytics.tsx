@@ -40,6 +40,14 @@ type TeamAnalyticsProps = {
 export default function TeamAnalytics({ team, leaderboard, weights, onUserSelect, isMember = false }: TeamAnalyticsProps) {
   const stageChartData = Object.entries(team.stageCounts).map(([k, v]) => ({ name: k.replace("_", " "), Number: v as number }));
 
+  const colorMap: Record<string, string> = {
+    Identify: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+    Engage_AI: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    Engage_Human: "bg-violet-500/10 text-violet-500 border-violet-500/20",
+    Offering: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    Finalizing: "bg-teal-500/10 text-teal-500 border-teal-500/20",
+    Closed: "bg-green-500/10 text-green-500 border-green-500/20",
+  };
   return (
     <div className="space-y-6">
       {/* Team Overview - Hidden for Members */}
@@ -124,12 +132,14 @@ export default function TeamAnalytics({ team, leaderboard, weights, onUserSelect
       {/* Weights legend */}
       <div className="rounded-lg border bg-card p-4 shadow-sm">
         <h3 className="text-sm font-semibold mb-2">Stage weights</h3>
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-          {Object.entries(weights).map(([stage, w]) => (
-            <div key={stage} className="px-2 py-1 rounded border bg-muted/30">
-              {stage.replace("_", " ")}: {w}
-            </div>
-          ))}
+        <div className="flex flex-wrap gap-3 text-xs">
+          {Object.entries(weights).map(([stage, w]) => {
+            return (
+              <div key={stage} className={cn("px-3 py-1.5 rounded-md border font-medium", colorMap[stage] || "bg-muted/30 text-muted-foreground")}>
+                {stage.replace("_", " ")}: {w}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
