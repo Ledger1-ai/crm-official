@@ -53,9 +53,10 @@ export default function GlobalSearchWidget() {
                 <Search className="h-4 w-4 text-muted-foreground mr-2 shrink-0" />
 
                 <input
-                    className="bg-transparent border-none outline-none text-sm w-full placeholder:text-muted-foreground/50 h-full"
+                    className="!bg-transparent border-none outline-none text-sm w-full placeholder:text-muted-foreground/50 h-full"
                     placeholder="Search tasks, leads, projects..."
                     value={query}
+                    autoComplete="off"
                     onChange={(e) => handleSearch(e.target.value)}
                     onFocus={() => { if (query.length >= 2) setShowResults(true); }}
                 />
