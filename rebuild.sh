@@ -49,16 +49,17 @@ git pull
 echo "Rebuilding Next.js App"
 
 # Install dependencies
-pnpm install
+# Install dependencies
+npm install
 
 # Update Prisma scheme
-pnpm prisma db push
+npx prisma db push
 
 # Seed DB
-pnpm prisma db seed
+npx prisma db seed
 
 # Build Next.js App
-pnpm build
+npm run build
 
 # Start PM2 process
 echo "Start PM2 process: $variable"

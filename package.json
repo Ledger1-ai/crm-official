@@ -121,7 +121,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^13.0.0",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "xmlbuilder2": "^4.0.3",
     "zod": "^4.3.5",
     "zustand": "^5.0.9"
@@ -152,25 +152,11 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.51.0"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "react": "19",
-        "react-dom": "19"
-      }
-    },
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "@swc/core",
-      "aws-crt",
-      "bcrypt",
-      "canvas",
-      "cypress",
-      "prisma",
-      "protobufjs",
-      "puppeteer",
-      "sharp"
-    ]
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom",
+    "utf7": {
+      "semver": "^5.7.2"
+    }
   }
 }
