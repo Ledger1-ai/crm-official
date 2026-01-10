@@ -99,11 +99,34 @@ const PRESETS = [
 export function ColorPicker({ label, description, value, onChange }: ColorPickerProps) {
     const [hex, setHex] = useState(() => hslToHex(value));
     const [justCopied, setJustCopied] = useState(false);
+    // Custom swatches state (14 slots)
+    const [customSwatches, setCustomSwatches] = useState<string[]>([]);
+    const [isEyeDropperSupported, setIsEyeDropperSupported] = useState(false);
 
     // Sync if external value changes (e.g. preset loaded)
     useEffect(() => {
         setHex(hslToHex(value));
     }, [value]);
+
+    // Load custom swatches from local storage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem("theme-custom-swatches");
+        if (saved) {
+            try {
+                setCustomSwatches(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse custom swatches", e);
+            }
+        } else {
+            // Initialize with empty strings or default placeholders if needed
+            // For now, we'll just allow adding new ones up to 14
+        }
+
+        // Check for EyeDropper support
+        if (typeof window !== "undefined" && "EyeDropper" in window) {
+            setIsEyeDropperSupported(true);
+        }
+    }, []);
 
     const handleColorChange = (newHex: string) => {
         setHex(newHex);
@@ -114,6 +137,34 @@ export function ColorPicker({ label, description, value, onChange }: ColorPicker
         navigator.clipboard.writeText(hex.toUpperCase());
         setJustCopied(true);
         setTimeout(() => setJustCopied(false), 2000);
+    };
+
+    const handleEyeDropper = async () => {
+        if (!isEyeDropperSupported) return;
+        try {
+            // @ts-ignore - EyeDropper is new
+            const eyeDropper = new window.EyeDropper();
+            // @ts-ignore
+            const result = await eyeDropper.open();
+            handleColorChange(result.sRGBHex);
+        } catch (e) {
+            console.log("EyeDropper canceled or failed", e);
+        }
+    };
+
+    const saveToCustomSwatch = (colorToSave: string) => {
+        let newSwatches = [...customSwatches];
+        // If already exists, move to front
+        if (newSwatches.includes(colorToSave)) {
+            newSwatches = newSwatches.filter(c => c !== colorToSave);
+        }
+        newSwatches.unshift(colorToSave);
+        // Limit to 14
+        if (newSwatches.length > 14) {
+            newSwatches = newSwatches.slice(0, 14);
+        }
+        setCustomSwatches(newSwatches);
+        localStorage.setItem("theme-custom-swatches", JSON.stringify(newSwatches));
     };
 
     return (
@@ -148,26 +199,26 @@ export function ColorPicker({ label, description, value, onChange }: ColorPicker
                     >
                         <Copy className="w-2.5 h-2.5" />
                     </button>
+                    {isEyeDropperSupported && (
+                        <button
+                            onClick={handleEyeDropper}
+                            className="ml-0.5 p-0.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+                            title="Pick Color from Screen"
+                        >
+                            <Presentation className="w-2.5 h-2.5 rotate-180" /> {/* Using Presentation as Pipette-like icon implies picking */}
+                        </button>
+                    )}
                 </div>
 
                 {/* Popover Picker */}
                 <Popover>
                     <PopoverTrigger asChild>
                         <button
-                            className="relative w-8 h-8 rounded-md border border-border/50 shadow-sm transition-transform active:scale-95 hover:scale-105 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 overflow-hidden flex items-center justify-center bg-background group/easel"
+                            className="w-9 h-9 rounded-md border border-border/50 shadow-sm transition-transform active:scale-95 hover:scale-105 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 overflow-hidden"
                             title="Pick color"
+                            style={{ backgroundColor: hex }}
                         >
-                            {/* Easel Leg Effect */}
-                            <div className="absolute bottom-0 w-1 h-3 bg-muted-foreground/30 rounded-full transform translate-y-1" />
-
-                            {/* Canvas Color */}
-                            <div
-                                className="w-4 h-4 rounded-[1px] shadow-sm relative z-10 border border-black/10 dark:border-white/10"
-                                style={{ backgroundColor: hex }}
-                            />
-
-                            {/* Easel Top Frame */}
-                            <Presentation className="absolute w-full h-full text-foreground/20 stroke-[1.5px] z-0 scale-125 pb-0.5" />
+                            {/* Solid Color Block - No Icon */}
                         </button>
                     </PopoverTrigger>
                     <PopoverContent
@@ -190,21 +241,69 @@ export function ColorPicker({ label, description, value, onChange }: ColorPicker
                                         prefixed={false}
                                     />
                                 </div>
+                                {isEyeDropperSupported && (
+                                    <button
+                                        onClick={handleEyeDropper}
+                                        className="h-8 w-8 flex items-center justify-center rounded-md border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200 transition-colors"
+                                        title="Pick from Screen"
+                                    >
+                                        <Presentation className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
 
-                            <div className="grid grid-cols-8 gap-1">
-                                {PRESETS.map((color) => (
+                            {/* Preset Colors */}
+                            <div>
+                                <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-1.5">Presets</div>
+                                <div className="grid grid-cols-8 gap-1">
+                                    {PRESETS.map((color) => (
+                                        <button
+                                            key={color}
+                                            className={cn(
+                                                "w-5 h-5 rounded-sm border border-white/10 shadow-sm transition-all hover:scale-110",
+                                                hex.toLowerCase() === color.toLowerCase() && "ring-2 ring-white ring-offset-1 ring-offset-black"
+                                            )}
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => handleColorChange(color)}
+                                            title={color}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Custom Swatches */}
+                            <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <div className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Custom</div>
                                     <button
-                                        key={color}
-                                        className={cn(
-                                            "w-5 h-5 rounded-sm border border-white/10 shadow-sm transition-all hover:scale-110",
-                                            hex.toLowerCase() === color.toLowerCase() && "ring-2 ring-white ring-offset-1 ring-offset-black"
-                                        )}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => handleColorChange(color)}
-                                        title={color}
-                                    />
-                                ))}
+                                        onClick={() => saveToCustomSwatch(hex)}
+                                        className="text-[10px] text-primary hover:underline"
+                                    >
+                                        + Save Current
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-7 gap-1">
+                                    {/* Render saved swatches */}
+                                    {customSwatches.map((color, i) => (
+                                        <button
+                                            key={`${color}-${i}`}
+                                            className={cn(
+                                                "w-6 h-6 rounded-sm border border-white/10 shadow-sm transition-all hover:scale-110",
+                                                hex.toLowerCase() === color.toLowerCase() && "ring-2 ring-white ring-offset-1 ring-offset-black"
+                                            )}
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => handleColorChange(color)}
+                                            title={color}
+                                        />
+                                    ))}
+                                    {/* Fill remaining slots up to 14 with empty placeholders */}
+                                    {Array.from({ length: Math.max(0, 14 - customSwatches.length) }).map((_, i) => (
+                                        <div
+                                            key={`empty-${i}`}
+                                            className="w-6 h-6 rounded-sm border border-neutral-800 bg-neutral-900"
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </PopoverContent>

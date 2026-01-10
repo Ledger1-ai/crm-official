@@ -11,16 +11,19 @@ import {
     Check,
     AlertTriangle,
     Sparkles,
+    MousePointer2,
+    Move,
+    Type,
+    Palette,
+    Layers,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { ColorPicker } from "./ColorPicker";
 import { LivePreview } from "./LivePreview";
-import { ThemeCard } from "./ThemeCard";
 import { THEME_PRESETS, type ThemePreset } from "@/app/providers/ThemeProvider";
 
 // Default colors for a new custom theme
@@ -34,10 +37,10 @@ const DEFAULT_CUSTOM_COLORS = {
     primaryForeground: "0 0% 5%",
     accent: "45 90% 20%",
     accentGlow: "45 90% 35%",
-    success: "142 71% 45%",
-    warning: "38 92% 50%",
-    error: "0 84% 60%",
+    // Removed Status Colors as per new plan
 };
+
+const DEFAULT_RADIUS = "0.5rem";
 
 // Preset theme metadata for quick start
 const PRESET_COLORS: Record<ThemePreset, Partial<typeof DEFAULT_CUSTOM_COLORS>> = {
@@ -55,6 +58,8 @@ export interface CustomTheme {
     id: string;
     name: string;
     colors: typeof DEFAULT_CUSTOM_COLORS;
+    radius: string;
+    motion: "fast" | "fluid";
     createdAt: number;
     shared?: boolean;
 }
@@ -75,32 +80,33 @@ export function ThemeEditor({
     const router = useRouter();
     const [themeName, setThemeName] = useState(editingTheme?.name || "My Custom Theme");
 
-    // Initialize colors based on priority:
-    // 1. editingTheme (if we are editing a specific custom theme)
-    // 2. activeCustomTheme (if we are creating new but want to start from current custom theme)
-    // 3. activeThemeId (if we are creating new and starting from a preset)
-    // 4. Default fallback
+    // Colors State
     const [colors, setColors] = useState<typeof DEFAULT_CUSTOM_COLORS>(() => {
         if (editingTheme?.colors) return editingTheme.colors;
-
         if (activeCustomTheme?.colors) return activeCustomTheme.colors;
-
         if (activeThemeId && activeThemeId in PRESET_COLORS) {
             return {
                 ...DEFAULT_CUSTOM_COLORS,
                 ...PRESET_COLORS[activeThemeId as ThemePreset],
             };
         }
-
         return { ...DEFAULT_CUSTOM_COLORS };
     });
 
-    const [reducedMotion, setReducedMotion] = useState(false);
+    // System Feel State
+    const [radius, setRadius] = useState<string>(editingTheme?.radius || DEFAULT_RADIUS);
+    const [motion, setMotion] = useState<"fast" | "fluid">(editingTheme?.motion || "fluid");
 
     // Apply preview styles to document
     useEffect(() => {
         const style = document.createElement("style");
         style.id = "theme-editor-preview";
+
+        // Convert motion choice to CSS logic (approximate for preview)
+        // Note: Real reduced motion usually uses media query. Here we simulate via transition duration override?
+        // Actually the global css uses :root.reduced-motion. We can toggle a class on body or just specific vars.
+        // For now, let's just handle colors and radius. Motion visualization in preview might be subtle.
+
         style.textContent = `
       :root {
         --background: ${colors.background} !important;
@@ -120,6 +126,7 @@ export function ThemeEditor({
         --border: ${colors.primary} / 0.2 !important;
         --input: ${colors.elevated} !important;
         --ring: ${colors.primary} !important;
+        --radius: ${radius} !important;
       }
     `;
 
@@ -127,10 +134,18 @@ export function ThemeEditor({
         document.getElementById("theme-editor-preview")?.remove();
         document.head.appendChild(style);
 
+        // Motion handling (toggle class on body for preview purposes)
+        if (motion === "fast") {
+            document.documentElement.classList.add("reduced-motion"); // Using existing class from globals.css
+        } else {
+            document.documentElement.classList.remove("reduced-motion");
+        }
+
         return () => {
             document.getElementById("theme-editor-preview")?.remove();
+            document.documentElement.classList.remove("reduced-motion");
         };
-    }, [colors]);
+    }, [colors, radius, motion]);
 
     const updateColor = (key: keyof typeof colors, value: string) => {
         setColors((prev) => ({ ...prev, [key]: value }));
@@ -143,6 +158,8 @@ export function ThemeEditor({
 
     const resetToDefault = () => {
         setColors({ ...DEFAULT_CUSTOM_COLORS });
+        setRadius(DEFAULT_RADIUS);
+        setMotion("fluid");
         setThemeName("My Custom Theme");
     };
 
@@ -155,6 +172,8 @@ export function ThemeEditor({
             id: editingTheme?.id || `custom-${Date.now()}`,
             name: themeName,
             colors,
+            radius,
+            motion,
             createdAt: editingTheme?.createdAt || Date.now(),
         };
 
@@ -188,6 +207,8 @@ export function ThemeEditor({
         const exportData = {
             name: themeName,
             colors,
+            radius,
+            motion,
             exportedAt: new Date().toISOString(),
         };
         const blob = new Blob([JSON.stringify(exportData, null, 2)], {
@@ -216,6 +237,8 @@ export function ThemeEditor({
                     if (data.colors) {
                         setColors({ ...DEFAULT_CUSTOM_COLORS, ...data.colors });
                         if (data.name) setThemeName(data.name);
+                        if (data.radius) setRadius(data.radius);
+                        if (data.motion) setMotion(data.motion);
                     }
                 } catch {
                     alert("Invalid theme file");
@@ -274,131 +297,119 @@ export function ThemeEditor({
                     Create Your Theme
                 </h1>
                 <p className="text-muted-foreground">
-                    Customize every color to match your mood. Changes preview in real-time.
+                    Define your brand's look and feel, from colors to motion.
                 </p>
             </div>
 
             {/* Main Content */}
             <div className="flex-1 px-6 md:px-8 lg:px-10 pb-32">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column - Controls */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Theme Name */}
-                        <div>
-                            <Label htmlFor="theme-name" className="text-sm font-medium">
-                                Theme Name
-                            </Label>
-                            <Input
-                                id="theme-name"
-                                value={themeName}
-                                onChange={(e) => setThemeName(e.target.value)}
-                                className="mt-2"
-                                placeholder="My Custom Theme"
-                            />
-                        </div>
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    {/* Left & Middle Column - 2x2 Grid Controls */}
+                    <div className="xl:col-span-2 space-y-8">
 
-                        {/* Start from Preset */}
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                                <RotateCcw className="w-4 h-4" />
-                                Start from Preset
-                            </p>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                {THEME_PRESETS.map((preset) => (
-                                    <button
-                                        key={preset}
-                                        onClick={() => loadPreset(preset)}
-                                        className="p-2 rounded-lg border border-border/50 hover:border-primary/50 transition-colors text-left"
-                                    >
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <span
-                                                className="w-3 h-3 rounded-full"
-                                                style={{
-                                                    backgroundColor: `hsl(${PRESET_COLORS[preset].primary})`,
-                                                }}
-                                            />
-                                        </div>
-                                        <p className="text-xs font-medium truncate capitalize">
-                                            {preset.replace("-", " ")}
-                                        </p>
-                                    </button>
-                                ))}
+                        {/* Global Settings */}
+                        <div className="flex gap-6 items-end">
+                            <div className="flex-1">
+                                <Label htmlFor="theme-name" className="text-sm font-medium">
+                                    Theme Name
+                                </Label>
+                                <Input
+                                    id="theme-name"
+                                    value={themeName}
+                                    onChange={(e) => setThemeName(e.target.value)}
+                                    className="mt-2"
+                                    placeholder="My Custom Theme"
+                                />
+                            </div>
+
+                            {/* Preset Quick Loader */}
+                            <div className="flex-1">
+                                <Label className="text-sm font-medium mb-2 block">Quick Start Presets</Label>
+                                <div className="flex gap-2 overflow-x-auto pb-1">
+                                    {THEME_PRESETS.map((preset) => (
+                                        <button
+                                            key={preset}
+                                            onClick={() => loadPreset(preset)}
+                                            className="w-8 h-8 rounded-full border border-border/50 hover:scale-110 transition-transform flex-shrink-0"
+                                            style={{ backgroundColor: `hsl(${PRESET_COLORS[preset].primary})` }}
+                                            title={preset}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
                         <Separator />
 
-                        {/* Backgrounds */}
-                        <div className="space-y-8">
-                            {/* Backgrounds */}
+                        {/* 4-Quadrant Visual Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+
+                            {/* Q1: Backgrounds */}
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
-                                    <div className="w-8 h-[1px] bg-border" />
+                                    <Layers className="w-4 h-4" />
                                     Background & Surface
-                                    <div className="flex-1 h-[1px] bg-border" />
                                 </h3>
                                 <div className="space-y-3">
                                     <ColorPicker
                                         label="App Background"
-                                        description="Main application canvas color (bg0)"
+                                        description="Main application canvas (bg0)"
                                         value={colors.background}
                                         onChange={(v) => updateColor("background", v)}
                                     />
                                     <ColorPicker
-                                        label="Surface / Cards"
-                                        description="Panels, cards, and content areas (bg1)"
+                                        label="Surface Cards"
+                                        description="Panels and containers (bg1)"
                                         value={colors.surface}
                                         onChange={(v) => updateColor("surface", v)}
                                     />
                                     <ColorPicker
                                         label="Elevated Elements"
-                                        description="Modals, dropdowns, sticky headers (bg2)"
+                                        description="Modals and sticky headers (bg2)"
                                         value={colors.elevated}
                                         onChange={(v) => updateColor("elevated", v)}
                                     />
                                 </div>
                             </div>
 
-                            {/* Text */}
+                            {/* Q2: Typography */}
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
-                                    <div className="w-8 h-[1px] bg-border" />
+                                    <Type className="w-4 h-4" />
                                     Typography
-                                    <div className="flex-1 h-[1px] bg-border" />
                                 </h3>
                                 <div className="space-y-3">
                                     <ColorPicker
                                         label="Primary Text"
-                                        description="Headings, titles, and body text"
+                                        description="Headings and main content"
                                         value={colors.foreground}
                                         onChange={(v) => updateColor("foreground", v)}
                                     />
                                     <ColorPicker
                                         label="Muted Text"
-                                        description="Descriptions, labels, and secondary text"
+                                        description="Subtitles and metadata"
                                         value={colors.mutedForeground}
                                         onChange={(v) => updateColor("mutedForeground", v)}
                                     />
                                 </div>
                             </div>
 
-                            {/* Brand & Accent */}
+                            {/* Q3: Brand Core */}
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
-                                    <div className="w-8 h-[1px] bg-border" />
-                                    Brand & Identity
-                                    <div className="flex-1 h-[1px] bg-border" />
+                                    <Palette className="w-4 h-4" />
+                                    Brand Core
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="space-y-3">
                                     <ColorPicker
-                                        label="Primary Brand Color"
-                                        description="Main action buttons and links"
+                                        label="Primary Color"
+                                        description="Main buttons and active states"
                                         value={colors.primary}
                                         onChange={(v) => updateColor("primary", v)}
                                     />
                                     <ColorPicker
                                         label="Primary Foreground"
-                                        description="Text color on primary buttons"
+                                        description="Text on primary buttons"
                                         value={colors.primaryForeground}
                                         onChange={(v) => updateColor("primaryForeground", v)}
                                     />
@@ -409,7 +420,7 @@ export function ThemeEditor({
                                         onChange={(v) => updateColor("accent", v)}
                                     />
                                     <ColorPicker
-                                        label="Accent Glow"
+                                        label="Glow"
                                         description="Focus rings and subtle glows"
                                         value={colors.accentGlow}
                                         onChange={(v) => updateColor("accentGlow", v)}
@@ -417,138 +428,148 @@ export function ThemeEditor({
                                 </div>
                             </div>
 
-                            {/* Status System */}
+                            {/* Q4: System Feel */}
                             <div>
                                 <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
-                                    <div className="w-8 h-[1px] bg-border" />
-                                    Status System
-                                    <div className="flex-1 h-[1px] bg-border" />
+                                    <MousePointer2 className="w-4 h-4" />
+                                    System Feel
                                 </h3>
-                                <div className="space-y-3">
-                                    <ColorPicker
-                                        label="Success"
-                                        description="Positive actions, completion states"
-                                        value={colors.success}
-                                        onChange={(v) => updateColor("success", v)}
-                                    />
-                                    <ColorPicker
-                                        label="Warning"
-                                        description="Alerts, caution states"
-                                        value={colors.warning}
-                                        onChange={(v) => updateColor("warning", v)}
-                                    />
-                                    <ColorPicker
-                                        label="Error / Destructive"
-                                        description="Errors, destructive actions"
-                                        value={colors.error}
-                                        onChange={(v) => updateColor("error", v)}
-                                    />
+                                <div className="space-y-6 p-4 rounded-xl border border-border/40 bg-card/20">
+                                    {/* Radius Control */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-xs font-medium">Corner Radius</Label>
+                                            <span className="text-[10px] text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
+                                                {radius}
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="1.5"
+                                            step="0.1"
+                                            value={parseFloat(radius)}
+                                            onChange={(e) => setRadius(`${e.target.value}rem`)}
+                                            className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                                        />
+                                        <div className="flex justify-between text-[10px] text-muted-foreground px-0.5">
+                                            <span>Square</span>
+                                            <span>Round</span>
+                                        </div>
+                                    </div>
+
+                                    <Separator className="opacity-50" />
+
+                                    {/* Motion Control */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <Label className="text-xs font-medium">Motion Speed</Label>
+                                            <Move className="w-3 h-3 text-muted-foreground" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                onClick={() => setMotion("fast")}
+                                                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${motion === "fast"
+                                                    ? "bg-primary/20 border-primary text-primary"
+                                                    : "bg-transparent border-border text-muted-foreground hover:bg-muted"
+                                                    }`}
+                                            >
+                                                Fast (Reduced)
+                                            </button>
+                                            <button
+                                                onClick={() => setMotion("fluid")}
+                                                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${motion === "fluid"
+                                                    ? "bg-primary/20 border-primary text-primary"
+                                                    : "bg-transparent border-border text-muted-foreground hover:bg-muted"
+                                                    }`}
+                                            >
+                                                Fluid (Standard)
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <Separator />
-
-                        {/* Motion */}
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                                Motion
-                            </p>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setReducedMotion(true)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${reducedMotion
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-muted text-muted-foreground hover:text-foreground"
-                                        }`}
-                                >
-                                    Minimal
-                                </button>
-                                <button
-                                    onClick={() => setReducedMotion(false)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${!reducedMotion
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-muted text-muted-foreground hover:text-foreground"
-                                        }`}
-                                >
-                                    Balanced
-                                </button>
-                            </div>
                         </div>
                     </div>
 
                     {/* Right Column - Preview & Actions */}
                     <div className="space-y-6">
                         {/* Live Preview */}
-                        <LivePreview
-                            themeName={themeName}
-                            colors={{
-                                background: colors.background,
-                                surface: colors.surface,
-                                foreground: colors.foreground,
-                                mutedForeground: colors.mutedForeground,
-                                primary: colors.primary,
-                                primaryForeground: colors.primaryForeground,
-                                accent: colors.accent,
-                                success: colors.success,
-                                warning: colors.warning,
-                                error: colors.error,
-                            }}
-                        />
+                        <div className="sticky top-6">
+                            <LivePreview
+                                themeName={themeName}
+                                colors={{
+                                    background: colors.background,
+                                    surface: colors.surface,
+                                    foreground: colors.foreground,
+                                    mutedForeground: colors.mutedForeground,
+                                    primary: colors.primary,
+                                    primaryForeground: colors.primaryForeground,
+                                    accent: colors.accent,
+                                    // Pass mock status colors if needed by older preview, 
+                                    // but we will update LivePreview next
+                                    success: "142 71% 45%",
+                                    warning: "38 92% 50%",
+                                    error: "0 84% 60%",
+                                }}
+                                radius={radius}
+                            />
 
-                        {/* Readability Check */}
-                        <div
-                            className={`p-4 rounded-lg border ${contrastResult.passed
-                                ? "border-green-500/30 bg-green-500/10"
-                                : "border-yellow-500/30 bg-yellow-500/10"
-                                }`}
-                        >
-                            <p className="text-sm font-medium mb-2">Readability</p>
-                            {contrastResult.passed ? (
-                                <div className="flex items-center gap-2 text-green-500 text-sm">
-                                    <Check className="w-4 h-4" />
-                                    All contrast checks passed
-                                </div>
-                            ) : (
-                                <div className="space-y-1">
-                                    {contrastResult.issues.map((issue, i) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-center gap-2 text-yellow-500 text-sm"
-                                        >
-                                            <AlertTriangle className="w-4 h-4" />
-                                            {issue}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-2">
-                            <Button variant="outline" className="w-full" onClick={exportTheme}>
-                                <Download className="w-4 h-4 mr-2" />
-                                Export Theme
-                            </Button>
-                            <Button variant="outline" className="w-full" onClick={importTheme}>
-                                <Upload className="w-4 h-4 mr-2" />
-                                Import Theme
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full"
-                                onClick={resetToDefault}
+                            {/* Readability Check */}
+                            <div
+                                className={`mt-4 p-4 rounded-lg border ${contrastResult.passed
+                                    ? "border-green-500/30 bg-green-500/10"
+                                    : "border-yellow-500/30 bg-yellow-500/10"
+                                    }`}
                             >
-                                <RotateCcw className="w-4 h-4 mr-2" />
-                                Reset to Default
-                            </Button>
+                                <p className="text-sm font-medium mb-2">Readability</p>
+                                {contrastResult.passed ? (
+                                    <div className="flex items-center gap-2 text-green-500 text-sm">
+                                        <Check className="w-4 h-4" />
+                                        All contrast checks passed
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {contrastResult.issues.map((issue, i) => (
+                                            <div
+                                                key={i}
+                                                className="flex items-center gap-2 text-yellow-500 text-sm"
+                                            >
+                                                <AlertTriangle className="w-4 h-4" />
+                                                {issue}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="mt-6 space-y-2">
+                                <Button variant="outline" className="w-full" onClick={exportTheme}>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Export Theme
+                                </Button>
+                                <Button variant="outline" className="w-full" onClick={importTheme}>
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    Import Theme
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    className="w-full hover:bg-destructive/10 hover:text-destructive"
+                                    onClick={resetToDefault}
+                                >
+                                    <RotateCcw className="w-4 h-4 mr-2" />
+                                    Reset to Default
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Sticky Footer */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border">
                 <div className="flex items-center justify-end gap-3 px-6 py-4 md:px-8 lg:px-10">
                     <Button variant="ghost" onClick={handleCancel}>
                         <X className="w-4 h-4 mr-2" />
