@@ -49,10 +49,10 @@ export default function BasaltFooter() {
                             <span className="text-cyan-500 font-semibold">Your Business. Supercharged.</span> Empowering companies with autonomous AI agents that drive revenue and customer satisfaction.
                         </p>
                         <a
-                            href="mailto:hello@basalthq.com"
+                            href="mailto:info@basalthq.com"
                             className="text-cyan-500 text-sm hover:underline"
                         >
-                            hello@basalthq.com
+                            info@basalthq.com
                         </a>
                     </div>
 
