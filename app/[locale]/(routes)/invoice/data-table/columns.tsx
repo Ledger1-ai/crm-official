@@ -98,15 +98,6 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: true,
   }, */
   {
-    accessorKey: "rossum_status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Rosssum state" />
-    ),
-    cell: ({ row }) => <div className="">{row.getValue("rossum_status")}</div>,
-    enableSorting: false,
-    enableHiding: true,
-  },
-  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

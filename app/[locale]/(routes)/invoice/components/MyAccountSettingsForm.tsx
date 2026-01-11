@@ -257,6 +257,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="CZ12345678"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -274,6 +275,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="Fio banka, a.s."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -291,6 +293,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="123456789"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -308,6 +311,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="2010"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -325,6 +329,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="CZ1234567890000060000001"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -342,6 +347,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="FIOBCZPPXXX"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -414,6 +420,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="CZK"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -431,6 +438,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                           disabled={isLoading}
                           placeholder="Kč"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -453,6 +461,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="+420"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -470,6 +479,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="123 456 789"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -504,6 +514,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="608 123 456"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -540,6 +551,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="123 456 789"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -558,7 +570,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Office street</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -575,6 +587,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="New York"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -588,7 +601,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Office state</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -601,7 +614,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Office zip</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -614,7 +627,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Office country</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -627,7 +640,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Office country code</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} placeholder="CZ" {...field} />
+                      <Input disabled={isLoading} placeholder="CZ" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -642,7 +655,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Business street</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -659,6 +672,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                         disabled={isLoading}
                         placeholder="New York"
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -672,7 +686,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Business state</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -685,7 +699,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Business zip</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -698,7 +712,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Business country</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} {...field} />
+                      <Input disabled={isLoading} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -711,7 +725,7 @@ export function MyAccountSettingsForm({ initialData }: UpdateAccountFormProps) {
                   <FormItem>
                     <FormLabel>Business country code</FormLabel>
                     <FormControl>
-                      <Input disabled={isLoading} placeholder="CZ" {...field} />
+                      <Input disabled={isLoading} placeholder="CZ" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

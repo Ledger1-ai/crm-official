@@ -71,7 +71,7 @@ const ResendCard = async () => {
 
       {/* Update Key Form */}
       <form action={setSMTP} className="flex items-center gap-2">
-        <input type="hidden" name="id" value={resend_key?.id} />
+        <input type="hidden" name="id" value={resend_key?.id ?? ""} readOnly />
         <Input
           type="password"
           name="serviceKey"

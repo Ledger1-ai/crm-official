@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
-import { Eye, UserPlus, Check, X, Filter, ChevronDown, ChevronRight, Mail, Phone, Building, Trash2, Archive, Loader2 } from "lucide-react";
+import { Eye, UserPlus, Check, X, Filter, ChevronDown, ChevronRight, Mail, Phone, Building, Trash2, Archive, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 interface FormSubmission {
     id: string;
@@ -42,9 +43,10 @@ interface FormSubmissionsViewProps {
     submissions: FormSubmission[];
     forms: Form[];
     initialFormId?: string;
+    disableFormSelect?: boolean;
 }
 
-export function FormSubmissionsView({ submissions, forms, initialFormId = "all" }: FormSubmissionsViewProps) {
+export function FormSubmissionsView({ submissions, forms, initialFormId = "all", disableFormSelect = false }: FormSubmissionsViewProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [selectedFormId, setSelectedFormId] = useState<string>(initialFormId);
@@ -54,10 +56,22 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all" 
     const [isCreatingLead, setIsCreatingLead] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState<string | null>(null);
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+    const [searchQuery, setSearchQuery] = useState("");
 
     const filteredSubmissions = submissions.filter((s) => {
         if (selectedFormId !== "all" && s.form_id !== selectedFormId) return false;
         if (statusFilter !== "all" && s.status !== statusFilter) return false;
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            return (
+                (s.extracted_name && s.extracted_name.toLowerCase().includes(query)) ||
+                (s.extracted_email && s.extracted_email.toLowerCase().includes(query)) ||
+                (s.extracted_company && s.extracted_company.toLowerCase().includes(query)) ||
+                (s.form?.name && s.form.name.toLowerCase().includes(query))
+            );
+        }
+
         return true;
     });
 
@@ -175,28 +189,39 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all" 
                         Filters
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="flex gap-4">
-                    <div className="w-[200px]">
-                        <Select
-                            value={selectedFormId}
-                            onValueChange={(val) => {
-                                setSelectedFormId(val);
-                                router.push(val === "all" ? window.location.pathname : `${window.location.pathname}?form=${val}`);
-                            }}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filter by form" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Forms</SelectItem>
-                                {forms.map((form) => (
-                                    <SelectItem key={form.id} value={form.id}>
-                                        {form.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                <CardContent className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search by name, email, company..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9"
+                        />
                     </div>
+                    {!disableFormSelect && (
+                        <div className="w-[200px]">
+                            <Select
+                                value={selectedFormId}
+                                onValueChange={(val) => {
+                                    setSelectedFormId(val);
+                                    router.push(val === "all" ? window.location.pathname : `${window.location.pathname}?form=${val}`);
+                                }}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by form" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Forms</SelectItem>
+                                    {forms.map((form) => (
+                                        <SelectItem key={form.id} value={form.id}>
+                                            {form.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                     <div className="w-[200px]">
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
                             <SelectTrigger>
@@ -223,7 +248,7 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all" 
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ScrollArea className="h-[600px]">
+                    <ScrollArea>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -244,9 +269,8 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all" 
                                     </TableRow>
                                 ) : (
                                     filteredSubmissions.map((submission) => (
-                                        <>
+                                        <React.Fragment key={submission.id}>
                                             <TableRow
-                                                key={submission.id}
                                                 className={cn(
                                                     "cursor-pointer hover:bg-muted/50",
                                                     expandedRows.has(submission.id) && "bg-muted/50"
@@ -357,7 +381,7 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all" 
                                                     </TableCell>
                                                 </TableRow>
                                             )}
-                                        </>
+                                        </React.Fragment>
                                     ))
                                 )}
                             </TableBody>

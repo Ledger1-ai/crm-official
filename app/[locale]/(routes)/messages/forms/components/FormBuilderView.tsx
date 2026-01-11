@@ -758,7 +758,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={(e) => { e.stopPropagation(); router.push(`/messages/submissions?form=${form.id}`); }}
+                                                onClick={(e) => { e.stopPropagation(); router.push(`/messages/forms/${form.id}/submissions`); }}
                                                 className="h-8 px-2"
                                             >
                                                 <ExternalLink className="h-4 w-4 mr-1" />
@@ -840,7 +840,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => router.push(`/messages/submissions?form=${form.id}`)}>
+                                            <DropdownMenuItem onClick={() => router.push(`/messages/forms/${form.id}/submissions`)}>
                                                 <ExternalLink className="h-4 w-4 mr-2" /> View Submissions
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => showCustomize(form)}>
@@ -894,7 +894,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => router.push(`/messages/submissions?form=${form.id}`)}>
+                                            <DropdownMenuItem onClick={() => router.push(`/messages/forms/${form.id}/submissions`)}>
                                                 <ExternalLink className="h-4 w-4 mr-2" /> View Submissions
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => showCustomize(form)}>
@@ -941,7 +941,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                                         variant="outline"
                                         size="sm"
                                         className="flex-1"
-                                        onClick={() => router.push(`/messages/submissions?form=${form.id}`)}
+                                        onClick={() => router.push(`/messages/forms/${form.id}/submissions`)}
                                     >
                                         <ExternalLink className="h-4 w-4 mr-1" />
                                         Submissions

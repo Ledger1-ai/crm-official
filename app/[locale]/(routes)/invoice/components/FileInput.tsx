@@ -29,23 +29,30 @@ export function FileInput({ onClose }: Props) {
       const data = new FormData();
       data.set("file", file);
 
-      const res = await fetch("/api/upload", {
+      const res = await fetch("/api/upload?context=invoice", {
         method: "POST",
         body: data,
       });
       // handle the error
       if (!res.ok) throw new Error(await res.text());
+
+      toast({
+        title: "Success",
+        description: "Invoice uploaded successfully",
+      });
+      router.refresh();
+      onClose();
     } catch (e: any) {
       // Handle errors here
       console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: e.message || "Something went wrong",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    toast({
-      title: "Success",
-      description: "Invoice uploaded successfully",
-    });
-    router.refresh();
-    setIsLoading(false);
-    onClose();
   };
 
   return (
@@ -62,7 +69,7 @@ export function FileInput({ onClose }: Props) {
         {isLoading ? (
           <div className="flex space-x-5">
             <Icons.spinner className="animate-spin" />
-            <span className="">Uploading...</span>
+            <span className="">Processing Document...</span>
           </div>
         ) : (
           <span>Upload</span>

@@ -82,7 +82,7 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden">
+    <div className="fixed inset-0 flex h-[100dvh] overflow-hidden">
       <RecentActivityTracker />
       <SideBar />
       <div className="flex flex-col h-full w-full min-w-0 overflow-hidden">

@@ -176,6 +176,8 @@ model crm_Opportunities {
   assigned_campaings   crm_campaigns?                  @relation(fields: [campaign], references: [id])
   connected_documents  String[]                        @db.ObjectId
   documents            Documents[]                     @relation(fields: [connected_documents], references: [id])
+  invoiceIDs           String[]                        @db.ObjectId
+  invoices             Invoices[]                      @relation(fields: [invoiceIDs], references: [id])
   connected_contacts   String[]                        @db.ObjectId
   contacts             crm_Contacts[]                  @relation(fields: [connected_contacts], references: [id])
 
@@ -621,6 +623,12 @@ model Invoices {
   connected_documents           String[]        @db.ObjectId
   documents                     Documents[]     @relation(fields: [connected_documents], references: [id])
 
+  opportunityIDs                String[]                @db.ObjectId
+  opportunities                 crm_Opportunities[]     @relation(fields: [opportunityIDs], references: [id])
+
+  projectOpportunityIDs         String[]                @db.ObjectId
+  project_opportunities         Project_Opportunities[] @relation(fields: [projectOpportunityIDs], references: [id])
+
   team_id                       String?         @db.ObjectId
   assigned_team                 Team?           @relation(fields: [team_id], references: [id])
 }
@@ -646,6 +654,7 @@ model Documents {
   favourite              Boolean?
   document_file_mimeType String
   document_file_url      String
+  hash                   String?
   status                 String?
   visibility             String?
   tags                   Json?
@@ -1482,6 +1491,9 @@ model Project_Opportunities {
   relatedTasksIDs String[] @db.ObjectId
 
   assigned_project Boards? @relation(fields: [project], references: [id])
+
+  invoiceIDs       String[]    @db.ObjectId
+  invoices         Invoices[]  @relation(fields: [invoiceIDs], references: [id])
 }
 
 model FooterSection {

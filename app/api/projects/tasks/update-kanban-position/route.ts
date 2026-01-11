@@ -60,6 +60,45 @@ export async function PUT(req: Request) {
           },
         });
       }
+
+      // AUTOMATION: Check if moved to "Account Ready"
+      const destinationSection = await prismadb.sections.findUnique({
+        where: { id: destinationSectionId },
+        select: { title: true },
+      });
+
+      if (destinationSection?.title?.toLowerCase() === "account ready") {
+        for (const taskItem of destinationList) {
+          try {
+            // Fetch full task details
+            const task = await prismadb.tasks.findUnique({ where: { id: taskItem.id } });
+            if (task) {
+              // Check for existing account
+              const existing = await prismadb.crm_Accounts.findFirst({
+                where: { name: task.title }
+              });
+
+              if (!existing) {
+                await prismadb.crm_Accounts.create({
+                  data: {
+                    name: task.title,
+                    description: task.content || "",
+                    status: "Active",
+                    type: "Customer",
+                    createdBy: session.user.id,
+                    updatedBy: session.user.id,
+                    assigned_to: task.user || session.user.id,
+                    v: 0,
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            console.log("Automation Error", e);
+            // Continue even if one fails
+          }
+        }
+      }
       console.log("Task positions updated successfully");
       return NextResponse.json(
         {

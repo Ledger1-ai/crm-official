@@ -87,7 +87,7 @@ export default function JumpBackIn() {
                         <Link
                             key={`${item.href}-${index}`}
                             href={item.href}
-                            className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/50 transition-all text-sm font-medium capitalize"
+                            className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all text-sm font-medium capitalize"
                         >
                             {item.label}
                             <ArrowRight className="w-3 h-3 opacity-50" />

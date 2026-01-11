@@ -49,6 +49,11 @@ export default function RecentActivityTracker() {
                 const parent = parts[parts.length - 2];
                 // e.g. "leads" -> "Lead Item", "viewtask" -> "Viewtask Item"
                 let parentLabel = parent.charAt(0).toUpperCase() + parent.slice(1);
+
+                if (parentLabel === "Viewtask") {
+                    parentLabel = "View Task";
+                }
+
                 if (parentLabel.endsWith("s")) {
                     parentLabel = parentLabel.slice(0, -1);
                 }

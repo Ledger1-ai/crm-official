@@ -1,20 +1,19 @@
 import { authOptions } from "@/lib/auth";
-import { getS3Client } from "@/lib/digital-ocean-s3";
 import { prismadb } from "@/lib/prisma";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+
 export const dynamic = "force-dynamic";
 
 //Get single invoice data
-export async function GET(request: Request, { params }: any) {
+export async function GET(request: Request, props: { params: Promise<{ invoiceId: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ status: 401, body: { error: "Unauthorized" } });
   }
 
-  const { invoiceId } = params;
+  const { invoiceId } = await props.params;
 
   if (!invoiceId) {
     return NextResponse.json({
@@ -40,13 +39,13 @@ export async function GET(request: Request, { params }: any) {
 }
 
 //Delete single invoice by invoiceId
-export async function DELETE(request: Request, { params }: any) {
+export async function DELETE(request: Request, props: { params: Promise<{ invoiceId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ status: 401, body: { error: "Unauthorized" } });
   }
 
-  const { invoiceId } = params;
+  const { invoiceId } = await props.params;
 
   if (!invoiceId) {
     return NextResponse.json({
@@ -69,71 +68,51 @@ export async function DELETE(request: Request, { params }: any) {
   }
 
   try {
-    const s3 = getS3Client();
-    //Delete files from S3
-
-    //Delete invoice file from S3
+    // 1. Attempt to delete from Azure Blob Storage (Best Effort)
+    // We wrap this in a try/catch so that file storage errors DO NOT block the DB deletion.
     if (invoiceData?.invoice_file_url) {
-      const bucketParams = {
-        Bucket: process.env.DO_BUCKET,
-        Key: `invoices/${
-          invoiceData?.invoice_file_url?.split("/").slice(-1)[0]
-        }`,
-      };
-      await s3.send(new DeleteObjectCommand(bucketParams));
-      console.log("Success - invoice deleted from S3 bucket");
+      try {
+        // Lazy load the Azure client to avoid top-level dependency issues
+        const { BlobServiceClient } = require("@azure/storage-blob");
+        const connectionString = process.env.BLOB_STORAGE_CONNECTION_STRING;
+        const containerName = process.env.BLOB_STORAGE_CONTAINER;
+
+        if (connectionString && containerName) {
+          const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+          const containerClient = blobServiceClient.getContainerClient(containerName);
+
+          // Naive logic: Extract blob name from URL
+          // URL: https://<account>.blob.core.windows.net/<container>/<blobName>
+          const parts = invoiceData.invoice_file_url.split('/');
+          const blobName = parts[parts.length - 1];
+
+          if (blobName) {
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            await blockBlobClient.deleteIfExists();
+            console.log("[DELETE] Deleted blob from Azure:", blobName);
+          }
+        } else {
+          console.warn("[DELETE] Missing Azure config, skipping file delete.");
+        }
+      } catch (fileErr) {
+        console.error("[DELETE] Failed to delete file from Azure (non-fatal):", fileErr);
+      }
     }
 
-    //Delete rossum annotation files from S3 - JSON
-    if (invoiceData?.rossum_annotation_json_url) {
-      //Delete file from S3
-      const bucketParams = {
-        Bucket: process.env.DO_BUCKET,
-        Key: `rossum/${
-          invoiceData?.rossum_annotation_json_url?.split("/").slice(-1)[0]
-        }`,
-      };
-      await s3.send(new DeleteObjectCommand(bucketParams));
-      console.log("Success - rossum annotation json deleted from S3 bucket");
-    }
-
-    //Delete rossum annotation files from S3 - XML
-    if (invoiceData?.rossum_annotation_xml_url) {
-      //Delete file from S3
-      const bucketParams = {
-        Bucket: process.env.DO_BUCKET,
-        Key: `rossum/${
-          invoiceData?.rossum_annotation_xml_url?.split("/").slice(-1)[0]
-        }`,
-      };
-      await s3.send(new DeleteObjectCommand(bucketParams));
-      console.log("Success - rossum annotation xml deleted from S3 bucket");
-    }
-
-    //Delete money S3 xml document file from S3
-    if (invoiceData?.money_s3_url) {
-      //Delete file from S3
-      const bucketParams = {
-        Bucket: process.env.DO_BUCKET,
-        Key: `xml/${invoiceData?.money_s3_url?.split("/").slice(-1)[0]}`,
-      };
-      await s3.send(new DeleteObjectCommand(bucketParams));
-      console.log("Success - money S3 xml deleted from S3 bucket");
-    }
-
-    //Delete invoice from database
+    // 2. Delete invoice from database (CRITICAL priority)
     const invoice = await prismadb.invoices.delete({
       where: {
         id: invoiceId,
       },
     });
-    console.log("Invoice deleted from database");
+    console.log("[DELETE] Invoice deleted from database:", invoiceId);
+
     return NextResponse.json({ invoice }, { status: 200 });
-  } catch (err) {
-    console.log("Error", err);
-    return NextResponse.json({
-      status: 500,
-      body: { error: "Something went wrong while delete invoice" },
-    });
+  } catch (err: any) {
+    console.error("[DELETE] Error:", err);
+    return NextResponse.json(
+      { error: err.message || "Something went wrong while deleting invoice" },
+      { status: 500 }
+    );
   }
 }

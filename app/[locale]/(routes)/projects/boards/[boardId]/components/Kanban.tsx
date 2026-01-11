@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import moment from "moment";
-import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState, useMemo } from "react";
 import { Check, EyeIcon, Pencil, PlusCircle, PlusIcon } from "lucide-react";
@@ -110,10 +110,48 @@ const Kanban = (props: any) => {
     }));
   }, [data, search, filterAssignee, filterStatus, filterPriority]);
 
-  const onDragEnd = async ({ source, destination }: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination, type } = result;
+
     if (!destination) return;
-    console.log(source, "source - onDragEnd");
-    console.log(destination, "destination - onDragEnd");
+
+    // Handle Column Reordering
+    if (type === "COLUMN") {
+      if (source.index === destination.index) return;
+
+      const newSections = [...data];
+      const [removed] = newSections.splice(source.index, 1);
+      newSections.splice(destination.index, 0, removed);
+
+      setData(newSections);
+
+      try {
+        await axios.put(`/api/projects/sections/reorder-sections`, {
+          list: newSections,
+        });
+        toast({
+          title: "Section moved",
+          description: "New section position saved"
+        });
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to save section order"
+        });
+      }
+      return;
+    }
+
+    // Handle Task Reordering (Existing Logic)
+    // console.log(source, "source - onDragEnd");
+    // console.log(destination, "destination - onDragEnd");
+
+    // Note: The original logic accessed data by index, assuming data matched filteredData order.
+    // If filtering is active, indexes might not match. DND is usually disabled when filtering,
+    // but the original code didn't explicit disable it. 
+    // We will stick to the original logic structure but ensuring we access proper columns.
+
     const sourceColIndex = data.findIndex(
       (e: any) => e.id === source.droppableId
     );
@@ -143,7 +181,7 @@ const Kanban = (props: any) => {
     }
 
     try {
-      setData(data);
+      setData([...data]); // Force re-render with new reference
       await axios.put(`/api/projects/tasks/update-kanban-position`, {
         resourceList: sourceTasks,
         destinationList: destinationTasks,
@@ -163,7 +201,7 @@ const Kanban = (props: any) => {
     setIsLoadingSection(true);
     try {
       await axios.delete(`/api/projects/sections/delete-section/${sectionId}`);
-      const newData = [...data].filter((e) => e.id !== sectionId);
+      const newData = [...data].filter((e: any) => e.id !== sectionId);
       setData(newData);
       toast({
         title: "Section deleted",
@@ -183,7 +221,6 @@ const Kanban = (props: any) => {
     }
   };
 
-  //Done
   const updateSectionTitle = async (
     e: ChangeEvent<HTMLInputElement>,
     sectionId: string
@@ -191,12 +228,11 @@ const Kanban = (props: any) => {
     clearTimeout(timer);
     const newTitle = e.target.value;
     const newData = [...data];
-    const index = newData.findIndex((e) => e.id === sectionId);
+    const index = newData.findIndex((e: any) => e.id === sectionId);
     newData[index].title = newTitle;
     setData(newData);
     timer = setTimeout(async () => {
       try {
-        //updateSection(sectionId, { title: newTitle });
         await axios.put(`/api/projects/sections/update-title/${sectionId}`, {
           newTitle,
         });
@@ -210,27 +246,24 @@ const Kanban = (props: any) => {
     }, timeout);
   };
 
-  //Done
   const createTask = async (sectionId: string) => {
-    //console.log(sectionId, "sectionId - createTask");
-    //const task = await addTask(boardId, sectionId);
     try {
-      const task = await axios.post(
+      const { data: task } = await axios.post(
         `/api/projects/tasks/create-task/${boardId}`,
         {
           section: sectionId,
         }
       );
-      //console.log(task, "task - createTask");
       const newData = [...data];
-      //console.log(newData, "newData - createTask");
-      const index = newData.findIndex((e) => e.id === sectionId);
-      newData[index].tasks.unshift(task);
-      setData(newData);
-      toast({
-        title: "Task created",
-        description: "New task saved in database",
-      });
+      const index = newData.findIndex((e: any) => e.id === sectionId);
+      if (index !== -1) {
+        newData[index].tasks.unshift(task);
+        setData(newData);
+        toast({
+          title: "Task created",
+          description: "New task saved in database",
+        });
+      }
     } catch (error) {
       console.log(error);
       toast({
@@ -285,11 +318,19 @@ const Kanban = (props: any) => {
         title: "Task deleted",
         description: "Task deleted successfully",
       });
+      // Update local state if needed or rely on refresh
+      const newData = [...data];
+      const sectionIndex = newData.findIndex((s: any) => s.id === selectedTask.section);
+      if (sectionIndex !== -1) {
+        newData[sectionIndex].tasks = newData[sectionIndex].tasks.filter((t: any) => t.id !== selectedTask.id);
+        setData(newData);
+      }
+
     } catch (error) {
       console.log(error);
       toast({
         variant: "destructive",
-        title: "Task deleted",
+        title: "Error",
         description: "Something went wrong, during deleting task",
       });
     } finally {
@@ -297,13 +338,6 @@ const Kanban = (props: any) => {
       router.refresh();
     }
   };
-
-  if (isLoading) return <LoadingComponent />;
-
-  //console.log(sectionId, "sectionId - Kanban");
-  //console.log(updateOpenSheet, "updateOpenSheet - Kanban");
-
-  // ... (keep existing logic up to return)
 
   return (
     <>
@@ -408,34 +442,53 @@ const Kanban = (props: any) => {
         {/* Kanban Board Area */}
         <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 px-2">
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex h-full gap-4 snap-x snap-mandatory min-w-fit pr-10">
-              {filteredData?.map((section: any, index: number) => (
-                <KanbanColumn
-                  key={section.id}
-                  section={section}
-                  index={index}
-                  onUpdateTitle={updateSectionTitle}
-                  onDeleteSection={(id) => { setSectionId(id); setOpenSectionAlert(true); }}
-                  onCreateTask={createTask}
-                  onViewTask={(task) => router.push(`/projects/tasks/viewtask/${task.id}`)}
-                  onEditTask={(task) => { setSelectedTask(task); setUpdateOpenSheet(true); }}
-                  onDeleteTask={(task) => { setSelectedTask(task); setOpen(true); }}
-                  onDoneTask={(task) => onDone(task.id)}
-                />
-              ))}
-
-              {/* Add Section Button Column */}
-              <div className="shrink-0 w-80 h-full flex items-start justify-center pt-2 snap-center opacity-50 hover:opacity-100 transition-opacity">
-                <Button
-                  variant="outline"
-                  className="w-full h-12 border-dashed border-2 bg-transparent hover:bg-muted/50"
-                  onClick={() => setSectionOpenDialog(true)}
+            <Droppable droppableId="board" type="COLUMN" direction="horizontal">
+              {(provided) => (
+                <div
+                  className="flex h-full gap-4 snap-x snap-mandatory min-w-fit pr-10"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
                 >
-                  <PlusCircle className="w-5 h-5 mr-2" />
-                  Add Section
-                </Button>
-              </div>
-            </div>
+                  {filteredData?.map((section: any, index: number) => (
+                    <Draggable key={section.id} draggableId={section.id} index={index}>
+                      {(providedDrag) => (
+                        <div
+                          ref={providedDrag.innerRef}
+                          {...providedDrag.draggableProps}
+                          className="h-full"
+                        >
+                          <KanbanColumn
+                            section={section}
+                            index={index}
+                            dragHandleProps={providedDrag.dragHandleProps}
+                            onUpdateTitle={updateSectionTitle}
+                            onDeleteSection={(id) => { setSectionId(id); setOpenSectionAlert(true); }}
+                            onCreateTask={createTask}
+                            onViewTask={(task) => router.push(`/projects/tasks/viewtask/${task.id}`)}
+                            onEditTask={(task) => { setSelectedTask(task); setUpdateOpenSheet(true); }}
+                            onDeleteTask={(task) => { setSelectedTask(task); setOpen(true); }}
+                            onDoneTask={(task) => onDone(task.id)}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+
+                  {/* Add Section Button Column */}
+                  <div className="shrink-0 w-80 h-full flex items-start justify-center pt-2 snap-center opacity-50 hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 border-dashed border-2 bg-transparent hover:bg-muted/50"
+                      onClick={() => setSectionOpenDialog(true)}
+                    >
+                      <PlusCircle className="w-5 h-5 mr-2" />
+                      Add Section
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Droppable>
           </DragDropContext>
         </div>
       </div>

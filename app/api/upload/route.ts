@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
+    const url = new URL(req.url);
+    const context = url.searchParams.get("context");
+
     const conn = process.env.BLOB_STORAGE_CONNECTION_STRING;
     const container = process.env.BLOB_STORAGE_CONTAINER;
     if (!conn || !container) {
@@ -27,6 +30,44 @@ export async function POST(req: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    // Calculate SHA256 hash
+    const crypto = require('crypto');
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(buffer);
+    const hex = hashSum.digest('hex');
+
+    // Check for existing document with same hash in this team
+    const teamInfo = await getCurrentUserTeamId();
+    const teamId = teamInfo?.teamId;
+
+    const existingDoc = await (prismadb.documents as any).findFirst({
+      where: {
+        hash: hex,
+        team_id: teamId
+      }
+    });
+
+    if (existingDoc) {
+      console.log("[GENERIC_UPLOAD_POST] Duplicate document found:", existingDoc.id);
+
+      // FIX: If context is invoice, we MUST process it even if the doc exists
+      // The user might be re-uploading because the previous attempt failed to create an invoice
+      if (context === "invoice") {
+        try {
+          console.log("[GENERIC_UPLOAD_POST] Processing duplicate document for Invoice...");
+          const { processInvoiceFromDocument } = await import("@/lib/invoice-processor");
+          await processInvoiceFromDocument(existingDoc.id, session.user.id, teamId || null);
+          console.log("[GENERIC_UPLOAD_POST] Invoice Processing Complete (Duplicate Doc).");
+        } catch (err) {
+          console.error("[GENERIC_UPLOAD_POST] Duplicate processing failed:", err);
+          throw new Error("Invoice processing failed: " + (err as any).message);
+        }
+      }
+
+      return NextResponse.json({ ok: true, document: existingDoc }, { status: 200 });
+    }
+
     const fileNameSafe = file.name?.replace(/[^a-zA-Z0-9._-]/g, "_") || `upload_${Date.now()}`;
     const key = `uploads/${session.user.id}/${Date.now()}_${fileNameSafe}`;
 
@@ -49,9 +90,6 @@ export async function POST(req: NextRequest) {
     console.log("[GENERIC_UPLOAD_POST] Uploaded blob URL:", fileUrl);
 
     // Create Document record (generic)
-    const teamInfo = await getCurrentUserTeamId();
-    const teamId = teamInfo?.teamId;
-
     const doc = await (prismadb.documents as any).create({
       data: {
         document_name: file.name || fileNameSafe,
@@ -62,9 +100,26 @@ export async function POST(req: NextRequest) {
         assigned_user: session.user.id,
         key,
         size: buffer.length,
+        hash: hex,
       },
     });
     console.log("[GENERIC_UPLOAD_POST] Document created:", { id: doc.id, url: doc.document_file_url });
+
+    // Handle context-specific actions
+    // Handle context-specific actions
+    if (context === "invoice") {
+      // Run SYNCHRONOUSLY so the client waits for the invoice to be created
+      try {
+        console.log("[GENERIC_UPLOAD_POST] Starting Invoice Processing...");
+        const { processInvoiceFromDocument } = await import("@/lib/invoice-processor");
+        await processInvoiceFromDocument(doc.id, session.user.id, teamId || null);
+        console.log("[GENERIC_UPLOAD_POST] Invoice Processing Complete.");
+      } catch (err) {
+        console.error("[GENERIC_UPLOAD_POST] Invoice processing failed:", err);
+        // We might want to return a warning, but for now strict error is safer to debug
+        throw new Error("Invoice processing failed: " + (err as any).message);
+      }
+    }
 
     return NextResponse.json({ ok: true, document: doc }, { status: 201 });
   } catch (e: any) {

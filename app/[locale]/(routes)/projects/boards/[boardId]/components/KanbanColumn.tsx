@@ -1,7 +1,7 @@
 "use client";
 
-import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { PlusIcon, TrashIcon, MoreHorizontal } from "lucide-react";
+import { Draggable, Droppable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
+import { PlusIcon, TrashIcon, MoreHorizontal, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import KanbanCard from "./KanbanCard";
+import KanbanCard, { KanbanCardContent } from "./KanbanCard";
 
 interface Task {
     id: string;
@@ -29,6 +29,7 @@ interface Section {
 interface KanbanColumnProps {
     section: Section;
     index: number;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null;
     onUpdateTitle: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
     onDeleteSection: (id: string) => void;
     onCreateTask: (sectionId: string) => void;
@@ -41,6 +42,7 @@ interface KanbanColumnProps {
 export default function KanbanColumn({
     section,
     index,
+    dragHandleProps,
     onUpdateTitle,
     onDeleteSection,
     onCreateTask,
@@ -52,7 +54,12 @@ export default function KanbanColumn({
     return (
         <div className="flex flex-col h-full w-80 min-w-[320px] bg-muted/20 rounded-xl border shadow-sm backdrop-blur-sm snap-center">
             {/* Column Header */}
-            <div className="p-3 flex items-center justify-between gap-2 border-b bg-background/50 rounded-t-xl">
+            <div className="p-3 flex items-center justify-between gap-2 border-b bg-background/50 rounded-t-xl group/header">
+                {/* Drag Handle */}
+                <div {...dragHandleProps} className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded text-muted-foreground/50 hover:text-foreground">
+                    <GripVertical className="w-4 h-4" />
+                </div>
+
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                     <input
                         type="text"
@@ -82,7 +89,27 @@ export default function KanbanColumn({
             </div>
 
             {/* Task List */}
-            <Droppable droppableId={section.id} isDropDisabled={false} isCombineEnabled={false}>
+            <Droppable
+                droppableId={section.id}
+                isDropDisabled={false}
+                isCombineEnabled={false}
+                renderClone={(provided, snapshot, rubric) => {
+                    const task = section.tasks[rubric.source.index];
+                    return (
+                        <KanbanCardContent
+                            task={task}
+                            provided={provided}
+                            isDragging={snapshot.isDragging}
+                            style={provided.draggableProps.style}
+                            dragHandleProps={provided.dragHandleProps}
+                            onView={(t) => onViewTask(t)}
+                            onEdit={(t) => onEditTask(t)}
+                            onDelete={(t) => onDeleteTask(t)}
+                            onDone={(t) => onDoneTask(t)}
+                        />
+                    );
+                }}
+            >
                 {(provided, snapshot) => (
                     <div
                         ref={provided.innerRef}

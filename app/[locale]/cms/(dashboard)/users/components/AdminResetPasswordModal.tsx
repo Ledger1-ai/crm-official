@@ -53,15 +53,17 @@ export const AdminResetPasswordModal: React.FC<AdminResetPasswordModalProps> = (
                         <AlertTriangle className="h-5 w-5" />
                         <DialogTitle>Reset Password</DialogTitle>
                     </div>
-                    <DialogDescription>
-                        Are you sure you want to reset the password for <span className="font-semibold text-foreground">{userName}</span>?
-                        <br /><br />
-                        This will:
-                        <ul className="list-disc pl-5 mt-1 space-y-1">
-                            <li>Generate a temporary password.</li>
-                            <li>Send an email to the user.</li>
-                            <li>Force them to change it on next login.</li>
-                        </ul>
+                    <DialogDescription asChild>
+                        <div>
+                            Are you sure you want to reset the password for <span className="font-semibold text-foreground">{userName}</span>?
+                            <br /><br />
+                            This will:
+                            <ul className="list-disc pl-5 mt-1 space-y-1">
+                                <li>Generate a temporary password.</li>
+                                <li>Send an email to the user.</li>
+                                <li>Force them to change it on next login.</li>
+                            </ul>
+                        </div>
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

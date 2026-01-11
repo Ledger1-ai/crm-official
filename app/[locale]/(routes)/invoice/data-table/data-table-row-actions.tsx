@@ -30,7 +30,6 @@ import Link from "next/link";
 import LoadingModal from "@/components/modals/loading-modal";
 import { useAppStore } from "@/store/store";
 
-import { Edit } from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -39,6 +38,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+
+import AssignOpportunityModal from "../components/AssignOpportunityModal";
+import { Edit, Target } from "lucide-react";
+// ... imports ...
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -50,6 +53,7 @@ export function DataTableRowActions<TData>({
   const [open, setOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [openRossumView, setOpenRossumView] = useState(false);
+  const [openAssignOpportunity, setOpenAssignOpportunity] = useState(false);
   const [openTestSheet, setOpenTestSheet] = useState(false);
 
   //zustand
@@ -233,13 +237,11 @@ export function DataTableRowActions<TData>({
               <DropdownMenuItem onClick={() => setOpenView(true)}>
                 Preview invoice
               </DropdownMenuItem>
-
               <DropdownMenuItem
                 onClick={() => router.push(`/invoice/detail/${invoice.id}`)}
               >
                 Invoice detail
               </DropdownMenuItem>
-
               <Link href={invoice.invoice_file_url} target={"_blank"}>
                 <DropdownMenuItem>
                   Preview invoice in new window
@@ -256,92 +258,28 @@ export function DataTableRowActions<TData>({
                 <Edit className="mr-2 w-4 h-4" />
                 Create task from Invoice
               </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuSeparator />
-
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Rossum</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={() => setOpenRossumView(true)}>
-                Edit metadata with Rossum cockpit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onExtract}>
-                Extract data from invoice
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuSeparator />
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Exports for ERPs</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={onMoneyS3export}>
-                Money S3 XML
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuSeparator />
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              Download data for ERPs
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
               <DropdownMenuItem
-                onClick={() =>
-                  router.push(
-                    invoice.rossum_annotation_json_url
-                      ? invoice.rossum_annotation_json_url
-                      : "/invoice"
-                  )
-                }
+                onClick={() => setOpenAssignOpportunity(true)}
               >
-                JSON
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  router.push(
-                    invoice.money_s3_url ? invoice.money_s3_url : "/invoice"
-                  )
-                }
-              >
-                MoneyS3 XML
+                <Target className="mr-2 w-4 h-4" />
+                Assign to Opportunity
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
 
-          <DropdownMenuLabel></DropdownMenuLabel>
-
           <DropdownMenuSeparator />
-
-          <DropdownMenuItem onClick={onSendToMail}>
-            Send XML to accountant email
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <DropdownMenuItem onClick={() => setOpen(true)} className="text-red-600">
             Delete
             <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
           </DropdownMenuItem>
-          {process.env.NODE_ENV === "development" && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Development mode only</DropdownMenuLabel>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <DropdownMenuItem>Rossum annotation JSON</DropdownMenuItem>
-                  <DropdownMenuSubContent>
-                    <Link
-                      href={`/invoice/annotation/${invoice.rossum_annotation_id}`}
-                      target="_blank"
-                    >
-                      <DropdownMenuItem>Show annotation</DropdownMenuItem>
-                    </Link>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSubTrigger>
-              </DropdownMenuSub>
-            </>
-          )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <AssignOpportunityModal
+        isOpen={openAssignOpportunity}
+        onClose={() => setOpenAssignOpportunity(false)}
+        invoiceId={invoice.id}
+      />
     </>
   );
 }

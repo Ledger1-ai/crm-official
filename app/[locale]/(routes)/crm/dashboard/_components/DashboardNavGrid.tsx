@@ -130,21 +130,21 @@ export default function DashboardNavGrid({ isMember = false }: Props) {
                 <Link
                     key={item.title}
                     href={item.href}
-                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                    className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02]"
                 >
                     {/* Glass Gradient Background - enhanced opacity for faint hue */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20 group-hover:opacity-100 transition-opacity duration-300`} />
 
                     <div className="relative z-10 flex flex-col items-center justify-center space-y-3 text-center">
                         {/* Spiced up icon container with gradient background and ring */}
-                        <div className={`p-3 rounded-full bg-gradient-to-br ${item.color} border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300 ${item.iconColor} ring-1 ring-white/20 group-hover:ring-white/40`}>
+                        <div className={`p-3 rounded-full bg-gradient-to-br ${item.color} border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 ${item.iconColor} ring-1 ring-white/20 group-hover:ring-white/40`}>
                             <item.icon className="w-8 h-8" strokeWidth={1.5} />
                         </div>
                         <div className="space-y-1">
-                            <span className="block text-lg font-medium text-foreground group-hover:text-white transition-colors">
+                            <span className="block text-lg font-medium text-foreground group-hover:text-primary transition-colors">
                                 {item.title}
                             </span>
-                            <span className="block text-sm text-muted-foreground group-hover:text-white/80 transition-colors">
+                            <span className="block text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                 {item.description}
                             </span>
                         </div>

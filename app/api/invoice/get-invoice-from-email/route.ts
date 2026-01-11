@@ -19,6 +19,10 @@ const imapConfig: Imap.Config = {
 export async function GET() {
   try {
     console.log("Starting email check...");
+    if (!imapConfig.user || !imapConfig.password || !imapConfig.host) {
+      console.warn("IMAP configuration missing. Skipping email check.");
+      return NextResponse.json({ message: "IMAP not configured. Skipped." }, { status: 200 });
+    }
     const imap = new Imap(imapConfig);
     const emailsProcessed = await checkEmail(imap);
     console.log(`Email check completed. Processed ${emailsProcessed} emails.`);
@@ -34,14 +38,16 @@ export async function GET() {
     const debug = process.env.NODE_ENV !== "production";
     const payload = debug
       ? {
-          error: "Internal Server Error",
-          message: error?.message,
-          code: error?.code,
-          name: error?.name,
-          stack: error?.stack,
-        }
+        error: "Internal Server Error",
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+        stack: error?.stack,
+      }
       : { error: "Internal Server Error" };
-    return NextResponse.json(payload, { status: 500 });
+
+    // Return 200 even on error to prevent client-side crash, but include error info
+    return NextResponse.json({ ...payload, success: false }, { status: 200 });
   }
 }
 

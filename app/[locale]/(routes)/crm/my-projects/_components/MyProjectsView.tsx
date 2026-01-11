@@ -120,17 +120,17 @@ export default function MyProjectsView({ userId }: Props) {
             >
                 {/* My Tasks Button */}
                 <Link href={`/projects/tasks/${userId}`}>
-                    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
+                    <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-20 group-hover:opacity-60 transition-opacity duration-300" />
                         <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
-                            <div className="p-3 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300 text-blue-400 ring-1 ring-white/20 group-hover:ring-white/40">
+                            <div className="p-3 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 text-blue-400 ring-1 ring-white/20 group-hover:ring-white/40">
                                 <CheckSquare className="w-6 h-6" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-0.5">
-                                <span className="block text-sm font-medium text-foreground group-hover:text-white transition-colors">
+                                <span className="block text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                                     My Tasks
                                 </span>
-                                <span className="block text-xs text-muted-foreground group-hover:text-white/80 transition-colors">
+                                <span className="block text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                     View assigned tasks
                                 </span>
                             </div>
@@ -140,17 +140,17 @@ export default function MyProjectsView({ userId }: Props) {
 
                 {/* Gantt View Button */}
                 <Link href="/projects/gantt">
-                    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
+                    <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-violet-500/20 opacity-20 group-hover:opacity-60 transition-opacity duration-300" />
                         <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
-                            <div className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300 text-purple-400 ring-1 ring-white/20 group-hover:ring-white/40">
+                            <div className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 text-purple-400 ring-1 ring-white/20 group-hover:ring-white/40">
                                 <BarChart2 className="w-6 h-6" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-0.5">
-                                <span className="block text-sm font-medium text-foreground group-hover:text-white transition-colors">
+                                <span className="block text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                                     Gantt View
                                 </span>
-                                <span className="block text-xs text-muted-foreground group-hover:text-white/80 transition-colors">
+                                <span className="block text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                     Project timeline
                                 </span>
                             </div>
@@ -160,17 +160,17 @@ export default function MyProjectsView({ userId }: Props) {
 
                 {/* Calendar Button */}
                 <Link href="/projects/calendar">
-                    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
+                    <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-green-500/20 opacity-20 group-hover:opacity-60 transition-opacity duration-300" />
                         <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
-                            <div className="p-3 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300 text-emerald-400 ring-1 ring-white/20 group-hover:ring-white/40">
+                            <div className="p-3 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 text-emerald-400 ring-1 ring-white/20 group-hover:ring-white/40">
                                 <Calendar className="w-6 h-6" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-0.5">
-                                <span className="block text-sm font-medium text-foreground group-hover:text-white transition-colors">
+                                <span className="block text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                                     Calendar
                                 </span>
-                                <span className="block text-xs text-muted-foreground group-hover:text-white/80 transition-colors">
+                                <span className="block text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                     Task deadlines
                                 </span>
                             </div>
@@ -180,17 +180,17 @@ export default function MyProjectsView({ userId }: Props) {
 
                 {/* Documents Button */}
                 <Link href="/documents">
-                    <div className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
+                    <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] h-full">
                         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/20 to-blue-500/20 opacity-20 group-hover:opacity-60 transition-opacity duration-300" />
                         <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
-                            <div className="p-3 rounded-full bg-gradient-to-br from-sky-500/20 to-blue-500/20 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-300 text-sky-400 ring-1 ring-white/20 group-hover:ring-white/40">
+                            <div className="p-3 rounded-full bg-gradient-to-br from-sky-500/20 to-blue-500/20 border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 text-sky-400 ring-1 ring-white/20 group-hover:ring-white/40">
                                 <FileText className="w-6 h-6" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-0.5">
-                                <span className="block text-sm font-medium text-foreground group-hover:text-white transition-colors">
+                                <span className="block text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                                     Documents
                                 </span>
-                                <span className="block text-xs text-muted-foreground group-hover:text-white/80 transition-colors">
+                                <span className="block text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                     View your files
                                 </span>
                             </div>

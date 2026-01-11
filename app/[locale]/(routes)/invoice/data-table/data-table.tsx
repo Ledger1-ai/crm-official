@@ -31,6 +31,10 @@ import { DataTableToolbar } from "./data-table-toolbar";
 import { InvoiceCard } from "./invoice-card";
 import { ViewToggle, type ViewMode } from "@/components/ViewToggle";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { Bug } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -50,6 +54,7 @@ export function InvoiceDataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [viewMode, setViewMode] = React.useState<ViewMode>("table");
   const isMobile = useIsMobile();
+  const router = useRouter();
 
   // Set grid view which acts as card view here for mobile
   React.useEffect(() => {
@@ -83,13 +88,17 @@ export function InvoiceDataTable<TData, TValue>({
     enableColumnResizing: true,
   });
 
+  // ... inside component ...
+
+  // Refetch logic moved to SyncInvoiceCard.tsx as per user request
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 w-full">
           <DataTableToolbar table={table} />
         </div>
-        <div className="flex items-center ml-2">
+        <div className="flex items-center ml-4 gap-2">
           <ViewToggle value={viewMode} onChange={setViewMode} />
         </div>
       </div>

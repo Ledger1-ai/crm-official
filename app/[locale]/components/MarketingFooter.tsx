@@ -154,7 +154,7 @@ export default async function MarketingFooter() {
     // Fallback to footer settings if no social settings exist
     if (socialLinks.length === 0) {
         const fallbackX = footerSettings?.socialXUrl || "https://x.com/BasaltHQ";
-        const fallbackDiscord = footerSettings?.socialDiscordUrl || "https://discord.gg/vARPqF84Zt";
+        const fallbackDiscord = footerSettings?.socialDiscordUrl || "https://discord.gg/gcgNugyWkg";
         socialLinks.push(
             { url: fallbackX, label: "X (Twitter)", icon: <XIcon />, hoverColor: "hover:text-white" },
             { url: fallbackDiscord, label: "Discord", icon: <DiscordIcon />, hoverColor: "hover:text-[#5865F2]" }
