@@ -836,6 +836,7 @@ model Users {
   name                 String?
   password             String?
   username             String?
+  phone                String?
   userStatus           ActiveStatus          @default(PENDING)
   userLanguage         Language              @default(en)
   mustChangePassword   Boolean               @default(false)

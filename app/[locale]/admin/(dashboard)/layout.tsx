@@ -51,9 +51,9 @@ export default async function AdminDashboardLayout({
     const showModules = user?.is_admin || user?.assigned_team?.slug === "ledger1";
 
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="fixed inset-0 flex h-[100dvh] overflow-hidden">
             <AnySideBar build={build} />
-            <div className="flex flex-col h-full w-full overflow-hidden">
+            <div className="flex flex-col h-full w-full min-w-0 overflow-hidden">
                 <Header
                     id={session.user.id as string}
                     name={session.user.name as string}
@@ -63,7 +63,7 @@ export default async function AdminDashboardLayout({
                 />
                 <div className="flex flex-1 min-h-0 overflow-hidden">
                     <AdminSidebar showModules={!!showModules} />
-                    <div className="flex-1 overflow-y-auto h-full p-5">
+                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-5">
                         {children}
                     </div>
                 </div>

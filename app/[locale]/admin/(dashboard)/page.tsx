@@ -3,9 +3,14 @@ import { authOptions } from "@/lib/auth";
 import Container from "@/app/[locale]/(routes)/components/ui/Container";
 import { prismadb } from "@/lib/prisma";
 
-import TeamAiSettingsCompact from "./components/TeamAiSettingsCompact";
-import ResendCard from "@/app/[locale]/cms/(dashboard)/_components/ResendCard";
-import { Users, ShieldCheck, UserCheck, Eye, Bot, Mail } from "lucide-react";
+import { Users, ShieldCheck, UserCheck, Eye } from "lucide-react";
+
+// Users Components
+import { InviteForm } from "@/app/[locale]/cms/(dashboard)/users/components/IviteForm";
+import { AdminUserDataTable } from "@/app/[locale]/cms/(dashboard)/users/table-components/data-table";
+import { columns } from "@/app/[locale]/cms/(dashboard)/users/table-components/columns";
+import { getUsers } from "@/actions/get-users";
+import SendMailToAll from "@/app/[locale]/cms/(dashboard)/users/components/send-mail-to-all";
 
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -17,15 +22,17 @@ export default async function AdminDashboardPage() {
 
   const teamId = user?.assigned_team?.id;
 
-  // Fetch quick stats
-  const [usersCount, rolesData] = await Promise.all([
-    prismadb.users.count(),
+  // Fetch team-specific stats
+  const [rolesData, users] = await Promise.all([
     prismadb.users.groupBy({
       by: ['team_role'],
+      where: { team_id: teamId },
       _count: true,
     }),
+    getUsers() // Fetches users for current team context
   ]);
 
+  const usersCount = users.length;
   const adminCount = rolesData.find(r => r.team_role === 'ADMIN')?._count ?? 0;
   const memberCount = rolesData.find(r => r.team_role === 'MEMBER' || r.team_role === null)?._count ?? 0;
   const viewerCount = rolesData.find(r => r.team_role === 'VIEWER')?._count ?? 0;
@@ -33,7 +40,8 @@ export default async function AdminDashboardPage() {
   return (
     <Container
       title="Administration"
-      description="Manage your BasaltCRM instance settings, users, and AI configuration."
+      description="Manage your BasaltCRM instance, invite new members, and configure user access."
+      action={<SendMailToAll />}
     >
       <div className="space-y-6">
         {/* Quick Stats Row */}
@@ -44,45 +52,24 @@ export default async function AdminDashboardPage() {
           <StatCard label="Viewers" value={viewerCount} icon={Eye} />
         </div>
 
-        {/* AI Configuration - Horizontal Layout */}
-        <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
-          <div className="flex items-center gap-3 p-5 border-b border-border">
-            <div className="p-2.5 bg-primary/10 rounded-lg">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">AI Configuration</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure your team's AI provider, model, and authentication.
-              </p>
-            </div>
-          </div>
-          <div className="p-5">
-            {teamId ? (
-              <TeamAiSettingsCompact teamId={teamId} />
-            ) : (
-              <div className="p-4 border rounded bg-muted/20 text-muted-foreground text-center">
-                No Team Assigned. Cannot configure AI.
-              </div>
-            )}
-          </div>
+        {/* Invite Section */}
+        <div className="p-5 bg-card/50 border border-border rounded-xl">
+          <h4 className="text-lg font-semibold mb-4">
+            Invite New User
+          </h4>
+          <InviteForm />
         </div>
 
-        {/* Email Configuration - Full Width Below */}
+        {/* Users Table */}
         <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
-          <div className="flex items-center gap-3 p-5 border-b border-border">
-            <div className="p-2.5 bg-primary/10 rounded-lg">
-              <Mail className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Email Configuration</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure email sending via Resend.
-              </p>
-            </div>
+          <div className="p-5 border-b border-border">
+            <h4 className="text-lg font-semibold">All Users</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Click the settings icon on any user row to configure their module access.
+            </p>
           </div>
-          <div className="p-5">
-            <ResendCard />
+          <div className="p-4">
+            <AdminUserDataTable columns={columns} data={users} />
           </div>
         </div>
       </div>

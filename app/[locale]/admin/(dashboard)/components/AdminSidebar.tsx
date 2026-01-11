@@ -5,11 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
     LayoutDashboard,
-    Users,
     Package,
     ChevronLeft,
     ChevronRight,
     Mail,
+    MessageSquare,
+    Bot,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -45,8 +46,9 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
 
     const navItems = [
         { label: "Overview", href: "/admin", icon: LayoutDashboard, exact: true },
-        { label: "Users", href: "/admin/users", icon: Users },
         { label: "Email Settings", href: "/admin/settings", icon: Mail },
+        { label: "SMS Configuration", href: "/admin/sms-config", icon: MessageSquare },
+        { label: "AI Settings", href: "/admin/ai-settings", icon: Bot },
         ...(showModules ? [{ label: "Modules", href: "/admin/modules", icon: Package }] : []),
     ];
 

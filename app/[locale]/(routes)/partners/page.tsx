@@ -33,10 +33,14 @@ const PartnersPage = async () => {
         return redirect("/");
     }
 
-    const [teams, plans] = await Promise.all([
+    const [teams, plans, totalUsers] = await Promise.all([
         getTeams(),
-        getPlans()
+        getPlans(),
+        prismadb.users.count()
     ]);
+
+    const activeTeamsCount = (teams as any[]).filter(t => t.status === 'ACTIVE').length;
+    const totalTeamsCount = (teams as any[]).length;
 
     return (
         <Container
@@ -46,6 +50,21 @@ const PartnersPage = async () => {
             <div className="p-4 space-y-6">
                 <PartnersNavigation availablePlans={plans as any} />
 
+                {/* Global Stats Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 bg-card border rounded-lg shadow-sm">
+                        <div className="text-sm text-muted-foreground font-medium">Total Teams</div>
+                        <div className="text-2xl font-bold">{totalTeamsCount}</div>
+                    </div>
+                    <div className="p-4 bg-card border rounded-lg shadow-sm">
+                        <div className="text-sm text-muted-foreground font-medium">Active Teams</div>
+                        <div className="text-2xl font-bold">{activeTeamsCount}</div>
+                    </div>
+                    <div className="p-4 bg-card border rounded-lg shadow-sm">
+                        <div className="text-sm text-muted-foreground font-medium">Total Users</div>
+                        <div className="text-2xl font-bold">{totalUsers}</div>
+                    </div>
+                </div>
 
                 <Suspense fallback={<div>Loading teams...</div>}>
                     <PartnersView initialTeams={teams as any} availablePlans={plans as any} />

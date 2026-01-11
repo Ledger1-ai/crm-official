@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, MessageSquare } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
-import Container from "@/app/[locale]/(routes)/components/ui/Container";
 import TeamDetailsView from "./_components/TeamDetailsView";
+import { prismadb } from "@/lib/prisma";
 
 import { getCurrentUserTeamId } from "@/lib/team-utils";
 import { getTeam } from "@/actions/teams/get-team";
@@ -18,6 +18,53 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
         getPlans()
     ]);
     const currentUserInfo = await getCurrentUserTeamId();
+
+    // Fetch System Resend Key Data for Global Admins
+    let systemResendData = { resendKeyId: "", envKey: undefined as string | undefined, dbKey: undefined as string | undefined };
+    let ownerInfo = null;
+    let roleCounts = { owner: 0, admin: 0, member: 0, viewer: 0 };
+    let customRoles: any[] = [];
+
+    if (currentUserInfo?.isGlobalAdmin && team) {
+        const [resend_key, owner, roleCountsData, customRolesData] = await Promise.all([
+            prismadb.systemServices.findFirst({
+                where: { name: "resend_smtp" },
+            }),
+            // Fetch owner info
+            team.owner_id ? prismadb.users.findUnique({
+                where: { id: team.owner_id },
+                select: { id: true, name: true, email: true, phone: true }
+            }) : null,
+            // Fetch role counts for this team
+            Promise.all([
+                prismadb.users.count({ where: { team_id: team.id, team_role: "OWNER" } }),
+                prismadb.users.count({ where: { team_id: team.id, team_role: "ADMIN" } }),
+                prismadb.users.count({ where: { team_id: team.id, OR: [{ team_role: "MEMBER" }, { team_role: null }] } }),
+                prismadb.users.count({ where: { team_id: team.id, team_role: "VIEWER" } }),
+            ]),
+            // Fetch custom roles for this team
+            prismadb.customRole.findMany({
+                where: { team_id: team.id },
+                include: { _count: { select: { users: true } } },
+                orderBy: { created_at: "asc" },
+            }),
+        ]);
+
+        systemResendData = {
+            resendKeyId: resend_key?.id ?? "",
+            envKey: process.env.RESEND_API_KEY,
+            dbKey: resend_key?.serviceKey || undefined,
+        };
+
+        ownerInfo = owner;
+        roleCounts = {
+            owner: roleCountsData[0],
+            admin: roleCountsData[1],
+            member: roleCountsData[2],
+            viewer: roleCountsData[3],
+        };
+        customRoles = customRolesData;
+    }
 
     if (!team) {
         return notFound();
@@ -37,9 +84,14 @@ const TeamDetailsPage = async ({ params }: { params: Promise<{ teamId: string }>
                 team={team}
                 availablePlans={plans}
                 currentUserInfo={currentUserInfo}
+                systemResendData={systemResendData}
+                ownerInfo={ownerInfo}
+                roleCounts={roleCounts}
+                customRoles={customRoles}
             />
         </div>
     );
 };
 
 export default TeamDetailsPage;
+
