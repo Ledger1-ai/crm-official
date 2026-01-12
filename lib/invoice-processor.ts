@@ -1,28 +1,12 @@
 import { prismadb } from "@/lib/prisma";
+import Tesseract from "tesseract.js";
 
 // Lazy load dependencies to prevent module load crashes
-let pdf2img: any;
 let pdfParse: any;
-let Tesseract: any;
 
 // Helper: Lazy load
 async function loadDependencies() {
     if (!pdfParse) pdfParse = require("pdf-parse/lib/pdf-parse.js");
-    if (!pdf2img) pdf2img = require("pdf-img-convert");
-    if (!Tesseract) Tesseract = (await import("tesseract.js")).default;
-
-    // Polyfills only if not browser (needed for pdf.js inside pdf-parse or pdf-img-convert sometimes)
-    if (process.env.NODE_ENV !== 'browser') {
-        try {
-            const customCanvas = require('canvas');
-            (global as any).Canvas = customCanvas.Canvas;
-            (global as any).Image = customCanvas.Image;
-            (global as any).ImageData = customCanvas.ImageData;
-            (global as any).DOMMatrix = customCanvas.DOMMatrix;
-        } catch (e) {
-            console.warn("[INVOICE_PROCESSOR] Canvas polyfill failed (OCR might not work for PDFs):", e);
-        }
-    }
 }
 
 
@@ -148,23 +132,16 @@ export async function processInvoiceFromDocument(
             }
         }
 
-        // Tesseract Fallback
+        // Tesseract Fallback for images
         if (!extractedText || extractedText.trim().length < 50 || document.document_file_mimeType.startsWith("image/")) {
             console.log("[INVOICE_PROCESSOR] Running Tesseract OCR...");
             let imagesToScan: Buffer[] = [];
 
             if (document.document_file_mimeType === "application/pdf") {
-                console.log("[INVOICE_PROCESSOR] Converting PDF to images for OCR...");
-                try {
-                    const response = await fetch(document.document_file_url);
-                    const arrayBuffer = await response.arrayBuffer();
-                    const buffer = Buffer.from(arrayBuffer);
-
-                    const outputImages = await pdf2img.convert(buffer, { page_numbers: [1, 2, 3], base64: false });
-                    imagesToScan = outputImages.map((img: any) => Buffer.from(img));
-                } catch (imgErr: any) {
-                    console.warn("[INVOICE_PROCESSOR] PDF-to-Image conversion failed:", imgErr);
-                }
+                // PDF with no text - we can't convert to images without native canvas
+                // Log that OCR is not available for scanned PDFs
+                console.warn("[INVOICE_PROCESSOR] PDF appears to be scanned (no extractable text). PDF-to-image OCR is not available.");
+                console.warn("[INVOICE_PROCESSOR] Consider uploading individual page images for OCR processing.");
             } else if (document.document_file_mimeType.startsWith("image/")) {
                 const response = await fetch(document.document_file_url);
                 const arrayBuffer = await response.arrayBuffer();

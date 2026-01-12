@@ -11,22 +11,6 @@ import { generateObject } from "ai";
 // Ensure Node runtime
 export const runtime = 'nodejs';
 
-// Polyfill Canvas/Image/DOMMatrix for pdfjs-dist (used by pdf-img-convert)
-// MUST run before requiring pdf-img-convert
-// We are in Node runtime, so we can unconditionally polyfill
-{
-    try {
-        const customCanvas = require('canvas');
-        (global as any).Canvas = customCanvas.Canvas;
-        (global as any).Image = customCanvas.Image;
-        (global as any).ImageData = customCanvas.ImageData;
-        (global as any).DOMMatrix = customCanvas.DOMMatrix;
-    } catch (e) {
-        console.warn("Canvas polyfill failed:", e);
-    }
-}
-
-const pdf2img = require("pdf-img-convert");
 // Require lib directly to avoid index.js checks that fail in Next.js
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
@@ -60,7 +44,7 @@ export async function POST(req: Request) {
 
         let extractedText = "";
 
-        // 1. Try PDF Parse
+        // 1. Try PDF Parse (text-based extraction)
         if (blobName.toLowerCase().endsWith(".pdf")) {
             try {
                 log("[DEBUG] Attempting pdf-parse...");
@@ -73,33 +57,32 @@ export async function POST(req: Request) {
             }
         }
 
-        // 2. Try Tesseract if needed
+        // 2. For images, try Tesseract directly
         if (!extractedText || extractedText.trim().length < 50) {
-            log("[DEBUG] Text short/empty. Attempting Tesseract (Canvas required)...");
-            try {
-                log("[DEBUG] Converting PDF to images...");
-                // Only first page for debug speed
-                const outputImages = await pdf2img.convert(buffer, { page_numbers: [1], base64: false });
-                const imagesToScan = outputImages.map((img: any) => Buffer.from(img));
-                log(`[DEBUG] Converted to ${imagesToScan.length} images.`);
+            const isImage = /\.(png|jpg|jpeg|gif|bmp|tiff|webp)$/i.test(blobName);
 
-                for (const imgBuffer of imagesToScan) {
-                    log("[DEBUG] Running Tesseract.recognize...");
-                    const { data: { text } } = await Tesseract.recognize(imgBuffer, 'eng');
-                    extractedText += "\n" + text;
-                    log(`[DEBUG] OCR Page Text Length: ${text.length}`);
+            if (isImage) {
+                log("[DEBUG] Image file detected. Running Tesseract OCR...");
+                try {
+                    const { data: { text } } = await Tesseract.recognize(buffer, 'eng');
+                    extractedText = text;
+                    log(`[DEBUG] OCR Text Length: ${text.length}`);
+                } catch (e: any) {
+                    log(`[DEBUG] Tesseract failed: ${e.message}`);
                 }
-            } catch (e: any) {
-                log(`[DEBUG] Tesseract/Conversion failed: ${e.message}`);
-                log(`[DEBUG] Stack: ${e.stack}`);
+            } else if (blobName.toLowerCase().endsWith(".pdf")) {
+                // PDF with no text - we can't convert to images without pdf-img-convert
+                // Just log that OCR is not available for scanned PDFs
+                log("[DEBUG] PDF appears to be scanned (no extractable text). PDF-to-image OCR is not available.");
+                log("[DEBUG] Consider uploading a text-based PDF or individual page images for OCR.");
             }
         }
 
         if (!extractedText || extractedText.trim().length === 0) {
-            throw new Error("No text extracted from either method.");
+            throw new Error("No text extracted. For scanned PDFs, please upload individual page images.");
         }
 
-        // 3. Try AI Parse (Optional, just to show it works)
+        // 3. Try AI Parse
         log("[DEBUG] Attempting AI Parse...");
         const InvoiceSchema = z.object({
             invoice_number: z.string().optional(),
