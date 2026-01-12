@@ -39,6 +39,7 @@ jobs:
           GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
         run: |
           npm install
+          npx prisma generate
           npm run build --if-present
           npm run test --if-present
       - name: Prepare Standalone Build
