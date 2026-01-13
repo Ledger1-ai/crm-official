@@ -11,10 +11,10 @@ export default function ConnectCCP({
   baseUrl,
   height = 480,
 }: {
-  baseUrl?: string; // e.g. https://ledger1crm.my.connect.aws
+  baseUrl?: string; // e.g. https://your-instance.my.connect.aws
   height?: number;
 }) {
-  const url = (baseUrl || process.env.NEXT_PUBLIC_CONNECT_BASE_URL || "https://ledger1crm.my.connect.aws") + "/ccp-v2/";
+  const url = (baseUrl || process.env.NEXT_PUBLIC_CONNECT_BASE_URL || "") + "/ccp-v2/";
   return (
     <div className="rounded border bg-card p-2">
       <div className="text-xs font-semibold mb-2">Amazon Connect Softphone (CCP)</div>

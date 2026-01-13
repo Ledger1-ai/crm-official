@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       prompt,
       meta,
       ts: new Date().toISOString(),
-      source: 'ledger1crm',
+      source: 'basaltcrm',
     };
 
     // Persist last used wallet for VoiceHub status indicator
@@ -53,14 +53,14 @@ export async function POST(req: Request) {
       } else {
         await prismadb.systemServices.create({ data: { name: 'voicehub', serviceId: wallet, v: 0 } });
       }
-    } catch {}
+    } catch { }
 
     let base = String(process.env.VOICEHUB_BASE_URL || process.env.NEXT_PUBLIC_VOICEHUB_BASE_URL || '').trim().replace(/\/+$/, '');
     if (!base) {
       try {
         const svc = await prismadb.systemServices.findFirst({ where: { name: 'voicehub' } });
         base = String(svc?.serviceUrl || '').trim().replace(/\/+$/, '');
-      } catch {}
+      } catch { }
     }
 
     if (base) {

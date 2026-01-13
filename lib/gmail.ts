@@ -15,6 +15,7 @@ export const GMAIL_SCOPES = [
   // OIDC scopes (optional) for email identity when needed
   "openid",
   "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/gmail.settings.basic",
 ];
 
 function requireEnv(name: string): string {
@@ -30,29 +31,29 @@ function getProductionBaseUrl(): string {
   const explicit = (process.env.GMAIL_REDIRECT_URI || "").trim();
   const nextAuthUrl = (process.env.NEXTAUTH_URL || "").trim().replace(/\/$/, "");
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "").trim().replace(/\/$/, "");
-  
+
   // Helper to check if URL is localhost
   const isLocalhost = (url: string) => /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(url);
-  
+
   // Production fallback
-  const PRODUCTION_FALLBACK = "https://crm.ledger1.ai";
-  
+  const PRODUCTION_FALLBACK = "https://crm.basalthq.com";
+
   // Priority order:
   // 1. Explicit GMAIL_REDIRECT_URI if not localhost
   // 2. NEXTAUTH_URL if not localhost
   // 3. NEXT_PUBLIC_APP_URL if not localhost  
   // 4. Production fallback
-  
+
   if (explicit && !isLocalhost(explicit)) {
     // Extract base from explicit redirect URI (remove /api/google/callback if present)
     const explicitBase = explicit.replace(/\/api\/google\/callback\/?$/, "");
     return explicitBase;
   }
-  
+
   if (nextAuthUrl && !isLocalhost(nextAuthUrl)) {
     return nextAuthUrl;
   }
-  
+
   if (appUrl && !isLocalhost(appUrl)) {
     // Ensure protocol
     if (!appUrl.startsWith("http://") && !appUrl.startsWith("https://")) {
@@ -60,16 +61,16 @@ function getProductionBaseUrl(): string {
     }
     return appUrl;
   }
-  
+
   // In production (NODE_ENV=production), always use production fallback if we got here
   if (process.env.NODE_ENV === "production") {
     return PRODUCTION_FALLBACK;
   }
-  
+
   // In development, allow localhost
   if (nextAuthUrl) return nextAuthUrl;
   if (appUrl) return appUrl.startsWith("http") ? appUrl : `http://${appUrl}`;
-  
+
   return "http://localhost:3000";
 }
 
@@ -87,7 +88,7 @@ export function getOAuth2Client() {
   const clientSecret = requireEnv("GMAIL_CLIENT_SECRET");
 
   const redirectUri = getOAuth2ClientRedirectUri();
-  
+
   // Log for debugging in case of issues (will appear in server logs)
   if (process.env.NODE_ENV === "production") {
     console.log("[GMAIL_OAUTH] Using redirect URI:", redirectUri);

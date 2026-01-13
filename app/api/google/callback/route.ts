@@ -13,7 +13,13 @@ import { exchangeCodeForTokens } from "@/lib/gmail";
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const origin = url.origin;
+
+  // Fix: Use configured app URL instead of request origin (which might be internal container ID)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "";
+  const nextAuthUrl = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "";
+
+  // Priority: NEXT_PUBLIC_APP_URL -> NEXTAUTH_URL -> Request Origin (fallback)
+  const origin = appUrl || nextAuthUrl || url.origin;
 
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
@@ -43,7 +49,7 @@ export async function GET(req: Request) {
     const redirectOk = `${origin}/en/crm/leads?google=connected`;
     return NextResponse.redirect(redirectOk, { status: 302 });
   } catch (e: any) {
-     
+
     console.error("[GOOGLE_OAUTH_CALLBACK]", e?.message || e);
     const redirectErr = `${origin}/en/crm/leads?google=error`;
     return NextResponse.redirect(redirectErr, { status: 302 });

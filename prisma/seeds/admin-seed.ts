@@ -5,15 +5,11 @@ const prisma = new PrismaClient();
 
 async function main() {
     const targetEmail = "sysadm@basalthq.com";
-    const oldEmail = "admin@ledger1.com";
+
     const password = process.env.ADMIN_PASSWORD;
 
     const targetUser = await prisma.users.findUnique({
         where: { email: targetEmail },
-    });
-
-    const oldUser = await prisma.users.findUnique({
-        where: { email: oldEmail },
     });
 
     if (targetUser) {
@@ -29,24 +25,6 @@ async function main() {
 
         await prisma.users.update({
             where: { email: targetEmail },
-            data: updateData,
-        });
-    } else if (oldUser) {
-        console.log(`Found legacy admin user ${oldEmail}. Migrating to ${targetEmail}...`);
-        const updateData: any = {
-            email: targetEmail,
-            is_admin: true,
-        };
-
-        if (password) {
-            updateData.password = await bcrypt.hash(password, 12);
-            console.log("Updating password from environment variable.");
-        } else {
-            console.log("No ADMIN_PASSWORD provided. Preserving existing password.");
-        }
-
-        await prisma.users.update({
-            where: { email: oldEmail },
             data: updateData,
         });
     } else {

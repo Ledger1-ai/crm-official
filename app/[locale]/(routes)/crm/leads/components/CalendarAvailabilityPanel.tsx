@@ -112,6 +112,7 @@ export default function CalendarAvailabilityPanel() {
         if (prim.length > 0) {
           setSelectedCalendarIds(prim.map((c) => c.id));
         } else if (list.length > 0) {
+          // Fix: Ensure we select the first calendar if no primary is found to avoid "Select at least one" error
           setSelectedCalendarIds([list[0].id]);
         }
       } catch (e: any) {

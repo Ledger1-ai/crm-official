@@ -48,8 +48,10 @@ export async function GET(_req: Request) {
 
     return NextResponse.json({ ok: true, calendars }, { status: 200 });
   } catch (e: any) {
-     
+
     console.error("[CALENDAR_LIST_GET]", e?.message || e);
-    return new NextResponse("Failed to list calendars", { status: 500 });
+    // Fix: Return the actual error message to the frontend for debugging
+    const errorMessage = e?.response?.data?.error?.message || e?.message || "Failed to list calendars";
+    return new NextResponse(errorMessage, { status: 500 });
   }
 }

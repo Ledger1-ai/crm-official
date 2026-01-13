@@ -78,12 +78,6 @@
         "category": "ventures"
     },
     {
-        "id": "ledger1",
-        "name": "Ledger1",
-        "url": "https://basalthq.com/images/basalt-logo-icon.png",
-        "category": "primary"
-    },
-    {
         "id": "surge",
         "name": "Surge",
         "url": "https://surge.basalthq.com/ppsymbol.png",

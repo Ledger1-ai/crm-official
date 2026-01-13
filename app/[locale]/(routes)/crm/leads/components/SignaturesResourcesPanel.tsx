@@ -6,12 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'react-hot-toast';
-import dynamic from 'next/dynamic';
-const SignatureBuilder = dynamic(() => import('@/components/SignatureBuilder'), { ssr: false });
+
 
 /**
 * Signatures & Resources panel
-* - Signature tab: paste HTML signature, preview, save to /api/profile/signature
 * - Resources tab: manage per-user resource buttons, and per-project presets (create, edit, duplicate default)
 * - Prompt tab: edit per-user default outreach prompt, save to /api/profile/outreach-prompt
 */
@@ -86,12 +84,7 @@ function ResourceEditorRow({
 
 export default function SignaturesResourcesPanel() {
   const [tab, setTab] = useState('resources');
-  const [showSignatureBuilder, setShowSignatureBuilder] = useState(false);
 
-  // Signature
-  const [signatureHtml, setSignatureHtml] = useState<string>('');
-  const [signatureMeta, setSignatureMeta] = useState<any>(null);
-  const signaturePreview = useMemo(() => ({ __html: signatureHtml || '' }), [signatureHtml]);
 
   // Resources
   const [resources, setResources] = useState<ResourceLink[]>(DEFAULT_RESOURCES);
@@ -114,22 +107,7 @@ export default function SignaturesResourcesPanel() {
     // Load existing settings + projects on mount
     (async () => {
       try {
-        // Signature
-        const sigRes = await fetch('/api/profile/signature', { method: 'GET' });
-        if (sigRes.ok) {
-          const data = await sigRes.json();
-          setSignatureHtml(data.signature_html || '');
-          const meta = data.signature_meta || null;
-          setSignatureMeta(meta);
-          // Apply theme from signature meta if present
-          try {
-            const t = (meta?.theme) || {};
-            if (typeof t.primary === 'string') setThemePrimary(t.primary);
-            if (typeof t.secondary === 'string') setThemeSecondary(t.secondary);
-            // Fallback: if accentColor exists but no theme.secondary, use it as secondary accent
-            if (!t.secondary && typeof meta?.accentColor === 'string') setThemeSecondary(meta.accentColor);
-          } catch { }
-        }
+
 
         // Resources
         const resRes = await fetch('/api/profile/resources', { method: 'GET' });
@@ -159,23 +137,7 @@ export default function SignaturesResourcesPanel() {
     })();
   }, []);
 
-  const saveSignature = async () => {
-    try {
-      const res = await fetch('/api/profile/signature', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ signatureHtml, meta: signatureMeta }),
-      });
-      if (res.ok) {
-        toast.success('Signature saved');
-      } else {
-        const t = await res.text();
-        toast.error(`Failed to save signature: ${t}`);
-      }
-    } catch (e: any) {
-      toast.error(`Failed to save signature: ${e?.message || e}`);
-    }
-  };
+
 
   const addResource = () => {
     setResources((prev) => [
@@ -229,29 +191,14 @@ export default function SignaturesResourcesPanel() {
         <div className="flex items-center justify-start mb-4 w-full overflow-hidden">
           <div className="overflow-x-auto no-scrollbar w-full">
             <TabsList className="inline-flex h-8 p-0.5 min-w-max">
-              <TabsTrigger value="signature" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Signature</TabsTrigger>
+
               <TabsTrigger value="resources" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Resources</TabsTrigger>
               <TabsTrigger value="prompt" className="text-[10px] uppercase tracking-wider font-semibold px-2 py-1 whitespace-nowrap">Prompt</TabsTrigger>
             </TabsList>
           </div>
         </div>
 
-        {/* Signature Tab - embedded builder behind an explicit toggle */}
-        <TabsContent value="signature">
-          {!showSignatureBuilder ? (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Use the Signature Builder to compose and save your email signature. It will be saved to your profile and can be copied for Gmail.</p>
-              <Button onClick={() => setShowSignatureBuilder(true)}>Open Signature Builder</Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <SignatureBuilder hasAccess={true} />
-              <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => setShowSignatureBuilder(false)}>Close Builder</Button>
-              </div>
-            </div>
-          )}
-        </TabsContent>
+
 
         {/* Resources Tab */}
         <TabsContent value="resources">

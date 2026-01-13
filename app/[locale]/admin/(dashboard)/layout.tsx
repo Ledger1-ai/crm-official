@@ -48,7 +48,7 @@ export default async function AdminDashboardLayout({
         include: { assigned_team: true }
     });
 
-    const showModules = user?.is_admin || user?.assigned_team?.slug === "ledger1";
+    const showModules = user?.is_admin || user?.assigned_team?.slug === "basalthq";
 
     return (
         <div className="fixed inset-0 flex h-[100dvh] overflow-hidden">
