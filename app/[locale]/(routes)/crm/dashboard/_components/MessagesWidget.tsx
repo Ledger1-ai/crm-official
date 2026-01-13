@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { MessageSquare, CalendarIcon, ArrowRight, User, FileInput, FileText } from "lucide-react";
+import DashboardCard from "./DashboardCard";
 
 import {
     Dialog,
@@ -46,15 +47,14 @@ export default function MessagesWidget({ messages }: MessagesWidgetProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-500 border-cyan-500/20 hover:border-cyan-500/40 border-dashed w-full justify-between">
-                    <div className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
-                        <span className="hidden sm:inline">Messages</span>
-                    </div>
-                    <Badge className="ml-1 px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 border-none text-white">
-                        {messages.length}
-                    </Badge>
-                </Button>
+                <DashboardCard
+                    icon={MessageSquare}
+                    label="Messages"
+                    count={messages.length}
+                    description={unreadMessagesCount > 0 ? `${unreadMessagesCount} unread messages` : "Inbox & Forms"}
+                    primaryColor="text-cyan-500"
+                    className="w-full"
+                />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>

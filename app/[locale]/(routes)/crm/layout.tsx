@@ -21,7 +21,6 @@ export default async function CrmLayout({
 
     return (
         <div className="flex h-full w-full overflow-hidden">
-            {/* CrmSidebar - Desktop only, Fixed height (hidden for Members) */}
             <CrmSidebar isMember={isMember} />
             <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-32 md:pb-0">
                 {children}

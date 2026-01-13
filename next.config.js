@@ -2,9 +2,9 @@ const withNextIntl = require("next-intl/plugin")("./i18n.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // turbopack: {
-  //   root: __dirname,
-  // },
+  turbopack: {
+    root: __dirname,
+  },
   typescript: { ignoreBuildErrors: true },
   images: {
     remotePatterns: [

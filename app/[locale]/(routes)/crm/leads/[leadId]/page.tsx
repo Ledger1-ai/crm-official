@@ -3,6 +3,7 @@ import Container from "@/app/[locale]/(routes)/components/ui/Container";
 import React from "react";
 import { BasicView } from "./components/BasicView";
 import DocumentsView from "../../components/DocumentsView";
+import { LeadScore } from "../components/LeadScore";
 
 interface LeadDetailPageProps {
   params: Promise<{
@@ -21,6 +22,7 @@ const LeadDetailPage = async (props: LeadDetailPageProps) => {
     <Container
       title={`Lead: ${lead?.firstName} ${lead?.lastName}`}
       description={"Everything you need to know about sales potential"}
+      action={<LeadScore leadData={lead} />}
     >
       <div className="space-y-5">
         <BasicView data={lead} />

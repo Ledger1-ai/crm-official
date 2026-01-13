@@ -53,16 +53,10 @@ const ContractsView = ({ data, crmData, accountId }: any) => {
         />
       </div>
 
-      {!data || data.length === 0 ? (
-        <Card>
-          <CardContent className="p-5">No assigned contracts found</CardContent>
-        </Card>
-      ) : (
-        <ContractsDataTable
-          data={data}
-          columns={columns}
-        />
-      )}
+      <ContractsDataTable
+        data={data || []}
+        columns={columns}
+      />
     </div>
   );
 };

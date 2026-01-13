@@ -8,6 +8,7 @@ import SideBar from "./components/SideBar";
 import Footer from "./components/Footer";
 import { Metadata } from "next";
 import RecentActivityTracker from "@/components/RecentActivityTracker";
+import GlobalDialer from "@/components/voice/GlobalDialer";
 
 function getSafeMetadataBase(): URL {
   const envUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -98,6 +99,7 @@ export default async function AppLayout({
         </div>
         <Footer />
       </div>
+      <GlobalDialer />
     </div>
   );
 }

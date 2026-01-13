@@ -84,14 +84,14 @@ function StatusBadge({ status }: { status?: string | null }) {
   const s = status || 'IDLE';
   const color =
     s === 'CLOSED'
-      ? 'bg-gray-200 text-gray-800'
+      ? 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700'
       : s === 'MEETING_BOOKED'
-        ? 'bg-green-200 text-green-800'
+        ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800'
         : s === 'OPENED'
-          ? 'bg-blue-200 text-blue-800'
+          ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800'
           : s === 'SENT'
-            ? 'bg-orange-200 text-orange-800'
-            : 'bg-slate-200 text-slate-800';
+            ? 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700';
   return <span className={`px-2 py-1 rounded text-xs font-semibold ${color}`}>{s}</span>;
 }
 

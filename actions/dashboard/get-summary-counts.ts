@@ -19,6 +19,7 @@ export type DashboardCounts = {
 export const getSummaryCounts = async (): Promise<DashboardCounts> => {
   // Get team context for filtering
   const teamInfo = await getCurrentUserTeamId();
+  console.log('[getSummaryCounts] teamInfo:', teamInfo);
   const teamId = teamInfo?.teamId;
   const isGlobalAdmin = teamInfo?.isGlobalAdmin;
 

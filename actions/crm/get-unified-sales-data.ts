@@ -16,6 +16,8 @@ export type UnifiedSalesData = {
     summary: {
         revenue: number;
         activeDeals: number;
+        leadsCount: number;
+        opportunitiesCount: number;
         storagePercentage: number;
         activeUsers: number;
     };
@@ -62,6 +64,8 @@ export const getUnifiedSalesData = async (): Promise<UnifiedSalesData | null> =>
         summary: {
             revenue: summaryCounts.revenue,
             activeDeals,
+            leadsCount: summaryCounts.leads,
+            opportunitiesCount: summaryCounts.opportunities,
             storagePercentage,
             activeUsers: summaryCounts.users,
         },

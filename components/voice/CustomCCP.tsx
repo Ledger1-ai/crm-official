@@ -4,6 +4,20 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Phone,
+  PhoneOff,
+  UserCheck,
+  Coffee,
+  Power,
+  X,
+  Delete,
+  Hash,
+  ChevronDown,
+  ChevronUp,
+  Activity,
+  User
+} from "lucide-react";
 
 /**
  * CustomCCP
@@ -78,6 +92,27 @@ export default function CustomCCP({
       const digit = char.replace(/[^\d]/g, "");
       return base + digit;
     });
+  }
+
+  // Handle Numpad Click
+  function handlePadClick(key: string | number) {
+    const k = String(key);
+    // If connected, send DTMF
+    if (contactStatus === "Connected") {
+      // Map CLR/Del to nothing or maybe hangup? Standard keypad has *, 0, #
+      if (k === "Clear" || k === "Del") return;
+      sendDtmf(k);
+      return;
+    }
+
+    // Otherwise, standard dialing input
+    if (k === "Clear") {
+      clearDial();
+    } else if (k === "Del") { // Backspace
+      backspaceDial();
+    } else {
+      appendDial(k);
+    }
   }
   function backspaceDial() {
     setDisplayNumber((prev) => {
@@ -781,57 +816,33 @@ export default function CustomCCP({
 
   // Use theme primary color unless an explicit accentColor is provided
   const accent = accentColor || "hsl(var(--primary))";
-  const agentColOrder = dialerLeft ? "md:order-2" : "md:order-1";
-  const dialerColOrder = dialerLeft ? "md:order-1" : "md:order-2";
+
+  // State for collapsible debug logs
+  const [debugOpen, setDebugOpen] = useState(false);
 
   return (
-    <div className={`rounded-xl border bg-card p-3 shadow-sm ${className || ""}`}>
-      {/* Header */}
-      <div
-        className={`mb-3 flex items-center justify-between rounded-lg px-3 py-2 ${theme === "dark" ? "bg-gradient-to-r from-slate-900 to-slate-800" : "bg-gradient-to-r from-white to-slate-50"
-          } border`}
-        style={{ borderColor: accent, boxShadow: `0 0 0 1px ${accent}` }}
-      >
-        <div className="flex items-center gap-3">
-          <div className="h-6 w-6 rounded-md" style={{ backgroundColor: accent }} />
-          <div className="flex flex-col">
-            <div className="text-xs font-semibold">{title || "Custom Softphone"}</div>
-            {subtitle ? <div className="text-[10px] text-muted-foreground">{subtitle}</div> : null}
-          </div>
-        </div>
+    <div className={`flex flex-col h-full bg-background ${className || ""}`}>
+      {/* Header / Connection Status */}
+      <div className="flex items-center justify-between p-3 border-b bg-muted/30">
         <div className="flex items-center gap-2">
-          {agentState ? (
-            <span className="text-[10px] px-2 py-1 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-200">
-              {agentState}
-            </span>
-          ) : null}
-          {contactStatus ? (
-            <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200">
-              {contactStatus}
-            </span>
-          ) : null}
+          <div className={`h-2 w-2 rounded-full ${ccpReadyRef.current ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
+          <span className="text-xs font-semibold text-foreground/80">{title || "Softphone"}</span>
+        </div>
+        <div className="flex items-center gap-1">
           {!launched ? (
-            <Button size="sm" onClick={handleLaunch} disabled={initializing} className="h-7">
-              {initializing ? "Launching…" : "Launch"}
+            <Button size="sm" variant="outline" onClick={handleLaunch} disabled={initializing} className="h-6 text-[10px]">
+              {initializing ? "Init..." : "Launch"}
             </Button>
           ) : (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                try {
-                  const fallback = `${urlBase}/connect/ccp-v2${theme === "dark" ? "?theme=dark" : ""}`;
-                  const full = ccpResolvedUrlRef.current || fallback;
-                  const win = window.open(full, "_blank", "noopener,noreferrer");
-                  if (!win) setError("Popup blocked. Please allow popups for this site.");
-                } catch (e: any) {
-                  setError(e?.message || "Failed to open CCP");
-                }
-              }}
-              className="h-7"
-            >
-              Open Native CCP
-            </Button>
+            <div className="flex items-center gap-1">
+              {/* Connection Status Indicator */}
+              <div className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${contactStatus === "Connected" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                contactStatus ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                  "bg-slate-500/10 text-muted-foreground border-border"
+                }`}>
+                {contactStatus || "Idle"}
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -839,143 +850,175 @@ export default function CustomCCP({
       {/* Hidden CCP iframe container */}
       <div ref={ccpContainerRef} style={{ display: "none" }} />
 
-      <div className="grid md:grid-cols-2 gap-3">
-        <div className={`space-y-3 ${agentColOrder}`}>
-          {/* Agent panel */}
-          <section className="rounded-md border bg-background p-3" style={{ borderColor: accent }}>
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold">Agent</div>
-              {routingProfile ? <div className="microtext text-muted-foreground">RP: {routingProfile}</div> : null}
-            </div>
-            <div className="mt-2 flex items-center gap-2 text-[11px]">
-              {agentName ? (
-                <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">{agentName}</span>
-              ) : null}
-              {agentState ? (
-                <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">{agentState}</span>
-              ) : null}
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <Button variant="outline" onClick={goAvailable}>
-                Go Available
-              </Button>
-              <Button variant="outline" onClick={goBreak}>
-                Go Break
-              </Button>
-              <Button variant="outline" onClick={goOffline}>
-                Go Offline
-              </Button>
-            </div>
-          </section>
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
 
-          {/* Contact actions */}
-          <section className="rounded-md border bg-background p-3 mt-3" style={{ borderColor: accent }}>
-            <div className="text-xs font-semibold">Contact</div>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              <Button variant="outline" onClick={acceptContact}>
-                Answer Incoming
-              </Button>
-              <Button variant="outline" onClick={hangupActive}>
-                Hang Up
-              </Button>
-              <Button variant="outline" onClick={clearContact}>
-                Close Contact
-              </Button>
-            </div>
-          </section>
+        {/* Agent Controls Card */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Agent Status</span>
+            <span className={`text-[10px] font-mono ${agentState === "Available" || agentState === "Routable" ? "text-emerald-500" : "text-amber-500"}`}>
+              {agentState || "Unknown"}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant={agentState === "Available" || agentState === "Routable" ? "default" : "outline"}
+              className={`h-14 flex flex-col gap-1 items-center justify-center border-dashed border-2 ${agentState === "Available" || agentState === "Routable" ? "border-solid border-emerald-500 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 hover:text-emerald-600" : "hover:bg-emerald-500/5 hover:text-emerald-600 hover:border-emerald-500/50"}`}
+              onClick={goAvailable}
+            >
+              <UserCheck className="h-4 w-4" />
+              <span className="text-[10px] font-medium">Available</span>
+            </Button>
+            <Button
+              variant={agentState !== "Available" && agentState !== "Offline" && agentState ? "default" : "outline"}
+              className="h-14 flex flex-col gap-1 items-center justify-center hover:bg-amber-500/10 hover:text-amber-600 hover:border-amber-500/50"
+              onClick={goBreak}
+            >
+              <Coffee className="h-4 w-4" />
+              <span className="text-[10px] font-medium">Break</span>
+            </Button>
+            <Button
+              variant={agentState === "Offline" ? "destructive" : "outline"}
+              className="h-14 flex flex-col gap-1 items-center justify-center hover:bg-red-500/10 hover:text-red-600 hover:border-red-500/50"
+              onClick={goOffline}
+            >
+              <Power className="h-4 w-4" />
+              <span className="text-[10px] font-medium">Offline</span>
+            </Button>
+          </div>
         </div>
 
-        {/* Outbound dialer (compact, frosted glass) */}
-        <section className={`rounded-md border p-3 ${dialerColOrder}`} style={{ borderColor: accent }}>
-          <div className="rounded-xl border border-primary/30 bg-white/10 dark:bg-slate-900/30 backdrop-blur-md p-3">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div className="md:col-span-3">
-                <label className="text-xs font-medium">Number (E.164)</label>
-                <Input
-                  placeholder="+15551234567"
-                  value={displayNumber}
-                  onChange={(e) => setDisplayNumber(e.target.value)}
-                  className="h-8"
-                />
-              </div>
+        {/* Active Call Controls */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Active Call</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              onClick={acceptContact}
+              disabled={!contactStatus || contactStatus === "Connected"}
+              className="h-12 bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              <span className="text-xs">Answer</span>
+            </Button>
+            <Button
+              onClick={hangupActive}
+              variant="destructive"
+              className="h-12 shadow-md shadow-red-500/20"
+            >
+              <PhoneOff className="h-4 w-4 mr-2" />
+              <span className="text-xs">Hang Up</span>
+            </Button>
+            <Button
+              onClick={clearContact}
+              variant="secondary"
+              className="h-12"
+            >
+              <X className="h-4 w-4 mr-2" />
+              <span className="text-xs">Close</span>
+            </Button>
+          </div>
+        </div>
 
-              <div className="md:col-span-1 flex md:block items-stretch md:h-full">
-                <Button
-                  className="w-full h-12 md:h-full min-h-[200px] text-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={() => dialNumber(displayNumber)}
-                  disabled={!String(displayNumber || "").trim()}
-                >
-                  Dial
-                </Button>
-              </div>
+        {/* Numpad Section */}
+        <div className="pt-2">
+          <div className="bg-card/50 rounded-xl p-3 border shadow-inner">
+            {/* Number Display */}
+            <div className="relative mb-3">
+              <Input
+                value={displayNumber}
+                onChange={(e) => setDisplayNumber(e.target.value)}
+                className="text-center text-xl font-mono h-12 bg-background border-muted shadow-sm pr-10"
+                placeholder="Enter Number..."
+              />
+              <button
+                onClick={backspaceDial}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Delete className="h-4 w-4" />
+              </button>
+            </div>
 
-              <div className="md:col-span-2">
-                <div className="grid grid-cols-3 gap-2">
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("1")}>1</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("2")}>2</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("3")}>3</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("4")}>4</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("5")}>5</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("6")}>6</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("7")}>7</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("8")}>8</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("9")}>9</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("+")}>+</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary bg-primary/10 hover:bg-primary/20" onClick={() => appendDial("0")}>0</Button>
-                  <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={backspaceDial}>⌫</Button>
-                  <Button variant="outline" className="h-10 md:h-12 col-span-3 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={clearDial}>Clear</Button>
-                </div>
-              </div>
-
-              {contactStatus === "Connected" && (
-                <div className="md:col-span-1">
-                  <div className="text-xs font-semibold mb-1">DTMF</div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("1")}>1</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("2")}>2</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("3")}>3</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("4")}>4</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("5")}>5</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("6")}>6</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("7")}>7</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover/bg-primary/10" onClick={() => sendDtmf("8")}>8</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("9")}>9</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("0")}>0</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("*")}>*</Button>
-                    <Button variant="outline" className="h-10 md:h-12 border-primary/40 text-primary/80 hover:bg-primary/10" onClick={() => sendDtmf("#")}>#</Button>
-                  </div>
-                </div>
+            {/* Keypad Grid */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {contactStatus === "Connected" ? (
+                /* Connected: Standard DTMF Layout (1-9, *, 0, #) */
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, "*", 0, "#"].map((key) => (
+                  <Button
+                    key={key}
+                    variant="outline"
+                    onClick={() => handlePadClick(key)}
+                    className="h-10 text-lg font-medium transition-all active:scale-95 hover:bg-primary/10 hover:border-primary/50 text-foreground"
+                  >
+                    {key}
+                  </Button>
+                ))
+              ) : (
+                /* Dialing: Input Layout (1-9, +, 0, CLR) */
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, "+", 0, "Clear"].map((key) => (
+                  <Button
+                    key={key}
+                    variant="outline"
+                    onClick={() => handlePadClick(key)}
+                    className={`h-10 text-lg font-medium transition-all active:scale-95 ${key === "Clear" ? "text-xs text-muted-foreground uppercase tracking-widest" : "hover:bg-primary/5 hover:border-primary/30 text-foreground"}`}
+                  >
+                    {key === "Clear" ? "CLR" : key}
+                  </Button>
+                ))
               )}
             </div>
+
+            {/* Dial Button */}
+            <Button
+              onClick={() => dialNumber(displayNumber)}
+              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 rounded-lg"
+              disabled={!displayNumber}
+            >
+              <Phone className="h-5 w-5 mr-2" />
+              Call Now
+            </Button>
           </div>
 
-          <div className="microtext text-muted-foreground mt-2">
-            Outbound uses Agent.connect with Endpoint.byPhoneNumber. Ensure the agent is Routable and CCP is initialized.
-          </div>
-        </section>
-      </div>
-
-      {/* Logs */}
-      <section className="rounded-md border bg-background p-3 mt-3" style={{ borderColor: accent }}>
-        <div className="text-xs font-semibold mb-2">Events</div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-[11px] font-medium">Log Messages</label>
-            <Textarea value={logs.join("\n")} readOnly rows={6} className="text-[11px]" />
-          </div>
-          <div>
-            <label className="text-[11px] font-medium">Event Messages</label>
-            <Textarea value={events.join("\n")} readOnly rows={6} className="text-[11px]" />
+          <div className="mt-2 text-[10px] text-center text-muted-foreground/60">
+            E.164 Format Required (e.g. +1555...)
           </div>
         </div>
-      </section>
 
-      {/* Helper + errors */}
-      <div className="mt-2 text-[11px] text-muted-foreground">
-        CCP runs invisibly with loginPopup. Add your site origin to Approved origins in Amazon Connect for inline
-        permissions if needed.
+        {/* Debug / Logs Expansion */}
+        {/* Debug / Logs Expansion */}
+        <div className="border rounded-lg bg-muted/20">
+          <div
+            className="flex items-center justify-between p-2 cursor-pointer hover:bg-muted/30"
+            onClick={() => setDebugOpen(!debugOpen)}
+          >
+            <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+              <Activity className="h-3 w-3" />
+              System Logs & Events
+            </span>
+            {debugOpen ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+          </div>
+
+          {debugOpen && (
+            <div className="p-2 border-t space-y-2 animate-in slide-in-from-top-2 duration-200">
+              <div>
+                <label className="text-[9px] font-semibold text-muted-foreground uppercase block mb-1">Logs</label>
+                <Textarea value={logs.join("\n")} readOnly className="h-20 text-[9px] font-mono bg-background resize-none" />
+              </div>
+              <div>
+                <label className="text-[9px] font-semibold text-muted-foreground uppercase block mb-1">Events</label>
+                <Textarea value={events.join("\n")} readOnly className="h-20 text-[9px] font-mono bg-background resize-none" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <div className="p-2 text-xs text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded">
+            <span className="font-semibold">Error:</span> {error}
+          </div>
+        )}
       </div>
-      {error ? <div className="mt-2 text-[11px] text-red-600">{error}</div> : null}
     </div>
   );
 }

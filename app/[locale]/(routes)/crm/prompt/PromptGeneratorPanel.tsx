@@ -4,6 +4,13 @@ import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from 'react-hot-toast';
 import CustomCCP from '@/components/voice/CustomCCP';
 
@@ -218,34 +225,38 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
       </section>
 
       {/* Role selection */}
-      <section className="rounded-md border bg-card p-4">
+      <section className="rounded-md border bg-card p-4 max-w-md">
         <h2 className="text-lg font-semibold mb-2">Role</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="flex flex-col gap-4">
           <div>
-            <label className="text-xs font-medium">Preset</label>
-            <select
-              className="w-full h-9 px-2 border rounded-md bg-background"
+            <label className="text-xs font-medium mb-1.5 block">Preset</label>
+            <Select
               value={roleKey}
-              onChange={(e) => setRoleKey(e.target.value as RolePreset['key'])}
+              onValueChange={(val) => setRoleKey(val as RolePreset['key'])}
             >
-              {ROLE_PRESETS.map((r) => (
-                <option key={r.key} value={r.key}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-            <div className="microtext text-muted-foreground mt-1">
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a role" />
+              </SelectTrigger>
+              <SelectContent>
+                {ROLE_PRESETS.map((r) => (
+                  <SelectItem key={r.key} value={r.key}>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="microtext text-muted-foreground mt-2 px-1">
               {(ROLE_PRESETS.find(r => r.key === roleKey)?.description) || ''}
             </div>
           </div>
           {roleKey === 'custom' && (
             <>
               <div>
-                <label className="text-xs font-medium">Custom Role Name</label>
+                <label className="text-xs font-medium mb-1.5 block">Custom Role Name</label>
                 <Input value={customRoleName} onChange={(e) => setCustomRoleName(e.target.value)} placeholder="e.g., Enterprise Advisor" />
               </div>
-              <div className="md:col-span-2">
-                <label className="text-xs font-medium">Custom Role Notes</label>
+              <div className="">
+                <label className="text-xs font-medium mb-1.5 block">Custom Role Notes</label>
                 <Textarea rows={3} value={roleNotes} onChange={(e) => setRoleNotes(e.target.value)} placeholder="Define behaviors, tone, and goals..." />
               </div>
             </>
@@ -255,19 +266,32 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
 
       {/* Actions */}
       <section className="rounded-md border bg-card p-4">
-        <div className="flex items-center gap-3">
-          <Button onClick={handleGenerate}>Generate Prompt</Button>
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium">Wallet</label>
-            <Input value={wallet} onChange={(e) => setWallet(e.target.value)} placeholder="0x..." className="w-48" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-wrap">
+          <Button onClick={handleGenerate} className="w-full sm:w-auto">Generate Prompt</Button>
+
+          <div className="flex items-center gap-2 flex-1 w-full sm:w-auto min-w-[200px]">
+            <span className="text-xs font-medium whitespace-nowrap">Wallet</span>
+            <Input
+              value={wallet}
+              onChange={(e) => setWallet(e.target.value)}
+              placeholder="0x..."
+              className="flex-1 min-w-0"
+            />
           </div>
-          <Button variant="outline" onClick={handlePushToVoiceHub}>
+
+          <Button variant="outline" onClick={handlePushToVoiceHub} className="w-full sm:w-auto">
             Push to VoiceHub
           </Button>
         </div>
-        <div className="mt-3">
-          <label className="text-xs font-medium">Generated Prompt</label>
-          <Textarea rows={10} value={prompt || generated} onChange={(e) => setPrompt(e.target.value)} />
+
+        <div className="mt-4">
+          <label className="text-xs font-medium mb-1.5 block">Generated Prompt</label>
+          <Textarea
+            rows={10}
+            value={prompt || generated}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="font-mono text-sm bg-muted/30"
+          />
         </div>
       </section>
 

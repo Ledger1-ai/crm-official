@@ -61,18 +61,15 @@ const AvatarDropdown = ({ avatar, userId, name, email }: Props) => {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/projects/dashboard")}>
-          Todo dashboard
-        </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => router.push(`/crm/dashboard/${userId}`)}
+          onClick={() => router.push(`/crm/dashboard`)}
         >
-          Sales dashboard
+          Sales Dashboard
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/profile")}>
           <Settings className="w-4 h-4 inline-block mr-2 stroke-current text-gray-500" />
-          <span>Profile settings</span>
+          <span>Profile Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => {
@@ -80,7 +77,7 @@ const AvatarDropdown = ({ avatar, userId, name, email }: Props) => {
           signOut({ callbackUrl: `/${locale}/sign-in?loggedOut=true` });
         }}>
           <LogOut className="w-4 h-4 inline-block mr-2 stroke-current text-gray-500" />
-          <span>Sign out</span>
+          <span>Sign Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

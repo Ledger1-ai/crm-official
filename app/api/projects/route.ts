@@ -5,23 +5,35 @@ import { authOptions } from "@/lib/auth";
 import { getCurrentUserTeamId } from "@/lib/team-utils";
 
 export async function GET() {
+  console.log('[GET /api/projects] Request started');
   const session = await getServerSession(authOptions);
-  if (!session) return new NextResponse("Unauthenticated", { status: 401 });
+  if (!session) {
+    console.log('[GET /api/projects] No session');
+    return new NextResponse("Unauthenticated", { status: 401 });
+  }
   try {
     const teamInfo = await getCurrentUserTeamId();
+    console.log('[GET /api/projects] Team Info:', teamInfo);
     const teamId = teamInfo?.teamId;
+
+    if (!session?.user?.id) {
+      console.log('[GET /api/projects] Missing session.user.id');
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
 
     const orConditions: any[] = [
       { user: session.user.id },
       { sharedWith: { has: session.user.id } },
     ];
 
-    if (teamId) {
+    if (teamId && typeof teamId === 'string') {
       orConditions.push({
         team_id: teamId,
         visibility: "public"
       });
     }
+
+    console.log('[GET /api/projects] orConditions:', JSON.stringify(orConditions));
 
     // Return projects (boards) accessible to the user
     const boards = await prismadb.boards.findMany({
@@ -33,8 +45,8 @@ export async function GET() {
     });
     return NextResponse.json({ projects: boards }, { status: 200 });
   } catch (e) {
-    console.log("[PROJECTS_GET]", e);
-    return new NextResponse("Initial error", { status: 500 });
+    console.error("[PROJECTS_GET] Error:", e);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 

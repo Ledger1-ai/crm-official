@@ -7,6 +7,10 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { path, userAgent, visitorId } = body;
 
+        if (!path) {
+            return NextResponse.json({ success: false, message: "Missing path" }, { status: 400 });
+        }
+
         // Use the persistent visitorId from client as the 'ipHash' for unique tracking
         // This ensures refreshes don't count as new visitors
         const ipHash = visitorId || crypto.createHash('sha256').update(Math.random().toString()).digest('hex').substring(0, 10);

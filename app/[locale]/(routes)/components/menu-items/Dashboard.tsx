@@ -7,12 +7,12 @@ type Props = {
   open: boolean;
   title: string;
   isMobile?: boolean;
+  teamRole?: string;
 };
 
 const DashboardMenu = ({ open, title, isMobile = false }: Props) => {
   const pathname = usePathname();
   // Strictly match /dashboard or /<locale>/dashboard. 
-  // Ensure it does NOT match /projects or others if logic was somehow fuzzy.
   const isPath = pathname === "/dashboard" || /^\/[a-zA-Z0-9-]+\/dashboard(\/|$)/.test(pathname);
 
   return (

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import * as Switch from "@radix-ui/react-switch";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, Check, X, RefreshCw, Menu, MessageSquare, MoreVertical } from "lucide-react";
+import { Plus, Trash2, Pencil, Check, X, RefreshCw, Menu, MessageSquare, MoreVertical, Search } from "lucide-react";
 import ChatBoard from "./ChatBoard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,11 @@ type ChatSession = {
   isTemporary: boolean;
   createdAt: string;
   updatedAt?: string | null;
+  assigned_user?: {
+    name?: string;
+    email?: string;
+    avatar?: string;
+  };
 };
 
 type ChatMessage = {
@@ -36,7 +41,8 @@ export default function ChatApp() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [creatingTitle, setCreatingTitle] = useState<string>("");
-  const [creatingTemporary, setCreatingTemporary] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [useHistory, setUseHistory] = useState<boolean>(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loadingSessions, setLoadingSessions] = useState<boolean>(false);
   const [loadingMessages, setLoadingMessages] = useState<boolean>(false);
@@ -69,7 +75,7 @@ export default function ChatApp() {
       const res = await fetch("/api/chat/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: creatingTitle || "New Chat", isTemporary: creatingTemporary }),
+        body: JSON.stringify({ title: creatingTitle || "New Chat", isTemporary: !useHistory }),
       });
       if (!res.ok) throw new Error(`Failed to create session: ${res.status}`);
       const json = await res.json();
@@ -77,7 +83,7 @@ export default function ChatApp() {
       setSessions((prev) => [created, ...prev]);
       setActiveSessionId(created.id);
       setCreatingTitle("");
-      setCreatingTemporary(false);
+      // Keep history setting as is for next chat? Or reset? Let's keep it.
       toast.success("Session created");
       setMessages([]);
       if (window.innerWidth < 640) setSidebarOpen(false);
@@ -105,6 +111,7 @@ export default function ChatApp() {
   }
 
   async function deleteSession(sessionId: string) {
+    if (!confirm("Are you sure you want to delete this chat? This action cannot be undone.")) return;
     try {
       const res = await fetch(`/api/chat/sessions/${sessionId}`, { method: "DELETE" });
       if (!res.ok && res.status !== 204) throw new Error(`Failed to delete session`);
@@ -219,16 +226,29 @@ export default function ChatApp() {
             </Button>
           </div>
           <div className="flex items-center justify-between px-1">
-            <label className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer">
+            <label className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer select-none">
               <Switch.Root
-                className="w-8 h-4 bg-muted-foreground/30 rounded-full relative data-[state=checked]:bg-primary transition-colors"
-                checked={creatingTemporary}
-                onCheckedChange={setCreatingTemporary}
+                className="w-9 h-5 bg-muted-foreground/30 rounded-full relative data-[state=checked]:bg-primary transition-colors flex items-center px-0.5"
+                checked={useHistory}
+                onCheckedChange={setUseHistory}
               >
-                <Switch.Thumb className="block w-3 h-3 bg-background rounded-full shadow-sm transition-transform translate-x-0.5 data-[state=checked]:translate-x-4.5" />
+                <Switch.Thumb className="block w-4 h-4 bg-background rounded-full shadow-sm transition-transform translate-x-0 data-[state=checked]:translate-x-4" />
               </Switch.Root>
-              Temporary Chat
+              Chat History
             </label>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="px-4 pt-2">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search chats..."
+              className="pl-8 bg-muted/50"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
 
@@ -239,93 +259,101 @@ export default function ChatApp() {
               No chats yet. Start a new one!
             </div>
           )}
-          {sessions.map((s) => (
-            <div
-              key={s.id}
-              className={cn(
-                "group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all hover:bg-muted/50",
-                activeSessionId === s.id && "bg-muted shadow-sm border border-border/50"
-              )}
-              onClick={() => {
-                setActiveSessionId(s.id);
-                if (window.innerWidth < 640) setSidebarOpen(false);
-              }}
-            >
-              <MessageSquare className={cn(
-                "w-4 h-4 shrink-0",
-                activeSessionId === s.id ? "text-primary" : "text-muted-foreground"
-              )} />
-
-              <div className="flex-1 min-w-0">
-                {renamingSessionId === s.id ? (
-                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Input
-                      value={renameTitle}
-                      onChange={(e) => setRenameTitle(e.target.value)}
-                      className="h-7 text-sm"
-                      autoFocus
-                    />
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => renameSession(s.id)}>
-                      <Check className="w-3 h-3" />
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setRenamingSessionId(null)}>
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col">
-                    <span className="truncate text-sm font-medium">{s.title || "Untitled Chat"}</span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {new Date(s.createdAt).toLocaleDateString()} • {s.isTemporary ? "Temp" : "Saved"}
-                    </span>
-                  </div>
+          {sessions
+            .filter((s) => !s.isTemporary) // Filter out temporary sessions
+            .filter((s) => (s.title || "Untitled Chat").toLowerCase().includes(searchQuery.toLowerCase()))
+            .map((s) => (
+              <div
+                key={s.id}
+                className={cn(
+                  "group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all hover:bg-muted/50",
+                  activeSessionId === s.id && "bg-muted shadow-sm border border-border/50"
                 )}
-              </div>
+                onClick={() => {
+                  setActiveSessionId(s.id);
+                  if (window.innerWidth < 640) setSidebarOpen(false);
+                }}
+              >
+                <MessageSquare className={cn(
+                  "w-4 h-4 shrink-0",
+                  activeSessionId === s.id ? "text-primary" : "text-muted-foreground"
+                )} />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical className="w-3 h-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={(e) => {
-                    e.stopPropagation();
-                    setRenamingSessionId(s.id);
-                    setRenameTitle(s.title || "");
-                  }}>
-                    <Pencil className="w-3 h-3 mr-2" /> Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => {
-                    e.stopPropagation();
-                    toggleTemporary(s.id, !s.isTemporary);
-                  }}>
-                    {s.isTemporary ? <Check className="w-3 h-3 mr-2" /> : <X className="w-3 h-3 mr-2" />}
-                    {s.isTemporary ? "Make Persistent" : "Make Temporary"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={(e) => {
+                <div className="flex-1 min-w-0">
+                  {renamingSessionId === s.id ? (
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <Input
+                        value={renameTitle}
+                        onChange={(e) => setRenameTitle(e.target.value)}
+                        className="h-7 text-sm"
+                        autoFocus
+                      />
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => renameSession(s.id)}>
+                        <Check className="w-3 h-3" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setRenamingSessionId(null)}>
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col">
+                      <span className="truncate text-sm font-medium">{s.title || "Untitled Chat"}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(s.createdAt).toLocaleDateString()} • {s.isTemporary ? "Temp" : "Saved"}
+                        {s.assigned_user && (
+                          <span className="block text-[10px] text-primary/70 truncate">
+                            by {s.assigned_user.name || s.assigned_user.email}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical className="w-3 h-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={(e) => {
                       e.stopPropagation();
-                      deleteSession(s.id);
-                    }}
-                  >
-                    <Trash2 className="w-3 h-3 mr-2" /> Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ))}
+                      setRenamingSessionId(s.id);
+                      setRenameTitle(s.title || "");
+                    }}>
+                      <Pencil className="w-3 h-3 mr-2" /> Rename
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTemporary(s.id, !s.isTemporary);
+                    }}>
+                      {s.isTemporary ? <Check className="w-3 h-3 mr-2" /> : <X className="w-3 h-3 mr-2" />}
+                      {s.isTemporary ? "Turn History On" : "Turn History Off"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteSession(s.id);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 mr-2" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ))}
         </div>
-      </aside>
+      </aside >
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 bg-background/50">
+      < main className="flex-1 flex flex-col min-w-0 bg-background/50" >
         <div className="h-14 border-b border-border flex items-center px-4 justify-between bg-background/80 backdrop-blur-sm sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <Button
@@ -340,43 +368,45 @@ export default function ChatApp() {
               <h1 className="font-semibold text-sm sm:text-base">
                 {activeSession?.title || "Varuni AI Assistant"}
               </h1>
-              {activeSession && (
-                <span className="text-[10px] text-muted-foreground">
-                  {activeSession.isTemporary ? "Temporary Session" : "Persistent Session"}
+              {activeSession && activeSession.isTemporary && (
+                <span className="text-[10px] text-amber-500 font-medium flex items-center gap-1">
+                  History Off (Not Saved)
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        {activeSessionId ? (
-          <ChatBoard
-            key={activeSessionId}
-            sessionId={activeSessionId}
-            initialMessages={messages as any[]}
-            isTemporary={activeSession?.isTemporary || false}
-            onRefresh={() => loadMessages(activeSessionId)}
-          />
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
-            <div className="p-6 bg-primary/5 rounded-full ring-1 ring-primary/10">
-              <MessageSquare className="w-12 h-12 text-primary/50" />
+        {
+          activeSessionId ? (
+            <ChatBoard
+              key={activeSessionId}
+              sessionId={activeSessionId}
+              initialMessages={messages as any[]}
+              isTemporary={activeSession?.isTemporary || false}
+              onRefresh={() => loadMessages(activeSessionId)}
+            />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
+              <div className="p-6 bg-primary/5 rounded-full ring-1 ring-primary/10">
+                <MessageSquare className="w-12 h-12 text-primary/50" />
+              </div>
+              <div className="space-y-2 max-w-md">
+                <h3 className="text-xl font-semibold">Start a Conversation</h3>
+                <p className="text-muted-foreground text-sm">
+                  Select an existing chat from the sidebar or create a new one to start chatting with Varuni.
+                </p>
+                <Button onClick={() => {
+                  if (window.innerWidth < 640) setSidebarOpen(true);
+                  // Focus input logic could go here
+                }}>
+                  Open Chats
+                </Button>
+              </div>
             </div>
-            <div className="space-y-2 max-w-md">
-              <h3 className="text-xl font-semibold">Start a Conversation</h3>
-              <p className="text-muted-foreground text-sm">
-                Select an existing chat from the sidebar or create a new one to start chatting with Varuni.
-              </p>
-              <Button onClick={() => {
-                if (window.innerWidth < 640) setSidebarOpen(true);
-                // Focus input logic could go here
-              }}>
-                Open Chats
-              </Button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+          )
+        }
+      </main >
+    </div >
   );
 }

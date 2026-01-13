@@ -71,19 +71,12 @@ const AccountsView = ({ data, crmData }: any) => {
         </Sheet>
       </div>
 
-      {!data || data.length === 0 ? (
-        <Card>
-          <CardContent className="p-5">No assigned accounts found</CardContent>
-        </Card>
-      ) : (
-
-        <AccountDataTable
-          data={data}
-          columns={columns}
-          industries={industries}
-          users={users}
-        />
-      )}
+      <AccountDataTable
+        data={data || []}
+        columns={columns}
+        industries={industries}
+        users={users}
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Folder, CalendarIcon, ArrowRight } from "lucide-react";
+import DashboardCard from "./DashboardCard";
 
 import {
     Dialog,
@@ -39,15 +40,14 @@ export default function NewProjectsWidget({ projects }: NewProjectsWidgetProps) 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border-amber-500/20 hover:border-amber-500/40 border-dashed w-full justify-between">
-                    <div className="flex items-center gap-2">
-                        <Folder className="h-4 w-4" />
-                        <span className="hidden sm:inline">New Projects</span>
-                    </div>
-                    <Badge className="ml-1 px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center bg-amber-500 hover:bg-amber-600 border-none">
-                        {projects.length}
-                    </Badge>
-                </Button>
+                <DashboardCard
+                    icon={Folder}
+                    label="New Projects"
+                    count={projects.length}
+                    description={projects.length > 0 ? "Projects assigned this week" : "No new projects"}
+
+                    className="w-full"
+                />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>

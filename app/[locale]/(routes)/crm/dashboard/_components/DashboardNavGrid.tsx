@@ -42,6 +42,7 @@ const navItems = [
         color: "from-purple-500/20 to-pink-500/20",
         iconColor: "text-purple-400",
     },
+
     {
         title: "Contracts",
         description: "View and manage contracts",
@@ -50,14 +51,7 @@ const navItems = [
         color: "from-slate-500/20 to-zinc-500/20",
         iconColor: "text-slate-400",
     },
-    {
-        title: "Dashboard",
-        description: "Sales performance overview",
-        href: "/crm/sales-command",
-        icon: LayoutDashboard,
-        color: "from-pink-500/20 to-rose-500/20",
-        iconColor: "text-pink-400",
-    },
+
     {
         title: "Dialer",
         description: "Make and track calls",
@@ -82,6 +76,8 @@ const navItems = [
         color: "from-indigo-500/20 to-violet-500/20",
         iconColor: "text-indigo-400",
     },
+
+
     {
         title: "My Projects",
         description: "Your assigned projects & pools",
@@ -98,6 +94,7 @@ const navItems = [
         color: "from-teal-500/20 to-emerald-500/20",
         iconColor: "text-teal-400",
     },
+
     {
         title: "Opportunities",
         description: "Track sales pipeline",

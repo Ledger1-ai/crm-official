@@ -3,10 +3,17 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { toast } from "sonner";
-import { Loader, Send, Square, RefreshCw, ArrowDown } from "lucide-react";
+import { Loader, Send, Square, RefreshCw, ArrowDown, Download, MoreVertical } from "lucide-react";
 import { MessageBubble } from "./MessageBubble";
+import { ChatScore } from "./ChatScore";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ChatMessage = {
     id: string;
@@ -152,10 +159,27 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
         }
     };
 
+    const handleExport = () => {
+        if (!messages.length) return;
+        const text = messages.map((m: any) => `[${new Date(m.createdAt).toLocaleString()}] ${m.role.toUpperCase()}:\n${m.content || (m.parts ? m.parts.map((p: any) => typeof p === 'string' ? p : (p.text || '')).join('') : '')}\n`).join("\n---\n\n");
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `chat-export-${sessionId}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success("Chat exported!");
+    };
+
     return (
         <div className="flex-1 flex flex-col min-h-0 relative bg-background/50">
             {/* Header (Context & Refresh) */}
             <div className="absolute top-4 right-4 z-30 flex items-center gap-2 bg-background/80 backdrop-blur-sm p-2 rounded-full border shadow-sm">
+                <ChatScore sessionId={sessionId} />
+                <div className="w-px h-4 bg-border mx-1" />
                 <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
                     <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
@@ -165,15 +189,21 @@ export default function ChatBoard({ sessionId, initialMessages, isTemporary, onR
                     </div>
                     <span>{percentUsed}% Context</span>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 rounded-full"
-                    onClick={onRefresh}
-                    title="Refresh messages"
-                >
-                    <RefreshCw className="w-3 h-3" />
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+                            <MoreVertical className="w-3 h-3" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={onRefresh}>
+                            <RefreshCw className="w-3 h-3 mr-2" /> Refresh
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleExport}>
+                            <Download className="w-3 h-3 mr-2" /> Export Chat
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {/* Messages list */}

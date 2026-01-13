@@ -153,7 +153,7 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 custom-scrollbar">
             <div className="flex flex-col gap-1 px-3">
-              <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} />
+              <DashboardMenu open={open} title={dict.ModuleMenu.dashboard} teamRole={teamRole} />
 
               {/* Separator for clarity */}
               <div className="my-2 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent opacity-50 mx-2" />
@@ -162,11 +162,12 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 <ProjectModuleMenu open={open} title={dict.ModuleMenu.projects} />
               )}
 
-              {modules.find(
+              {/* CRM Removed as per user request to be only in Dashboard Grid */}
+              {/* {modules.find(
                 (menuItem: any) => menuItem.name === "crm" && menuItem.enabled
               ) && hasFeature("crm") && (
                   <CrmModuleMenu open={open} localizations={dict.ModuleMenu.crm} />
-                )}
+                )} */}
 
               {/* Other Modules */}
               {/* Note: I am not refactoring EVERY component separately yet, but passing 'open' creates re-renders. 
@@ -216,13 +217,14 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
 
       {/* Mobile Bottom Navigation (Preserved/Minimally Touched) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-background/95 via-background/90 to-background/95 backdrop-blur-xl border-t border-white/5 flex flex-row overflow-x-auto items-center justify-between px-4 py-2 gap-4 no-scrollbar safe-area-pb">
-        <DashboardMenu open={false} title={dict.ModuleMenu.dashboard} isMobile />
+        <DashboardMenu open={false} title={dict.ModuleMenu.dashboard} isMobile teamRole={teamRole} />
         {modules.find((m: any) => m.name === "projects" && m.enabled) && hasFeature("projects") && teamRole !== "MEMBER" && (
           <ProjectModuleMenu open={false} title={dict.ModuleMenu.projects} isMobile />
         )}
-        {modules.find((m: any) => m.name === "crm" && m.enabled) && hasFeature("crm") && (
+        {/* CRM Removed from Mobile Bar too */}
+        {/* {modules.find((m: any) => m.name === "crm" && m.enabled) && hasFeature("crm") && (
           <CrmModuleMenu open={false} localizations={dict.ModuleMenu.crm} isMobile />
-        )}
+        )} */}
         {modules.find((m: any) => m.name === "emails" && m.enabled) && hasFeature("emails") && (
           <EmailsModuleMenu open={false} title={dict.ModuleMenu.emails} isMobile />
         )}

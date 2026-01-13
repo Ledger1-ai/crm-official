@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'react-hot-toast';
 import CustomCCP from '@/components/voice/CustomCCP';
 import PromptGeneratorPanel from '../prompt/PromptGeneratorPanel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 function isE164(num: string) {
   return /^\+[1-9]\d{1,14}$/.test(num);
@@ -33,7 +35,7 @@ function parseList(raw: string): { phone: string; leadId?: string }[] {
   return items;
 }
 
-export default function DialerPanel() {
+export default function DialerPanel({ isCompact = false }: { isCompact?: boolean }) {
   const [singlePhone, setSinglePhone] = useState<string>('');
   const [singleLeadId, setSingleLeadId] = useState<string>('');
   const [listRaw, setListRaw] = useState<string>('');
@@ -223,49 +225,7 @@ export default function DialerPanel() {
     toast.success('Run complete');
   }, [parsedList]);
 
-  // Floating numpad (draggable)
-  const [showPad, setShowPad] = useState<boolean>(true);
-  const [padPos, setPadPos] = useState<{ x: number; y: number }>({ x: 24, y: 240 });
-  const dragState = useRef<{ dragging: boolean; sx: number; sy: number; px: number; py: number }>({
-    dragging: false,
-    sx: 0,
-    sy: 0,
-    px: 24,
-    py: 240,
-  });
 
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!dragState.current.dragging) return;
-      const dx = e.clientX - dragState.current.sx;
-      const dy = e.clientY - dragState.current.sy;
-      const nx = Math.max(8, Math.min(window.innerWidth - 240, dragState.current.px + dx));
-      const ny = Math.max(8, Math.min(window.innerHeight - 240, dragState.current.py + dy));
-      setPadPos({ x: nx, y: ny });
-    };
-    const onUp = () => {
-      if (dragState.current.dragging) {
-        dragState.current.dragging = false;
-        dragState.current.px = padPos.x;
-        dragState.current.py = padPos.y;
-      }
-    };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-  }, [padPos]);
-
-  function beginDrag(e: React.MouseEvent<HTMLDivElement>) {
-    dragState.current.dragging = true;
-    dragState.current.sx = e.clientX;
-    dragState.current.sy = e.clientY;
-    dragState.current.px = padPos.x;
-    dragState.current.py = padPos.y;
-    e.preventDefault();
-  }
 
   function appendDial(char: string) {
     setSinglePhone((prev) => {
@@ -288,17 +248,15 @@ export default function DialerPanel() {
     setSinglePhone('');
   }
 
-  return (
+  const FullLayout = () => (
     <div className="w-full px-1 py-2 space-y-4">
-
-
       {/* Connect CCP Softphone */}
       <section className="rounded-md border bg-card p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-semibold">Connect Softphone</div>
         </div>
         <CustomCCP
-          theme="dark"
+          theme="dark" // Assuming dark theme is standard
           title="Connect Softphone"
           subtitle="Custom CCP (Streams invisible provider)"
         />
@@ -306,7 +264,7 @@ export default function DialerPanel() {
 
       {/* Single Dial */}
       <section className="rounded-md border bg-card p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className={cn("grid gap-3", isCompact ? "grid-cols-1" : "grid-cols-1 md:grid-cols-3")}>
           <div>
             <label className="text-xs font-medium">Phone (E.164)</label>
             <Input
@@ -329,110 +287,171 @@ export default function DialerPanel() {
             </Button>
           </div>
         </div>
-        <div className="mt-3 flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => setShowPad((v) => !v)}>
-            {showPad ? 'Hide Numpad' : 'Show Numpad'}
-          </Button>
-        </div>
       </section>
 
       {/* List Dial */}
-      <section className="rounded-md border bg-card p-4">
-        <h3 className="text-sm font-semibold mb-2">Custom Call List</h3>
-        <div className="space-y-2">
-          <label className="text-xs font-medium">Numbers (one per line). Optional leadId by comma or pipe.</label>
-          <Textarea
-            rows={8}
-            placeholder={`+18885551212\n+18885551213,lead-123\n+18885551214|lead-456`}
-            value={listRaw}
-            onChange={(e) => setListRaw(e.target.value)}
-          />
-          <div className="flex items-center gap-3">
-            <Button onClick={runListSequential} disabled={!parsedList.length || running}>
-              {running ? `Running (${currentIndex + 1}/${parsedList.length})` : 'Run'}
-            </Button>
-            {running && (
-              <Button variant="outline" onClick={stopRun}>
-                Stop
+      {!isCompact && (
+        <section className="rounded-md border bg-card p-4">
+          <h3 className="text-sm font-semibold mb-2">Custom Call List</h3>
+          <div className="space-y-2">
+            <label className="text-xs font-medium">Numbers (one per line). Optional leadId by comma or pipe.</label>
+            <Textarea
+              rows={8}
+              placeholder={`+18885551212\n+18885551213,lead-123\n+18885551214|lead-456`}
+              value={listRaw}
+              onChange={(e) => setListRaw(e.target.value)}
+            />
+            <div className="flex items-center gap-3">
+              <Button onClick={runListSequential} disabled={!parsedList.length || running}>
+                {running ? `Running (${currentIndex + 1}/${parsedList.length})` : 'Run'}
               </Button>
-            )}
-          </div>
-          <p className="microtext text-muted-foreground">
-            Example lines: +15551234567 or +15551234567,lead-789 or +15551234567|lead-789
-          </p>
-        </div>
-      </section>
-
-      {/* Recent results */}
-      <section className="rounded-md border bg-card p-4">
-        <h3 className="text-sm font-semibold mb-2">Recent Results</h3>
-        <div className="text-xs space-y-1">
-          {results.length === 0 && <div className="opacity-70">No calls yet.</div>}
-          {results.slice(0, 25).map((r, idx) => (
-            <div key={`${r.phone}-${idx}`} className="flex flex-wrap gap-2">
-              <span className={`px-2 py-1 rounded ${r.ok ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-                {r.ok ? 'OK' : 'ERR'}
-              </span>
-              <span className="font-mono">{r.phone}</span>
-              {r.leadId ? <span className="opacity-70">({r.leadId})</span> : null}
-              {r.ok ? (
-                <span className="opacity-80">tx={r.transactionId || '-'}</span>
-              ) : (
-                <span className="opacity-80">error={r.error || '-'}</span>
+              {running && (
+                <Button variant="outline" onClick={stopRun}>
+                  Stop
+                </Button>
               )}
             </div>
-          ))}
-        </div>
-      </section>
+            <p className="microtext text-muted-foreground">
+              Example lines: +15551234567 or +15551234567,lead-789 or +15551234567|lead-789
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Recent results */}
+      {!isCompact && (
+        <section className="rounded-md border bg-card p-4">
+          <h3 className="text-sm font-semibold mb-2">Recent Results</h3>
+          <div className="text-xs space-y-1">
+            {results.length === 0 && <div className="opacity-70">No calls yet.</div>}
+            {results.slice(0, 25).map((r, idx) => (
+              <div key={`${r.phone}-${idx}`} className="flex flex-wrap gap-2">
+                <span className={`px-2 py-1 rounded ${r.ok ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                  {r.ok ? 'OK' : 'ERR'}
+                </span>
+                <span className="font-mono">{r.phone}</span>
+                {r.leadId ? <span className="opacity-70">({r.leadId})</span> : null}
+                {r.ok ? (
+                  <span className="opacity-80">tx={r.transactionId || '-'}</span>
+                ) : (
+                  <span className="opacity-80">error={r.error || '-'}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Prompt Generator */}
-      <section className="rounded-md border bg-card p-4">
-        <h3 className="text-sm font-semibold mb-2">Prompt Generator</h3>
-        <PromptGeneratorPanel embedded={true} showSoftphone={false} />
-      </section>
+      {!isCompact && (
+        <section className="rounded-md border bg-card p-4">
+          <h3 className="text-sm font-semibold mb-2">Prompt Generator</h3>
+          <PromptGeneratorPanel embedded={true} showSoftphone={false} />
+        </section>
+      )}
+    </div>
+  );
 
-      {/* Floating draggable numpad (side, movable) */}
-      {showPad && (
-        <div
-          className="fixed z-50 w-[220px] rounded-xl border bg-background/80 backdrop-blur p-2 shadow-lg"
-          style={{ left: padPos.x, top: padPos.y }}
-        >
-          <div
-            className="cursor-move px-2 py-1 text-[11px] font-semibold border-b bg-foreground/5 rounded-t-xl"
-            onMouseDown={beginDrag}
-            title="Drag to move"
-          >
-            Numpad
-          </div>
-          <div className="grid grid-cols-3 gap-2 p-2">
-            <Button variant="outline" onClick={() => appendDial('1')}>1</Button>
-            <Button variant="outline" onClick={() => appendDial('2')}>2</Button>
-            <Button variant="outline" onClick={() => appendDial('3')}>3</Button>
-            <Button variant="outline" onClick={() => appendDial('4')}>4</Button>
-            <Button variant="outline" onClick={() => appendDial('5')}>5</Button>
-            <Button variant="outline" onClick={() => appendDial('6')}>6</Button>
-            <Button variant="outline" onClick={() => appendDial('7')}>7</Button>
-            <Button variant="outline" onClick={() => appendDial('8')}>8</Button>
-            <Button variant="outline" onClick={() => appendDial('9')}>9</Button>
-            <Button variant="outline" onClick={() => appendDial('+')}>+</Button>
-            <Button variant="outline" onClick={() => appendDial('0')}>0</Button>
-            <Button variant="outline" onClick={backspaceDial}>⌫</Button>
-            <Button variant="outline" onClick={clearDial} className="col-span-3">Clear</Button>
-          </div>
-          <div className="px-2 pb-2">
-            <Button className="w-full" onClick={runSingle} disabled={!singlePhone.trim()}>
-              Dial
-            </Button>
-          </div>
+  if (!isCompact) {
+    return <FullLayout />;
+  }
+
+  // Compact Layout (Tabs)
+  return (
+    <div className="w-full h-full flex flex-col">
+      <Tabs defaultValue="dial" className="w-full flex-1 flex flex-col">
+        <div className="px-4 py-2 border-b bg-muted/20">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="dial">Phone</TabsTrigger>
+            <TabsTrigger value="list">List</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="settings">Config</TabsTrigger>
+          </TabsList>
         </div>
-      )}
-      {!showPad && (
-        <div className="fixed z-40 bottom-6 right-6">
-          <Button className="rounded-full shadow-md" onClick={() => setShowPad(true)} title="Show Numpad">
-            Numpad
-          </Button>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <TabsContent value="dial" className="mt-0 space-y-4">
+            {/* Softphone */}
+            <div className="rounded-lg border bg-card/50 p-3 shadow-sm">
+              <CustomCCP theme="dark" title="Softphone" subtitle="Connected" />
+            </div>
+
+            {/* Single Dial Form */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Number</label>
+                <Input
+                  placeholder="+1..."
+                  value={singlePhone}
+                  onChange={(e) => setSinglePhone(e.target.value)}
+                  className="text-lg font-mono h-11"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Lead ID (Opt)</label>
+                <Input
+                  placeholder="lead-123"
+                  value={singleLeadId}
+                  onChange={(e) => setSingleLeadId(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <Button
+                size="lg"
+                className="w-full font-semibold text-base mt-2"
+                onClick={runSingle}
+                disabled={!singlePhone.trim() || !singleLeadId.trim() || gateCheckingSingle || !gateOkSingle}
+              >
+                Call Now
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="list" className="mt-0 space-y-3">
+            <div className="space-y-2">
+              <label className="text-xs font-medium">Bulk Dial List</label>
+              <Textarea
+                rows={12}
+                className="font-mono text-xs"
+                placeholder={`+18885550001\n+18885550002,lead-A`}
+                value={listRaw}
+                onChange={(e) => setListRaw(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" className="flex-1" onClick={runListSequential} disabled={!parsedList.length || running}>
+                {running ? 'Running...' : 'Start Batch'}
+              </Button>
+              {running && <Button size="sm" variant="destructive" onClick={stopRun}>Stop</Button>}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="history" className="mt-0">
+            <div className="space-y-2">
+              {results.length === 0 && <div className="text-sm text-center py-8 text-muted-foreground">No recent calls</div>}
+              {results.map((r, i) => (
+                <div key={i} className="flex items-start justify-between p-2 rounded border bg-card/50 text-xs">
+                  <div>
+                    <div className="font-mono font-medium">{r.phone}</div>
+                    {r.leadId && <div className="text-muted-foreground">{r.leadId}</div>}
+                  </div>
+                  <div className={cn("px-1.5 py-0.5 rounded font-bold", r.ok ? "bg-emerald-500/20 text-emerald-500" : "bg-red-500/20 text-red-500")}>
+                    {r.ok ? 'OK' : 'ERR'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-0 h-full">
+            {/* Embedded Prompt Gen but scaled down? Or just hidden if too complex */}
+            <div className="text-xs text-muted-foreground mb-4">
+              Configure agent prompts and settings. call scripts.
+            </div>
+            <PromptGeneratorPanel embedded={true} showSoftphone={false} />
+          </TabsContent>
         </div>
-      )}
+      </Tabs>
     </div>
   );
 }

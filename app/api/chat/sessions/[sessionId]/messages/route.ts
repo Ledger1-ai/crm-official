@@ -11,6 +11,30 @@ type Params = {
   params: { sessionId: string };
 };
 
+import { prismadb } from "@/lib/prisma";
+
+// ... existing imports ...
+
+// Helper to check access
+async function checkAccess(sessionUserId: string, targetUserId: string) {
+  if (sessionUserId === targetUserId) return true;
+
+  const currentUser = await prismadb.users.findUnique({
+    where: { id: sessionUserId },
+    select: { id: true, team_id: true, is_admin: true, team_role: true },
+  });
+
+  const isAdmin = currentUser?.is_admin || currentUser?.team_role === "OWNER" || currentUser?.team_role === "ADMIN";
+  if (!isAdmin || !currentUser?.team_id) return false;
+
+  const targetUser = await prismadb.users.findUnique({
+    where: { id: targetUserId },
+    select: { team_id: true },
+  });
+
+  return targetUser?.team_id === currentUser.team_id;
+}
+
 // GET /api/chat/sessions/:sessionId/messages
 // Returns all messages in a session, ordered chronologically.
 export async function GET(req: Request, { params }: { params: Promise<{ sessionId: string }> }) {
@@ -26,7 +50,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ sessionI
       where: { id: sessionId },
     });
 
-    if (!chatSession || chatSession.user !== session.user.id) {
+    if (!chatSession) {
+      return new NextResponse("Not Found", { status: 404 });
+    }
+
+    const hasAccess = await checkAccess(session.user.id, chatSession.user);
+    if (!hasAccess) {
       return new NextResponse("Not Found", { status: 404 });
     }
 
@@ -63,7 +92,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
       where: { id: sessionId },
     });
 
-    if (!chatSession || chatSession.user !== auth.user.id) {
+    if (!chatSession) {
+      return new NextResponse("Not Found", { status: 404 });
+    }
+
+    const hasAccess = await checkAccess(auth.user.id, chatSession.user);
+    if (!hasAccess) {
       return new NextResponse("Not Found", { status: 404 });
     }
 

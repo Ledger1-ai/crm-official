@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Coins } from "lucide-react";
+import { Users, Wand2, Target, Megaphone, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
-import MenuItem from "./MenuItem";
+import ExpandableMenuItem, { SubMenuItemType } from "./ExpandableMenuItem";
 
 type Props = {
   open: boolean;
@@ -13,16 +13,30 @@ type Props = {
 
 const CrmModuleMenu = ({ open, localizations, isMobile = false }: Props) => {
   const pathname = usePathname();
-  // Match /crm paths but exclude /crm/university which has its own menu item
-  const isPath = /^\/([a-z]{2}\/)?crm(\/|$)/.test(pathname) && !pathname.includes("/crm/university");
+
+  // Active if any of the sub-paths match
+  const isPath =
+    /^\/([a-z]{2}\/)?crm\/leads/.test(pathname) ||
+    /^\/([a-z]{2}\/)?crm\/lead-wizard/.test(pathname) ||
+    /^\/([a-z]{2}\/)?crm\/lead-pools/.test(pathname) ||
+    /^\/([a-z]{2}\/)?crm\/campaigns/.test(pathname);
+
+  // Sub-menu items matching screenshot
+  const subItems: SubMenuItemType[] = [
+    { label: "LeadGen Wizard", href: "/crm/lead-wizard", icon: Wand2 },
+    { label: "Lead Pools", href: "/crm/lead-pools", icon: Target },
+    { label: "Campaigns", href: "/crm/campaigns", icon: Megaphone },
+    { label: "Settings", href: "/crm/leads?tab=settings", icon: Settings },
+  ];
 
   return (
-    <MenuItem
-      href="/crm/dashboard"
-      icon={Coins}
-      title={localizations.title}
+    <ExpandableMenuItem
+      href="/crm/leads"
+      icon={Users}
+      title="Leads Manager"
       isOpen={open}
       isActive={isPath}
+      items={subItems}
       isMobile={isMobile}
     />
   );

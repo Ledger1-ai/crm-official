@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
     LayoutDashboard,
-    PieChart,
     Building2,
     Contact,
     Users,
@@ -14,7 +13,14 @@ import {
     FileText,
     ChevronLeft,
     ChevronRight,
+    Wand2,
+    Megaphone,
+    Settings,
+    ChevronDown,
+    LayoutList,
+    Folder
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface CrmSidebarProps {
     isMember?: boolean;
@@ -26,6 +32,7 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobileExpanded, setIsMobileExpanded] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [leadsExpanded, setLeadsExpanded] = useState(true); // Default open for visibility
 
     useEffect(() => {
         setIsMounted(true);
@@ -33,7 +40,12 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
         if (stored) {
             setIsCollapsed(stored === "true");
         }
-    }, []);
+
+        // Auto-expand if on leads page
+        if (pathname.includes('/crm/leads') || pathname.includes('/crm/lead-wizard') || pathname.includes('/crm/lead-pools')) {
+            setLeadsExpanded(true);
+        }
+    }, [pathname]);
 
     // Dispatch event when mobile expansion changes
     useEffect(() => {
@@ -48,12 +60,21 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
     };
 
     const navItems = [
-        { label: "Overview", href: "/crm/sales-command", icon: LayoutDashboard },
+
         { label: "Accounts", href: "/crm/accounts", icon: Building2 },
         { label: "Contacts", href: "/crm/contacts", icon: Contact },
         { label: "Contracts", href: "/crm/contracts", icon: FileText },
         { label: "Dialer", href: "/crm/dialer", icon: Phone },
-        { label: "Leads Manager", href: "/crm/leads", icon: Users },
+        // Leads Manager with Subitems
+        {
+            label: "Leads Manager",
+            href: "/crm/leads",
+            icon: Users,
+        },
+        {
+            label: "Projects", href: "/crm/projects", icon: Folder, // Assuming Folder icon is imported 
+            // Note: need to make sure Folder is imported
+        },
         { label: "Opportunities", href: "/crm/opportunities", icon: Target },
     ];
 
@@ -79,15 +100,16 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
                         isCollapsed ? "items-center" : ""
                     )}
                 >
-
-
                     {navItems.map((item) => {
-                        // Improved active state logic
                         const isActive =
                             item.href === "/crm"
                                 ? pathname === "/crm"
                                 : pathname.startsWith(item.href);
 
+                        // Special rendering for expandable items
+
+
+                        // Standard Item Rendering
                         return (
                             <button
                                 key={item.label}
@@ -128,6 +150,7 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
                 onClick={() => setIsMobileExpanded(!isMobileExpanded)}
             >
                 {navItems.map((item) => {
+                    // Mobile doesn't support deep testing easily in this compact view, simplified to main items
                     const isActive =
                         item.href === "/crm"
                             ? pathname === "/crm"
