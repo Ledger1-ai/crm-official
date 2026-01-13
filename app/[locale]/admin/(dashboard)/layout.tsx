@@ -53,7 +53,11 @@ export default async function AdminDashboardLayout({
     return (
         <div className="fixed inset-0 flex h-[100dvh] overflow-hidden">
             {/* Removed Global Sidebar for Admin to avoid confusion */}
-            <div className="flex flex-col h-full w-full min-w-0 overflow-hidden">
+            {/* Restored Global Sidebar for Admin */}
+            <div className="hidden md:flex h-full w-[250px] flex-col fixed inset-y-0 z-50">
+                <AnySideBar />
+            </div>
+            <div className="flex flex-col h-full w-full min-w-0 overflow-hidden md:pl-[250px]">
                 <Header
                     id={session.user.id as string}
                     name={session.user.name as string}
