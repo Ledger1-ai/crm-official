@@ -1,197 +1,148 @@
-
 import { createAzure } from "@ai-sdk/azure";
-import { openai, createOpenAI } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createMistral } from "@ai-sdk/mistral";
 import { prismadb } from "@/lib/prisma";
+import { AiProvider } from "@prisma/client";
 
 export function isReasoningModel(modelId: string | undefined | null): boolean {
     if (!modelId) return false;
-    return modelId.toLowerCase().includes("o1") || modelId.toLowerCase().includes("gpt-5");
+    return modelId.toLowerCase().includes("o1") ||
+        modelId.toLowerCase().includes("gpt-5") ||
+        modelId.toLowerCase().includes("deepseek-reasoner");
 }
 
 export async function getAiSdkModel(userId: string | "system") {
     const DEBUG_PREFIX = "[getAiSdkModel]";
-    // Helper to get system config
+
+    // --- Provider Factory Helper ---
+    const createProviderModel = (provider: AiProvider, modelId: string, apiKey?: string) => {
+        switch (provider) {
+            case "OPENAI": {
+                const openai = createOpenAI({
+                    apiKey: apiKey || process.env.OPENAI_API_KEY,
+                });
+                return openai(modelId);
+            }
+            case "AZURE": {
+                // Azure typically requires resource name + deployment (modelId here)
+                // Fallback to env vars if no specific key provided
+                const azure = createAzure({
+                    apiKey: apiKey || process.env.AZURE_OPENAI_API_KEY,
+                    resourceName: process.env.AZURE_OPENAI_RESOURCE_NAME, // Assuming env usage for base
+                });
+                return azure(modelId);
+            }
+            case "GOOGLE": {
+                const google = createGoogleGenerativeAI({
+                    apiKey: apiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+                });
+                return google(modelId);
+            }
+            case "ANTHROPIC": {
+                const anthropic = createAnthropic({
+                    apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
+                });
+                return anthropic(modelId);
+            }
+            case "GROK": {
+                // xAI (Grok) uses an OpenAI-compatible API
+                const grok = createOpenAI({
+                    name: 'grok',
+                    baseURL: 'https://api.x.ai/v1',
+                    apiKey: apiKey || process.env.XAI_API_KEY,
+                });
+                return grok(modelId);
+            }
+            case "DEEPSEEK": {
+                // DeepSeek uses an OpenAI-compatible API
+                const deepseek = createOpenAI({
+                    name: 'deepseek',
+                    baseURL: 'https://api.deepseek.com',
+                    apiKey: apiKey || process.env.DEEPSEEK_API_KEY,
+                });
+                return deepseek(modelId);
+            }
+            case "MISTRAL": {
+                const mistral = createMistral({
+                    apiKey: apiKey || process.env.MISTRAL_API_KEY,
+                });
+                return mistral(modelId);
+            }
+            default:
+                console.warn(`${DEBUG_PREFIX} Unknown provider ${provider}, falling back to OpenAI`);
+                const fallback = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+                return fallback(modelId);
+        }
+    };
+
+    // 1. Get System Config (Default Fallback)
     const getSystemConfig = async () => {
         try {
-            // Find the active system config, or just the first one
-            // Ideally we'd filter by isActive: true, but following existing pattern
-            const sysConfig = await prismadb.systemAiConfig.findFirst({
-                where: { isActive: true }
-            });
-            return sysConfig;
+            return await prismadb.systemAiConfig.findFirst({ where: { isActive: true } });
         } catch (error) {
             console.warn("Failed to fetch system config", error);
             return null;
         }
     };
-
     const systemConfig = await getSystemConfig();
-    const systemModelId = systemConfig?.defaultModelId || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
+    const systemModelId = systemConfig?.defaultModelId || "gpt-5";
+    const systemProvider = systemConfig?.provider || "OPENAI";
 
-    // Helper to get Azure provider
-    const getAzureModel = (modelId: string, apiKey?: string, config?: any) => {
-        let key = apiKey || process.env.AZURE_OPENAI_API_KEY;
-        let url = process.env.AZURE_OPENAI_ENDPOINT; // Default to env var
-
-        // If we have config from DB (UnifiedAiCard format), construct URL
-        if (config?.resourceName) {
-            // Construct: https://{resourceName}.openai.azure.com/openai/deployments/{deploymentId}
-            // Note: The AI SDK might expect just the base resource URL or full endpoint.
-            // createAzure({ baseURL }) usually expects the resource URL (e.g. https://my-resource.openai.azure.com/openai/deployments/my-deployment)
-            // OR just the generic base https://my-resource.openai.azure.com if we pass deployment via model('deployment-name')
-
-            // However, typical Azure AI SDK usage:
-            // const azure = createAzure({ resourceName: '...', apiKey: '...' })
-            // BUT the SDK wrapper we are using (vercel ai sdk) uses baseURL + apiKey usually.
-
-            // Let's try to construct the resource URL if not provided.
-            // "https://RESOURCE.openai.azure.com"
-            // The SDK handles appending /openai/deployments/... if we give it the resource base.
-
-            // Wait, createAzure from @ai-sdk/azure supports 'resourceName' directly!
-            // Let's fallback to that if simpler.
-
-            // Parsing the config:
-            const resourceName = config.resourceName;
-
-            // If we have resourceName, we can pass it directly to createAzure.
-            if (resourceName && key) {
-                const azure = createAzure({
-                    resourceName: resourceName,
-                    apiKey: key,
-                });
-                // When using resourceName, the model ID passed to azure(...) should be the deployment name.
-                // config.deploymentId might be the model ID we want to use?
-                // Or 'modelId' passed in is the deployment name?
-                // Usually in this app, modelId seems to be the deployment name for Azure.
-                return azure(modelId || config.deploymentId);
-            }
-        }
-
-        // Fallback to URL based
-        if (key && url) {
-            const azure = createAzure({
-                apiKey: key,
-                baseURL: url,
-            });
-            return azure(modelId);
-        }
-        return null;
-    };
-
-    // Helper to get OpenAI provider
-    const getOpenAIModel = (modelId: string, apiKey?: string) => {
-        // Force standard OpenAI URL to prevent accidental Azure fallback via env vars
-        const customOpenai = createOpenAI({
-            apiKey: apiKey || process.env.OPENAI_API_KEY,
-            baseURL: "https://api.openai.com/v1"
+    // 2. Resolve User's Team Config
+    let teamConfig = null;
+    if (userId !== "system") {
+        const user = await prismadb.users.findUnique({
+            where: { id: userId },
+            select: { team_id: true }
         });
-        return customOpenai(modelId);
-    };
-
-
-    // If system request, return system model based on provider
-    if (userId === "system") {
-        if (systemConfig?.provider === "AZURE") {
-            const az = getAzureModel(
-                systemModelId,
-                systemConfig.apiKey ?? undefined,
-                systemConfig.configuration
-            );
-            if (az) {
-                console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig (AZURE) | userId=system`);
-                return az;
-            }
+        if (user?.team_id) {
+            teamConfig = await prismadb.teamAiConfig.findUnique({
+                where: { team_id: user.team_id },
+            });
         }
-
-        // Legacy fallback
-        if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
-            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: EnvVars (AZURE legacy fallback) | userId=system`);
-            return getAzureModel(systemModelId)!;
-        }
-
-        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig/OpenAI (fallback) | userId=system`);
-        return getOpenAIModel(systemModelId, systemConfig?.apiKey ?? undefined);
     }
 
-    // 2. Get user's team
-    const user = await prismadb.users.findUnique({
-        where: { id: userId },
-        select: { team_id: true }
-    });
+    // 3. Determine Final Config
+    let finalProvider = systemProvider;
+    let finalModelId = systemModelId;
+    let finalApiKey: string | undefined = systemConfig?.apiKey ?? undefined;
 
-    if (!user?.team_id) {
-        // Fallback to system logic
-        if (systemConfig?.provider === "AZURE") {
-            const az = getAzureModel(systemModelId, systemConfig.apiKey ?? undefined, systemConfig.configuration);
-            if (az) {
-                console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig (AZURE, no team) | userId=${userId}`);
-                return az;
-            }
-        }
-        if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
-            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: EnvVars (AZURE legacy, no team) | userId=${userId}`);
-            return getAzureModel(systemModelId)!;
-        }
-        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: SystemConfig/OpenAI (no team) | userId=${userId}`);
-        return getOpenAIModel(systemModelId, systemConfig?.apiKey ?? undefined);
-    }
-
-    // 3. Get team's AI config
-    const teamConfig = await prismadb.teamAiConfig.findUnique({
-        where: { team_id: user.team_id },
-    });
-
-    // 4. Determine which provider/model to use
     if (teamConfig) {
-        // Use team model if specified, otherwise system default
-        const modelId = teamConfig.modelId || systemModelId;
+        // Override with team pref if set
+        finalProvider = teamConfig.provider;
+        finalModelId = teamConfig.modelId || systemModelId;
 
-        if (teamConfig.provider === "AZURE") {
-            if (teamConfig.useSystemKey) {
-                if (systemConfig?.provider === "AZURE") {
-                    const az = getAzureModel(modelId, systemConfig.apiKey ?? undefined, systemConfig.configuration);
-                    if (az) {
-                        console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (AZURE, useSystemKey) | userId=${userId} | teamId=${user.team_id}`);
-                        return az;
-                    }
+        // Key Logic: 
+        // If useSystemKey is TRUE -> Ensure we use the system key for the TEAM'S chosen provider if available.
+        // If useSystemKey is FALSE -> Use the team's apiKey.
+
+        if (teamConfig.useSystemKey) {
+            // Find system config for the TEAM'S provider? 
+            // Currently schema structure: SystemAiConfig is per provider (unique).
+            // We fetched `findFirst({ isActive: true })` above which is just ONE default system config.
+            // We should fetch the system key specifically for the requested provider.
+
+            if (finalProvider !== systemProvider) {
+                const specificSystemConfig = await prismadb.systemAiConfig.findUnique({
+                    where: { provider: finalProvider }
+                });
+                if (specificSystemConfig?.apiKey) {
+                    finalApiKey = specificSystemConfig.apiKey;
+                } else {
+                    // No system key for this provider? Fallback to env vars handled inside createProviderModel
+                    finalApiKey = undefined;
                 }
-                if (process.env.AZURE_OPENAI_API_KEY) {
-                    console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (AZURE envVars, useSystemKey) | userId=${userId} | teamId=${user.team_id}`);
-                    return getAzureModel(modelId)!;
-                }
-            } else {
-                // Custom Team Azure? Not fully supported in UI yet (only apiKey in schema), 
-                // assumng env vars or partial support via apiKey
-                console.debug(`${DEBUG_PREFIX} TeamConfig AZURE without useSystemKey - not fully supported | userId=${userId} | teamId=${user.team_id}`);
+            }
+        } else {
+            // Use custom team key
+            if (teamConfig.apiKey) {
+                finalApiKey = teamConfig.apiKey;
             }
         }
-
-        // STANDARD OPENAI / DEFAULT
-        if (teamConfig.provider === "OPENAI" || teamConfig.provider === undefined) {
-            if (teamConfig.apiKey && !teamConfig.useSystemKey) {
-                console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (OPENAI, custom apiKey) | userId=${userId} | teamId=${user.team_id}`);
-                return getOpenAIModel(modelId, teamConfig.apiKey);
-            }
-            console.debug(`${DEBUG_PREFIX} Selected modelId="${modelId}" | Source: TeamConfig (OPENAI, systemKey) | userId=${userId} | teamId=${user.team_id}`);
-            return getOpenAIModel(modelId, systemConfig?.apiKey ?? undefined);
-        }
     }
 
-    // FALLBACK
-    if (systemConfig?.provider === "AZURE") {
-        const az = getAzureModel(systemModelId, systemConfig.apiKey ?? undefined, systemConfig.configuration);
-        if (az) {
-            console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback SystemConfig (AZURE) | userId=${userId}`);
-            return az;
-        }
-    }
-
-    if (!systemConfig && process.env.AZURE_OPENAI_API_KEY) {
-        console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback EnvVars (AZURE legacy) | userId=${userId}`);
-        return getAzureModel(systemModelId)!;
-    }
-
-    console.debug(`${DEBUG_PREFIX} Selected modelId="${systemModelId}" | Source: Fallback OpenAI (final) | userId=${userId}`);
-    return getOpenAIModel(systemModelId, systemConfig?.apiKey ?? undefined);
+    console.debug(`${DEBUG_PREFIX} Selected: Provider=${finalProvider} | Model=${finalModelId} | User=${userId}`);
+    return createProviderModel(finalProvider, finalModelId, finalApiKey);
 }

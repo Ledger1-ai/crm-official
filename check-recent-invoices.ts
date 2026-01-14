@@ -10,7 +10,7 @@ async function main() {
             date_created: 'desc'
         },
         include: {
-            connected_documents: true
+            documents: true
         }
     });
 
@@ -22,9 +22,9 @@ async function main() {
         console.log(`Status: ${inv.status}`);
         console.log(`Team ID: ${inv.team_id}`);
         console.log(`User ID: ${inv.assigned_user_id}`);
-        console.log(`Doc count: ${inv.connected_documents.length}`);
-        if (inv.connected_documents.length > 0) {
-            console.log(`Doc Name: ${inv.connected_documents[0].document_name}`);
+        console.log(`Doc count: ${inv.documents.length}`);
+        if (inv.documents.length > 0) {
+            console.log(`Doc Name: ${inv.documents[0].document_name}`);
         }
     });
 

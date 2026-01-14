@@ -12,6 +12,7 @@ interface DashboardCardProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     count?: number | string;
     description?: string;
     variant?: CardVariant;
+    primaryColor?: string;
     iconClassName?: string;
 }
 
@@ -24,7 +25,7 @@ const variantIconStyles: Record<CardVariant, string> = {
 };
 
 const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
-    ({ className, icon: Icon, label, count, description, variant = "default", iconClassName, ...props }, ref) => {
+    ({ className, icon: Icon, label, count, description, variant = "default", iconClassName, primaryColor, ...props }, ref) => {
         return (
             <button
                 ref={ref}
@@ -64,7 +65,7 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                             <div className={cn(
                                 "w-12 h-12 rounded-xl border border-white/5 bg-white/5 flex items-center justify-center shadow-inner ring-1 ring-white/10",
                                 "backdrop-blur-sm",
-                                variantIconStyles[variant]
+                                primaryColor ? primaryColor : variantIconStyles[variant]
                             )}>
                                 <Icon className={cn("w-6 h-6", iconClassName)} />
                             </div>

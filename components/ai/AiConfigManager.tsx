@@ -405,14 +405,15 @@ export const AiConfigManager = ({
                                                         )}
 
                                                         {/* Pricing */}
+                                                        {/* Pricing (User Facing - Includes Markup) */}
                                                         <div className="flex items-center gap-3 pt-3 mt-1 border-t border-white/5">
                                                             <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                                 <DollarSign className="w-3 h-3 text-emerald-400" />
-                                                                <span>In: ${model.inputPrice.toFixed(4)}</span>
+                                                                <span>In: ${((model.inputPrice || 0) * (1 + ((model as any).defaultMarkup || 20) / 100)).toFixed(4)}</span>
                                                             </div>
                                                             <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                                                 <Zap className="w-3 h-3 text-amber-400" />
-                                                                <span>Out: ${model.outputPrice.toFixed(4)}</span>
+                                                                <span>Out: ${((model.outputPrice || 0) * (1 + ((model as any).defaultMarkup || 20) / 100)).toFixed(4)}</span>
                                                             </div>
                                                         </div>
                                                     </div>

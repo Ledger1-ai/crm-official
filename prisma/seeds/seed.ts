@@ -1,13 +1,10 @@
-//import { PrismaClient } from "@prisma/client";
-const { PrismaClient } = require("@prisma/client");
-/*
-Seed data is used to populate the database with initial data.
-*/
-//Menu Items
+import { PrismaClient } from "@prisma/client";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+
 const moduleData = require("../initial-data/system_Modules_Enabled.json");
-//GPT Models
 const gptModelsData = require("../initial-data/gpt_Models.json");
-//CRM
 const crmOpportunityTypeData = require("../initial-data/crm_Opportunities_Type.json");
 const crmOpportunitySaleStagesData = require("../initial-data/crm_Opportunities_Sales_Stages.json");
 const crmCampaignsData = require("../initial-data/crm_campaigns.json");
@@ -81,48 +78,49 @@ async function main() {
     console.log("Industry Types already seeded");
   }
 
-  //Seed AI Models (migrated from gpt_models + new defaults)
+  // Seed AI Models (Strict 2026 Lineup - Optimized for Cost)
   const defaultModels = [
     // OpenAI
-    { name: "GPT-5 (Preview)", modelId: "gpt-5-preview", provider: "OPENAI", isActive: true },
-    { name: "GPT-5", modelId: "gpt-5", provider: "OPENAI", isActive: true },
-    { name: "GPT-4o", modelId: "gpt-4o", provider: "OPENAI", isActive: true },
-    { name: "GPT-4 Turbo", modelId: "gpt-4-turbo", provider: "OPENAI", isActive: true },
-    { name: "o1 Preview", modelId: "o1-preview", provider: "OPENAI", isActive: true },
-
-    // Azure (Legacy + New)
-    { name: "Azure GPT-5 (Preview)", modelId: "gpt-5-preview", provider: "AZURE", isActive: true },
-    { name: "Azure GPT-5", modelId: "gpt-5", provider: "AZURE", isActive: true },
-    { name: "Azure GPT-4o", modelId: "gpt-4o", provider: "AZURE", isActive: true },
-    { name: "Azure GPT-4 Turbo", modelId: "gpt-4-turbo", provider: "AZURE", isActive: true },
-    { name: "Azure GPT-3.5 Turbo", modelId: "gpt-35-turbo", provider: "AZURE", isActive: true },
+    // Removed GPT-5 and o1 Pro as requested (High Cost)
+    { name: "GPT-5 Mini", modelId: "gpt-5-mini", provider: "OPENAI", isActive: true, maxContext: 200000, inputPrice: 0.25, outputPrice: 2.00 },
 
     // Anthropic
-    { name: "Claude 4.5 Sonnet", modelId: "claude-4-5-sonnet-latest", provider: "ANTHROPIC", isActive: true },
-    { name: "Claude 4.5 Opus", modelId: "claude-4-5-opus-latest", provider: "ANTHROPIC", isActive: true },
-    { name: "Claude 4.5 Haiku", modelId: "claude-4-5-haiku-latest", provider: "ANTHROPIC", isActive: true },
+    { name: "Claude 4.5 Opus", modelId: "claude-4-5-opus", provider: "ANTHROPIC", isActive: true, maxContext: 200000, inputPrice: 5.00, outputPrice: 25.00 },
+    { name: "Claude 4.5 Sonnet", modelId: "claude-4-5-sonnet", provider: "ANTHROPIC", isActive: true, maxContext: 200000, inputPrice: 3.00, outputPrice: 15.00 },
 
     // Google
-    { name: "Gemini 3.0 Pro", modelId: "gemini-3.0-pro", provider: "GOOGLE", isActive: true },
-    { name: "Gemini 3.0 Flash", modelId: "gemini-3.0-flash", provider: "GOOGLE", isActive: true },
+    { name: "Gemini 3.0 Pro", modelId: "gemini-3.0-pro", provider: "GOOGLE", isActive: true, maxContext: 2000000, inputPrice: 2.00, outputPrice: 12.00 },
+    { name: "Gemini 3.0 Flash", modelId: "gemini-3.0-flash", provider: "GOOGLE", isActive: true, maxContext: 2000000, inputPrice: 0.50, outputPrice: 3.00 },
 
-    // Mistral
-    { name: "Mistral Large 2", modelId: "mistral-large-latest", provider: "MISTRAL", isActive: true },
+    // xAI (Grok)
+    { name: "Grok 3", modelId: "grok-3", provider: "GROK", isActive: true, maxContext: 128000, inputPrice: 3.00, outputPrice: 15.00 },
+    { name: "Grok Code Fast 1", modelId: "grok-code-fast-1", provider: "GROK", isActive: true, maxContext: 256000, inputPrice: 0.20, outputPrice: 1.50 },
 
-    // Perplexity
-    { name: "Llama 3.1 Sonar Ex Large", modelId: "llama-3.1-sonar-e-large-128k-online", provider: "PERPLEXITY", isActive: true },
+    // DeepSeek
+    { name: "DeepSeek V3", modelId: "deepseek-chat", provider: "DEEPSEEK", isActive: true, maxContext: 128000, inputPrice: 0.14, outputPrice: 0.28 },
+    { name: "Kimi k2", modelId: "kimi-k2", provider: "DEEPSEEK", isActive: true, maxContext: 200000, inputPrice: 0.50, outputPrice: 2.40 },
 
-    // Grok
-    { name: "Grok 2", modelId: "grok-2", provider: "GROK", isActive: true },
-
-    // Deepseek
-    { name: "DeepSeek Chat", modelId: "deepseek-chat", provider: "DEEPSEEK", isActive: true },
+    // Azure (Restored & Requested)
+    { name: "Azure GPT-5 (Preview)", modelId: "gpt-5-preview", provider: "AZURE", isActive: true, maxContext: 128000, inputPrice: 5.00, outputPrice: 20.00 },
+    { name: "Azure GPT-5 Nano", modelId: "gpt-5-nano", provider: "AZURE", isActive: true, maxContext: 128000, inputPrice: 0.10, outputPrice: 0.50 },
+    { name: "Azure GPT-4o", modelId: "gpt-4o", provider: "AZURE", isActive: true, maxContext: 128000, inputPrice: 2.50, outputPrice: 10.00 },
   ];
 
-  // Proper Sync Logic
+  // Logic to PERMANENTLY REMOVE old models not in the new list
+  const activeModelIds = defaultModels.map(m => m.modelId);
+
+  // First, delete any models that are NOT in our strict 2026 lineup
+  const deleted = await prisma.aiModel.deleteMany({
+    where: {
+      modelId: { notIn: activeModelIds }
+    }
+  });
+  console.log(`Deleted ${deleted.count} outdated models (older than 8 months or deprecated)`);
+
+  // Sync Logic
   for (const m of defaultModels) {
     const existing = await prisma.aiModel.findFirst({
-      where: { modelId: m.modelId, provider: m.provider }
+      where: { modelId: m.modelId, provider: m.provider as any }
     });
 
     if (!existing) {
@@ -132,8 +130,10 @@ async function main() {
           modelId: m.modelId,
           provider: m.provider as any,
           isActive: m.isActive ?? true,
-          inputPrice: 0,
-          outputPrice: 0
+          inputPrice: m.inputPrice ?? 0,
+          outputPrice: m.outputPrice ?? 0,
+          maxContext: m.maxContext ?? 128000,
+          defaultMarkup: 20.0
         }
       });
       console.log(`Created ${m.provider} - ${m.name}`);
@@ -142,7 +142,10 @@ async function main() {
         where: { id: existing.id },
         data: {
           name: m.name,
-          isActive: m.isActive ?? true
+          isActive: m.isActive ?? true,
+          inputPrice: m.inputPrice ?? 0,
+          outputPrice: m.outputPrice ?? 0,
+          maxContext: m.maxContext ?? 128000
         }
       });
       console.log(`Updated ${m.provider} - ${m.name}`);

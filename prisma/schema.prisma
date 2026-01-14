@@ -1124,9 +1124,13 @@ model AiModel {
   description String?
   
   // Pricing per 1k tokens (managed by Partner)
-  inputPrice  Float      @default(0)
-  outputPrice Float      @default(0)
+  inputPrice  Float      @default(0) // Cost from provider
+  outputPrice Float      @default(0) // Cost from provider
   
+  // Billing Strategy
+  maxContext    Int      @default(128000)
+  defaultMarkup Float    @default(20.0) // Percentage markup (e.g. 20%)
+
   isActive    Boolean    @default(true)
   isDefault   Boolean    @default(false)
   created_on  DateTime?  @default(now()) @db.Date

@@ -11,6 +11,9 @@ export const updateModelPricing = async (formData: FormData) => {
     const isActive = formData.get("isActive") === "on";
     const isDefault = formData.get("isDefault") === "on";
 
+    const defaultMarkup = parseFloat(formData.get("defaultMarkup") as string);
+    const maxContext = parseInt(formData.get("maxContext") as string);
+
     if (isDefault) {
         // Unset other defaults if this one is being set to true
         // We need to know the provider to unset defaults only for that provider? 
@@ -34,6 +37,8 @@ export const updateModelPricing = async (formData: FormData) => {
         data: {
             inputPrice,
             outputPrice,
+            defaultMarkup,
+            maxContext,
             isActive,
             isDefault
         }
