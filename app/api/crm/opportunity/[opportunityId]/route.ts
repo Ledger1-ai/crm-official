@@ -4,15 +4,17 @@ import { getServerSession } from "next-auth";
 import { prismadb } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
+
 export async function PUT(req: Request, props: { params: Promise<{ opportunityId: string }> }) {
   const params = await props.params;
+  const { opportunityId } = params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return new NextResponse("Unauthenticated", { status: 401 });
   }
 
-  if (!params.opportunityId) {
+  if (!opportunityId) {
     return new NextResponse("Opportunity ID is required", { status: 400 });
   }
 
@@ -27,7 +29,7 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
 
     if (newStage?.probability === 100) {
       const opportunity = await prismadb.crm_Opportunities.findUnique({
-        where: { id: params.opportunityId },
+        where: { id: opportunityId },
       });
 
       if (opportunity && !opportunity.account) {
@@ -37,11 +39,12 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
             status: "Active",
             assigned_to: opportunity.assigned_to,
             annual_revenue: String(opportunity.expected_revenue),
+            v: 0,
           },
         });
 
         await prismadb.crm_Opportunities.update({
-          where: { id: params.opportunityId },
+          where: { id: opportunityId },
           data: {
             sales_stage: destination,
             account: newAccount.id,
@@ -49,7 +52,7 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
         });
       } else {
         await prismadb.crm_Opportunities.update({
-          where: { id: params.opportunityId },
+          where: { id: opportunityId },
           data: {
             sales_stage: destination,
           },
@@ -57,7 +60,7 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
       }
     } else {
       await prismadb.crm_Opportunities.update({
-        where: { id: params.opportunityId },
+        where: { id: opportunityId },
         data: {
           sales_stage: destination,
         },
@@ -88,20 +91,21 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
 
 export async function DELETE(req: Request, props: { params: Promise<{ opportunityId: string }> }) {
   const params = await props.params;
+  const { opportunityId } = params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return new NextResponse("Unauthenticated", { status: 401 });
   }
 
-  if (!params.opportunityId) {
+  if (!opportunityId) {
     return new NextResponse("Opportunity ID is required", { status: 400 });
   }
 
   try {
     await prismadb.crm_Opportunities.delete({
       where: {
-        id: params.opportunityId,
+        id: opportunityId,
       },
     });
 

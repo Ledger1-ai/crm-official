@@ -144,6 +144,19 @@ const DEFAULT_SOCIAL_LINKS: SocialLink[] = SOCIAL_PLATFORMS.map(p => ({
   active: false
 }));
 
+const SOCIAL_BASE_URLS: Record<string, string> = {
+  linkedin: "https://www.linkedin.com/in/",
+  twitter: "https://x.com/",
+  facebook: "https://www.facebook.com/",
+  instagram: "https://www.instagram.com/",
+  medium: "https://medium.com/@",
+  patreon: "https://www.patreon.com/",
+  discord: "https://discord.com/users/", // or invite link logic, but base for now
+  github: "https://github.com/",
+  youtube: "https://www.youtube.com/@",
+  website: "https://", // special case
+};
+
 // --- Helper Functions ---
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -158,10 +171,37 @@ const hexToRgb = (hex: string) => {
 
 const getIconUrl = (name: string, color: string) => {
   const hex = color.replace("#", "");
-  // Using a consistent set of icons. For X/Twitter we handle specifically in the loop if needed, 
-  // but icon8 has a specific 'twitterx' or we can map 'twitter' to it if we want to force it globally.
-  // For now, standard list.
-  return `https://img.icons8.com/ios-filled/50/${hex}/${name}.png`;
+  // Map 'twitter' to 'twitterx' for Icons8 compatibility
+  const iconName = name === 'twitter' ? 'twitterx' : name;
+  return `https://img.icons8.com/ios-filled/50/${hex}/${iconName}.png`;
+};
+
+const ensureAbsoluteUrl = (url: string, platform?: string) => {
+  if (!url) return "";
+  const trimmed = url.trim();
+
+  // If it already has a protocol, rely on it
+  if (trimmed.match(/^(http:\/\/|https:\/\/|mailto:|tel:)/i)) {
+    return trimmed;
+  }
+
+  // If it looks like a domain (has a dot and no spaces), treat as website/direct link needs https
+  if (trimmed.includes(".") && !trimmed.includes(" ")) {
+    return `https://${trimmed}`;
+  }
+
+  // If we have a platform context and it's not a URL, prepend the base URL
+  if (platform && SOCIAL_BASE_URLS[platform]) {
+    // Remove @ if user added it
+    const cleanHandle = trimmed.replace(/^@/, "");
+    // Special handling for website if it doesn't have a dot (unlikely but safe)
+    if (platform === 'website') return `https://${cleanHandle}`;
+
+    return `${SOCIAL_BASE_URLS[platform]}${cleanHandle}`;
+  }
+
+  // Fallback: assume it's a domain/link the user meant to be absolute
+  return `https://${trimmed}`;
 };
 
 // --- Component ---
@@ -340,7 +380,26 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
   const handleImageUpload = async (file: File, field: "profileImage" | "companyLogoUrl") => {
     setUploading(true);
     try {
-      // Basic compression
+      // SPECIAL HANDLING FOR COMPANY LOGO:
+      // Upload RAW to preserve transparency perfectly for all formats (PNG, WebP, GIF, etc).
+      // This fixes the issue where logos were getting black backgrounds or artifacts.
+      if (field === "companyLogoUrl") {
+        const formData = new FormData();
+        formData.append("file", file); // Upload raw file
+
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const json = await res.json();
+
+        if (res.ok && json?.document?.document_file_url) {
+          startUpdate(field, json.document.document_file_url);
+          toast.success("Logo uploaded!");
+          return json.document.document_file_url;
+        } else {
+          throw new Error(json?.error || "Upload failed");
+        }
+      }
+
+      // Normal processing for Profile Images or non-PNGs (resize, compress, force PNG output)
       const reader = new FileReader();
       const dataURL: string = await new Promise((resolve, reject) => {
         reader.onload = () => resolve(reader.result as string);
@@ -362,13 +421,23 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
       canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
       if (ctx) {
+        // Ensure transparent background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // ALWAYS use PNG to ensure transparency is preserved.
+        // Even if original was JPEG, converting to PNG is safe.
+        // If original was transparent PNG, this keeps it transparent.
+        const outputType = "image/png";
+
         const blob: Blob = await new Promise((resolve) =>
-          canvas.toBlob((b) => resolve(b!), file.type || "image/jpeg", 0.85)
+          canvas.toBlob((b) => resolve(b!), outputType, 1.0)
         );
 
         const formData = new FormData();
-        formData.append("file", new File([blob], file.name, { type: file.type }));
+        // Force filename to have .png extension to match the mime type
+        const safeName = file.name.replace(/\.[^/.]+$/, "") + ".png";
+        formData.append("file", new File([blob], safeName, { type: "image/png" }));
 
         const res = await fetch("/api/upload", { method: "POST", body: formData });
         const json = await res.json();
@@ -381,7 +450,8 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
           throw new Error(json?.error || "Upload failed");
         }
       }
-    } catch (e: any) {
+    }
+    catch (e: any) {
       toast.error(e.message || "Failed to upload image");
     } finally {
       setUploading(false);
@@ -477,19 +547,20 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
       let iconUrl = "";
       switch (link.platform) {
         case "linkedin": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/icons8-linkedin-50.png"; break;
-        case "twitter": iconUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/X_logo_2023_original.svg/50px-X_logo_2023_original.svg.png"; break; // Stable X logo
+        case "twitter": iconUrl = "https://img.icons8.com/ios-filled/50/000000/twitterx.png"; break; // Direct working X logo
         case "facebook": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/icons8-facebook-50.png"; break;
         case "instagram": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/icons8-instagram-50.png"; break;
         case "medium": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/icons8-medium-50.png"; break;
         case "patreon": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/icons8-patreon-50.png"; break;
         case "youtube": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/YouTube.png"; break;
         case "discord": iconUrl = "https://storage.googleapis.com/tgl_cdn/images/Social/Discord-Symbol-Blurple.png"; break;
+        case "github": iconUrl = "https://img.icons8.com/ios-filled/50/000000/github.png"; break;
         default: iconUrl = "https://storage.googleapis.com/tgl_cdn/images/symbols/web.png"; // Fallback
       }
 
       return `
               <td style="padding-right: 6px;">
-                <a href="${link.url}" target="_blank" style="text-decoration:none;">
+                <a href="${ensureAbsoluteUrl(link.url, link.platform)}" target="_blank" style="text-decoration:none;">
                   <img src="${iconUrl}" width="${link.platform === 'twitter' ? 20 : 26}" height="${link.platform === 'twitter' ? 20 : 26}" alt="${link.platform}" style="display:block; border:0;" />
                 </a>
               </td>
@@ -505,7 +576,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
            <tr>
              ${medallions.map(m => `
                <td style="padding-right: 12px;">
-                 <a href="${m.linkUrl || '#'}" style="text-decoration: none; cursor: ${m.linkUrl ? 'pointer' : 'default'};">
+                 <a href="${ensureAbsoluteUrl(m.linkUrl) || '#'}" style="text-decoration: none; cursor: ${m.linkUrl ? 'pointer' : 'default'};">
                    <img src="${m.imageUrl}" height="40" style="display: block; max-height: 40px; width: auto;" alt="Award" />
                  </a>
                </td>
@@ -521,11 +592,11 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
 
       return `
         ${wrapperStart}
-        <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; width: 100%;">
+        <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: auto;">
           <tr>
             <td style="padding: 16px; border-left: 4px solid ${accentColor}; background-color: rgba(${rgb}, 0.03);">
 
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              <table cellpadding="0" cellspacing="0" border="0" style="width: auto;">
                 <tr>
                   ${showLeftColumn ? `
                   <td valign="top" style="padding-right: 20px; width: 125px;">
@@ -571,19 +642,19 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
                           <td width="24" style="padding-bottom: 6px; vertical-align: middle;">
                              <img src="${getIconUrl('globe', accentColor)}" width="14" height="14" alt="W" style="display: block;" />
                           </td>
-                          <td style="padding-bottom: 6px; vertical-align: middle;"><a href="https://${website}" style="color: inherit; text-decoration: none;">${website}</a></td>
+                          <td style="padding-bottom: 6px; vertical-align: middle;"><a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a></td>
                         </tr>
                       ` : ''}
                     </table>
 
                     ${socialHtml}
 
+                    ${!showLeftColumn && medallions && medallions.length > 0 ? medallionsHtml : ''}
                   </td>
-                </tr>
                 </tr>
               </table>
 
-              ${medallionsHtml}
+              ${showLeftColumn && medallions && medallions.length > 0 ? medallionsHtml : ''}
 
             </td>
           </tr>
@@ -592,33 +663,65 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
       `;
     }
 
-    // Template 2: Minimalist (Clean, no background)
-    if (template === "minimalist") {
+    // Template 2: Modern (Horizontal bar logic)
+    if (template === "modern") {
       return `
         ${wrapperStart}
-        <table cellpadding="0" cellspacing="0" border="0" style="font-family: Helvetica, Arial, sans-serif; color: ${textColor};">
+        <table cellpadding="0" cellspacing="0" border="0" style="font-family: Helvetica, Arial, sans-serif; width: auto;">
           <tr>
-            ${profileImage ? `
-              <td valign="top" style="padding-right: 12px;">
-                <img src="${profileImage}" width="60" height="${imageShape === 'oval' ? 75 : 60}" style="${getImageStyle(60)}" alt="${firstName}" />
-              </td>
-            ` : ''}
-            <td valign="top" style="border-left: 1px solid #ddd; padding-left: 12px;">
-              <div style="font-weight: bold; font-size: 16px;">${nameHtml}</div>
-              <div style="font-size: 14px; color: rgba(${textRgb}, 0.7); margin-bottom: 6px;">${title}</div>
+            <td valign="middle" style="padding-right: 20px;">
+               ${profileImage ? `<img src="${profileImage}" width="80" height="${imageShape === 'oval' ? 100 : 80}" style="${getImageStyle(80)}" />` : ''}
+               ${companyLogoUrl ? `<div style="margin-top:8px;"><img src="${companyLogoUrl}" width="80" style="display:block;width:80px;height:auto;" /></div>` : ''}
+            </td>
+            <td style="border-left: 2px solid ${accentColor}; padding-left: 20px;">
+              <h3 style="margin: 0; font-size: 18px; color: ${textColor}; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                ${nameHtml}
+              </h3>
+              <p style="margin: 2px 0 8px 0; font-size: 12px; font-weight: 600; color: ${accentColor}; text-transform: uppercase;">
+                 ${title} ${department ? `// ${department}` : ''}
+              </p>
 
               <div style="font-size: 12px; line-height: 1.5;">
                 ${phone ? `<div><img src="${getIconUrl('phone', accentColor)}" width="10" height="10" style="vertical-align: middle; margin-right: 4px;" /> ${formattedPhone}</div>` : ''}
                 ${email ? `<div><img src="${getIconUrl('mail', accentColor)}" width="10" height="10" style="vertical-align: middle; margin-right: 4px;" /> <a href="mailto:${email}" style="color:inherit; text-decoration:none;">${email}</a></div>` : ''}
-                ${website ? `<div><img src="${getIconUrl('globe', accentColor)}" width="10" height="10" style="vertical-align: middle; margin-right: 4px;" /> <a href="https://${website}" style="color:inherit; text-decoration:none;">${website}</a></div>` : ''}
+                ${website ? `<div><img src="${getIconUrl('globe', accentColor)}" width="10" height="10" style="vertical-align: middle; margin-right: 4px;" /> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color:inherit; text-decoration:none;">${website}</a></div>` : ''}
               </div>
 
                ${socialHtml}
-
                ${medallionsHtml}
             </td>
           </tr>
         </table>
+        ${wrapperEnd}
+      `;
+    }
+
+    // Template 3: Minimalist
+    if (template === "minimalist") {
+      return `
+        ${wrapperStart}
+        <div style="font-family: 'Courier New', Courier, monospace; width: auto;">
+          <h2 style="margin: 0; font-size: 20px; color: ${textColor}; border-bottom: 2px solid ${accentColor}; display: inline-block; padding-bottom: 4px;">
+            ${nameHtml}
+          </h2>
+          <p style="margin: 6px 0 12px 0; font-size: 14px; color: rgba(${textRgb}, 0.7);">
+            ${title} ${department ? `<br/><span style="font-size:12px;">${department}</span>` : ''}
+          </p>
+
+          <div style="display: flex; align-items: flex-start; gap: 16px;">
+             ${profileImage ? `<div><img src="${profileImage}" width="60" height="${imageShape === 'oval' ? 75 : 60}" style="${getImageStyle(60)}" /></div>` : ''}
+             <div style="flex: 1;">
+                 ${companyLogoUrl ? `<div style="margin-bottom:8px;"><img src="${companyLogoUrl}" height="24" style="display:block;height:24px;width:auto;" /></div>` : ''}
+                 <div style="font-size: 12px; line-height: 1.6;">
+                   ${phone ? `<div>P: ${formattedPhone}</div>` : ''}
+                   ${email ? `<div>E: <a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a></div>` : ''}
+                   ${website ? `<div>W: <a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a></div>` : ''}
+                 </div>
+                 ${socialHtml}
+                 ${medallionsHtml}
+             </div>
+          </div>
+        </div>
         ${wrapperEnd}
       `;
     }
@@ -639,7 +742,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
               <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
                 ${phone ? `<tr><td style="padding: 2px 8px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('phone', accentColor)}" width="12" height="12" style="vertical-align: middle; margin-right: 6px;" /> ${formattedPhone}</td></tr>` : ''}
                 ${email ? `<tr><td style="padding: 2px 8px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('mail', accentColor)}" width="12" height="12" style="vertical-align: middle; margin-right: 6px;" /> <a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a></td></tr>` : ''}
-                ${website ? `<tr><td style="padding: 2px 8px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('globe', accentColor)}" width="12" height="12" style="vertical-align: middle; margin-right: 6px;" /> <a href="https://${website}" style="color: inherit; text-decoration: none;">${website}</a></td></tr>` : ''}
+                ${website ? `<tr><td style="padding: 2px 8px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('globe', accentColor)}" width="12" height="12" style="vertical-align: middle; margin-right: 6px;" /> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a></td></tr>` : ''}
               </table>
 
               <div style="margin-top: 16px;">
@@ -673,7 +776,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
               <div style="font-size: 13px; color: rgba(${textRgb}, 0.7); line-height: 1.6;">
                 ${phone ? `<div style="display: flex; align-items: center; gap: 6px;"><img src="${getIconUrl('phone', accentColor)}" width="14" height="14" /> ${formattedPhone}</div>` : ''}
                 ${email ? `<div style="display: flex; align-items: center; gap: 6px;"><img src="${getIconUrl('mail', accentColor)}" width="14" height="14" /> <a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a></div>` : ''}
-                ${website ? `<div style="display: flex; align-items: center; gap: 6px;"><img src="${getIconUrl('globe', accentColor)}" width="14" height="14" /> <a href="https://${website}" style="color: inherit; text-decoration: none;">${website}</a></div>` : ''}
+                ${website ? `<div style="display: flex; align-items: center; gap: 6px;"><img src="${getIconUrl('globe', accentColor)}" width="14" height="14" /> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a></div>` : ''}
               </div>
 
                <div style="margin-top: 12px;">${socialHtml}</div>
@@ -700,11 +803,11 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
                  <tr>
                    ${phone ? `<td style="padding-right: 12px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('phone', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> ${formattedPhone}</td>` : ''}
                    ${email ? `<td style="padding-right: 12px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('mail', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> <a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a></td>` : ''}
-                 </tr>
-                 <tr>
-                   ${website ? `<td colspan="2" style="padding-top: 4px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('globe', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> <a href="https://${website}" style="color: inherit; text-decoration: none;">${website}</a></td>` : ''}
-                 </tr>
-               </table>
+                  </tr>
+                  <tr>
+                    ${website ? `<td colspan="2" style="padding-top: 4px; font-size: 13px; color: rgba(${textRgb}, 0.8);"><img src="${getIconUrl('globe', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a></td>` : ''}
+                  </tr>
+                </table>
 
                <div style="display: flex; align-items: center; gap: 12px;">
                  ${socialHtml}
@@ -742,7 +845,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
               ${medallions && medallions.length > 0 ? `
                 <div style="margin-top: 12px; text-align: center;">
                     ${medallions.map(m => `
-                      <a href="${m.linkUrl || '#'}" style="text-decoration: none; cursor: ${m.linkUrl ? 'pointer' : 'default'};">
+                      <a href="${ensureAbsoluteUrl(m.linkUrl) || '#'}" style="text-decoration: none; cursor: ${m.linkUrl ? 'pointer' : 'default'};">
                          <img src="${m.imageUrl}" height="32" style="display: inline-block; max-height: 32px; width: auto; margin: 2px;" alt="Award" />
                       </a>
                     `).join("")}
@@ -761,7 +864,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
               <div style="font-size: 12px; display: flex; gap: 16px; color: ${textColor};">
                  ${phone ? `<span><b style="color:${accentColor}">P:</b> ${formattedPhone}</span>` : ''}
                  ${email ? `<span><b style="color:${accentColor}">E:</b> <a href="mailto:${email}" style="color:inherit; text-decoration:none;">${email}</a></span>` : ''}
-                 ${website ? `<span><b style="color:${accentColor}">W:</b> <a href="https://${website}" style="color:inherit; text-decoration:none;">${website}</a></span>` : ''}
+                 ${website ? `<span><b style="color:${accentColor}">W:</b> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color:inherit; text-decoration:none;">${website}</a></span>` : ''}
               </div>
               <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px;">
                  ${socialHtml}
@@ -783,7 +886,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
            <div style="margin-top: 4px;">
               ${phone ? `<a href="${telHref}" style="color:inherit; text-decoration:none; margin-right: 8px;">${formattedPhone}</a>` : ''}
               ${email ? `<a href="mailto:${email}" style="color:inherit; text-decoration:none; margin-right: 8px;">${email}</a>` : ''}
-              ${website ? `<a href="https://${website}" style="color:inherit; text-decoration:none;">${website}</a>` : ''}
+              ${website ? `<a href="${ensureAbsoluteUrl(website, 'website')}" style="color:inherit; text-decoration:none;">${website}</a>` : ''}
            </div>
            <div style="margin-top: 6px;">${socialHtml}</div>
            ${medallionsHtml}
@@ -793,39 +896,8 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
     }
 
 
-    // Template 3: Modern (Bottom bar)
-    // NOTE: This acts as our fallback/default return if no specific template matched above, 
-    // OR if template === 'modern' explicitly. 
-    // However, if we added more templates below, we must ensure they are reachable.
-    // Ideally, we make 'modern' an if-block too, and have a final fallback.
-
-    if (template === "modern") {
-      return `
-      ${wrapperStart}
-      <div style="font-family: sans-serif; max-width: 600px; width: 100%;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-           ${profileImage ? `<img src="${profileImage}" width="64" height="${imageShape === 'oval' ? 80 : 64}" style="${getImageStyle(64)}" />` : ''}
-           <div>
-             <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: ${textColor};">${nameHtml}</h2>
-             <div style="font-size: 14px; color: ${accentColor}; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">${title}</div>
-           </div>
-        </div>
-
-        <div style="border-top: 2px solid ${accentColor}; padding-top: 12px; display:flex; justify-content:space-between; flex-wrap:wrap;">
-          <div style="font-size: 12px; color: rgba(${textRgb}, 0.8); line-height: 1.6;">
-            ${phone ? `<div><img src="${getIconUrl('phone', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> ${formattedPhone}</div>` : ''}
-            ${email ? `<div><img src="${getIconUrl('mail', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> ${email}</div>` : ''}
-            ${website ? `<div><img src="${getIconUrl('globe', accentColor)}" width="11" height="11" style="vertical-align:middle; margin-right:4px;" /> ${website}</div>` : ''}
-          </div>
-          ${companyLogoUrl ? `<div><img src="${companyLogoUrl}" height="40" style="display:block;" /></div>` : ''}
-        </div>
-
-        ${socialHtml}
-        ${medallionsHtml}
-      </div>
-      ${wrapperEnd}
-    `;
-    }
+    // Template 3: Modern (Bottom bar) - REMOVED redundant block to fix TS error
+    // (We already handled 'modern' above)
 
     // Template 9: Tech (Monospace, Code Block)
     if (template === "tech") {
@@ -842,12 +914,13 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
           <div style="margin-top: 16px; font-size: 12px; color: #ccc;">
             ${phone ? `<div>phone: <span style="color: #a5d6ff;">"${formattedPhone}"</span>,</div>` : ''}
             ${email ? `<div>email: <span style="color: #a5d6ff;">"${email}"</span>,</div>` : ''}
-            ${website ? `<div>web: <span style="color: #a5d6ff;">"<a href="https://${website}" style="color:inherit;text-decoration:none;">${website}</a>"</span>,</div>` : ''}
+            ${website ? `<div>web: <span style="color: #a5d6ff;">"<a href="${ensureAbsoluteUrl(website, 'website')}" style="color:inherit;text-decoration:none;">${website}</a>"</span>,</div>` : ''}
           </div>
+
 
           <div style="margin-top: 16px;">
             <span style="color: #888;">return</span> [
-            ${activeSocials.map(s => `<a href="${s.url}" style="color: ${accentColor}; text-decoration: none; margin-right: 8px;">${s.platform}</a>`).join(", ")}
+            ${activeSocials.map(s => `<a href="${ensureAbsoluteUrl(s.url, s.platform)}" style="color: ${accentColor}; text-decoration: none; margin-right: 8px;">${s.platform}</a>`).join(", ")}
             ];
           </div>
           ${medallionsHtml}
@@ -875,7 +948,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
           <div style="font-size: 13px; color: rgba(${textRgb}, 0.8); line-height: 1.8;">
             ${phone ? `${formattedPhone} &nbsp;|&nbsp;` : ''}
             ${email ? `<a href="mailto:${email}" style="color: inherit; text-decoration: none;">${email}</a>` : ''}
-            ${website ? `&nbsp;|&nbsp; <a href="https://${website}" style="color: inherit; text-decoration: none;">${website}</a>` : ''}
+            ${website ? `&nbsp;|&nbsp; <a href="${ensureAbsoluteUrl(website, 'website')}" style="color: inherit; text-decoration: none;">${website}</a>` : ''}
           </div>
 
           <div style="margin-top: 16px;">
@@ -909,7 +982,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
 
       <div style="margin-top: 12px; font-size: 13px;">
         ${email ? `<b>E:</b> <a href="mailto:${email}" style="text-decoration:none; color:${textColor};">${email}</a> &nbsp; ` : ''}
-        ${website ? `<b>W:</b> <a href="https://${website}" style="text-decoration:none; color:${textColor};">${website}</a>` : ''}
+        ${website ? `<b>W:</b> <a href="${ensureAbsoluteUrl(website, 'website')}" style="text-decoration:none; color:${textColor};">${website}</a>` : ''}
       </div>
       ${medallionsHtml}
     </div>
@@ -934,7 +1007,7 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
               ${email ? `<td style="padding: 2px 0;"><b>Email:</b> <a href="mailto:${email}" style="color:inherit; text-decoration:none;">${email}</a></td>` : ''}
             </tr>
             <tr>
-              ${website ? `<td style="padding: 2px 0;"><b>Web:</b> <a href="https://${website}" style="color:inherit; text-decoration:none;">${website}</a></td>` : ''}
+              ${website ? `<td style="padding: 2px 0;"><b>Web:</b> <a href="${ensureAbsoluteUrl(website, 'website')}" style="color:inherit; text-decoration:none;">${website}</a></td>` : ''}
               ${department ? `<td style="padding: 2px 0;"><b>Dept:</b> ${department}</td>` : ''}
             </tr>
           </table>
@@ -957,9 +1030,24 @@ const SignatureBuilder: React.FC<SignatureBuilderProps> = ({ hasAccess }) => {
     try {
       setSaving(true);
       const html = generateHTML();
+
+      // Sanitize data before saving to ensure consumers of the JSON get absolute URLs
+      const sanitizedData = {
+        ...data,
+        website: ensureAbsoluteUrl(data.website, 'website'),
+        socialLinks: data.socialLinks.map(link => ({
+          ...link,
+          url: ensureAbsoluteUrl(link.url, link.platform)
+        })),
+        medallions: data.medallions.map(m => ({
+          ...m,
+          linkUrl: ensureAbsoluteUrl(m.linkUrl)
+        }))
+      };
+
       const payload = {
         signatureHtml: html,
-        meta: data
+        meta: sanitizedData
       };
 
       const res = await fetch("/api/profile/signature", {
