@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import DashboardCard from "../DashboardCard";
 import { DollarSign, TrendingUp, Users2, Activity, UserPlus, FolderPlus, ClipboardList, MessageSquare } from "lucide-react";
 import { EntityBreakdown } from "../../../../dashboard/components/EntityBreakdown";
@@ -42,6 +43,8 @@ const AdminDashboard = ({
     allTasksCount = 0,
     messagesCount = 0
 }: AdminDashboardProps) => {
+    const router = useRouter();
+
     return (
         <div className="flex flex-col space-y-8 p-4">
             {/* 1. Header & Quick Actions (Pills) */}
@@ -113,6 +116,9 @@ const AdminDashboard = ({
                         count={revenue.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })}
                         description="From open opportunities"
                         variant="success"
+                        hideIcon={true}
+                        onClick={() => router.push("/crm/opportunities")}
+                        className="cursor-pointer hover:ring-1 hover:ring-emerald-500/50"
                     />
                     <DashboardCard
                         icon={TrendingUp}
@@ -120,6 +126,8 @@ const AdminDashboard = ({
                         count={activePipelineCount}
                         description={`${totalLeads} Leads, ${totalOpportunities} Opportunities`}
                         variant="info"
+                        onClick={() => router.push("/crm/opportunities")}
+                        className="cursor-pointer hover:ring-1 hover:ring-cyan-500/50"
                     />
                     <DashboardCard
                         icon={Users2}
@@ -127,6 +135,8 @@ const AdminDashboard = ({
                         count={activeUsersCount}
                         description="Team members active"
                         variant="violet"
+                        onClick={() => router.push("/settings/team")}
+                        className="cursor-pointer hover:ring-1 hover:ring-violet-500/50"
                     />
                     <DashboardCard
                         icon={Activity}
@@ -134,6 +144,8 @@ const AdminDashboard = ({
                         count="98%"
                         description="Operational"
                         variant="warning"
+                        onClick={() => router.push("/partners/plans")}
+                        className="cursor-pointer hover:ring-1 hover:ring-amber-500/50"
                     />
                 </div>
             </div>

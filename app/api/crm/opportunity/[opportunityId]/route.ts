@@ -21,14 +21,48 @@ export async function PUT(req: Request, props: { params: Promise<{ opportunityId
   const { destination } = body;
 
   try {
-    await prismadb.crm_Opportunities.update({
-      where: {
-        id: params.opportunityId,
-      },
-      data: {
-        sales_stage: destination,
-      },
+    const newStage = await prismadb.crm_Opportunities_Sales_Stages.findUnique({
+      where: { id: destination },
     });
+
+    if (newStage?.probability === 100) {
+      const opportunity = await prismadb.crm_Opportunities.findUnique({
+        where: { id: params.opportunityId },
+      });
+
+      if (opportunity && !opportunity.account) {
+        const newAccount = await prismadb.crm_Accounts.create({
+          data: {
+            name: opportunity.name || "New Account",
+            status: "Active",
+            assigned_to: opportunity.assigned_to,
+            annual_revenue: String(opportunity.expected_revenue),
+          },
+        });
+
+        await prismadb.crm_Opportunities.update({
+          where: { id: params.opportunityId },
+          data: {
+            sales_stage: destination,
+            account: newAccount.id,
+          },
+        });
+      } else {
+        await prismadb.crm_Opportunities.update({
+          where: { id: params.opportunityId },
+          data: {
+            sales_stage: destination,
+          },
+        });
+      }
+    } else {
+      await prismadb.crm_Opportunities.update({
+        where: { id: params.opportunityId },
+        data: {
+          sales_stage: destination,
+        },
+      });
+    }
 
     const data = await prismadb.crm_Opportunities.findMany({
       include: {

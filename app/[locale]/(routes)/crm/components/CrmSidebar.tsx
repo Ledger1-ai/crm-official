@@ -72,7 +72,7 @@ export default function CrmSidebar({ isMember = false }: CrmSidebarProps) {
             icon: Users,
         },
         {
-            label: "Projects", href: "/crm/projects", icon: Folder, // Assuming Folder icon is imported 
+            label: "Projects", href: "/crm/my-projects", icon: Folder, // Assuming Folder icon is imported 
             // Note: need to make sure Folder is imported
         },
         { label: "Opportunities", href: "/crm/opportunities", icon: Target },
