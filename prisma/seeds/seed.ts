@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { createRequire } from "module";
 
-const require = createRequire(import.meta.url);
 
 const moduleData = require("../initial-data/system_Modules_Enabled.json");
 const gptModelsData = require("../initial-data/gpt_Models.json");
