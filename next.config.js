@@ -31,25 +31,7 @@ const nextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_APP_VERSION: (() => {
-      try {
-        const { execSync } = require("child_process");
-        // Get generic commit messages to find the most recent version
-        const commitMessages = execSync("git log -n 50 --format=%s", { encoding: "utf-8" }).trim().split('\n');
-
-        for (const msg of commitMessages) {
-          const versionMatch = msg.match(/^v?(\d+\.\d+\.\d+[a-zA-Z0-9-]*)/);
-          if (versionMatch) {
-            return versionMatch[1];
-          }
-        }
-
-        // Fallback to package.json version
-        return require("./package.json").version;
-      } catch {
-        return require("./package.json").version;
-      }
-    })(),
+    NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
   },
   async redirects() {
     return [

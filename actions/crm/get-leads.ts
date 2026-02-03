@@ -1,3 +1,5 @@
+"use server";
+
 import { prismadb } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -49,4 +51,59 @@ export const getLeads = async () => {
     },
   });
   return data;
+};
+
+//Get leads by month for chart
+export const getLeadsByMonth = async (startDate?: Date, endDate?: Date, departmentId?: string) => {
+  const teamInfo = await getCurrentUserTeamId();
+  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) return [];
+
+  const whereClause: any = {};
+  if (!teamInfo?.isGlobalAdmin) {
+    whereClause.team_id = teamInfo?.teamId;
+  }
+
+  // Filter by Department (if applicable based on user assignment)
+  if (departmentId && departmentId !== "all") {
+    whereClause.assigned_department_id = departmentId;
+  }
+
+  // Add Dynamic Date Range
+  if (startDate && endDate) {
+    whereClause.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
+  const leads = await prismadb.crm_Leads.findMany({
+    where: whereClause,
+    select: {
+      createdAt: true,
+    },
+  });
+
+  if (!leads) {
+    return [];
+  }
+
+  const leadsByMonth = leads.reduce(
+    (acc: any, lead: any) => {
+      const month = new Date(lead.createdAt).toLocaleString("default", {
+        month: "long",
+      });
+      acc[month] = (acc[month] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
+
+  const chartData = Object.keys(leadsByMonth).map((month: any) => {
+    return {
+      name: month,
+      Number: leadsByMonth[month],
+    };
+  });
+
+  return chartData;
 };

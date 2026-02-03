@@ -1,3 +1,5 @@
+"use server";
+
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -65,18 +67,39 @@ export const getTasks = async () => {
 };
 
 //get tasks by month for chart
-export const getTasksByMonth = async () => {
+export const getTasksByMonth = async (startDate?: Date, endDate?: Date, departmentId?: string) => {
+  const whereClause: any = {};
+
+  if (startDate && endDate) {
+    whereClause.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
   const tasks = await prismadb.tasks.findMany({
+    where: whereClause,
     select: {
       createdAt: true,
+      assigned_user: {
+        select: {
+          department_id: true
+        }
+      }
     },
   });
 
   if (!tasks) {
-    return {};
+    return [];
   }
 
-  const tasksByMonth = tasks.reduce((acc: any, task: any) => {
+  // Filter by department if needed
+  let filteredTasks = tasks;
+  if (departmentId && departmentId !== "all") {
+    filteredTasks = tasks.filter((t: any) => t.assigned_user?.department_id === departmentId);
+  }
+
+  const tasksByMonth = filteredTasks.reduce((acc: any, task: any) => {
     const month = new Date(task.createdAt).toLocaleString("default", {
       month: "long",
     });

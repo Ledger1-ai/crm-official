@@ -1,3 +1,5 @@
+"use server";
+
 import { prismadb } from "@/lib/prisma";
 
 import { getServerSession } from "next-auth";
@@ -30,9 +32,9 @@ export const getOpportunities = async () => {
 };
 
 //Get opportunities by month for chart
-export const getOpportunitiesByMonth = async () => {
+export const getOpportunitiesByMonth = async (startDate?: Date, endDate?: Date, departmentId?: string) => {
   const teamInfo = await getCurrentUserTeamId();
-  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) return {};
+  if (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin) return [];
 
   const whereClause: any = {};
   if (!teamInfo?.isGlobalAdmin) {
@@ -40,6 +42,19 @@ export const getOpportunitiesByMonth = async () => {
   }
   if (teamInfo?.teamRole === "MEMBER" || teamInfo?.teamRole === "VIEWER") {
     whereClause.assigned_to = teamInfo?.userId;
+  }
+
+  // Filter by Department
+  if (departmentId && departmentId !== "all") {
+    whereClause.assigned_department_id = departmentId;
+  }
+
+  // Add Dynamic Date Range
+  if (startDate && endDate) {
+    whereClause.created_on = {
+      gte: startDate,
+      lte: endDate,
+    };
   }
 
   const opportunities = await prismadb.crm_Opportunities.findMany({
@@ -50,7 +65,7 @@ export const getOpportunitiesByMonth = async () => {
   });
 
   if (!opportunities) {
-    return {};
+    return [];
   }
 
   const opportunitiesByMonth = opportunities.reduce(

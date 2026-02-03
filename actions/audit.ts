@@ -31,9 +31,10 @@ export async function logActivity(
 ) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) return;
+        const userId = (session?.user as any)?.id;
+        if (!userId) return;
 
-        await logActivityInternal(session.user.id, action, resource, details);
+        await logActivityInternal(userId, action, resource, details);
     } catch (error) {
         console.error("Failed to log activity:", error);
     }

@@ -839,6 +839,7 @@ model Role {
 }
 
 model Users {
+  saved_reports SavedReport[]
   id                   String                   @id @default(auto()) @map("_id") @db.ObjectId
   v                    Int                      @default(0) @map("__v")
   account_name         String?
@@ -2178,4 +2179,22 @@ model RolePermission {
   assigned_team Team @relation(fields: [team_id], references: [id])
 
   @@unique([team_id, role, scope])
+}
+
+model SavedReport {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  type      String   @default("AI_SUMMARY")
+  content   String
+  prompt    String?
+  filters   Json?
+  
+  userId    String   @db.ObjectId
+  user      Users    @relation(fields: [userId], references: [id])
+  
+  teamId    String?  @db.ObjectId
+  // Optional: team Team? @relation(fields: [teamId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

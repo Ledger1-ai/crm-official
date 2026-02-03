@@ -1,79 +1,44 @@
 import React from "react";
 import Container from "../components/ui/Container";
-
-import { BarChartDemo } from "@/components/tremor/BarChart";
-import {
-  getUsersByMonth,
-  getUsersByMonthAndYear,
-  getUsersCountOverall,
-} from "@/actions/get-users";
-import { AreaChartDemo } from "@/components/tremor/AreaChart";
+import ReportsDashboard from "./components/ReportsDashboard";
+import { getUsersByMonth } from "@/actions/get-users";
+import { getOpportunitiesByMonth } from "@/actions/crm/get-opportunities";
 import { getTasksByMonth } from "@/actions/campaigns/get-tasks";
-import {
-  getOpportunitiesByMonth,
-  getOpportunitiesByStage,
-} from "@/actions/crm/get-opportunities";
+import { getFinancialsByMonth } from "@/actions/reports/get-financials";
+
+import { getLeadsByMonth } from "@/actions/crm/get-leads";
+import { getDepartments } from "@/actions/departments/get-departments";
 
 type Props = {};
 
 const ReportsPage = async (props: Props) => {
-  const newUsersOverall = await getUsersByMonth();
-  const newUserByMonthOverall = await getUsersCountOverall();
-  const newUsers = await getUsersByMonthAndYear(2023);
-  const newUsers2024 = await getUsersByMonthAndYear(2024);
-  const tasks = await getTasksByMonth();
-  const oppsByStage = await getOpportunitiesByStage();
-  const oppsByMonth = await getOpportunitiesByMonth();
+  // Fetch initial data (defaults to current year in actions if no dates provided)
+  const [usersData, oppsData, tasksData, financialsData, leadsData, deptsResult] = await Promise.all([
+    getUsersByMonth(),
+    getOpportunitiesByMonth(),
+    getTasksByMonth(),
+    getFinancialsByMonth(),
+    getLeadsByMonth(),
+    getDepartments()
+  ]);
 
-  //console.log("newUserByMonthOverall:", newUserByMonthOverall);
-  //console.log("New users overall:", newUsersOverall);
+  const departments = deptsResult.success ? deptsResult.departments || [] : [];
 
   return (
     <Container
       title="Reports"
       description={
-        "Here will be predefined reports for every module. We use Tremor for data visualization."
+        "Comprehensive analytics overview of your CRM performance."
       }
     >
-      <div className="pt-5 space-y-3">
-        {/*         <BarChartDemo
-          chartData={newUsersOverall}
-          title={"Number of new users by month (Overall)"}
-        /> */}
-        <BarChartDemo
-          chartData={newUserByMonthOverall}
-          title={"Number of new users by month (Overall)"}
-        />
-        <AreaChartDemo
-          chartData={newUserByMonthOverall}
-          title={"New users by month (Overall)"}
-        />
-      </div>
-      <div className="pt-5 space-y-3">
-        <BarChartDemo
-          chartData={newUsers}
-          title={"Number of new users by month (2023)"}
-        />
-        <AreaChartDemo chartData={newUsers} title={"New users by month"} />
-      </div>
-      <div className="pt-5 space-y-3">
-        <BarChartDemo
-          chartData={newUsers2024}
-          title={"Number of new users by month (2024)"}
-        />
-        <AreaChartDemo chartData={newUsers2024} title={"New users by month"} />
-      </div>
       <div className="pt-5">
-        <BarChartDemo chartData={tasks} title={"New tasks by month (2023)"} />
-      </div>
-      <div className="pt-5">
-        <BarChartDemo chartData={oppsByStage} title={"Opps by sales stage"} />
-      </div>
-
-      <div className="pt-5">
-        <BarChartDemo
-          chartData={oppsByMonth}
-          title={"New Opps by month (2023)"}
+        <ReportsDashboard
+          usersInitial={usersData}
+          oppsInitial={oppsData}
+          tasksInitial={tasksData}
+          financialsInitial={financialsData}
+          leadsInitial={leadsData}
+          departments={departments}
         />
       </div>
     </Container>

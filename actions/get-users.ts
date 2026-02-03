@@ -1,3 +1,5 @@
+"use server";
+
 import { prismadb } from "@/lib/prisma";
 import { Team } from "@prisma/client";
 import { getCurrentUserTeamId } from "@/lib/team-utils";
@@ -110,20 +112,45 @@ export const getUsersByMonthAndYear = async (year: number) => {
   return chartData;
 };
 
-//Get new users by month for chart
-export const getUsersByMonth = async () => {
+//Get new users by month for chart with dynamic date range
+export const getUsersByMonth = async (startDate?: Date, endDate?: Date) => {
+  const whereClause: any = {};
+
+  if (startDate && endDate) {
+    whereClause.created_on = {
+      gte: startDate,
+      lte: endDate,
+    };
+  } else {
+    // Default to current year if no date range provided
+    const currentYear = new Date().getFullYear();
+    whereClause.created_on = {
+      gte: new Date(currentYear, 0, 1),
+      lte: new Date(currentYear, 11, 31),
+    };
+  }
+
   const users = await prismadb.users.findMany({
+    where: whereClause,
     select: {
       created_on: true,
     },
+    orderBy: {
+      created_on: "asc",
+    }
   });
 
   if (!users) {
-    return {};
+    return [];
   }
 
   const usersByMonth = users.reduce((acc: any, user: any) => {
-    const month = new Date(user.created_on).toLocaleString("default", {
+    // If no created_on, skip
+    if (!user.created_on) return acc;
+
+    // Explicitly handle date object
+    const createdDate = new Date(user.created_on);
+    const month = createdDate.toLocaleString("default", {
       month: "long",
     });
 
@@ -132,6 +159,7 @@ export const getUsersByMonth = async () => {
     return acc;
   }, {});
 
+  // For charts, we might want to ensure all months in range are present or just let the data speak
   const chartData = Object.keys(usersByMonth).map((month: any) => {
     return {
       name: month,
@@ -142,18 +170,33 @@ export const getUsersByMonth = async () => {
   return chartData;
 };
 
-export const getUsersCountOverall = async () => {
+export const getUsersCountOverall = async (startDate?: Date, endDate?: Date) => {
+  const whereClause: any = {};
+
+  if (startDate && endDate) {
+    whereClause.created_on = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
   const users = await prismadb.users.findMany({
+    where: whereClause,
     select: {
       created_on: true,
     },
+    orderBy: {
+      created_on: "asc",
+    }
   });
 
   if (!users) {
-    return {};
+    return [];
   }
 
   const usersByMonth = users.reduce((acc: any, user: any) => {
+    if (!user.created_on) return acc;
+
     const date = new Date(user.created_on);
     const yearMonth = `${date.getFullYear()}-${date.getMonth() + 1}`;
 
@@ -164,10 +207,11 @@ export const getUsersCountOverall = async () => {
 
   const chartData = Object.keys(usersByMonth).map((yearMonth: any) => {
     const [year, month] = yearMonth.split("-");
+    const dateObj = new Date(parseInt(year), parseInt(month) - 1);
     return {
       year: parseInt(year),
       month: parseInt(month),
-      name: `${month}/${year}`,
+      name: `${dateObj.toLocaleString("default", { month: "short" })} ${year}`,
       Number: usersByMonth[yearMonth],
     };
   });

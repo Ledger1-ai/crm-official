@@ -1,10 +1,10 @@
 {
   "name": "basaltcrm-app",
-  "version": "1.1.4d",
+  "version": "1.1.4e",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "build": "prisma generate && node ./scripts/prisma-db-push-named.cjs && prisma db seed && next build",
+    "build": "node ./scripts/update-version.js && prisma generate && node ./scripts/prisma-db-push-named.cjs && prisma db seed && next build",
     "start": "next start",
     "db:push:named": "node ./scripts/prisma-db-push-named.cjs",
     "lint": "eslint ."
@@ -89,7 +89,7 @@
     "jotai": "^2.16.1",
     "lucide-react": "^0.556.0",
     "mailparser": "^3.9.1",
-    "mermaid": "^11.12.2",
+    "mermaid": "^10.9.5",
     "moment": "^2.30.1",
     "next": "^16.1.6",
     "next-auth": "^4.24.13",
@@ -114,6 +114,7 @@
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.6",
     "react-syntax-highlighter": "^16.1.0",
+    "react-to-print": "^3.2.0",
     "react-youtube": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "6.5.2",
@@ -137,6 +138,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/imap": "^0.8.43",
     "@types/mailparser": "^3.4.6",
+    "@types/next-auth": "^3.13.0",
     "@types/node": "^24.10.4",
     "@types/nodemailer": "^7.0.4",
     "@types/pdf-parse": "^1.1.5",
@@ -163,6 +165,7 @@
     "react-dom": "$react-dom",
     "utf7": {
       "semver": "^5.7.2"
-    }
+    },
+    "tar": "^7.5.7"
   }
 }
