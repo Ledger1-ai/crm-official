@@ -43,8 +43,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     const users = await prismadb.users.findMany({
       /*       where: {
         email: {
-          //contains: "pavel@softbase.cz",
-          equals: "pavel@softbase.cz",
+          //contains: "marketing@basalthq.com",
+          equals: "marketing@basalthq.com",
         },
       }, */
     });

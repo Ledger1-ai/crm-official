@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
     Plus, Copy, Code, Eye, Trash2, Settings, ChevronDown, ChevronRight,
     GripVertical, FileText, Lock, Globe, Users, Sparkles, Braces, Loader2,
-    Palette, RefreshCw, Search, BarChart3, ExternalLink, MoreHorizontal
+    Palette, RefreshCw, Search, BarChart3, ExternalLink, MoreHorizontal, Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +78,9 @@ interface Form {
     created_by?: string;
     primary_color?: string;
     custom_css?: string;
+    require_captcha: boolean;
+    captcha_site_key?: string;
+    captcha_secret_key?: string;
     fields: FormField[];
     _count: {
         submissions: number;
@@ -95,6 +98,10 @@ interface FormBuilderViewProps {
     projects: Project[];
     baseUrl: string;
     currentUserId: string;
+    teamCaptchaConfig?: {
+        site_key: string;
+        secret_key: string;
+    } | null;
 }
 
 // Field types must match Prisma FormFieldType enum exactly
@@ -131,7 +138,7 @@ const LEAD_FIELD_MAPPINGS = [
     { value: "country", label: "Country" },
 ];
 
-export function FormBuilderView({ forms: initialForms, projects, baseUrl, currentUserId }: FormBuilderViewProps) {
+export function FormBuilderView({ forms: initialForms, projects, baseUrl, currentUserId, teamCaptchaConfig }: FormBuilderViewProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [forms, setForms] = useState<Form[]>(initialForms);
@@ -157,6 +164,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
         description: "",
         project_id: "",
         visibility: "PUBLIC" as "PUBLIC" | "PRIVATE",
+        require_captcha: false,
         fields: [
             { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email" },
         ] as Partial<FormField>[],
@@ -251,6 +259,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
             name: newForm.name,
             description: newForm.description,
             visibility: newForm.visibility,
+            require_captcha: newForm.require_captcha,
             fields: newForm.fields.map((f, i) => ({
                 name: f.name,
                 label: f.label,
@@ -275,6 +284,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 description: parsed.description || "",
                 project_id: newForm.project_id,
                 visibility: parsed.visibility || "PUBLIC",
+                require_captcha: parsed.require_captcha || false,
                 fields: (parsed.fields || []).map((f: any) => ({
                     name: f.name || "",
                     label: f.label || "",
@@ -320,6 +330,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 description: parsed.description || "",
                 project_id: newForm.project_id,
                 visibility: parsed.visibility || "PUBLIC",
+                require_captcha: parsed.require_captcha || false,
                 fields: (parsed.fields || []).map((f: any) => ({
                     name: f.name || "",
                     label: f.label || "",
@@ -410,6 +421,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                         position: i,
                         is_visible: true,
                     })),
+                    require_captcha: newForm.require_captcha,
                 }),
             });
 
@@ -425,6 +437,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 description: "",
                 project_id: "",
                 visibility: "PUBLIC",
+                require_captcha: false,
                 fields: [{ name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email" }],
             });
             setEditorMode("basic");
@@ -513,12 +526,18 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
     };
 
     const generateJsSnippet = (form: Form, theme: FormTheme = formTheme) => {
+        // STRICT: Only use team key
+        const siteKey = teamCaptchaConfig?.site_key || "";
+        const hasCaptcha = form.require_captcha && siteKey;
+
         return `<!-- ${form.name} Form Script -->
+${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : ""}
 <div id="form-${form.slug}"></div>
 <script>
 (function() {
   const formSlug = "${form.slug}";
   const apiEndpoint = "${baseUrl}/api/forms/submit";
+  const captchaRequired = ${form.require_captcha ? "true" : "false"};
   
   // Theme configuration
   const theme = {
@@ -574,10 +593,16 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
     form.appendChild(wrapper);
   });
   
-  const submit = document.createElement("button");
-  submit.type = "submit";
-  submit.textContent = "Submit";
   submit.style.cssText = "background:" + theme.primaryColor + ";color:" + theme.buttonTextColor + ";border:none;padding:12px 28px;border-radius:" + theme.borderRadius + ";cursor:pointer;font-size:14px;font-weight:500;width:100%;margin-top:8px;";
+  
+  if (captchaRequired) {
+    const turnstileWrapper = document.createElement("div");
+    turnstileWrapper.className = "cf-turnstile";
+    turnstileWrapper.dataset.sitekey = "${siteKey}";
+    turnstileWrapper.style.marginBottom = "16px";
+    form.appendChild(turnstileWrapper);
+  }
+
   form.appendChild(submit);
   
   // Hover effect
@@ -599,6 +624,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
       body: JSON.stringify({
         form_slug: formSlug,
         data: data,
+        captcha_token: captchaRequired ? form.querySelector('[name="cf-turnstile-response"]')?.value : null,
         source_url: window.location.href,
         referrer: document.referrer
       })
@@ -1024,7 +1050,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                         </div>
 
                         {/* AI Prompt Input */}
-                        <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                        <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-lg border border-border">
                             <div className="flex items-start gap-3">
                                 <Sparkles className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
                                 <div className="flex-1 space-y-3">
@@ -1185,6 +1211,41 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                                             </Button>
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* Turnstile Captcha Settings */}
+                                <div className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <Shield className="h-5 w-5 text-blue-500" />
+                                            <div>
+                                                <Label className="text-base">Spam Protection (Turnstile)</Label>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Protect your form from bots using Cloudflare Turnstile
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Switch
+                                            checked={newForm.require_captcha}
+                                            onCheckedChange={(v) => setNewForm({ ...newForm, require_captcha: v })}
+                                        />
+                                    </div>
+
+                                    {/* Team Keys Info / Config Link */}
+                                    {newForm.require_captcha && (
+                                        <div className={`flex items-center gap-2 text-xs p-3 rounded mb-2 border ${teamCaptchaConfig ? "bg-blue-500/10 text-blue-500 border-blue-500/20" : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                                            }`}>
+                                            <Shield className="h-4 w-4 shrink-0" />
+                                            <span>
+                                                {teamCaptchaConfig
+                                                    ? "Active: Using centralized team keys."
+                                                    : "Warning: No team keys configured. Captcha will not work."}
+                                            </span>
+                                            <a href="/admin/captcha-config" target="_blank" className="underline hover:opacity-80 ml-auto font-medium">
+                                                {teamCaptchaConfig ? "Manage Keys" : "Configure Now"}
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-4">

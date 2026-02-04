@@ -6,7 +6,7 @@ import crypto from "crypto";
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { form_slug, data, source_url, referrer, utm_source, utm_medium, utm_campaign } = body;
+        const { form_slug, data, captcha_token, source_url, referrer, utm_source, utm_medium, utm_campaign } = body;
 
         if (!form_slug) {
             return NextResponse.json({ error: "Form slug required" }, { status: 400 });
@@ -30,6 +30,49 @@ export async function POST(req: NextRequest) {
 
         if (form.status !== "ACTIVE") {
             return NextResponse.json({ error: "Form is not active" }, { status: 400 });
+        }
+
+        // Verify Captcha if required
+        if (form.require_captcha) {
+            if (!captcha_token) {
+                return NextResponse.json({ error: "Captcha verification required" }, { status: 400 });
+            }
+
+            // Determine which keys to use
+            let secretKey = form.captcha_secret_key;
+
+            // If no form-specific key, try to fetch team config
+            if (!secretKey) {
+                const teamConfig = await (prismadb as any).teamCaptchaConfig.findUnique({
+                    where: { team_id: form.team_id }
+                });
+                if (teamConfig && teamConfig.secret_key) {
+                    secretKey = teamConfig.secret_key;
+                }
+            }
+
+            if (!secretKey) {
+                console.error(`Form ${form.id} requires captcha but has no secret key configured (form or team level)`);
+                return NextResponse.json({ error: "Form configuration error: missing captcha key" }, { status: 500 });
+            }
+
+            try {
+                const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+                const verifyRes = await fetch(verifyUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(captcha_token)}`,
+                });
+
+                const verifyData = await verifyRes.json();
+                if (!verifyData.success) {
+                    console.warn(`Captcha verification failed for form ${form.id}:`, verifyData["error-codes"]);
+                    return NextResponse.json({ error: "Captcha verification failed. Please try again." }, { status: 400 });
+                }
+            } catch (error) {
+                console.error("Error verifying Turnstile token:", error);
+                return NextResponse.json({ error: "Captcha service error" }, { status: 500 });
+            }
         }
 
         // Validate required fields

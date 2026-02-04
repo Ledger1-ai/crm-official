@@ -1,6 +1,7 @@
 {
   "name": "basaltcrm-app",
-  "version": "1.1.5d",
+  "version": "1.1.5e",
+  "author": "Michael Milton (BasaltHQ)",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",

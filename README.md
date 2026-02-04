@@ -1,6 +1,6 @@
 # BasaltCRM
 
-[![BasaltCRM Cover](public/images/basalt_cover.png)](https://basalthq.com)
+[![BasaltCRM Cover](public/images/basalt-cover.png)](https://basalthq.com)
 
 BasaltCRM is a premium open source CRM built on top of Next.js 14 using TypeScript, shadcn/ui, Prisma, and MongoDB. Feature-packed with AI-assisted workflows, intelligent automation, and a next-gen architecture.
 
@@ -17,11 +17,11 @@ BasaltCRM is a premium open source CRM built on top of Next.js 14 using TypeScri
 
 BasaltCRM is the first CRM that doesn't just manage your data—it actively works for you. From finding prospects to closing deals with voice AI, BasaltCRM is your unfair advantage.
 
-![Dashboard Preview](public/images/dashboard_final.png)
+![Dashboard Preview](public/dashboardgit.png)
 
 ## Online Demo
 
-You can try it here [demo.nextcrm.io](https://demo.nextcrm.io), login via Google account or create new user and password.
+You can try it here [crm.basalthq.com/en/sign-in](https://crm.basalthq.com/en/sign-in). BasaltCRM is free to enroll.
 
 ## Tech Stack + Features
 
@@ -83,7 +83,7 @@ We use [Resend](https://resend.com) + [React Email](https://react.email) for tem
 
 We use Tremor for high-performance dashboard analytics.
 
-![Reports Preview](public/images/reports_final.png)
+![Reports Preview](public/reports.png)
 
 ## Documentation
 
@@ -159,6 +159,13 @@ We welcome community contributions. Please open an issue for bugs or suggestions
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Ledger1-ai/crm-official&type=Timeline)](https://star-history.com/#Ledger1-ai/crm-official&Timeline)
+
+## Credits
+
+Special thanks to the original developer:
+
+- **Pavel Dovhomilja** ([@pdovhomilja](https://github.com/pdovhomilja))
+- Original Repository: [nextcrm-app](https://github.com/pdovhomilja/nextcrm-app)
 
 ## License
 

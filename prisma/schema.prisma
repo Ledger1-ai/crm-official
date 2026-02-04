@@ -968,6 +968,7 @@ model Team {
   email_config   TeamEmailConfig?
   sms_config     TeamSmsConfig?
   custom_roles   CustomRole[]
+  captcha_config TeamCaptchaConfig?
   RolePermission RolePermission[]
   workflows      crm_Workflow[]   @relation(name: "WorkflowTeam")
 }
@@ -1258,6 +1259,18 @@ model TeamSmsConfig {
   // Relations
   assigned_team Team @relation(fields: [team_id], references: [id])
 }
+
+model TeamCaptchaConfig {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  team_id    String   @unique @db.ObjectId
+  site_key   String
+  secret_key String
+  createdAt  DateTime @default(now()) @db.Date
+  updatedAt  DateTime @updatedAt @db.Date
+
+  assigned_team Team @relation(fields: [team_id], references: [id])
+}
+
 
 model chat_Sessions {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -1872,6 +1885,8 @@ model Form {
 
   // Settings
   require_captcha      Boolean  @default(false)
+  captcha_site_key     String?
+  captcha_secret_key   String?
   notify_emails        String[] // Emails to notify on submission
   webhook_url          String? // Optional webhook for submissions
   auto_respond         Boolean  @default(false)

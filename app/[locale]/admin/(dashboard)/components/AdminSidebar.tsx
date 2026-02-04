@@ -12,6 +12,7 @@ import {
     MessageSquare,
     Bot,
     Building2,
+    Shield,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -50,6 +51,7 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
         { label: "Email Settings", href: "/admin/settings", icon: Mail },
         { label: "SMS Configuration", href: "/admin/sms-config", icon: MessageSquare },
         { label: "AI Settings", href: "/admin/ai-settings", icon: Bot },
+        { label: "Captcha Config", href: "/admin/captcha-config", icon: Shield },
         ...(showModules ? [{ label: "Modules", href: "/admin/modules", icon: Package }] : []),
     ];
 

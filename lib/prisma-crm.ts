@@ -19,7 +19,7 @@ function computeCrmUrl(): string {
     throw new Error("Missing DATABASE_URL (or CRM_DATABASE_URL) for CRM Prisma client");
   }
 
-  const dbName = process.env.PRISMA_DB_NAME || "nextcrm";
+  const dbName = process.env.PRISMA_DB_NAME || "BasaltCRM";
   try {
     const u = new URL(base);
     if (!u.pathname || u.pathname === "/") {
@@ -36,7 +36,7 @@ function computeCrmUrl(): string {
 const crmUrl = computeCrmUrl();
 
 declare global {
-   
+
   var cachedPrismaCrm: PrismaClient | undefined;
 }
 

@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 # Params
 $acrName = 'ledger1acr'
 $acrImage = 'ledger1acr.azurecr.io/azure-realtime-gateway'
-$srcPath = 'u:\TUCCRM\nextcrm-app\aws\azure-gateway'
+$srcPath = 'u:\TUCCRM\basaltcrm-app\aws\azure-gateway'
 $subId = '0a8c8695-c09e-45cc-8a64-697faedee923'
 $rgName = 'ledger1-rt-gw'
 $appName = 'ledger1-gateway'

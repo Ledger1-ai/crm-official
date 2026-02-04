@@ -3,7 +3,7 @@
  *
  * This script:
  * - Connects to SOURCE and TARGET Mongo databases(same cluster, different DB names)
-  * - Copies all Prisma - modeled collections from SOURCE(e.g., nextcrm) into TARGET(BasaltCRM)
+  * - Copies all Prisma - modeled collections from SOURCE(e.g., BasaltCRM_Legacy) into TARGET(BasaltCRM)
     * - Reconciles Users by email, preserving TARGET user IDs when duplicates exist and remapping references
       * - Preserves ObjectId values when inserting new records to maintain relational integrity
         *
@@ -12,11 +12,11 @@
  * - BACKUP your databases before running.
  *
  * Environment variables(provide via CLI when running):
- * - SOURCE_DATABASE_URL(e.g., .../nextcrm?...)
+ * - SOURCE_DATABASE_URL(e.g., .../BasaltCRM_Legacy?...)
   * - TARGET_DATABASE_URL(e.g., .../ledger1crm?...)
   *
  * Example run on Windows(cmd.exe):
- * set SOURCE_DATABASE_URL = "mongodb+srv://user:pass@host/nextcrm?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000" && ^
+ * set SOURCE_DATABASE_URL = "mongodb+srv://user:pass@host/BasaltCRM_Legacy?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000" && ^
  * set TARGET_DATABASE_URL = "mongodb+srv://user:pass@host/ledger1crm?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000" && ^
  * npx ts - node./ scripts / migrate - to - ledger1crm.ts
   *

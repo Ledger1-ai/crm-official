@@ -4,7 +4,7 @@ export default async function getGithubRepoStars(): Promise<number> {
   try {
     const url =
       process.env.NEXT_PUBLIC_GITHUB_REPO_API ||
-      "https://api.github.com/repos/pdovhomilja/nextcrm-app";
+      "https://api.github.com/repos/Ledger1-ai/crm-official";
 
     // Prefer server-side token if available; fall back to NEXT_PUBLIC for compatibility
     const token =

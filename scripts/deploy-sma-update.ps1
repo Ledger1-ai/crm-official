@@ -20,8 +20,8 @@ Invoke-WebRequest -Uri $url -OutFile $codeZip
 Expand-Archive -Path $codeZip -DestinationPath $unpacked -Force
 
 # Replace handlers with our updated files from repo
-$localHandler = "u:\\TUCCRM\\nextcrm-app\\aws\\chime-sma-lambda\\handler.js"
-$localHandlerBasic = "u:\\TUCCRM\\nextcrm-app\\aws\\chime-sma-lambda\\handler-basic.js"
+$localHandler = "u:\\TUCCRM\\basaltcrm-app\\aws\\chime-sma-lambda\\handler.js"
+$localHandlerBasic = "u:\\TUCCRM\\basaltcrm-app\\aws\\chime-sma-lambda\\handler-basic.js"
 
 if (Test-Path $localHandler) {
   Copy-Item $localHandler (Join-Path $unpacked 'handler.js') -Force

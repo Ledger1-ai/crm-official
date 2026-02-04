@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /*
 Fetches Amazon Connect Streams SDK (connect-streams.js) and vendors it into:
-  nextcrm-app/public/connect/connect-streams.js
+  basaltcrm-app/public/connect/connect-streams.js
 
 Run:
-  node nextcrm-app/scripts/fetch-connect-streams.mjs
+  node basaltcrm-app/scripts/fetch-connect-streams.mjs
 
 Optional environment override:
   CONNECT_STREAMS_SOURCE_URL=https://your-internal-mirror/connect-streams.js
@@ -16,7 +16,7 @@ import path from 'path';
 import https from 'https';
 
 const workspaceRoot = path.resolve(path.join(process.cwd()));
-const outPath = path.resolve(path.join(workspaceRoot, 'nextcrm-app', 'public', 'connect', 'connect-streams.js'));
+const outPath = path.resolve(path.join(workspaceRoot, 'basaltcrm-app', 'public', 'connect', 'connect-streams.js'));
 
 const override = process.env.CONNECT_STREAMS_SOURCE_URL?.trim();
 const sources = [

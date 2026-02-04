@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { name, description, project_id, visibility, fields } = body;
+        const { name, description, project_id, visibility, fields, require_captcha, captcha_site_key, captcha_secret_key } = body;
 
         if (!name) {
             return NextResponse.json({ error: "Form name required" }, { status: 400 });
@@ -93,6 +93,9 @@ export async function POST(req: NextRequest) {
         // Only add optional fields if they have values
         if (description) formData.description = description;
         if (project_id && project_id !== "__none__") formData.project_id = project_id;
+        if (require_captcha !== undefined) formData.require_captcha = require_captcha;
+        if (captcha_site_key) formData.captcha_site_key = captcha_site_key;
+        if (captcha_secret_key) formData.captcha_secret_key = captcha_secret_key;
 
         const form = await (prismadb as any).form.create({
             data: {

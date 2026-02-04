@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 # Config
 $registry   = 'ledger1acr'
 $repo       = 'azure-realtime-gateway'
-$sourcePath = 'u:\TUCCRM\nextcrm-app\aws\azure-gateway'
+$sourcePath = 'u:\TUCCRM\basaltcrm-app\aws\azure-gateway'
 $subId      = '0a8c8695-c09e-45cc-8a64-697faedee923'
 $rgName     = 'ledger1-rt-gw'
 $appName    = 'ledger1-gateway'

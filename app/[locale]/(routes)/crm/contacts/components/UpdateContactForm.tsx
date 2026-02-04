@@ -581,7 +581,7 @@ export function UpdateContactForm({ initialData, setOpen }: NewTaskFormProps) {
                       <FormControl>
                         <Input
                           disabled={isLoading}
-                          placeholder="https://www.youtube.com/nextcrmio"
+                          placeholder="https://www.youtube.com/@basaltcrm"
                           {...field}
                         />
                       </FormControl>

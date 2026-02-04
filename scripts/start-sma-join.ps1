@@ -23,8 +23,8 @@ Write-Host "[ATTENDEE_ID] $attendeeId"
 # Persist join info for the web client to consume
 $joinInfo = @{ MeetingId = $meetingId; AttendeeId = $attendeeId; JoinToken = $joinToken; Region = $Region }
 $joinJson = $joinInfo | ConvertTo-Json -Compress
-Set-Content -Path "u:/TUCCRM/nextcrm-app/aws/chime-sma-lambda/last-join.json" -Value $joinJson -Encoding Ascii
-Write-Host "[JOIN_INFO_PATH] u:/TUCCRM/nextcrm-app/aws/chime-sma-lambda/last-join.json"
+Set-Content -Path "u:/TUCCRM/basaltcrm-app/aws/chime-sma-lambda/last-join.json" -Value $joinJson -Encoding Ascii
+Write-Host "[JOIN_INFO_PATH] u:/TUCCRM/basaltcrm-app/aws/chime-sma-lambda/last-join.json"
 
 # Initiate SMA call with ArgumentsMap containing the meeting join values (multiple key variants)
 aws chime-sdk-voice create-sip-media-application-call --region $Region --sip-media-application-id $SmaId --from-phone-number $FromPhone --to-phone-number $ToPhone --arguments-map MeetingId=$meetingId,AttendeeId=$attendeeId,JoinToken=$joinToken,X-Meeting-Id=$meetingId,X-Attendee-Id=$attendeeId,X-Join-Token=$joinToken | Out-Host

@@ -58,7 +58,7 @@ function loadSignatures(): Record<string, string[]> {
     ? path.isAbsolute(configured)
       ? configured
       : path.resolve(process.cwd(), configured)
-    : path.resolve(process.cwd(), "nextcrm-app/lib/scraper/tech/signatures.json");
+    : path.resolve(process.cwd(), "basaltcrm-app/lib/scraper/tech/signatures.json");
   try {
     const raw = fs.readFileSync(candidatePath, "utf-8");
     const parsed = JSON.parse(raw);

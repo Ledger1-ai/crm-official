@@ -72,7 +72,7 @@ $queuePick = Select-Item -Items $queues.QueueSummaryList -LabelProperty "Name" -
 $QueueId = $queuePick.Id
 Write-Host ("Selected QueueId: {0}" -f $QueueId) -ForegroundColor Yellow
 
-# Write .env.local in nextcrm-app root
+# Write .env.local in basaltcrm-app root
 $envPath = Join-Path (Split-Path $PSScriptRoot -Parent) ".env.local"
 Write-Host ("Writing environment file: {0}" -f $envPath) -ForegroundColor Cyan
 $envText = if (Test-Path $envPath) { Get-Content $envPath -Raw } else { "" }

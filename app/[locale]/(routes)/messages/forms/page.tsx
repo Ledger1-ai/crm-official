@@ -52,6 +52,12 @@ const FormsPage = async ({ params }: { params: Promise<{ locale: string }> }) =>
         orderBy: { title: "asc" },
     });
 
+    // Fetch team captcha configuration
+    // Fetch team captcha configuration
+    const teamCaptchaConfig = teamId ? await prismadb.teamCaptchaConfig.findUnique({
+        where: { team_id: teamId }
+    }) : null;
+
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || "https://yourdomain.com";
 
     return (
@@ -73,6 +79,7 @@ const FormsPage = async ({ params }: { params: Promise<{ locale: string }> }) =>
                     projects={projects}
                     baseUrl={baseUrl}
                     currentUserId={session.user.id}
+                    teamCaptchaConfig={teamCaptchaConfig}
                 />
             </Suspense>
         </Container>

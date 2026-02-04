@@ -3,13 +3,13 @@
 Prisma Mongo: ensure a database name is present for db push without changing .env
 
 - Reads DATABASE_URL from env
-- If no path database is present (e.g. mongodb+srv://user:pass@host), appends "/{PRISMA_DB_NAME}" (default: "nextcrm")
+- If no path database is present (e.g. mongodb+srv://user:pass@host), appends "/{PRISMA_DB_NAME}" (default: "BasaltCRM")
 - Preserves existing query string (?ssl=...&retryWrites=...)
 - Spawns "npx prisma db push" with the adjusted DATABASE_URL for this process only
 - Keeps your .env untouched to avoid impacting auth or other services reading a different default DB
 
 Configure via env (optional):
-  PRISMA_DB_NAME        -> database name to append (default: nextcrm)
+  PRISMA_DB_NAME        -> database name to append (default: BasaltCRM)
 */
 
 const { spawnSync } = require("child_process");
@@ -41,7 +41,7 @@ function main() {
     process.exit(1);
   }
 
-  const dbName = process.env.PRISMA_DB_NAME || "nextcrm";
+  const dbName = process.env.PRISMA_DB_NAME || "BasaltCRM";
   const adjusted = withDbName(base, dbName);
 
   // Informative log without leaking credentials (mask user:pass if present)

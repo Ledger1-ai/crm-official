@@ -2,7 +2,7 @@ import { prismadb } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const apiKey = req.headers.get("NEXTCRM_TOKEN");
+  const apiKey = req.headers.get("BASALT_TOKEN");
 
   // Get API key from headers
   if (!apiKey) {
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   // Here you would typically check the API key against a stored value
   // For example, you could fetch it from a database or environment variable
-  const storedApiKey = process.env.NEXTCRM_TOKEN; // Example of fetching from env
+  const storedApiKey = process.env.BASALT_TOKEN; // Example of fetching from env
   if (apiKey !== storedApiKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

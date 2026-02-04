@@ -49,7 +49,7 @@ const DEFAULT_PRIOR: Record<PatternName, number> = {
 const PRIOR_WEIGHT = 3; // Bayesian alpha weight applied to prior counts
 
 // File-based persistence
-const STORE_PATH = path.resolve(process.cwd(), "nextcrm-app/lib/scraper/ml/pattern-store.json");
+const STORE_PATH = path.resolve(process.cwd(), "basaltcrm-app/lib/scraper/ml/pattern-store.json");
 
 type StoreShape = { [domain: string]: DomainPattern };
 let storeCache: StoreShape | null = null;
