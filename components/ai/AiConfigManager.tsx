@@ -1,5 +1,7 @@
 "use client";
 
+// Force rebuild 1
+
 import { useState, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AiProvider, AiModel, TeamAiConfig } from "@prisma/client";
@@ -23,6 +25,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { ApiKeyModal } from "@/components/modals/api-key-modal";
+import {
+    OpenAIIcon,
+    AnthropicIcon,
+    AzureIcon,
+    GoogleIcon,
+    GrokIcon,
+    DeepSeekIcon,
+    PerplexityIcon,
+    MistralIcon
+} from "@/components/ai/ProviderIcons";
 
 interface AiConfigManagerProps {
     teamId: string;
@@ -32,61 +44,61 @@ interface AiConfigManagerProps {
 }
 
 // Provider metadata for beautiful cards
-const PROVIDER_META: Record<AiProvider, { name: string; color: string; gradient: string; icon: string; url: string }> = {
+const PROVIDER_META: Record<AiProvider, { name: string; color: string; gradient: string; icon: React.ReactNode; url: string }> = {
     OPENAI: {
         name: "OpenAI",
         color: "text-emerald-400",
         gradient: "from-emerald-500/20 to-green-500/20",
-        icon: "🤖",
+        icon: <OpenAIIcon className="w-8 h-8" />,
         url: "https://platform.openai.com/api-keys",
     },
     ANTHROPIC: {
         name: "Anthropic",
         color: "text-amber-400",
         gradient: "from-amber-500/20 to-orange-500/20",
-        icon: "🧠",
+        icon: <AnthropicIcon className="w-8 h-8" />,
         url: "https://console.anthropic.com/settings/keys",
     },
     AZURE: {
         name: "Azure OpenAI",
         color: "text-blue-400",
         gradient: "from-blue-500/20 to-cyan-500/20",
-        icon: "☁️",
+        icon: <AzureIcon className="w-8 h-8" />,
         url: "https://portal.azure.com/",
     },
     GOOGLE: {
         name: "Google AI",
         color: "text-violet-400",
         gradient: "from-violet-500/20 to-purple-500/20",
-        icon: "✨",
+        icon: <GoogleIcon className="w-7 h-7" />,
         url: "https://aistudio.google.com/apikey",
     },
     GROK: {
         name: "xAI Grok",
         color: "text-pink-400",
         gradient: "from-pink-500/20 to-rose-500/20",
-        icon: "🚀",
+        icon: <GrokIcon className="w-6 h-6" />,
         url: "https://console.x.ai/",
     },
     DEEPSEEK: {
         name: "DeepSeek",
         color: "text-teal-400",
         gradient: "from-teal-500/20 to-cyan-500/20",
-        icon: "🔍",
+        icon: <DeepSeekIcon className="w-8 h-8" />,
         url: "https://platform.deepseek.com/",
     },
     PERPLEXITY: {
         name: "Perplexity",
         color: "text-indigo-400",
         gradient: "from-indigo-500/20 to-blue-500/20",
-        icon: "🔮",
+        icon: <PerplexityIcon className="w-8 h-8" />,
         url: "https://docs.perplexity.ai/",
     },
     MISTRAL: {
         name: "Mistral AI",
         color: "text-orange-400",
         gradient: "from-orange-500/20 to-red-500/20",
-        icon: "💨",
+        icon: <MistralIcon className="w-8 h-8" />,
         url: "https://console.mistral.ai/api-keys",
     },
 };
@@ -268,7 +280,7 @@ export const AiConfigManager = ({
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className={`p-3 rounded-xl bg-gradient-to-br ${meta.gradient} text-2xl shadow-inner`}>
+                                        <div className={`p-3 rounded-xl bg-gradient-to-br ${meta.gradient} ${meta.color} text-2xl shadow-inner`}>
                                             {meta.icon}
                                         </div>
                                         <div>

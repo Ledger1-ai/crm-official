@@ -10,6 +10,7 @@ import { FormSubmissionsView } from "../../../submissions/components/FormSubmiss
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExportButton } from "./components/ExportButton";
 
 const SingleFormSubmissionsPage = async ({ params, searchParams }: { params: Promise<{ locale: string, formId: string }>, searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) => {
     const { locale, formId } = await params;
@@ -109,13 +110,14 @@ const SingleFormSubmissionsPage = async ({ params, searchParams }: { params: Pro
             title={`Submissions: ${form.name}`}
             description={`View and manage submissions for ${form.name}`}
         >
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
                 <Link href={`/${locale}/messages/forms`}>
                     <Button variant="ghost" size="sm" className="gap-2">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Forms
                     </Button>
                 </Link>
+                <ExportButton formId={formId} />
             </div>
             <Suspense fallback={<SuspenseLoading />}>
                 <FormSubmissionsView

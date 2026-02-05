@@ -32,6 +32,7 @@ export async function assignInvoiceToOpportunity(invoiceId: string, opportunityI
             // Handle Project Opportunity (Feature)
             const opportunity = await prismadb.project_Opportunities.findUnique({
                 where: { id: opportunityId },
+                include: { invoices: true }
             });
             if (!opportunity) throw new Error("Project Opportunity not found");
 
@@ -45,14 +46,30 @@ export async function assignInvoiceToOpportunity(invoiceId: string, opportunityI
                 },
             });
 
-            // Link in Project Opportunity AND Update Value
+            // Calculate new total including the new invoice
+            // Note: The new invoice isn't in 'opportunity.invoices' yet because we just fetched it before linking (or race condition).
+            // Safer to re-fetch or add manually.
+            // Let's re-fetch to be safe and clean.
+
+            const updatedOpportunityInvoices = await prismadb.project_Opportunities.findUnique({
+                where: { id: opportunityId },
+                include: { invoices: true }
+            });
+
+            const totalValue = updatedOpportunityInvoices?.invoices.reduce((acc, inv) => {
+                const val = parseFloat(inv.invoice_amount?.replace(/[^0-9.]/g, '') || "0");
+                return acc + (isNaN(val) ? 0 : val);
+            }, 0) || 0;
+
+
+            // Update Value
             await prismadb.project_Opportunities.update({
                 where: { id: opportunityId },
                 data: {
                     invoices: {
-                        connect: { id: invoiceId }
+                        connect: { id: invoiceId } // Ensure connected if not already
                     },
-                    valueEstimate: amountInt, // Update estimate
+                    valueEstimate: Math.round(totalValue),
                 },
             });
 
@@ -63,6 +80,7 @@ export async function assignInvoiceToOpportunity(invoiceId: string, opportunityI
             });
             if (!opportunity) throw new Error("Opportunity not found");
 
+            // 1. Connect the invoice
             await prismadb.invoices.update({
                 where: { id: invoiceId },
                 data: {
@@ -77,18 +95,34 @@ export async function assignInvoiceToOpportunity(invoiceId: string, opportunityI
                 data: {
                     invoices: {
                         connect: { id: invoiceId }
-                    },
-                    budget: amountInt,
-                    expected_revenue: amountInt,
+                    }
+                }
+            });
+
+            // 2. Fetch all invoices to sum them up
+            const updatedOpp = await prismadb.crm_Opportunities.findUnique({
+                where: { id: opportunityId },
+                include: { invoices: true }
+            });
+
+            const totalRevenue = updatedOpp?.invoices.reduce((acc, inv) => {
+                const val = parseFloat(inv.invoice_amount?.replace(/[^0-9.]/g, '') || "0");
+                return acc + (isNaN(val) ? 0 : val);
+            }, 0) || 0;
+
+            // 3. Update the budget/revenue
+            await prismadb.crm_Opportunities.update({
+                where: { id: opportunityId },
+                data: {
+                    budget: Math.round(totalRevenue),
+                    expected_revenue: Math.round(totalRevenue),
                 },
             });
         }
 
         revalidatePath("/invoice");
-        return { success: true };
-
-        revalidatePath("/invoice");
         revalidatePath(`/crm/opportunities/${opportunityId}`);
+        revalidatePath("/", "layout"); // Update everything including dashboard
 
         return { success: true };
     } catch (error) {

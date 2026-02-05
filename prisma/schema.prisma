@@ -1847,6 +1847,7 @@ enum FormFieldType {
   DATETIME
   FILE
   HIDDEN
+  CONSENT
 }
 
 enum FormStatus {
@@ -1861,6 +1862,11 @@ enum FormVisibility {
   PRIVATE // Submissions visible only to form creator
 }
 
+enum SubmissionBehavior {
+  MESSAGE
+  REDIRECT
+}
+
 model Form {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   v  Int?   @map("__v")
@@ -1872,6 +1878,7 @@ model Form {
 
   // Form configuration
   status          FormStatus @default(DRAFT)
+  submission_behavior SubmissionBehavior @default(MESSAGE)
   success_message String?    @default("Thank you for your submission!")
   redirect_url    String? // Optional redirect after submission
 
@@ -1900,6 +1907,7 @@ model Form {
 
   // Stats (denormalized)
   submission_count Int @default(0)
+  view_count       Int @default(0)
 
   // Timestamps
   createdAt DateTime  @default(now()) @db.Date
@@ -1908,9 +1916,29 @@ model Form {
   // Relations
   fields      FormField[]
   submissions FormSubmission[]
+  views       FormView[]
 
   @@index([team_id, status])
   @@index([project_id])
+}
+
+model FormView {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  form_id String @db.ObjectId
+  
+  // Metadata
+  ip_address String?
+  user_agent String?
+  referer    String?
+  
+  // Timestamps
+  viewedAt DateTime @default(now())
+
+  // Relations
+  form Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  @@index([form_id])
+  @@index([viewedAt])
 }
 
 model FormField {

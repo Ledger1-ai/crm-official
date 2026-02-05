@@ -70,7 +70,24 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { name, description, project_id, visibility, fields, require_captcha, captcha_site_key, captcha_secret_key } = body;
+        const {
+            name,
+            description,
+            project_id,
+            visibility,
+            fields,
+            require_captcha,
+            captcha_site_key,
+            captcha_secret_key,
+            webhook_url,
+            submission_behavior,
+            redirect_url,
+            success_message,
+            notify_emails,
+            auto_respond,
+            auto_respond_subject,
+            auto_respond_body
+        } = body;
 
         if (!name) {
             return NextResponse.json({ error: "Form name required" }, { status: 400 });
@@ -96,6 +113,14 @@ export async function POST(req: NextRequest) {
         if (require_captcha !== undefined) formData.require_captcha = require_captcha;
         if (captcha_site_key) formData.captcha_site_key = captcha_site_key;
         if (captcha_secret_key) formData.captcha_secret_key = captcha_secret_key;
+        if (webhook_url) formData.webhook_url = webhook_url;
+        if (submission_behavior) formData.submission_behavior = submission_behavior;
+        if (redirect_url) formData.redirect_url = redirect_url;
+        if (success_message) formData.success_message = success_message;
+        if (notify_emails) formData.notify_emails = notify_emails;
+        if (auto_respond !== undefined) formData.auto_respond = auto_respond;
+        if (auto_respond_subject) formData.auto_respond_subject = auto_respond_subject;
+        if (auto_respond_body) formData.auto_respond_body = auto_respond_body;
 
         const form = await (prismadb as any).form.create({
             data: {

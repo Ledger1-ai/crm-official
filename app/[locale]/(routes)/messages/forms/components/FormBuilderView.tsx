@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import {
     Plus, Copy, Code, Eye, Trash2, Settings, ChevronDown, ChevronRight,
     GripVertical, FileText, Lock, Globe, Users, Sparkles, Braces, Loader2,
-    Palette, RefreshCw, Search, BarChart3, ExternalLink, MoreHorizontal, Shield
+    Palette, RefreshCw, Search, BarChart3, ExternalLink, MoreHorizontal, Shield,
+    LineChart, PenLine
 } from "lucide-react";
+import AnalyticsCharts from "@/app/[locale]/cms/(dashboard)/components/AnalyticsCharts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -81,6 +83,14 @@ interface Form {
     require_captcha: boolean;
     captcha_site_key?: string;
     captcha_secret_key?: string;
+    webhook_url?: string;
+    submission_behavior: "MESSAGE" | "REDIRECT";
+    redirect_url?: string;
+    success_message?: string;
+    notify_emails?: string[];
+    auto_respond: boolean;
+    auto_respond_subject?: string;
+    auto_respond_body?: string;
     fields: FormField[];
     _count: {
         submissions: number;
@@ -120,6 +130,7 @@ const FIELD_TYPES = [
     { value: "DATETIME", label: "Date & Time" },
     { value: "FILE", label: "File Upload" },
     { value: "HIDDEN", label: "Hidden" },
+    { value: "CONSENT", label: "Consent / Terms" },
 ];
 
 const LEAD_FIELD_MAPPINGS = [
@@ -130,6 +141,7 @@ const LEAD_FIELD_MAPPINGS = [
     { value: "lastName", label: "Last Name" },
     { value: "name", label: "Full Name" },
     { value: "company", label: "Company" },
+    { value: "jobTitle", label: "Job Title" },
     { value: "website", label: "Website" },
     { value: "address", label: "Address" },
     { value: "city", label: "City" },
@@ -137,6 +149,72 @@ const LEAD_FIELD_MAPPINGS = [
     { value: "zip", label: "ZIP Code" },
     { value: "country", label: "Country" },
 ];
+
+const FORM_TEMPLATES = {
+    blank: {
+        id: "blank",
+        name: "Blank Form",
+        description: "Start from scratch with a clean slate.",
+        fields: [
+            { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email" }
+        ]
+    },
+    contact: {
+        id: "contact",
+        name: "Contact Us",
+        description: "Standard contact form with Name, Email, and Message.",
+        fields: [
+            { name: "name", label: "Name", field_type: "TEXT", is_required: true, lead_field_mapping: "name", placeholder: "John Doe" },
+            { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email", placeholder: "john@example.com" },
+            { name: "message", label: "Message", field_type: "TEXTAREA", is_required: true, lead_field_mapping: "__none__", placeholder: "How can we help you?" }
+        ]
+    },
+    quote: {
+        id: "quote",
+        name: "Quote Request",
+        description: "Collect detailed requirements, budget, and file attachments.",
+        fields: [
+            { name: "name", label: "Name", field_type: "TEXT", is_required: true, lead_field_mapping: "name", placeholder: "Your Name" },
+            { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email", placeholder: "your@email.com" },
+            { name: "company", label: "Company", field_type: "TEXT", is_required: false, lead_field_mapping: "company", placeholder: "Company Name" },
+            { name: "details", label: "Project Details", field_type: "TEXTAREA", is_required: true, lead_field_mapping: "__none__", placeholder: "Describe your project..." },
+            { name: "budget", label: "Estimated Budget", field_type: "SELECT", options: ["< $1k", "$1k - $5k", "$5k - $10k", "$10k+"], is_required: false, lead_field_mapping: "__none__" },
+            { name: "rfp", label: "Attach RFP / Specs", field_type: "FILE", is_required: false, lead_field_mapping: "__none__" }
+        ]
+    },
+    newsletter: {
+        id: "newsletter",
+        name: "Newsletter Signup",
+        description: "Simple email capture for list building.",
+        fields: [
+            { name: "email", label: "Email Address", field_type: "EMAIL", is_required: true, lead_field_mapping: "email", placeholder: "Enter your email" }
+        ]
+    },
+    job_application: {
+        id: "job_application",
+        name: "Job Application",
+        description: "Collect applications with resume upload.",
+        fields: [
+            { name: "name", label: "Full Name", field_type: "TEXT", is_required: true, lead_field_mapping: "name", placeholder: "Candidate Name" },
+            { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email", placeholder: "email@example.com" },
+            { name: "phone", label: "Phone", field_type: "PHONE", is_required: true, lead_field_mapping: "phone", placeholder: "+1 (555) 000-0000" },
+            { name: "resume", label: "Resume / CV", field_type: "FILE", is_required: true, lead_field_mapping: "__none__" },
+            { name: "portfolio", label: "Portfolio URL", field_type: "TEXT", is_required: false, lead_field_mapping: "__none__", placeholder: "https://portfolio.com" }
+        ]
+    },
+    support_ticket: {
+        id: "support_ticket",
+        name: "Support Ticket",
+        description: "Support request with priority level.",
+        fields: [
+            { name: "name", label: "Name", field_type: "TEXT", is_required: true, lead_field_mapping: "name", placeholder: "Your Name" },
+            { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email", placeholder: "your@email.com" },
+            { name: "priority", label: "Priority", field_type: "SELECT", options: ["Low", "Medium", "High", "Urgent"], is_required: true, lead_field_mapping: "__none__" },
+            { name: "category", label: "Category", field_type: "SELECT", options: ["General", "Technical", "Billing", "Feature Request"], is_required: true, lead_field_mapping: "__none__" },
+            { name: "issue", label: "Issue Description", field_type: "TEXTAREA", is_required: true, lead_field_mapping: "__none__", placeholder: "Please describe your issue..." }
+        ]
+    }
+};
 
 export function FormBuilderView({ forms: initialForms, projects, baseUrl, currentUserId, teamCaptchaConfig }: FormBuilderViewProps) {
     const { toast } = useToast();
@@ -149,6 +227,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSavingTheme, setIsSavingTheme] = useState(false);
     const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set());
+    const [selectedTemplate, setSelectedTemplate] = useState("blank");
 
     // NEW: View toggle, search, and delete state
     const [viewMode, setViewMode] = useState<ViewMode>("table");
@@ -159,12 +238,38 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
     // Theme customization state
     const [formTheme, setFormTheme] = useState<FormTheme>(DEFAULT_THEME);
 
+    // Settings state
+    const [formSettings, setFormSettings] = useState<Partial<Form>>({});
+    const [activeSettingsTab, setActiveSettingsTab] = useState("general");
+    const [analyticsData, setAnalyticsData] = useState<{ kpi: any[], chartData: any[] } | null>(null);
+
+    useEffect(() => {
+        setAnalyticsData(null);
+    }, [selectedForm]);
+
+    useEffect(() => {
+        if (activeSettingsTab === 'analytics' && selectedForm && !analyticsData) {
+            fetch(`/api/forms/${selectedForm.id}/analytics`)
+                .then(res => res.json())
+                .then(data => setAnalyticsData(data))
+                .catch(err => console.error("Failed to load analytics", err));
+        }
+    }, [activeSettingsTab, selectedForm, analyticsData]);
+
     const [newForm, setNewForm] = useState({
         name: "",
         description: "",
         project_id: "",
         visibility: "PUBLIC" as "PUBLIC" | "PRIVATE",
         require_captcha: false,
+        webhook_url: "",
+        submission_behavior: "MESSAGE" as "MESSAGE" | "REDIRECT",
+        redirect_url: "",
+        success_message: "",
+        notify_emails: [] as string[],
+        auto_respond: false,
+        auto_respond_subject: "",
+        auto_respond_body: "",
         fields: [
             { name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email" },
         ] as Partial<FormField>[],
@@ -260,6 +365,11 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
             description: newForm.description,
             visibility: newForm.visibility,
             require_captcha: newForm.require_captcha,
+            webhook_url: newForm.webhook_url,
+            notify_emails: newForm.notify_emails,
+            auto_respond: newForm.auto_respond,
+            auto_respond_subject: newForm.auto_respond_subject,
+            auto_respond_body: newForm.auto_respond_body,
             fields: newForm.fields.map((f, i) => ({
                 name: f.name,
                 label: f.label,
@@ -285,6 +395,14 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 project_id: newForm.project_id,
                 visibility: parsed.visibility || "PUBLIC",
                 require_captcha: parsed.require_captcha || false,
+                webhook_url: parsed.webhook_url || "",
+                submission_behavior: parsed.submission_behavior || "MESSAGE",
+                redirect_url: parsed.redirect_url || "",
+                success_message: parsed.success_message || "Thank you for your submission!",
+                notify_emails: parsed.notify_emails || [],
+                auto_respond: parsed.auto_respond || false,
+                auto_respond_subject: parsed.auto_respond_subject || "",
+                auto_respond_body: parsed.auto_respond_body || "",
                 fields: (parsed.fields || []).map((f: any) => ({
                     name: f.name || "",
                     label: f.label || "",
@@ -331,6 +449,14 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 project_id: newForm.project_id,
                 visibility: parsed.visibility || "PUBLIC",
                 require_captcha: parsed.require_captcha || false,
+                webhook_url: parsed.webhook_url || "",
+                submission_behavior: parsed.submission_behavior || "MESSAGE",
+                redirect_url: parsed.redirect_url || "",
+                success_message: parsed.success_message || "Thank you for your submission!",
+                notify_emails: parsed.notify_emails || [],
+                auto_respond: parsed.auto_respond || false,
+                auto_respond_subject: parsed.auto_respond_subject || "",
+                auto_respond_body: parsed.auto_respond_body || "",
                 fields: (parsed.fields || []).map((f: any) => ({
                     name: f.name || "",
                     label: f.label || "",
@@ -422,6 +548,14 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                         is_visible: true,
                     })),
                     require_captcha: newForm.require_captcha,
+                    webhook_url: newForm.webhook_url,
+                    submission_behavior: newForm.submission_behavior,
+                    redirect_url: newForm.redirect_url,
+                    success_message: newForm.success_message,
+                    notify_emails: newForm.notify_emails,
+                    auto_respond: newForm.auto_respond,
+                    auto_respond_subject: newForm.auto_respond_subject,
+                    auto_respond_body: newForm.auto_respond_body,
                 }),
             });
 
@@ -438,8 +572,17 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 project_id: "",
                 visibility: "PUBLIC",
                 require_captcha: false,
+                webhook_url: "",
+                submission_behavior: "MESSAGE",
+                redirect_url: "",
+                success_message: "",
+                notify_emails: [],
+                auto_respond: false,
+                auto_respond_subject: "",
+                auto_respond_body: "",
                 fields: [{ name: "email", label: "Email", field_type: "EMAIL", is_required: true, lead_field_mapping: "email" }],
             });
+            setSelectedTemplate("blank");
             setEditorMode("basic");
             setJsonValue("");
             window.location.reload();
@@ -468,6 +611,26 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
 
     const showCustomize = (form: Form) => {
         setSelectedForm(form);
+
+        // Load settings state
+        setFormSettings({
+            name: form.name,
+            description: form.description || "",
+            visibility: form.visibility,
+            status: form.status,
+            submission_behavior: form.submission_behavior || "MESSAGE",
+            redirect_url: form.redirect_url || "",
+            success_message: form.success_message || "Thank you for your submission!",
+            require_captcha: form.require_captcha,
+            captcha_site_key: form.captcha_site_key || "",
+            captcha_secret_key: form.captcha_secret_key || "",
+            notify_emails: form.notify_emails || [],
+            webhook_url: form.webhook_url || "",
+            auto_respond: form.auto_respond,
+            auto_respond_subject: form.auto_respond_subject || "",
+            auto_respond_body: form.auto_respond_body || "",
+        });
+
         // Load existing theme
         if (form.custom_css) {
             try {
@@ -482,7 +645,7 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
         setShowCustomizeDialog(true);
     };
 
-    const saveTheme = async () => {
+    const saveSettings = async () => {
         if (!selectedForm) return;
         setIsSavingTheme(true);
         try {
@@ -490,16 +653,23 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    ...formSettings,
                     primary_color: formTheme.primaryColor,
                     custom_css: JSON.stringify(formTheme),
                 }),
             });
-            if (!response.ok) throw new Error("Failed to save theme");
-            toast({ title: "Success", description: "Theme saved successfully" });
+            if (!response.ok) throw new Error("Failed to save settings");
+
+            toast({ title: "Success", description: "Form settings saved successfully" });
             setShowCustomizeDialog(false);
-            window.location.reload();
+
+            // Optimistic update or reload
+            // window.location.reload(); // Reloading is safest for now
+            // But let's try to update local state to avoid full reload flicker if possible
+            setForms(prev => prev.map(f => f.id === selectedForm.id ? { ...f, ...formSettings, primary_color: formTheme.primaryColor, custom_css: JSON.stringify(formTheme) } as Form : f));
+
         } catch (error) {
-            toast({ title: "Error", description: "Failed to save theme", variant: "destructive" });
+            toast({ title: "Error", description: "Failed to save settings", variant: "destructive" });
         } finally {
             setIsSavingTheme(false);
         }
@@ -557,6 +727,7 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
   
   const form = document.createElement("form");
   form.id = "crm-form-" + formSlug;
+  form.enctype = "multipart/form-data"; // Enable file uploads
   form.style.cssText = "max-width:500px;font-family:" + theme.fontFamily + ";background:" + theme.backgroundColor + ";padding:24px;border-radius:" + theme.borderRadius + ";";
   
   const fields = ${JSON.stringify(form.fields.filter(f => f.field_type !== "HIDDEN").map(f => ({
@@ -571,28 +742,44 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
     const wrapper = document.createElement("div");
     wrapper.style.marginBottom = "16px";
     
-    const label = document.createElement("label");
-    label.textContent = field.label + (field.required ? " *" : "");
-    label.style.cssText = "display:block;margin-bottom:6px;font-weight:500;color:" + theme.labelColor + ";font-size:14px;";
-    wrapper.appendChild(label);
+    // Label
+    if (field.type !== "hidden") {
+        const label = document.createElement("label");
+        label.textContent = field.label + (field.required ? " *" : "");
+        label.style.cssText = "display:block;margin-bottom:6px;font-weight:500;color:" + theme.labelColor + ";font-size:14px;";
+        wrapper.appendChild(label);
+    }
     
     let input;
     if (field.type === "textarea") {
       input = document.createElement("textarea");
       input.rows = 4;
+    } else if (field.type === "select") {
+       input = document.createElement("select");
+       // Add options if available (logic omitted for brevity in snippets unless passed)
     } else {
       input = document.createElement("input");
-      input.type = field.type === "email" ? "email" : field.type === "phone" ? "tel" : "text";
+      // Map 'file' type correctly
+      input.type = field.type === "file" ? "file" : 
+                   field.type === "email" ? "email" : 
+                   field.type === "phone" ? "tel" : "text";
     }
+    
     input.name = field.name;
     input.required = field.required;
-    input.placeholder = field.placeholder || "";
-    input.style.cssText = "width:100%;padding:10px 12px;border:1px solid " + theme.borderColor + ";border-radius:" + theme.borderRadius + ";font-size:14px;background:" + theme.inputBgColor + ";color:" + theme.textColor + ";box-sizing:border-box;";
-    wrapper.appendChild(input);
+    if (field.placeholder && field.type !== "file") input.placeholder = field.placeholder;
     
+    // Styling
+    input.style.cssText = "width:100%;padding:10px 12px;border:1px solid " + theme.borderColor + ";border-radius:" + theme.borderRadius + ";font-size:14px;background:" + theme.inputBgColor + ";color:" + theme.textColor + ";box-sizing:border-box;";
+    
+    // Wrapper append
+    wrapper.appendChild(input);
     form.appendChild(wrapper);
   });
   
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.textContent = "Submit";
   submit.style.cssText = "background:" + theme.primaryColor + ";color:" + theme.buttonTextColor + ";border:none;padding:12px 28px;border-radius:" + theme.borderRadius + ";cursor:pointer;font-size:14px;font-weight:500;width:100%;margin-top:8px;";
   
   if (captchaRequired) {
@@ -615,19 +802,27 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
     submit.textContent = "Submitting...";
     submit.style.opacity = "0.7";
     
-    const data = {};
-    new FormData(form).forEach(function(v, k) { data[k] = v; });
+    // Use FormData for File Upload Support
+    const formData = new FormData(form);
+    
+    // Append System Fields
+    formData.append("form_slug", formSlug);
+    formData.append("source_url", window.location.href);
+    if (document.referrer) formData.append("referrer", document.referrer);
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("utm_source")) formData.append("utm_source", urlParams.get("utm_source"));
+    if (urlParams.has("utm_medium")) formData.append("utm_medium", urlParams.get("utm_medium"));
+    if (urlParams.has("utm_campaign")) formData.append("utm_campaign", urlParams.get("utm_campaign"));
+
+    if (captchaRequired) {
+        const token = form.querySelector('[name="cf-turnstile-response"]')?.value;
+        if (token) formData.append("captcha_token", token);
+    }
     
     fetch(apiEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        form_slug: formSlug,
-        data: data,
-        captcha_token: captchaRequired ? form.querySelector('[name="cf-turnstile-response"]')?.value : null,
-        source_url: window.location.href,
-        referrer: document.referrer
-      })
+      body: formData // Browser sets Content-Type: multipart/form-data with boundary
     })
     .then(function(r) { return r.json(); })
     .then(function(result) {
@@ -1027,6 +1222,37 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
 
                     {/* Scrollable Content Area */}
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4" style={{ maxHeight: 'calc(90vh - 180px)' }}>
+                        {/* Template Selection */}
+                        <div className="space-y-3">
+                            <Label>Choose a Template</Label>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {Object.entries(FORM_TEMPLATES).map(([key, template]) => (
+                                    <div
+                                        key={key}
+                                        className={`
+                                            cursor-pointer rounded-lg border p-4 hover:bg-muted/50 transition-all
+                                            ${selectedTemplate === key ? 'border-primary ring-1 ring-primary bg-primary/5' : 'border-border'}
+                                        `}
+                                        onClick={() => {
+                                            setSelectedTemplate(key);
+                                            // Auto-fill description if empty or default
+                                            if (!newForm.description || Object.values(FORM_TEMPLATES).some(t => t.description === newForm.description)) {
+                                                setNewForm(prev => ({ ...prev, description: template.description }));
+                                            }
+                                            // Update fields based on template
+                                            setNewForm(prev => ({
+                                                ...prev,
+                                                fields: template.fields.map(f => ({ ...f, position: 0 })) // Position will be fixed on submit
+                                            }));
+                                        }}
+                                    >
+                                        <div className="font-medium text-sm mb-1">{template.name}</div>
+                                        <div className="text-xs text-muted-foreground line-clamp-2">{template.description}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Mode Toggle */}
                         <div className="flex items-center justify-between border-b pb-4">
                             <div className="flex items-center gap-2">
@@ -1172,6 +1398,91 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                                     />
                                 </div>
 
+
+
+                                {/* Notifications & Auto-Reply Settings */}
+                                <div className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Users className="h-5 w-5 text-blue-500" />
+                                        <Label className="text-base">Notifications & Auto-Reply</Label>
+                                    </div>
+
+                                    <div className="grid gap-4 pl-8">
+                                        <div className="grid gap-2">
+                                            <Label className="text-sm">Team Notification Emails</Label>
+                                            <p className="text-xs text-muted-foreground">Comma-separated list of emails to notify when a submission is received (in addition to you).</p>
+                                            <Input
+                                                value={newForm.notify_emails ? newForm.notify_emails.join(", ") : ""}
+                                                onChange={(e) => setNewForm({ ...newForm, notify_emails: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
+                                                placeholder="colleague@example.com, sales@example.com"
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-2">
+                                            <div className="space-y-0.5">
+                                                <Label className="text-sm">Send Auto-Reply to Lead</Label>
+                                                <p className="text-xs text-muted-foreground">Send a confirmation email to the person who submitted the form.</p>
+                                            </div>
+                                            <Switch
+                                                checked={newForm.auto_respond}
+                                                onCheckedChange={(v) => setNewForm({ ...newForm, auto_respond: v })}
+                                            />
+                                        </div>
+
+                                        {newForm.auto_respond && (
+                                            <div className="space-y-3 pt-2 border-l-2 pl-3 ml-1 border-blue-500/20">
+                                                <div className="space-y-1">
+                                                    <Label className="text-xs">Email Subject</Label>
+                                                    <Input
+                                                        value={newForm.auto_respond_subject || ""}
+                                                        onChange={(e) => setNewForm({ ...newForm, auto_respond_subject: e.target.value })}
+                                                        placeholder="We received your message"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <div className="flex justify-between items-center">
+                                                        <Label className="text-xs">Email Body</Label>
+                                                        <div className="flex items-center gap-1">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-6 px-2 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    toast({ title: "AI Feature", description: "Enhance email capability coming soon." });
+                                                                }}
+                                                            >
+                                                                <Sparkles className="h-3 w-3 mr-1" />
+                                                                AI Enhance
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-6 px-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    toast({ title: "AI Feature", description: "Write with AI capability coming soon." });
+                                                                }}
+                                                            >
+                                                                <PenLine className="h-3 w-3 mr-1" />
+                                                                Write with AI
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                    <Textarea
+                                                        value={newForm.auto_respond_body || ""}
+                                                        onChange={(e) => setNewForm({ ...newForm, auto_respond_body: e.target.value })}
+                                                        placeholder="Thank you for contacting us..."
+                                                        rows={3}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                                 {/* Visibility Toggle */}
                                 <div className="p-4 border rounded-lg bg-muted/50">
                                     <div className="flex items-center justify-between">
@@ -1246,6 +1557,75 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                                             </a>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Integrations / Webhook */}
+                                <div className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="bg-purple-500/10 p-1 rounded">
+                                            <ExternalLink className="h-5 w-5 text-purple-600" />
+                                        </div>
+                                        <Label className="text-base">Integrations (Webhook)</Label>
+                                    </div>
+                                    <div className="grid gap-2 pl-8">
+                                        <Label className="text-sm">Webhook URL</Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            Send submission data to an external URL (e.g., Zapier, Make, Slack).
+                                        </p>
+                                        <Input
+                                            value={newForm.webhook_url || ""}
+                                            onChange={(e) => setNewForm({ ...newForm, webhook_url: e.target.value })}
+                                            placeholder="https://hooks.zapier.com/..."
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Submission Behavior */}
+                                <div className="p-4 border rounded-lg bg-muted/50 space-y-4">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <ChevronRight className="h-5 w-5 text-gray-500" />
+                                        <Label className="text-base">Submission Behavior</Label>
+                                    </div>
+                                    <div className="grid gap-4 pl-8">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm">After Submission</Label>
+                                            <div className="flex gap-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="radio"
+                                                        id="behavior-message"
+                                                        name="submission_behavior"
+                                                        className="h-4 w-4 text-primary"
+                                                        checked={newForm.submission_behavior === "MESSAGE"}
+                                                        onChange={() => setNewForm({ ...newForm, submission_behavior: "MESSAGE" })}
+                                                    />
+                                                    <Label htmlFor="behavior-message" className="font-normal cursor-pointer">Show Message</Label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="radio"
+                                                        id="behavior-redirect"
+                                                        name="submission_behavior"
+                                                        className="h-4 w-4 text-primary"
+                                                        checked={newForm.submission_behavior === "REDIRECT"}
+                                                        onChange={() => setNewForm({ ...newForm, submission_behavior: "REDIRECT" })}
+                                                    />
+                                                    <Label htmlFor="behavior-redirect" className="font-normal cursor-pointer">Redirect to URL</Label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {newForm.submission_behavior === "REDIRECT" && (
+                                            <div className="space-y-2">
+                                                <Label className="text-sm">Redirect URL</Label>
+                                                <Input
+                                                    value={newForm.redirect_url || ""}
+                                                    onChange={(e) => setNewForm({ ...newForm, redirect_url: e.target.value })}
+                                                    placeholder="https://example.com/thank-you"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">
@@ -1353,281 +1733,309 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                 </DialogContent>
             </Dialog>
 
-            {/* Customize Theme Dialog */}
+            {/* Form Settings Dialog */}
             <Dialog open={showCustomizeDialog} onOpenChange={setShowCustomizeDialog}>
-                <DialogContent className="max-w-4xl max-h-[90vh]">
-                    <DialogHeader>
-                        <DialogTitle>Customize Form: {selectedForm?.name}</DialogTitle>
+                <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
+                    <DialogHeader className="px-6 py-4 border-b">
+                        <DialogTitle>Form Settings: {selectedForm?.name}</DialogTitle>
                         <DialogDescription>
-                            Customize the appearance of your embedded form
+                            Configure behavior, appearance, and integrations
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid grid-cols-2 gap-6">
-                        {/* Left side - Theme controls */}
-                        <div className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="font-medium text-sm">Colors</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Primary / Button Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.primaryColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, primaryColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.primaryColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, primaryColor: e.target.value })}
-                                                placeholder="#F54029"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Background Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.backgroundColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, backgroundColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.backgroundColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, backgroundColor: e.target.value })}
-                                                placeholder="#ffffff"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Text Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.textColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, textColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.textColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, textColor: e.target.value })}
-                                                placeholder="#333333"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Label Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.labelColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, labelColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.labelColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, labelColor: e.target.value })}
-                                                placeholder="#374151"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Border Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.borderColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, borderColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.borderColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, borderColor: e.target.value })}
-                                                placeholder="#cccccc"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Input Background</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.inputBgColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, inputBgColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.inputBgColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, inputBgColor: e.target.value })}
-                                                placeholder="#ffffff"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Button Text Color</Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="color"
-                                                value={formTheme.buttonTextColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, buttonTextColor: e.target.value })}
-                                                className="w-12 h-9 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                value={formTheme.buttonTextColor}
-                                                onChange={(e) => setFormTheme({ ...formTheme, buttonTextColor: e.target.value })}
-                                                placeholder="#ffffff"
-                                                className="flex-1"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+
+                    <div className="flex-1 overflow-hidden flex">
+                        <Tabs defaultValue="general" orientation="vertical" className="flex w-full h-full" value={activeSettingsTab} onValueChange={setActiveSettingsTab}>
+                            <div className="w-48 border-r bg-muted/20 py-4 flex-shrink-0">
+                                <TabsList className="flex flex-col h-auto bg-transparent space-y-1 px-2 mb-4">
+                                    <TabsTrigger value="general" className="w-full justify-start px-3 py-2">General</TabsTrigger>
+                                    <TabsTrigger value="theme" className="w-full justify-start px-3 py-2">Theme</TabsTrigger>
+                                    <TabsTrigger value="submission" className="w-full justify-start px-3 py-2">Submission</TabsTrigger>
+                                    <TabsTrigger value="notifications" className="w-full justify-start px-3 py-2">Notifications</TabsTrigger>
+                                    <TabsTrigger value="integrations" className="w-full justify-start px-3 py-2">Integrations</TabsTrigger>
+                                </TabsList>
                             </div>
 
-                            <div className="space-y-4">
-                                <h3 className="font-medium text-sm">Style</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Border Radius</Label>
-                                        <Select
-                                            value={formTheme.borderRadius}
-                                            onValueChange={(v) => setFormTheme({ ...formTheme, borderRadius: v })}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="0px">None (Square)</SelectItem>
-                                                <SelectItem value="4px">Small (4px)</SelectItem>
-                                                <SelectItem value="8px">Medium (8px)</SelectItem>
-                                                <SelectItem value="12px">Large (12px)</SelectItem>
-                                                <SelectItem value="16px">Extra Large (16px)</SelectItem>
-                                                <SelectItem value="9999px">Pill (Full)</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Font Family</Label>
-                                        <Select
-                                            value={formTheme.fontFamily}
-                                            onValueChange={(v) => setFormTheme({ ...formTheme, fontFamily: v })}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="system-ui, -apple-system, sans-serif">System Default</SelectItem>
-                                                <SelectItem value="Inter, sans-serif">Inter</SelectItem>
-                                                <SelectItem value="Arial, sans-serif">Arial</SelectItem>
-                                                <SelectItem value="Helvetica, sans-serif">Helvetica</SelectItem>
-                                                <SelectItem value="Georgia, serif">Georgia</SelectItem>
-                                                <SelectItem value="'Times New Roman', serif">Times New Roman</SelectItem>
-                                                <SelectItem value="monospace">Monospace</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={resetTheme}>
-                                    <RefreshCw className="h-4 w-4 mr-1" />
-                                    Reset to Default
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Right side - Preview */}
-                        <div className="space-y-4">
-                            <h3 className="font-medium text-sm">Preview</h3>
-                            <div
-                                className="border rounded-lg p-6 min-h-[400px]"
-                                style={{ backgroundColor: "#f5f5f5" }}
-                            >
-                                <div
-                                    style={{
-                                        maxWidth: "100%",
-                                        fontFamily: formTheme.fontFamily,
-                                        backgroundColor: formTheme.backgroundColor,
-                                        padding: "24px",
-                                        borderRadius: formTheme.borderRadius,
-                                    }}
-                                >
-                                    {selectedForm?.fields.slice(0, 3).map((field, i) => (
-                                        <div key={i} style={{ marginBottom: "16px" }}>
-                                            <label
-                                                style={{
-                                                    display: "block",
-                                                    marginBottom: "6px",
-                                                    fontWeight: 500,
-                                                    color: formTheme.labelColor,
-                                                    fontSize: "14px",
-                                                }}
-                                            >
-                                                {field.label}{field.is_required ? " *" : ""}
-                                            </label>
-                                            <input
-                                                type="text"
-                                                placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
-                                                disabled
-                                                style={{
-                                                    width: "100%",
-                                                    padding: "10px 12px",
-                                                    border: `1px solid ${formTheme.borderColor}`,
-                                                    borderRadius: formTheme.borderRadius,
-                                                    fontSize: "14px",
-                                                    backgroundColor: formTheme.inputBgColor,
-                                                    color: formTheme.textColor,
-                                                    boxSizing: "border-box",
-                                                }}
+                            <div className="flex-1 overflow-y-auto p-6">
+                                <TabsContent value="general" className="space-y-6 mt-0">
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label>Form Name</Label>
+                                            <Input
+                                                value={formSettings.name || ""}
+                                                onChange={e => setFormSettings({ ...formSettings, name: e.target.value })}
                                             />
                                         </div>
-                                    ))}
-                                    {(selectedForm?.fields.length || 0) > 3 && (
-                                        <p style={{ color: formTheme.textColor, fontSize: "12px", marginBottom: "16px", opacity: 0.7 }}>
-                                            ...and {(selectedForm?.fields.length || 0) - 3} more fields
-                                        </p>
-                                    )}
-                                    <button
-                                        type="button"
-                                        style={{
-                                            backgroundColor: formTheme.primaryColor,
-                                            color: formTheme.buttonTextColor,
-                                            border: "none",
-                                            padding: "12px 28px",
-                                            borderRadius: formTheme.borderRadius,
-                                            cursor: "pointer",
-                                            fontSize: "14px",
-                                            fontWeight: 500,
-                                            width: "100%",
-                                            marginTop: "8px",
-                                        }}
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
+                                        <div className="space-y-2">
+                                            <Label>Description</Label>
+                                            <Textarea
+                                                value={formSettings.description || ""}
+                                                onChange={e => setFormSettings({ ...formSettings, description: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Visibility</Label>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant={formSettings.visibility === "PUBLIC" ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => setFormSettings({ ...formSettings, visibility: "PUBLIC" })}
+                                                >
+                                                    <Globe className="h-4 w-4 mr-1" /> Public
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant={formSettings.visibility === "PRIVATE" ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => setFormSettings({ ...formSettings, visibility: "PRIVATE" })}
+                                                >
+                                                    <Lock className="h-4 w-4 mr-1" /> Private
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="theme" className="space-y-6 mt-0">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-6">
+                                            {/* Existing Theme Controls */}
+                                            <div className="space-y-4">
+                                                <h3 className="font-medium text-sm">Colors</h3>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Primary Color</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input type="color" value={formTheme.primaryColor} onChange={(e) => setFormTheme({ ...formTheme, primaryColor: e.target.value })} className="w-12 h-9 p-1 cursor-pointer" />
+                                                            <Input value={formTheme.primaryColor} onChange={(e) => setFormTheme({ ...formTheme, primaryColor: e.target.value })} className="flex-1" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Background</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input type="color" value={formTheme.backgroundColor} onChange={(e) => setFormTheme({ ...formTheme, backgroundColor: e.target.value })} className="w-12 h-9 p-1 cursor-pointer" />
+                                                            <Input value={formTheme.backgroundColor} onChange={(e) => setFormTheme({ ...formTheme, backgroundColor: e.target.value })} className="flex-1" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Text</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input type="color" value={formTheme.textColor} onChange={(e) => setFormTheme({ ...formTheme, textColor: e.target.value })} className="w-12 h-9 p-1 cursor-pointer" />
+                                                            <Input value={formTheme.textColor} onChange={(e) => setFormTheme({ ...formTheme, textColor: e.target.value })} className="flex-1" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Inputs</Label>
+                                                        <div className="flex gap-2">
+                                                            <Input type="color" value={formTheme.inputBgColor} onChange={(e) => setFormTheme({ ...formTheme, inputBgColor: e.target.value })} className="w-12 h-9 p-1 cursor-pointer" />
+                                                            <Input value={formTheme.inputBgColor} onChange={(e) => setFormTheme({ ...formTheme, inputBgColor: e.target.value })} className="flex-1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <h3 className="font-medium text-sm">Typography & Style</h3>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Font Family</Label>
+                                                        <Select value={formTheme.fontFamily} onValueChange={(v) => setFormTheme({ ...formTheme, fontFamily: v })}>
+                                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="system-ui, -apple-system, sans-serif">System Default</SelectItem>
+                                                                <SelectItem value="Inter, sans-serif">Inter</SelectItem>
+                                                                <SelectItem value="Arial, sans-serif">Arial</SelectItem>
+                                                                <SelectItem value="monospace">Monospace</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs">Radius</Label>
+                                                        <Select value={formTheme.borderRadius} onValueChange={(v) => setFormTheme({ ...formTheme, borderRadius: v })}>
+                                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="0px">None</SelectItem>
+                                                                <SelectItem value="4px">Small</SelectItem>
+                                                                <SelectItem value="8px">Medium</SelectItem>
+                                                                <SelectItem value="12px">Large</SelectItem>
+                                                                <SelectItem value="999px">Pill</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <Button variant="outline" size="sm" onClick={resetTheme}>
+                                                <RefreshCw className="h-4 w-4 mr-1" /> Reset Theme
+                                            </Button>
+                                        </div>
+
+                                        {/* Preview Panel */}
+                                        <div className="border rounded-lg p-6 bg-slate-50 dark:bg-slate-900 overflow-hidden">
+                                            <div style={{
+                                                fontFamily: formTheme.fontFamily,
+                                                backgroundColor: formTheme.backgroundColor,
+                                                padding: "24px",
+                                                borderRadius: formTheme.borderRadius,
+                                                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+                                            }}>
+                                                <h4 style={{ color: formTheme.textColor, marginBottom: "16px", fontWeight: "bold" }}>Preview</h4>
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", color: formTheme.labelColor }}>Email *</label>
+                                                        <input style={{
+                                                            width: "100%", padding: "8px 12px",
+                                                            borderRadius: formTheme.borderRadius,
+                                                            border: `1px solid ${formTheme.borderColor}`,
+                                                            backgroundColor: formTheme.inputBgColor,
+                                                            color: formTheme.textColor
+                                                        }} placeholder="example@email.com" disabled />
+                                                    </div>
+                                                    <button style={{
+                                                        width: "100%", padding: "10px",
+                                                        borderRadius: formTheme.borderRadius,
+                                                        backgroundColor: formTheme.primaryColor,
+                                                        color: formTheme.buttonTextColor,
+                                                        border: "none", fontWeight: 500
+                                                    }}>Submit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="submission" className="space-y-6 mt-0">
+                                    <div className="space-y-6">
+                                        <div className="border p-4 rounded-lg space-y-4">
+                                            <Label className="text-base">What happens after submission?</Label>
+                                            <div className="grid gap-4 mt-2">
+                                                <div className="flex items-start space-x-3 p-3 bg-muted/40 rounded-lg cursor-pointer hover:bg-muted/60" onClick={() => setFormSettings({ ...formSettings, submission_behavior: "MESSAGE" })}>
+                                                    <input type="radio" checked={formSettings.submission_behavior === "MESSAGE"} onChange={() => { }} className="mt-1" />
+                                                    <div>
+                                                        <p className="font-medium">Show a success message</p>
+                                                        <p className="text-sm text-muted-foreground">Keep the user on the same page and show a thank you message.</p>
+                                                        {formSettings.submission_behavior === "MESSAGE" && (
+                                                            <Input
+                                                                className="mt-2"
+                                                                value={formSettings.success_message || ""}
+                                                                onChange={(e) => setFormSettings({ ...formSettings, success_message: e.target.value })}
+                                                                placeholder="Thank you for your submission!"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start space-x-3 p-3 bg-muted/40 rounded-lg cursor-pointer hover:bg-muted/60" onClick={() => setFormSettings({ ...formSettings, submission_behavior: "REDIRECT" })}>
+                                                    <input type="radio" checked={formSettings.submission_behavior === "REDIRECT"} onChange={() => { }} className="mt-1" />
+                                                    <div>
+                                                        <p className="font-medium">Redirect to a URL</p>
+                                                        <p className="text-sm text-muted-foreground">Send the user to a specific page (e.g., thank you page, calendar).</p>
+                                                        {formSettings.submission_behavior === "REDIRECT" && (
+                                                            <Input
+                                                                className="mt-2"
+                                                                value={formSettings.redirect_url || ""}
+                                                                onChange={(e) => setFormSettings({ ...formSettings, redirect_url: e.target.value })}
+                                                                placeholder="https://example.com/thank-you"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="border p-4 rounded-lg flex items-center justify-between">
+                                            <div>
+                                                <Label className="text-base">Spam Protection</Label>
+                                                <p className="text-sm text-muted-foreground">Require Turnstile captcha verification</p>
+                                            </div>
+                                            <Switch
+                                                checked={formSettings.require_captcha || false}
+                                                onCheckedChange={(c) => setFormSettings({ ...formSettings, require_captcha: c })}
+                                            />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="notifications" className="space-y-6 mt-0">
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label>Team Notification Emails</Label>
+                                            <Input
+                                                value={formSettings.notify_emails?.join(", ") || ""}
+                                                onChange={(e) => setFormSettings({ ...formSettings, notify_emails: e.target.value.split(",").map(s => s.trim()) })}
+                                                placeholder="colleague@example.com, sales@example.com"
+                                            />
+                                            <p className="text-xs text-muted-foreground">Comma-separated.</p>
+                                        </div>
+
+                                        <div className="border-t pt-4 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <Label>Auto-Responder</Label>
+                                                    <p className="text-sm text-muted-foreground">Send an email to the lead upon submission</p>
+                                                </div>
+                                                <Switch
+                                                    checked={formSettings.auto_respond || false}
+                                                    onCheckedChange={(c) => setFormSettings({ ...formSettings, auto_respond: c })}
+                                                />
+                                            </div>
+
+                                            {formSettings.auto_respond && (
+                                                <div className="pl-4 border-l-2 space-y-3">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">Subject</Label>
+                                                        <Input
+                                                            value={formSettings.auto_respond_subject || ""}
+                                                            onChange={(e) => setFormSettings({ ...formSettings, auto_respond_subject: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs">Message</Label>
+                                                        <Textarea
+                                                            rows={4}
+                                                            value={formSettings.auto_respond_body || ""}
+                                                            onChange={(e) => setFormSettings({ ...formSettings, auto_respond_body: e.target.value })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </TabsContent>
+
+                                <TabsContent value="integrations" className="space-y-6 mt-0">
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label>Webhook URL</Label>
+                                            <div className="flex gap-2">
+                                                <Input
+                                                    value={formSettings.webhook_url || ""}
+                                                    onChange={(e) => setFormSettings({ ...formSettings, webhook_url: e.target.value })}
+                                                    placeholder="https://hooks.zapier.com/..."
+                                                />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                We'll send a POST request with the submission data to this URL.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </TabsContent>
                             </div>
-                        </div>
+                        </Tabs>
                     </div>
-                    <DialogFooter>
+
+                    <DialogFooter className="px-6 py-4 border-t bg-muted/20">
                         <Button variant="outline" onClick={() => setShowCustomizeDialog(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={saveTheme} disabled={isSavingTheme}>
-                            {isSavingTheme ? "Saving..." : "Save Theme"}
+                        <Button onClick={saveSettings} disabled={isSavingTheme}>
+                            {isSavingTheme ? "Saving..." : "Save Changes"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Embed Code Dialog */}
-            <Dialog open={showEmbedDialog} onOpenChange={setShowEmbedDialog}>
+            < Dialog open={showEmbedDialog} onOpenChange={setShowEmbedDialog} >
                 <DialogContent className="max-w-3xl max-h-[80vh]">
                     <DialogHeader>
                         <DialogTitle>Embed Form: {selectedForm?.name}</DialogTitle>
@@ -1684,7 +2092,7 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                         </TabsContent>
                     </Tabs>
                 </DialogContent>
-            </Dialog>
-        </div>
+            </Dialog >
+        </div >
     );
 }

@@ -104,6 +104,7 @@ export async function PATCH(
             auto_respond_body,
             captcha_site_key,
             captcha_secret_key,
+            submission_behavior,
         } = body;
 
         // Build update data - only include fields that are provided
@@ -125,6 +126,7 @@ export async function PATCH(
         if (auto_respond_body !== undefined) updateData.auto_respond_body = auto_respond_body;
         if (captcha_site_key !== undefined) updateData.captcha_site_key = captcha_site_key;
         if (captcha_secret_key !== undefined) updateData.captcha_secret_key = captcha_secret_key;
+        if (submission_behavior !== undefined) updateData.submission_behavior = submission_behavior;
 
         const form = await (prismadb as any).form.update({
             where: { id: formId },
