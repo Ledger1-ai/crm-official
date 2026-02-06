@@ -24,7 +24,7 @@ export default function AliensPage() {
 
                 <main className="flex-grow pt-20">
                     {/* Hero Section */}
-                    <section className="py-24 md:py-32 relative overflow-hidden">
+                    <section className="pt-24 pb-8 md:pt-32 md:pb-12 relative overflow-hidden">
                         <div className="container mx-auto px-4 text-center">
                             <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20">
                                 <span className="relative flex h-3 w-3">
@@ -44,14 +44,14 @@ export default function AliensPage() {
                                 No breaks, no downtime, just pure performance.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row justify-center gap-6">
+                            <div className="flex flex-col sm:flex-row justify-center gap-4">
                                 <Link href="/register">
                                     <Button className="bg-cyan-500 hover:bg-cyan-400 text-black px-8 py-8 text-lg rounded-xl shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] font-bold tracking-wider transition-all duration-300 w-full sm:w-auto">
                                         DEPLOY AGENTS
                                     </Button>
                                 </Link>
                                 <Link href="/features">
-                                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-8 text-lg rounded-xl font-bold tracking-wider w-full sm:w-auto backdrop-blur-sm">
+                                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-8 text-lg rounded-xl font-bold tracking-wider w-full sm:w-auto backdrop-blur-sm shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                                         VIEW CAPABILITIES
                                     </Button>
                                 </Link>
@@ -60,7 +60,7 @@ export default function AliensPage() {
                     </section>
 
                     {/* Agent Roles Grid */}
-                    <section className="py-20">
+                    <section className="pt-8 pb-20">
                         <div className="container mx-auto px-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <AgentCard
@@ -94,7 +94,7 @@ export default function AliensPage() {
                     {/* The Sizzle / Automation Flow */}
                     <section className="py-24 bg-black/40 backdrop-blur-md border-y border-white/5">
                         <div className="container mx-auto px-4">
-                            <div className="flex flex-col lg:flex-row items-center gap-16">
+                            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
                                 <div className="lg:w-1/2">
                                     <h2 className="text-3xl md:text-5xl font-bold mb-8">
                                         End-to-End <span className="text-cyan-400">Autonomy</span>
@@ -136,39 +136,39 @@ export default function AliensPage() {
 
                                 <div className="lg:w-1/2 relative">
                                     {/* Visual Representation of Agent Cluster */}
-                                    <div className="relative aspect-square max-w-lg mx-auto">
-                                        <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-[100px] animate-pulse" />
-                                        <div className="relative z-10 grid grid-cols-2 gap-4 h-full">
-                                            <div className="glass-panel p-6 rounded-3xl flex flex-col justify-between transform translate-y-8">
-                                                <Bot className="h-12 w-12 text-cyan-400 mb-4" />
+                                    <div className="relative aspect-square max-w-lg mx-auto flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-cyan-500/10 rounded-full blur-[80px] animate-pulse" />
+                                        <div className="relative z-10 grid grid-cols-2 gap-4 w-full">
+                                            <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-2 transition-transform duration-500 shadow-2xl shadow-cyan-900/10 aspect-square">
+                                                <Bot className="h-10 w-10 text-cyan-400 mb-4" />
                                                 <div>
-                                                    <div className="text-xs font-mono text-cyan-500 mb-2">STATUS: BUSY</div>
-                                                    <div className="text-2xl font-bold">Booking Demos</div>
-                                                    <div className="text-sm text-gray-500 mt-2">142 calls active</div>
+                                                    <div className="text-xs font-mono text-cyan-500 mb-2 tracking-wider">STATUS: BUSY</div>
+                                                    <div className="text-xl font-bold text-white">Booking Demos</div>
+                                                    <div className="text-xs text-gray-400 mt-2">142 calls active</div>
                                                 </div>
                                             </div>
-                                            <div className="glass-panel p-6 rounded-3xl flex flex-col justify-between">
-                                                <Bot className="h-12 w-12 text-pink-400 mb-4" />
+                                            <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-2 transition-transform duration-500 shadow-2xl shadow-pink-900/10 aspect-square">
+                                                <Bot className="h-10 w-10 text-pink-400 mb-4" />
                                                 <div>
-                                                    <div className="text-xs font-mono text-pink-500 mb-2">STATUS: LEARNING</div>
-                                                    <div className="text-2xl font-bold">Optimizing Scripts</div>
-                                                    <div className="text-sm text-gray-500 mt-2">Analyzing 50k+ interactions</div>
+                                                    <div className="text-xs font-mono text-pink-500 mb-2 tracking-wider">STATUS: LEARNING</div>
+                                                    <div className="text-xl font-bold text-white">Optimizing</div>
+                                                    <div className="text-xs text-gray-400 mt-2">50k+ interactions</div>
                                                 </div>
                                             </div>
-                                            <div className="glass-panel p-6 rounded-3xl flex flex-col justify-between">
-                                                <Bot className="h-12 w-12 text-amber-400 mb-4" />
+                                            <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-2 transition-transform duration-500 shadow-2xl shadow-amber-900/10 aspect-square">
+                                                <Bot className="h-10 w-10 text-amber-400 mb-4" />
                                                 <div>
-                                                    <div className="text-xs font-mono text-amber-500 mb-2">STATUS: HUNTING</div>
-                                                    <div className="text-2xl font-bold">Prospecting</div>
-                                                    <div className="text-sm text-gray-500 mt-2">Verifying 300 leads/min</div>
+                                                    <div className="text-xs font-mono text-amber-500 mb-2 tracking-wider">STATUS: HUNTING</div>
+                                                    <div className="text-xl font-bold text-white">Prospecting</div>
+                                                    <div className="text-xs text-gray-400 mt-2">300 leads/min</div>
                                                 </div>
                                             </div>
-                                            <div className="glass-panel p-6 rounded-3xl flex flex-col justify-between transform -translate-y-8">
-                                                <Bot className="h-12 w-12 text-emerald-400 mb-4" />
+                                            <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-2 transition-transform duration-500 shadow-2xl shadow-emerald-900/10 aspect-square">
+                                                <Bot className="h-10 w-10 text-emerald-400 mb-4" />
                                                 <div>
-                                                    <div className="text-xs font-mono text-emerald-500 mb-2">STATUS: CLOSING</div>
-                                                    <div className="text-2xl font-bold">Contract Gen</div>
-                                                    <div className="text-sm text-gray-500 mt-2">$42k pipeline value</div>
+                                                    <div className="text-xs font-mono text-emerald-500 mb-2 tracking-wider">STATUS: CLOSING</div>
+                                                    <div className="text-xl font-bold text-white">Contract Gen</div>
+                                                    <div className="text-xs text-gray-400 mt-2">$42k pipeline</div>
                                                 </div>
                                             </div>
                                         </div>

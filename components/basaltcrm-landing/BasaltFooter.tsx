@@ -2,20 +2,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const navigationLinks = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Features', href: '#features' },
-    { label: 'AI Agents', href: '#ai-agents' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Home', href: '/' },
+    { label: 'Features', href: '/features' },
+    { label: 'AI Agents', href: '/ai-agents' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'Developers', href: '/developers' },
 ];
 
 const ecosystemLinks = [
-    { label: 'Basalt Echo', href: 'https://echo.basalthq.com' },
-    { label: 'Developer API', href: '/developers' },
-    { label: 'Status', href: 'https://status.basalthq.com' },
+    { label: 'BasaltHQ', href: 'https://basalthq.com' },
+    { label: 'BasaltSURGE', href: 'https://surge.basalthq.com' },
+    { label: 'BasaltERP', href: 'https://erp.basalthq.com' },
+    { label: 'BasaltCMS', href: 'https://cms.basalthq.com' },
+    { label: 'BasaltECHO', href: 'https://echo.basalthq.com' },
 ];
 
 const socialLinks = [
-    { label: 'Twitter', href: 'https://twitter.com/BasaltHQ' },
+    { label: 'Twitter', href: 'https://x.com/BasaltHQ' },
     { label: 'LinkedIn', href: 'https://linkedin.com/company/basalthq' },
     { label: 'GitHub', href: 'https://github.com/basalthq' },
     { label: 'Discord', href: 'https://discord.gg/gcgNugyWkg' },
@@ -114,23 +117,14 @@ export default function BasaltFooter() {
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-8">
-                            <h4 className="text-xs font-mono tracking-wider text-gray-500 mb-2">STATUS</h4>
-                            <div className="flex items-center gap-2">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                                <span className="text-xs text-emerald-500 font-mono">ALL SYSTEMS OPERATIONAL</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-gray-500 text-xs">
-                        © {new Date().getFullYear()} BasaltHQ. All rights reserved.
+                        © {new Date().getFullYear()} BasaltHQ Inc. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
                         <Link href="/privacy" className="text-gray-500 text-xs hover:text-white transition-colors">

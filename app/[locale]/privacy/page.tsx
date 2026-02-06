@@ -93,7 +93,7 @@ export default function PrivacyPage() {
                                     <li><strong>Deletion:</strong> Request deletion of your personal data (&quot;Right to be Forgotten&quot;).</li>
                                     <li><strong>Portability:</strong> Request transfer of your data to another service.</li>
                                 </ul>
-                                <p className="mt-4">To exercise these rights, please contact us at <a href="mailto:privacy@basalthq.com" className="text-primary hover:underline">privacy@basalthq.com</a>.</p>
+                                <p className="mt-4">To exercise these rights, please contact us at <a href="mailto:legal@basalthq.com" className="text-primary hover:underline">legal@basalthq.com</a>.</p>
                             </section>
 
                             <section>
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
                                     If you have any questions about this Privacy Policy, please contact us at:
                                 </p>
                                 <p className="mt-2">
-                                    <strong>Email:</strong> <a href="mailto:privacy@basalthq.com" className="text-primary hover:underline">privacy@basalthq.com</a><br />
+                                    <strong>Email:</strong> <a href="mailto:legal@basalthq.com" className="text-primary hover:underline">legal@basalthq.com</a><br />
                                     <strong>Address:</strong> 123 AI Boulevard, San Francisco, CA 94105, USA
                                 </p>
                             </section>
