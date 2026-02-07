@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prismadb } from "@/lib/prisma";
 import { format } from "date-fns";
+import * as XLSX from "xlsx";
 
 export async function POST(
     req: Request,
@@ -23,14 +24,13 @@ export async function POST(
             return new NextResponse("No submissions found", { status: 404 });
         }
 
-        // 1. Identify priority headers
-        // For the Airdrop form, we specifically want: email, wallet, socials
         const isAirdropForm = formId === "6986b9050b7508214f5180ce";
 
+        // 1. Identify headers and prepare data
         const fieldHeaders = new Set<string>();
         submissions.forEach((sub: any) => {
-            if (sub.data && typeof sub.data === 'object') {
-                Object.keys(sub.data).forEach(key => fieldHeaders.add(key));
+            if (sub.data && typeof sub.data === "object") {
+                Object.keys(sub.data).forEach((key) => fieldHeaders.add(key));
             }
         });
 
@@ -38,81 +38,51 @@ export async function POST(
 
         let finalHeaders: string[] = [];
         if (isAirdropForm) {
-            // Strictly follow user request: email, wallet address, screen name
             finalHeaders = ["Email", "Wallet Addresses", "Socials/Screen Names", "Submitted At"];
         } else {
             finalHeaders = ["ID", "Submitted At", ...sortedHeaders];
         }
 
-        // 2. Generate CSV Rows
-        const csvRows = [finalHeaders.join(",")];
-
-        submissions.forEach((sub: any) => {
+        // 2. Map submissions to rows
+        const rowData = submissions.map((sub: any) => {
             const data: any = sub.data || {};
-            let row: string[] = [];
 
             if (isAirdropForm) {
-                // Mapping for Airdrop form
-                // email, wallet address, screen name
-                const email = sub.extracted_email || data.email || "";
-                const wallet = data.wallet_addresses || "";
-                const socials = data.socials_list || "";
-
-                row = [
-                    email,
-                    wallet,
-                    socials,
-                    format(new Date(sub.createdAt), "yyyy-MM-dd HH:mm:ss")
-                ];
+                return {
+                    "Email": sub.extracted_email || data.email || "",
+                    "Wallet Addresses": data.wallet_addresses || "",
+                    "Socials/Screen Names": data.socials_list || "",
+                    "Submitted At": format(new Date(sub.createdAt), "yyyy-MM-dd HH:mm:ss")
+                };
             } else {
-                row = [
-                    sub.id,
-                    format(new Date(sub.createdAt), "yyyy-MM-dd HH:mm:ss"),
-                    ...sortedHeaders.map(header => {
-                        const val = data[header];
-                        return val === undefined || val === null ? "" : String(val);
-                    })
-                ];
+                const row: any = {
+                    "ID": sub.id,
+                    "Submitted At": format(new Date(sub.createdAt), "yyyy-MM-dd HH:mm:ss")
+                };
+                sortedHeaders.forEach(header => {
+                    row[header] = data[header] === undefined || data[header] === null ? "" : String(data[header]);
+                });
+                return row;
             }
-
-            // Clean each cell for CSV safety
-            const cleanRow = row.map(cell => {
-                let stringVal = cell === undefined || cell === null ? "" : String(cell);
-
-                // Standardize internal whitespace for legibility in spreadsheets
-                // We replace internal newlines with " ; " to keep the data in a single row
-                stringVal = stringVal
-                    .replace(/\r\n/g, " ; ")
-                    .replace(/\n/g, " ; ")
-                    .replace(/\r/g, " ; ")
-                    .replace(/\u2028/g, " ; ")
-                    .replace(/\u2029/g, " ; ")
-                    .trim();
-
-                // Escape quotes and wrap in quotes if it contains separator or existing quotes
-                if (stringVal.includes(",") || stringVal.includes('"')) {
-                    return `"${stringVal.replace(/"/g, '""')}"`;
-                }
-                return stringVal;
-            });
-
-            csvRows.push(cleanRow.join(","));
         });
 
-        // Use CRLF (\r\n) for record separators as per RFC 4180
-        const csvString = csvRows.join("\r\n");
-        // Add UTF-8 BOM (Byte Order Mark) so Excel/Numbers correctly detect encoding
-        const BOM = "\uFEFF";
+        // 3. Create Workbook and Worksheet
+        const ws = XLSX.utils.json_to_sheet(rowData, { header: finalHeaders });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Submissions");
 
-        return new NextResponse(BOM + csvString, {
+        // 4. Generate Buffer
+        const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+
+        return new NextResponse(buffer, {
             headers: {
-                "Content-Type": "text/csv; charset=utf-8",
-                "Content-Disposition": `attachment; filename="submissions-${formId}-${new Date().toISOString().split('T')[0]}.csv"`,
+                "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Content-Disposition": `attachment; filename="submissions-${formId}-${new Date().toISOString().split('T')[0]}.xlsx"`,
             }
         });
 
     } catch (error) {
-        console.error("[FORM_EXPORT_CSV]", error);
+        console.error("[FORM_EXPORT_EXCEL]", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

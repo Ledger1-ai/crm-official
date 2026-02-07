@@ -21,16 +21,16 @@ export function ExportButton({ formId }: { formId: string }) {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `submissions-${formId}-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `submissions-${formId}-${new Date().toISOString().split('T')[0]}.xlsx`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            toast.success("Export started");
+            toast.success("Excel export started");
         } catch (error) {
             console.error(error);
-            toast.error("Failed to export submissions");
+            toast.error("Failed to export submissions to Excel");
         } finally {
             setLoading(false);
         }
@@ -39,7 +39,7 @@ export function ExportButton({ formId }: { formId: string }) {
     return (
         <Button variant="outline" size="sm" onClick={handleExport} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
-            Export CSV
+            Export Excel
         </Button>
     );
 }

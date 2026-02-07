@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prismadb } from "@/lib/prisma";
 import crypto from "crypto";
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+};
+
 // Public endpoint - no auth required
 export async function POST(req: NextRequest) {
     try {
@@ -56,7 +62,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (!form_slug) {
-            return NextResponse.json({ error: "Form slug required" }, { status: 400 });
+            return NextResponse.json({ error: "Form slug required" }, { status: 400, headers: corsHeaders });
         }
 
         // Find the form
@@ -68,17 +74,17 @@ export async function POST(req: NextRequest) {
         });
 
         if (!form) {
-            return NextResponse.json({ error: "Form not found" }, { status: 404 });
+            return NextResponse.json({ error: "Form not found" }, { status: 404, headers: corsHeaders });
         }
 
         if (form.status !== "ACTIVE") {
-            return NextResponse.json({ error: "Form is not active" }, { status: 400 });
+            return NextResponse.json({ error: "Form is not active" }, { status: 400, headers: corsHeaders });
         }
 
         // Verify Captcha if required
         if (form.require_captcha) {
             if (!captcha_token) {
-                return NextResponse.json({ error: "Captcha verification required" }, { status: 400 });
+                return NextResponse.json({ error: "Captcha verification required" }, { status: 400, headers: corsHeaders });
             }
 
             // Determine which keys to use
@@ -96,7 +102,7 @@ export async function POST(req: NextRequest) {
 
             if (!secretKey) {
                 console.error(`Form ${form.id} requires captcha but has no secret key configured`);
-                return NextResponse.json({ error: "Form configuration error" }, { status: 500 });
+                return NextResponse.json({ error: "Form configuration error" }, { status: 500, headers: corsHeaders });
             }
 
             try {
@@ -109,10 +115,10 @@ export async function POST(req: NextRequest) {
 
                 const verifyData = await verifyRes.json();
                 if (!verifyData.success) {
-                    return NextResponse.json({ error: "Captcha verification failed" }, { status: 400 });
+                    return NextResponse.json({ error: "Captcha verification failed" }, { status: 400, headers: corsHeaders });
                 }
             } catch (error) {
-                return NextResponse.json({ error: "Captcha service error" }, { status: 500 });
+                return NextResponse.json({ error: "Captcha service error" }, { status: 500, headers: corsHeaders });
             }
         }
 
@@ -125,7 +131,7 @@ export async function POST(req: NextRequest) {
                 if (value === undefined || value === null || value === "") {
                     return NextResponse.json({
                         error: `Field "${field.label}" is required`
-                    }, { status: 400 });
+                    }, { status: 400, headers: corsHeaders });
                 }
             }
         }
@@ -426,11 +432,11 @@ export async function POST(req: NextRequest) {
             message: form.success_message || "Thank you for your submission!",
             submission_behavior: form.submission_behavior,
             redirect_url: form.redirect_url,
-        });
+        }, { headers: corsHeaders });
 
     } catch (error) {
         console.error("Error submitting form:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        return NextResponse.json({ error: "Internal server error" }, { status: 500, headers: corsHeaders });
     }
 }
 
@@ -438,10 +444,6 @@ export async function POST(req: NextRequest) {
 export async function OPTIONS(req: NextRequest) {
     return new NextResponse(null, {
         status: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-        },
+        headers: corsHeaders,
     });
 }
