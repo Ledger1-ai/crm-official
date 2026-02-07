@@ -81,7 +81,7 @@ export async function launchBrowser(): Promise<Browser> {
       "--disable-dev-shm-usage",
       "--disable-gpu",
     ],
-    defaultViewport: chromium.defaultViewport ?? { width: 1280, height: 800 },
+    defaultViewport: (chromium as any).defaultViewport ?? { width: 1280, height: 800 },
   });
 
   return browser;

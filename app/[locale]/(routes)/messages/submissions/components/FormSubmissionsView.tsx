@@ -479,8 +479,8 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all",
                         </DialogDescription>
                     </DialogHeader>
                     {selectedSubmission && (
-                        <ScrollArea className="flex-1 px-6">
-                            <div className="space-y-6 py-2">
+                        <div className="flex-1 overflow-y-auto px-6 min-h-0">
+                            <div className="space-y-6 py-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {Object.entries(selectedSubmission.data).map(([key, value]) => (
                                         <div key={key} className="group border rounded-xl p-4 bg-muted/30 hover:border-primary/50 transition-all">
@@ -511,7 +511,7 @@ export function FormSubmissionsView({ submissions, forms, initialFormId = "all",
                                     </div>
                                 )}
                             </div>
-                        </ScrollArea>
+                        </div>
                     )}
                     <DialogFooter className="p-6 pt-4 border-t bg-muted/5 gap-2 sm:gap-0">
                         <Button variant="outline" onClick={() => setShowDetailDialog(false)}>

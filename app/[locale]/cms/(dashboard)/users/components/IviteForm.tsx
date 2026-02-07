@@ -114,7 +114,7 @@ export function InviteForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full p-5 items-end"
+          className="grid grid-cols-1 md:grid-cols-5 gap-3 w-full p-5 items-end"
         >
           <FormField
             control={form.control}
@@ -155,7 +155,7 @@ export function InviteForm() {
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a user language" />
+                      <SelectValue placeholder="Language" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -168,24 +168,23 @@ export function InviteForm() {
             )}
           />
 
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="px-3"
-              onClick={() => setShowModulesModal(true)}
-              title="Configure Modules"
-            >
-              <Settings2 className="w-4 h-4" />
-            </Button>
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <Icons.spinner className="animate-spin" />
-              ) : (
-                "Invite user"
-              )}
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            onClick={() => setShowModulesModal(true)}
+          >
+            <Settings2 className="w-4 h-4" />
+            <span>Configure Modules</span>
+          </Button>
+
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <Icons.spinner className="animate-spin" />
+            ) : (
+              "Invite user"
+            )}
+          </Button>
         </form>
       </Form>
     </>

@@ -340,10 +340,9 @@ export async function POST(req: NextRequest) {
                 const recipients = Array.from(notificationTargets);
 
                 // Generate PDF once for all recipients
-                console.log(`[Notification] Generating PDF for form submission ${newSubmission.id}`);
                 const pdfBuffer = await generateSubmissionPdf({
                     ...newSubmission,
-                    form: form // Ensure form name is available for the PDF header
+                    form: form
                 });
 
                 const attachments = [{

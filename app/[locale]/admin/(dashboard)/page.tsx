@@ -76,7 +76,7 @@ export default async function AdminDashboardPage({
   return (
     <Container
       title="Administration"
-      description="Manage your BasaltCRM instance, invite new members, and configure user access."
+      description="Manage your Organization, invite new members, configure user access, and organize your team into departments."
       action={<SendMailToAll />}
       fluid
     >

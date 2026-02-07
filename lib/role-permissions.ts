@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, User, Phone, Briefcase, FileText, CheckSquare, GraduationCap, Laptop, Bot, LineChart } from "lucide-react";
+import { LayoutDashboard, Users, User, Phone, Briefcase, FileText, CheckSquare, GraduationCap, Laptop, Bot, LineChart, MessageSquare, FormInput, FileCheck, FileBarChart, Mail, FileEdit } from "lucide-react";
 
 export interface CrmModule {
     id: string;
@@ -440,6 +440,73 @@ export const CRM_MODULES: CrmModule[] = [
             },
             { id: 'flowstate.logs', name: 'Execution Logs', description: 'View run history' }
         ]
+    },
+    {
+        id: 'messages',
+        name: 'Messages',
+        route: '/messages',
+        description: 'Internal team messaging',
+        children: [
+            { id: 'messages.view', name: 'View Messages', description: 'Access inbox' },
+            { id: 'messages.send', name: 'Send Message', description: 'Compose new messages' },
+        ]
+    },
+    {
+        id: 'form_builder',
+        name: 'Form Builder',
+        route: '/messages/forms',
+        description: 'Lead capture forms',
+        children: [
+            { id: 'form_builder.view', name: 'View Forms', description: 'List existing forms' },
+            { id: 'form_builder.create', name: 'Create Form', description: 'Build new forms' },
+            { id: 'form_builder.submissions', name: 'View Submissions', description: 'Access form data' },
+        ]
+    },
+    {
+        id: 'invoice',
+        name: 'Invoices',
+        route: '/invoice',
+        description: 'Invoice management',
+        children: [
+            { id: 'invoice.view', name: 'View Invoices', description: 'List invoices' },
+            { id: 'invoice.upload', name: 'Upload Invoice', description: 'Import new invoices' },
+        ]
+    },
+    {
+        id: 'reports',
+        name: 'Reports',
+        route: '/reports',
+        description: 'Business analytics and reports',
+        children: [
+            { id: 'reports.view', name: 'View Reports', description: 'Access reporting tools' },
+        ]
+    },
+    {
+        id: 'emails',
+        name: 'Emails',
+        route: '/emails',
+        description: 'External email management',
+        children: [
+            { id: 'emails.view', name: 'View Emails', description: 'Access email client' },
+        ]
+    },
+    {
+        id: 'employee',
+        name: 'Employees',
+        route: '/employees',
+        description: 'Staff management',
+        children: [
+            { id: 'employee.view', name: 'View Employees', description: 'Access employee list' },
+        ]
+    },
+    {
+        id: 'databox',
+        name: 'Databox',
+        route: '/databox',
+        description: 'Custom data storage',
+        children: [
+            { id: 'databox.view', name: 'View Databox', description: 'Access databox tools' },
+        ]
     }
 ];
 
@@ -447,7 +514,7 @@ export const ROLE_CONFIGS: Record<Exclude<TeamRole, 'SUPER_ADMIN'>, { label: str
     ADMIN: {
         label: "Admin",
         description: "Full access to department resources",
-        defaultModules: ['dashboard', 'dashboard.view', 'leads', 'leads.tabs.all', 'accounts', 'accounts.view', 'contacts', 'contacts.view']
+        defaultModules: ['dashboard', 'dashboard.view', 'leads', 'leads.tabs.all', 'accounts', 'accounts.view', 'contacts', 'contacts.view', 'messages', 'form_builder']
     },
     MEMBER: {
         label: "Member",
