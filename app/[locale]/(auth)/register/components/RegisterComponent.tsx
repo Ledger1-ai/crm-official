@@ -97,18 +97,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
     }
   };
 
-  const loginWithGoogle = async () => {
-    setIsLoading(true);
 
-    try {
-      await signIn("google", {
-        callbackUrl: process.env.NEXT_PUBLIC_APP_URL,
-      });
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   //Localizations
   const t = useTranslations("RegisterComponent");
@@ -123,30 +112,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
         {/*  <pre>
           <code>{JSON.stringify(form.watch(), null, 2)}</code>
         </pre> */}
-        <div className="grid grid-cols-2 gap-6">
-          {/*        <Button variant="outline">
-            <Icons.gitHub className="mr-2 h-4 w-4" />
-            Github
-          </Button> */}
-          <Button
-            variant="outline"
-            onClick={loginWithGoogle}
-            disabled={isLoading}
-          >
-            <Icons.google className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-        </div>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or create new account
-            </span>
-          </div>
-        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} suppressHydrationWarning={true}>
             <div className="grid gap-2">
@@ -155,7 +121,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company / Team Name</FormLabel>
+                    <FormLabel>Company / Team Name <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -172,7 +138,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="planId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subscription Plan</FormLabel>
+                    <FormLabel>Subscription Plan <span className="text-red-500">*</span></FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -199,7 +165,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Full Name <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -216,7 +182,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Username <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -233,7 +199,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail</FormLabel>
+                    <FormLabel>E-mail <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -250,7 +216,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                 name="language"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Choose your language</FormLabel>
+                    <FormLabel>Choose your language <span className="text-red-500">*</span></FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -280,7 +246,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                   name="password"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -307,7 +273,7 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"
@@ -331,8 +297,8 @@ export function RegisterComponent({ availablePlans }: { availablePlans: any[] })
             </div>
 
             <div className="grid gap-2 py-5">
-              <Button disabled={isLoading} type="submit">
-                Create account
+              <Button disabled={isLoading || !form.formState.isValid} type="submit">
+                Create Account
               </Button>
             </div>
           </form>

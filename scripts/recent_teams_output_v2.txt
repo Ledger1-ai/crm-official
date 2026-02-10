@@ -1,0 +1,41 @@
+Checking for teams created since: 2025-11-01T00:00:00.000Z
+Excluding: ledger1, basalt, basalthq, internal
+Found 0 RELEVANT teams.
+--------------------------------------------------
+Checking for users created since Nov 1, 2025 (excluding known internal/test accounts)...
+Found 7 RELEVANT users.
+User: michaelm@theutilitycompany.co (Name: Michael Milton)
+Created: Sun Nov 30 2025 10:57:08 GMT-0700 (Mountain Standard Time)
+Assigned Team: BasaltHQ Team (Slug: basalthq)
+Team ID: 6934998c7038863976a7a5fd
+---
+User: sinisterx@gmail.com (Name: Eric)
+Created: Fri Dec 05 2025 17:57:59 GMT-0700 (Mountain Standard Time)
+Assigned Team: NONE (Slug: undefined)
+Team ID: null
+---
+User: dal@crecoin.co (Name: Davis)
+Created: Sat Feb 07 2026 11:50:24 GMT-0700 (Mountain Standard Time)
+Assigned Team: BasaltHQ Team (Slug: basalthq)
+Team ID: 6934998c7038863976a7a5fd
+---
+User: jgarcia@osirisprotocol.org (Name: John Garcia)
+Created: Sat Nov 29 2025 14:40:55 GMT-0700 (Mountain Standard Time)
+Assigned Team: Sales (Slug: basalthq-sales)
+Team ID: 6981495980abf3ea0656d43d
+---
+User: info@theutilitycompany.co (Name: Karishma Bhutani)
+Created: Sat Nov 29 2025 14:40:26 GMT-0700 (Mountain Standard Time)
+Assigned Team: BasaltHQ Team (Slug: basalthq)
+Team ID: 6934998c7038863976a7a5fd
+---
+User: mmfmilton@gmail.com (Name: Mayor)
+Created: Sun Nov 30 2025 20:41:40 GMT-0700 (Mountain Standard Time)
+Assigned Team: BasaltHQ Team (Slug: basalthq)
+Team ID: 6934998c7038863976a7a5fd
+---
+User: eturner@hitechlives.com (Name: Eric Turner)
+Created: Sat Nov 29 2025 14:42:28 GMT-0700 (Mountain Standard Time)
+Assigned Team: BasaltHQ Team (Slug: basalthq)
+Team ID: 6934998c7038863976a7a5fd
+---

@@ -1,8 +1,10 @@
+// ... (imports remain)
 import { prismadb } from "@/lib/prisma";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import TwitterProvider from "next-auth/providers/twitter";
+import AzureADProvider from "next-auth/providers/azure-ad";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { newUserNotify } from "./new-user-notify";
@@ -13,13 +15,13 @@ function getGoogleCredentials(): { clientId: string; clientSecret: string } {
   const clientId = process.env.GOOGLE_ID;
   const clientSecret = process.env.GOOGLE_SECRET;
   if (!clientId || clientId.length === 0) {
-    throw new Error("Missing GOOGLE_ID");
+    // console.warn("Missing GOOGLE_ID");
+    return { clientId: "", clientSecret: "" };
   }
-
   if (!clientSecret || clientSecret.length === 0) {
-    throw new Error("Missing GOOGLE_SECRET");
+    // console.warn("Missing GOOGLE_SECRET");
+    return { clientId: "", clientSecret: "" };
   }
-
   return { clientId, clientSecret };
 }
 
@@ -31,6 +33,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   providers: [
+    // Static providers (Env driven) as fallback
     GoogleProvider({
       clientId: getGoogleCredentials().clientId,
       clientSecret: getGoogleCredentials().clientSecret,
@@ -38,14 +41,20 @@ export const authOptions: NextAuthOptions = {
 
     GitHubProvider({
       name: "github",
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+      clientId: process.env.GITHUB_ID || "",
+      clientSecret: process.env.GITHUB_SECRET || "",
     }),
 
     TwitterProvider({
-      clientId: process.env.TWITTER_ID!,
-      clientSecret: process.env.TWITTER_SECRET!,
+      clientId: process.env.TWITTER_ID || "",
+      clientSecret: process.env.TWITTER_SECRET || "",
       version: "2.0",
+    }),
+
+    AzureADProvider({
+      clientId: process.env.AZURE_CLIENT_ID || "",
+      clientSecret: process.env.AZURE_CLIENT_SECRET || "",
+      tenantId: process.env.AZURE_TENANT_ID || "common",
     }),
 
     CredentialsProvider({
@@ -158,7 +167,8 @@ export const authOptions: NextAuthOptions = {
             },
           });
 
-          await newUserNotify(newUser);
+          // Try to prevent redundant notifications
+          // await newUserNotify(newUser);
 
           //Put new created user data in session
           session.user.id = newUser.id;
@@ -203,3 +213,74 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+
+// Cache for dynamic options to avoid hitting DB on every request (1 min cache)
+let cachedOptions: NextAuthOptions | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 60 * 1000;
+
+export async function getDynamicAuthOptions(): Promise<NextAuthOptions> {
+  const now = Date.now();
+  if (cachedOptions && (now - lastCacheTime < CACHE_TTL)) {
+    return cachedOptions;
+  }
+
+  // Start with base options (env vars)
+  // We clone providers to avoid mutating the exported static object indefinitely if we push/pop
+  const newOptions = { ...authOptions, providers: [...authOptions.providers] };
+
+  try {
+    const dbConfigs = await prismadb.systemAuthConfig.findMany({
+      where: { enabled: true }
+    });
+
+    // Add/Override providers from DB
+    for (const config of dbConfigs) {
+      if (config.provider === 'google') {
+        // Find existing index or append
+        const existingIndex = newOptions.providers.findIndex(p => p.id === 'google');
+        const provider = GoogleProvider({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret
+        });
+        if (existingIndex >= 0) {
+          newOptions.providers[existingIndex] = provider;
+        } else {
+          newOptions.providers.push(provider);
+        }
+      } else if (config.provider === 'github') {
+        const existingIndex = newOptions.providers.findIndex(p => p.id === 'github');
+        const provider = GitHubProvider({
+          name: "github",
+          clientId: config.clientId,
+          clientSecret: config.clientSecret
+        });
+        if (existingIndex >= 0) {
+          newOptions.providers[existingIndex] = provider;
+        } else {
+          newOptions.providers.push(provider);
+        }
+      } else if (config.provider === 'azure-ad') {
+        const existingIndex = newOptions.providers.findIndex(p => p.id === 'azure-ad');
+        const provider = AzureADProvider({
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          tenantId: config.tenantId || "common",
+        });
+        if (existingIndex >= 0) {
+          newOptions.providers[existingIndex] = provider;
+        } else {
+          newOptions.providers.push(provider);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch dynamic auth config:", error);
+    // Fallback to static env vars (newOptions already has them)
+  }
+
+  cachedOptions = newOptions;
+  lastCacheTime = now;
+  return newOptions;
+}

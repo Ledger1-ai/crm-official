@@ -1,5 +1,6 @@
 import { RegisterComponent } from "./components/RegisterComponent";
 import { getPlans } from "@/actions/plans/plan-actions";
+import Footer from "@/app/[locale]/(routes)/components/Footer";
 
 const RegisterPage = async () => {
   const plans = await getPlans();
@@ -11,6 +12,9 @@ const RegisterPage = async () => {
       </div>
       {/* @ts-ignore */}
       <RegisterComponent availablePlans={plans} />
+      <div className="w-full max-w-lg sm:max-w-xl mx-auto">
+        <Footer />
+      </div>
     </div>
   );
 };

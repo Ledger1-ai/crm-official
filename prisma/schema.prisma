@@ -1642,7 +1642,7 @@ model FooterSetting {
   tagline          String   @default("Your 24/7 AI workforce. Sales, Support, and Growth on autopilot.")
   copyrightText    String   @default("© 2025 Ledger AI. All rights reserved.")
   socialXUrl       String   @default("https://x.com/BasaltAI")
-  socialDiscordUrl String   @default("https://discord.gg/vARPqF84Zt")
+  socialDiscordUrl String   @default("https://discord.gg/gcgNugyWkg")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
@@ -1722,7 +1722,7 @@ model SocialSettings {
   facebookUrl       String?  @default("")
   youtubeUrl        String?  @default("")
   tiktokUrl         String?  @default("")
-  githubUrl         String?  @default("")
+  githubUrl         String?  @default("https://github.com/Ledger1-ai/crm-official")
   telegramUrl       String?  @default("")
   redditUrl         String?  @default("")
   threadsUrl        String?  @default("")
@@ -1773,6 +1773,19 @@ model PageView {
   city      String?
   country   String?
   createdAt DateTime @default(now()) @db.Date
+}
+
+model SystemAuthConfig {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  provider     String   // "google", "github", "azure-ad"
+  clientId     String
+  clientSecret String
+  tenantId     String?  // For Azure AD or optional logic
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@unique([provider])
 }
 
 // =============================================================================

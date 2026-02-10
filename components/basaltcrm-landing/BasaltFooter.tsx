@@ -20,7 +20,7 @@ const ecosystemLinks = [
 const socialLinks = [
     { label: 'Twitter', href: 'https://x.com/BasaltHQ' },
     { label: 'LinkedIn', href: 'https://linkedin.com/company/basalthq' },
-    { label: 'GitHub', href: 'https://github.com/basalthq' },
+    { label: 'GitHub', href: 'https://github.com/Ledger1-ai/crm-official' },
     { label: 'Discord', href: 'https://discord.gg/gcgNugyWkg' },
 ];
 

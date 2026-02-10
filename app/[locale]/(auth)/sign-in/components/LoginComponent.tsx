@@ -116,6 +116,24 @@ export function LoginComponent() {
       setIsLoading(false);
     }
   };
+  const loginWithMicrosoft = async () => {
+    setIsLoading(true);
+    try {
+      await signIn("azure-ad", {
+        callbackUrl: dashboardPath,
+      });
+    } catch (error) {
+      console.log(error, "error");
+      toast({
+        variant: "destructive",
+        description:
+          "Something went wrong while logging with your Microsoft account.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   //Login with username(email)/password
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
@@ -191,8 +209,8 @@ export function LoginComponent() {
         <CardDescription className="text-gray-300">Click here to login with: </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="grid grid-cols-2 gap-6">
-          <Button variant="outline" onClick={loginWithGitHub}>
+        <div className="grid grid-cols-3 gap-2">
+          <Button variant="outline" onClick={loginWithGitHub} className="px-0">
             <Icons.gitHub className="mr-2 h-4 w-4" />
             Github
           </Button>
@@ -200,6 +218,7 @@ export function LoginComponent() {
             variant="outline"
             onClick={loginWithGoogle}
             disabled={isLoading}
+            className="px-0"
           >
             {isLoading ? (
               <Icons.google className="mr-2 h-4 w-4 animate-spin" />
@@ -207,6 +226,15 @@ export function LoginComponent() {
               <Icons.google className="mr-2 h-4 w-4" />
             )}{" "}
             Google
+          </Button>
+          <Button
+            variant="outline"
+            onClick={loginWithMicrosoft}
+            disabled={isLoading}
+            className="px-0"
+          >
+            <Icons.microsoft className="mr-2 h-4 w-4" />
+            Microsoft
           </Button>
         </div>
         <div className="relative">
@@ -330,8 +358,10 @@ export function LoginComponent() {
                   </Button>
                 </div>
               )}
-              <DialogTrigger className="w-full text-right pt-5 ">
-                <Button variant={"destructive"}>Cancel</Button>
+              <DialogTrigger asChild>
+                <Button variant={"destructive"} className="w-full mt-5">
+                  Cancel
+                </Button>
               </DialogTrigger>
             </DialogContent>
           </Dialog>

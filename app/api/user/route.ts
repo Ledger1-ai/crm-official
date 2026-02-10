@@ -3,8 +3,8 @@ import { prismadb } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { hash } from "bcryptjs";
-import { newUserNotify } from "@/lib/new-user-notify";
 import { logActivityInternal } from "@/actions/audit";
+import sendEmail from "@/lib/sendmail";
 
 export async function POST(req: Request) {
   try {
@@ -56,13 +56,6 @@ export async function POST(req: Request) {
     const isFree = selectedPlan.price === 0;
     const initialStatus = isFree ? "ACTIVE" : "PENDING";
 
-    // Create User first (we need ID for team owner)
-    // Note: We are creating the user initially. If Team creation fails, we might leave a dangling user. 
-    // Ideally use a transaction, but Mongo doesn't support multi-document transactions in standalone.
-    // Assuming standard Replica Set or similar, transaction would be best.
-
-    // For now, simple flow:
-
     const hashedPassword = await hash(password, 12);
 
     const user = await prismadb.users.create({
@@ -72,7 +65,7 @@ export async function POST(req: Request) {
         email,
         userLanguage: language,
         password: hashedPassword,
-        userStatus: initialStatus === "PENDING" ? "PENDING" : "ACTIVE", // Or PENDING for everyone? User said "pending status until admin can approve" for non-free.
+        userStatus: initialStatus === "PENDING" ? "PENDING" : "ACTIVE",
         is_admin: false, // Default to false
         is_account_admin: true, // They are the owner of their account/team
       },
@@ -101,12 +94,69 @@ export async function POST(req: Request) {
       }
     });
 
-    // Notify Admins
-    if (!isFree) {
-      newUserNotify(user); // Reuse existing notification
+    // Send Emails
+    const sendFrom = "sales@basalthq.com";
+
+    // 1. Email to Sales Team (sales@basalthq.com)
+    try {
+      const salesSubject = `New Team Registration: ${companyName}`;
+      const salesHtml = `
+            <h2>New Team Registration Alert</h2>
+            <p><strong>Company:</strong> ${companyName}</p>
+            <p><strong>Proposed Plan:</strong> ${selectedPlan.name}</p>
+            <p><strong>Status:</strong> ${initialStatus}</p>
+            <hr />
+            <h3>User Details</h3>
+            <p><strong>User:</strong> ${name} (${email})</p>
+            <p><strong>Username:</strong> ${username}</p>
+            <p><strong>Language:</strong> ${language}</p>
+            <br />
+            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/partners">Review in Partners Dashboard</a></p>
+        `;
+
+      await sendEmail({
+        to: "sales@basalthq.com",
+        from: sendFrom,
+        subject: salesSubject,
+        text: `New Team Registration: ${companyName}\nUser: ${name} (${email})\nPlan: ${selectedPlan.name}\nStatus: ${initialStatus}`,
+        html: salesHtml
+      });
+      console.log(`[Register] Sent notification email to sales@basalthq.com for team ${companyName}`);
+    } catch (emailError) {
+      console.error("[Register] Failed to send sales notification email:", emailError);
     }
 
-    await logActivityInternal(user.id, "User Register", "Auth", `User registered with team ${team.name} on plan ${selectedPlan.name}`);
+    // 2. Email to User (Registrant)
+    try {
+      const userSubject = `Welcome to Basalt - Application Received`;
+      const userHtml = `
+            <h2>Thank you for signing up!</h2>
+            <p>We have successfully received your registration for <strong>${companyName}</strong>.</p>
+            <p>Your selected plan: <strong>${selectedPlan.name}</strong></p>
+            <br />
+            <p>Our team is currently reviewing your application details and will approve your account shortly.</p>
+            <p>Once approved, you will be able to access the full platform.</p>
+            <br />
+            <p>If you have any questions, please feel free to reach out to us at <a href="mailto:sales@basalthq.com">sales@basalthq.com</a>.</p>
+            <br />
+            <p>Best regards,</p>
+            <p>The Basalt Team</p>
+        `;
+
+      await sendEmail({
+        to: email,
+        from: sendFrom,
+        subject: userSubject,
+        text: `Thank you for signing up for Basalt!\n\nWe have received your registration for ${companyName}.\nOur team is reviewing your application and will approve your account shortly.`,
+        html: userHtml
+      });
+      console.log(`[Register] Sent welcome email to user ${email}`);
+    } catch (emailError) {
+      console.error("[Register] Failed to send user welcome email:", emailError);
+    }
+
+    // Log Activity
+    await logActivityInternal(user.id, "User Register", "Auth", `User registered with team ${companyName} on plan ${selectedPlan.name}`);
 
     return NextResponse.json({ ...user, teamId: team.id });
 

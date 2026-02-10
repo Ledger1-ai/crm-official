@@ -78,7 +78,7 @@ export default function BasaltNavbar({ themeColor = '#06b6d4' }: NavbarProps) {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center gap-1">
+                        <div className="hidden xl:flex items-center gap-1">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.label}
@@ -141,7 +141,7 @@ export default function BasaltNavbar({ themeColor = '#06b6d4' }: NavbarProps) {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="lg:hidden p-2 text-white transition-colors"
+                            className="xl:hidden p-2 text-white transition-colors"
                             style={{ color: mobileMenuOpen ? themeColor : 'white' }}
                         >
                             <svg
@@ -162,7 +162,7 @@ export default function BasaltNavbar({ themeColor = '#06b6d4' }: NavbarProps) {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden bg-black/80 backdrop-blur-xl mt-2 mx-4 rounded-2xl p-4 animate-fadeInUp border" style={{ borderColor: `${themeColor}40` }}>
+                    <div className="xl:hidden bg-black/80 backdrop-blur-xl mt-2 mx-4 rounded-2xl p-4 animate-fadeInUp border" style={{ borderColor: `${themeColor}40` }}>
                         <div className="flex flex-col gap-2">
                             {navLinks.map((link) => (
                                 <Link

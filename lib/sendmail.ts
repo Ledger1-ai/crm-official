@@ -5,7 +5,7 @@ import { Agent } from "https";
 
 
 interface EmailOptions {
-  from: string | undefined;
+  from?: string;
   to: string;
   subject: string;
   text: string;

@@ -5,9 +5,9 @@ import { createTranslator } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 
 import "@/app/[locale]/globals.css";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { AuthFooterWrapper } from "./components/AuthFooterWrapper";
-import { DiscordLogoIcon } from "@radix-ui/react-icons";
+import { DiscordLogoIcon, GitHubLogoIcon } from "@radix-ui/react-icons";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -50,11 +50,15 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
         </Link>
         <div className="flex items-center space-x-5">
           <div className="flex items-center border rounded-md p-2">
-            <Link href="https://discord.gg/vARPqF84Zt">
+            <Link href="https://discord.gg/gcgNugyWkg">
               <DiscordLogoIcon className="size-5" />
             </Link>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center border rounded-md p-2">
+            <Link href="https://github.com/Ledger1-ai/crm-official" target="_blank">
+              <GitHubLogoIcon className="size-5" />
+            </Link>
+          </div>
         </div>
       </div>
       <div className="flex items-center grow h-full overflow-hidden">

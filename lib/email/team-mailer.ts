@@ -49,7 +49,7 @@ export async function sendTeamEmail(teamId: string, options: EmailOptions) {
 
         const transporter = nodemailer.createTransport({
             SES: { ses, aws },
-        });
+        } as any);
 
         try {
             await transporter.sendMail({

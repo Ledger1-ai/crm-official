@@ -423,7 +423,7 @@ function PricingCard({
                 ))}
             </ul>
 
-            <Link href="/dashboard" className="w-full mt-auto">
+            <Link href="/register" className="w-full mt-auto">
                 <Button
                     className={`w-full py-6 text-lg rounded-[10px] font-semibold transition-all duration-300 ${buttonVariant === "primary"
                         ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
