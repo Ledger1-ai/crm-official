@@ -30,45 +30,37 @@ export default function TabNavigationCard({
         <button
             onClick={onClick}
             className={cn(
-                "group relative overflow-hidden rounded-xl border p-3 md:p-4 text-left transition-all duration-300 w-full flex flex-col items-center justify-center gap-2",
-                // Glassmorphism base - increased opacity for dark mode
-                "backdrop-blur-md",
-                // Active vs Inactive state
+                "group relative overflow-hidden rounded-2xl border transition-all duration-300 h-[100px] w-full flex flex-col justify-center items-center text-center",
                 isActive
-                    ? cn("bg-card ring-1 opacity-100 scale-[1.02]", borderColor, shadowColor, "shadow-[0_0_20px_-5px]")
-                    : cn("bg-card/60 opacity-90 hover:opacity-100 hover:bg-accent/50 hover:shadow-lg", borderColor && borderColor.replace("border-", "border-").replace("/50", "/30"), shadowColor && shadowColor.replace("shadow-", "shadow-").replace("/20", "/5"))
+                    ? cn("bg-[#09090b] border-primary/50 ring-1 ring-primary/20 scale-[1.02] shadow-lg shadow-primary/10")
+                    : cn("bg-[#09090b]/60 border-[#27272a] hover:border-primary/30 opacity-90 hover:opacity-100")
             )}
         >
-            {/* Background Gradient - more subtle */}
-            <div
+            {/* Giant Watermark Icon - Positioned Right */}
+            <Icon
                 className={cn(
-                    "absolute inset-0 bg-gradient-to-br transition-opacity duration-300",
-                    isActive ? "opacity-30" : "opacity-0 group-hover:opacity-20",
-                    gradient
+                    "absolute -right-4 -bottom-4 w-28 h-28 -rotate-12 transition-all duration-500 pointer-events-none",
+                    isActive ? "opacity-20 scale-110" : "opacity-5 group-hover:opacity-10",
+                    color
                 )}
             />
 
-            {/* Icon Container */}
-            <div
-                className={cn(
-                    "relative z-10 p-2.5 rounded-full transition-transform duration-300 group-hover:scale-110",
-                    // Glassy icon container
-                    "bg-background/40 border border-border/50 shadow-sm",
-                    isActive ? cn("scale-110 ring-1", borderColor) : ""
-                )}
-            >
-                <Icon className={cn("w-5 h-5 md:w-6 md:h-6", color)} />
+            <div className="relative z-10 w-full px-2 text-center">
+                <span
+                    className={cn(
+                        "block text-lg font-bold tracking-tight transition-colors",
+                        isActive ? "text-foreground" : "text-muted-foreground/80 group-hover:text-foreground"
+                    )}
+                >
+                    {label}
+                </span>
             </div>
 
-            {/* Label */}
-            <span
-                className={cn(
-                    "relative z-10 text-xs md:text-sm font-medium transition-colors text-center",
-                    isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                )}
-            >
-                {label}
-            </span>
+            {/* Subtle Glow on Hover */}
+            <div className={cn(
+                "absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transition-opacity duration-500 pointer-events-none",
+                isActive ? "opacity-20" : "opacity-0 group-hover:opacity-100"
+            )} />
         </button>
     );
 };

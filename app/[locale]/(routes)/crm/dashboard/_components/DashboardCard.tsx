@@ -31,9 +31,9 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
             <button
                 ref={ref}
                 className={cn(
-                    "relative group w-full p-4 overflow-hidden transition-all duration-300",
-                    "bg-[#09090b] border border-[#27272a] hover:border-primary/50 rounded-3xl", // Dark aesthetic
-                    "h-[120px]", // Compact height
+                    "relative group w-full p-3 overflow-hidden transition-all duration-300",
+                    "bg-[#09090b] border border-[#27272a] hover:border-primary/50 rounded-2xl", // Reduced radius
+                    "h-[110px]", // More compact height
                     className
                 )}
                 {...props}
@@ -41,7 +41,7 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                 {/* Giant Watermark Icon (Colorful) - Positioned Right */}
                 <Icon
                     className={cn(
-                        "absolute -right-6 -bottom-6 w-40 h-40 -rotate-12 transition-colors duration-500 pointer-events-none",
+                        "absolute -right-4 -bottom-4 w-32 h-32 -rotate-12 transition-colors duration-500 pointer-events-none",
                         variant === "default" && "text-muted-foreground/5 group-hover:text-muted-foreground/10",
                         variant === "success" && "text-emerald-500/10 group-hover:text-emerald-500/20",
                         variant === "info" && "text-cyan-500/10 group-hover:text-cyan-500/20",
@@ -50,11 +50,11 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                     )}
                 />
 
-                <div className={cn("relative z-10 w-full h-full flex flex-col justify-center", hideIcon ? "items-center text-center gap-1" : "items-start pl-2")}>
+                <div className={cn("relative z-10 w-full h-full flex flex-col justify-center", hideIcon ? "items-center text-center gap-1" : "items-start pl-1")}>
                     {hideIcon ? (
                         // Centered Layout (Stats/Deep Dive)
                         <>
-                            <h3 className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground/90 mb-1">
+                            <h3 className="font-bold text-[11px] uppercase tracking-wider text-muted-foreground/90 mb-0.5">
                                 {label}
                             </h3>
                             {count !== undefined && (
@@ -63,7 +63,7 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                                 </span>
                             )}
                             {description && (
-                                <p className="text-[10px] text-muted-foreground font-medium opacity-80">
+                                <p className="text-[9px] text-muted-foreground font-medium opacity-80">
                                     {description}
                                 </p>
                             )}
@@ -71,8 +71,8 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                     ) : (
                         // Clean List Layout (Entities/Icons) - Left Aligned, No Central Icon
                         <>
-                            <div className="flex items-center gap-3 mb-1">
-                                <h3 className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground/90">
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <h3 className="font-bold text-[11px] uppercase tracking-wider text-muted-foreground/90">
                                     {label}
                                 </h3>
                             </div>
@@ -86,7 +86,7 @@ const DashboardCard = React.forwardRef<HTMLButtonElement, DashboardCardProps>(
                             </div>
 
                             {description && (
-                                <p className="text-[10px] text-muted-foreground font-medium truncate max-w-full opacity-80 mt-1">
+                                <p className="text-[9px] text-muted-foreground font-medium truncate max-w-full opacity-80 mt-0.5">
                                     {description}
                                 </p>
                             )}

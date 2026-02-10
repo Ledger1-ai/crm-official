@@ -23,6 +23,12 @@ import {
   Phone,
   Wand2,
   Folder,
+  Shield,
+  CheckCircle2,
+  Radio,
+  Headset,
+  BarChart3,
+  Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DashboardCard from "../../crm/dashboard/_components/DashboardCard";
@@ -48,6 +54,12 @@ const iconMap: Record<string, LucideIcon> = {
   Phone,
   Wand2,
   Folder,
+  Shield,
+  CheckCircle2,
+  Radio,
+  Headset,
+  BarChart3,
+  Package
 };
 
 interface EntityItem {
@@ -164,7 +176,7 @@ export function EntityBreakdown({
                   description={`${percentage}% of records`}
                   variant={variant}
                   // Apply specific color overrides to matching valid tailwind classes
-                  className={cn("h-40 transition-colors duration-300", colors.bg, colors.border)}
+                  className={cn("transition-colors duration-300", colors.bg, colors.border)}
                   iconClassName={colors.icon}
                 />
               </Link>

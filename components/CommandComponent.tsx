@@ -49,7 +49,7 @@ export function CommandComponent() {
         router.push("/profile");
         setOpen(false);
       }
-      if (e.key === "k" && e.metaKey) {
+      if (e.key === "l" && e.metaKey) {
         clearUserCache();
         signOut({ callbackUrl: `/${locale}/sign-in?loggedOut=true` });
       }
@@ -100,7 +100,7 @@ export function CommandComponent() {
             <CommandItem onClick={() => { clearUserCache(); signOut({ callbackUrl: `/${locale}/sign-in?loggedOut=true` }); }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
-              <CommandShortcut>⌘k</CommandShortcut>
+              <CommandShortcut>⌘L</CommandShortcut>
             </CommandItem>
           </CommandGroup>
         </CommandList>

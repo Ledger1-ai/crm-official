@@ -22,7 +22,7 @@ const SupportComponent = () => {
           <Button asChild variant={"secondary"}>
             <Link
               className="border rounded-md p-2"
-              href={process.env.NEXT_PUBLIC_DISCORD_INVITE_URL || "#"}
+              href={process.env.NEXT_PUBLIC_DISCORD_INVITE_URL || "https://discord.com/invite/gcgNugyWkg"}
               target="_blank"
             >
               <DiscordLogoIcon />
@@ -34,7 +34,7 @@ const SupportComponent = () => {
           <Button asChild variant={"secondary"}>
             <Link
               className="border rounded-md p-2"
-              href={process.env.NEXT_PUBLIC_GITHUB_ISSUES_URL || "#"}
+              href={process.env.NEXT_PUBLIC_GITHUB_ISSUES_URL || "https://github.com/Ledger1-ai/crm-official/issues"}
               target="_blank"
             >
               <GitHubLogoIcon />

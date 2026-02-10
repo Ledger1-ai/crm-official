@@ -40,7 +40,7 @@ export default function AdminDocsSidebar({ docs, locale }: AdminDocsSidebarProps
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-primary">
                         <BookOpen className="h-5 w-5" />
-                        <span className="font-bold text-lg tracking-tight">Knowledge Base</span>
+                        <span className="font-bold text-lg tracking-tight">Help Hub</span>
                     </div>
                 </div>
                 <Link href={`/${locale}/cms/docs/new`}>

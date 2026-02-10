@@ -16,7 +16,11 @@ import {
     Folder,
     CheckSquare,
     GraduationCap,
-    Radio
+    Radio,
+    Headset,
+    Shield,
+    CheckCircle2,
+    Zap,
 } from "lucide-react";
 
 interface CrmSidebarProps {
@@ -70,6 +74,10 @@ export default function CrmSidebar({ isMember = false, allowedModules = [] }: Cr
         { id: 'projects', label: "Projects", href: "/crm/my-projects", icon: Folder },
         { id: 'opportunities', label: "Opportunities", href: "/crm/opportunities", icon: Target },
         { id: 'sales-command', label: "Sales Command", href: "/crm/sales-command", icon: Radio },
+        { id: 'cases', label: "Service Console", href: "/crm/cases", icon: Headset },
+        { id: 'guard-rules', label: "Guard Rules", href: "/crm/validation-rules", icon: Shield },
+        { id: 'approvals', label: "Approval Chains", href: "/crm/approvals", icon: CheckCircle2 },
+        { id: 'workflows', label: "FlowState Builder", href: "/crm/workflows", icon: Zap },
     ];
 
     // Filter items

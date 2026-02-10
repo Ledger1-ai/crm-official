@@ -3,7 +3,7 @@
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, BarChart } from "@tremor/react";
-import { Activity, DollarSign, TrendingUp, Filter, Printer } from "lucide-react";
+import { Activity, DollarSign, TrendingUp, Filter, Printer, Plus } from "lucide-react";
 import { useState, useTransition, useEffect, useRef } from "react";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
@@ -22,6 +22,7 @@ import { getTasksByMonth } from "@/actions/projects/get-tasks";
 import { getLeadsByMonth } from "@/actions/crm/get-leads";
 import { AISummaryModal } from "@/components/reports/AISummaryModal";
 import { CustomReportsPanel } from "@/components/reports/CustomReportsPanel";
+import Link from "next/link";
 
 // Types
 type DashboardData = {
@@ -121,6 +122,12 @@ export default function ReportsDashboard({
                         <Printer className="w-4 h-4 mr-2" />
                         Export PDF
                     </Button>
+                    <Link href="/reports/builder">
+                        <Button size="sm" className="gap-2 bg-primary">
+                            <Plus className="w-4 h-4" />
+                            Create Report
+                        </Button>
+                    </Link>
                     <AISummaryModal
                         data={{
                             financials,

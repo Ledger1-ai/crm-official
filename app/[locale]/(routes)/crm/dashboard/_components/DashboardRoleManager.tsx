@@ -44,7 +44,24 @@ const DashboardRoleManager = async () => {
     // 2. Fetch Data Parallel
     // We fetch different data based on role to optimize performance
     if (isAdmin) {
-        const [unifiedData, activeUsersCount, counts, modules, usersTasks, newLeads, newProjects, dailyTasks, messages] = await Promise.all([
+        const [
+            unifiedData,
+            activeUsersCount,
+            counts,
+            modules,
+            usersTasks,
+            newLeads,
+            newProjects,
+            dailyTasks,
+            messages,
+            workflowCount,
+            approvalCount,
+            guardCount,
+            caseCount,
+            productCount,
+            quoteCount,
+            reportCount
+        ] = await Promise.all([
             getUnifiedSalesData(),
             prismadb.users.count(),
             getSummaryCounts(),
@@ -53,30 +70,52 @@ const DashboardRoleManager = async () => {
             getNewLeads(),
             getNewProjects(),
             getDailyTasks(),
-            getUserMessages()
+            getUserMessages(),
+            prismadb.crm_Workflow.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.approvalProcess.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.validationRule.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.crm_Cases.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.crm_Products.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.crm_Quotes.count({ where: { team_id: (session.user as any).team_id } } as any),
+            prismadb.savedReport.count({ where: { teamId: (session.user as any).team_id } } as any),
         ]);
 
-        const crmModule = modules.find((module) => module.name === "crm" || module.name === "CRM"); // Case handling
-        const projectsModule = modules.find((module) => module.name === "projects" || module.name === "Projects");
+        const crmModule = modules.find((module: any) => module.name === "crm" || module.name === "CRM"); // Case handling
+        const projectsModule = modules.find((module: any) => module.name === "projects" || module.name === "Projects");
 
-        // Build CRM entities
+        // Build CRM entities - Comprehensive list for Phases 1-6
         const crmEntities: any[] = [];
         if (crmModule?.enabled) {
             crmEntities.push(
+                // Phase 1 & 2: Foundations & Sales
                 { name: "Accounts", value: counts.accounts, href: "/crm/accounts", iconName: "LandmarkIcon", color: "cyan" },
                 { name: "Contacts", value: counts.contacts, href: "/crm/contacts", iconName: "Contact", color: "violet" },
-                { name: "Contracts", value: counts.contracts, href: "/crm/contracts", iconName: "FilePenLine", color: "rose" },
-
-                { name: "Dialer", value: 0, href: "/crm/dialer", iconName: "Phone", color: "indigo" }, // Added
-                { name: "Lead Wizard", value: 0, href: "/crm/lead-wizard", iconName: "Wand2", color: "cyan" }, // Added
-                { name: "Lead Pools", value: 0, href: "/crm/lead-pools", iconName: "Target", color: "blue" }, // Added
-                { name: "Leads Manager", value: counts.leads, href: "/crm/leads", iconName: "Users", color: "emerald" }, // Added
-                { name: "Outreach", value: 0, href: "/crm/outreach", iconName: "Megaphone", color: "orange" }, // Renamed from Campaigns
-                // "My Projects" was in the screenshot grid, adding here for visual match
-                // "My Projects" was in the screenshot grid, adding here for visual match
-                { name: "My Projects", value: counts.boards, href: "/campaigns", iconName: "Folder", color: "yellow" },
-                // Leads removed as per user request to remove from "main admin panel"
+                { name: "Leads Manager", value: counts.leads, href: "/crm/leads", iconName: "Users2", color: "emerald" },
                 { name: "Opportunities", value: counts.opportunities, href: "/crm/opportunities", iconName: "HeartHandshake", color: "amber" },
+                { name: "Contracts", value: counts.contracts, href: "/crm/contracts", iconName: "FilePenLine", color: "rose" },
+                { name: "Invoices", value: counts.invoices, href: "/invoice", iconName: "FileText", color: "blue" },
+
+                // Phase 3: Intelligence & Automation (FlowState)
+                { name: "Workflows", value: workflowCount, href: "/crm/workflows", iconName: "Zap", color: "indigo" },
+                { name: "Approvals", value: approvalCount, href: "/crm/approvals", iconName: "CheckCircle2", color: "emerald" },
+                { name: "Guard Rules", value: guardCount, href: "/crm/validation-rules", iconName: "Shield", color: "rose" },
+
+                // Phase 4: Optimization & Outreach
+                { name: "Dialer", value: 0, href: "/crm/dialer", iconName: "Phone", color: "blue" },
+                { name: "Lead Wizard", value: 0, href: "/crm/lead-wizard", iconName: "Wand2", color: "cyan" },
+                { name: "Lead Pools", value: 0, href: "/crm/lead-pools", iconName: "Target", color: "violet" },
+                { name: "Outreach", value: 0, href: "/crm/outreach", iconName: "Megaphone", color: "orange" },
+                { name: "Sales Command", value: 0, href: "/crm/sales-command", iconName: "Radio", color: "pink" },
+
+                // Service Cloud
+                { name: "Service Console", value: caseCount, href: "/crm/cases", iconName: "Headset", color: "indigo" },
+
+                // Phase 5: Analytics & Reporting
+                { name: "Reports", value: reportCount, href: "/reports", iconName: "BarChart3", color: "amber" },
+
+                // Phase 6: Advanced CPQ
+                { name: "Products", value: productCount, href: "/crm/products", iconName: "Package", color: "teal" },
+                { name: "Quotes", value: quoteCount, href: "/crm/quotes", iconName: "FileText", color: "blue" },
             );
         }
 

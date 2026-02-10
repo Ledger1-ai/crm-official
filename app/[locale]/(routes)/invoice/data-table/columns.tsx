@@ -51,9 +51,19 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title=" Amount" />
     ),
-    cell: ({ row }) => (
-      <div className="w-[120px]">{row.getValue("invoice_amount")}</div>
-    ),
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("invoice_amount")?.toString().replace(/,/g, "") || "0");
+      const currency = (row.original as any).invoice_currency || "USD";
+
+      return (
+        <div className="font-medium">
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: currency,
+          }).format(amount)}
+        </div>
+      );
+    },
     enableSorting: true,
     enableHiding: false,
   },

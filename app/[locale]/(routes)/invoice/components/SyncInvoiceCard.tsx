@@ -9,21 +9,25 @@ import { runCronJob } from "@/actions/cron/get-invoice-from-mail";
 
 // Duplicate of the CardContent style to ensure consistency
 const CardContent = ({ card, loading = false }: { card: any, loading?: boolean }) => (
-    <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 md:p-6 hover:bg-accent/50 transition-all duration-300 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-[1.02] text-left w-full h-full cursor-pointer">
-        <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-20 group-hover:opacity-60 transition-opacity duration-300`} />
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-2 text-center h-full">
-            <div className={`p-3 rounded-full bg-gradient-to-br ${card.color} border border-border shadow-lg group-hover:scale-110 transition-transform duration-300 ${card.iconColor} ring-1 ring-white/20 group-hover:ring-white/40`}>
-                <Loader2 className={`w-6 h-6 md:w-8 md:h-8 ${loading ? "animate-spin" : ""}`} strokeWidth={1.5} />
-            </div>
+    <div className="group relative overflow-hidden rounded-2xl border border-[#27272a] bg-[#09090b] p-3 transition-all duration-300 h-[110px] w-full cursor-pointer">
+        {/* Giant Watermark Icon - Positioned Right */}
+        <Loader2
+            className={`absolute -right-4 -bottom-4 w-32 h-32 -rotate-12 transition-colors duration-500 pointer-events-none opacity-10 group-hover:opacity-20 ${card.iconColor} ${loading ? "animate-spin" : ""}`}
+        />
+
+        <div className="relative z-10 w-full h-full flex flex-col justify-center items-start pl-1">
             <div className="space-y-0.5">
-                <span className="block text-sm md:text-lg font-medium text-foreground group-hover:text-primary transition-colors">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground/90 group-hover:text-foreground transition-colors">
                     {card.title}
                 </span>
-                <span className="block text-[10px] md:text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
+                <span className="block text-xl font-bold tracking-tight text-foreground">
                     {card.description}
                 </span>
             </div>
         </div>
+
+        {/* Subtle Glow on Hover */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     </div>
 );
 

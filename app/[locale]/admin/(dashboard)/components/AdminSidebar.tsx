@@ -13,6 +13,7 @@ import {
     Bot,
     Building2,
     Shield,
+    Database,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -48,6 +49,7 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
 
     const navItems = [
         { label: "Overview", href: "/admin", icon: LayoutDashboard, exact: true },
+        { label: "Object Manager", href: "/admin/objects", icon: Database },
         { label: "Email Settings", href: "/admin/settings", icon: Mail },
         { label: "SMS Configuration", href: "/admin/sms-config", icon: MessageSquare },
         { label: "AI Settings", href: "/admin/ai-settings", icon: Bot },

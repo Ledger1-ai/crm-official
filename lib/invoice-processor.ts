@@ -75,9 +75,9 @@ function parseInvoiceFromText(text: string) {
         }
     }
 
-    // 3. Currency guess
-    if (text.includes("EUR") || text.includes("€")) result.invoice_currency = "EUR";
-    else if (text.includes("GBP") || text.includes("£")) result.invoice_currency = "GBP";
+    // 3. Currency guess - Defaulting to USD as requested
+    if (text.includes("GBP") || text.includes("£")) result.invoice_currency = "GBP";
+    else if (text.includes("EUR") || text.includes("€")) result.invoice_currency = "USD"; // User requested USD across the app
     else result.invoice_currency = "USD"; // Default
 
     // 4. Vendor Name guess

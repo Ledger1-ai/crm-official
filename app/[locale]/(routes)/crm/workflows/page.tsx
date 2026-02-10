@@ -9,8 +9,8 @@ import { Workflow, Plus, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-    title: "FlowState | Workflow Automation",
-    description: "Visual workflow builder for automating CRM processes"
+    title: "FlowState | Visual Automation",
+    description: "Visual builder for automating CRM processes with FlowState"
 };
 
 export default async function WorkflowsPage() {
@@ -42,7 +42,7 @@ export default async function WorkflowsPage() {
                 <CreateWorkflowDialog teamId={teamId || ""}>
                     <Button className="gap-2">
                         <Plus className="h-4 w-4" />
-                        New Workflow
+                        New FlowState
                     </Button>
                 </CreateWorkflowDialog>
             </div>
@@ -54,15 +54,15 @@ export default async function WorkflowsPage() {
                         <div className="p-4 bg-muted rounded-full mb-4">
                             <Workflow className="h-12 w-12 text-muted-foreground" />
                         </div>
-                        <h2 className="text-xl font-semibold mb-2">No workflows yet</h2>
+                        <h2 className="text-xl font-semibold mb-2">No FlowStates yet</h2>
                         <p className="text-muted-foreground mb-6 max-w-md">
-                            Create your first workflow to automate repetitive tasks like
+                            Create your first FlowState to automate repetitive tasks like
                             sending follow-up emails, creating tasks, or notifying your team.
                         </p>
                         <CreateWorkflowDialog teamId={teamId || ""}>
                             <Button size="lg" className="gap-2">
                                 <Plus className="h-5 w-5" />
-                                Create Your First Workflow
+                                Create Your First FlowState
                             </Button>
                         </CreateWorkflowDialog>
                     </div>

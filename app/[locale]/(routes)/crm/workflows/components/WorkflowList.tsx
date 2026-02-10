@@ -78,6 +78,11 @@ const triggerLabels: Record<string, string> = {
     LEAD_CREATED: "Lead Created",
     FORM_SUBMITTED: "Form Submitted",
     MANUAL: "Manual Trigger",
+    RECORD_CREATED: "Record Created",
+    RECORD_UPDATED: "Record Updated",
+    RECORD_DELETED: "Record Deleted",
+    SCHEDULED: "Scheduled",
+    APPROVAL_RESPONSE: "Approval Response",
 };
 
 export function WorkflowList({ workflows }: WorkflowListProps) {
@@ -90,7 +95,7 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
         setLoading(id);
         const result = await activateWorkflow(id);
         if (result.success) {
-            toast.success("Workflow activated");
+            toast.success("FlowState activated");
             router.refresh();
         } else {
             toast.error(result.error || "Failed to activate");
@@ -102,7 +107,7 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
         setLoading(id);
         const result = await pauseWorkflow(id);
         if (result.success) {
-            toast.success("Workflow paused");
+            toast.success("FlowState paused");
             router.refresh();
         } else {
             toast.error(result.error || "Failed to pause");
@@ -116,7 +121,7 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
         setLoading(workflowToDelete);
         const result = await deleteWorkflow(workflowToDelete);
         if (result.success) {
-            toast.success("Workflow deleted");
+            toast.success("FlowState deleted");
             router.refresh();
         } else {
             toast.error(result.error || "Failed to delete");
@@ -228,7 +233,7 @@ export function WorkflowList({ workflows }: WorkflowListProps) {
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Workflow?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete FlowState?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. All execution history will also be deleted.
                         </AlertDialogDescription>

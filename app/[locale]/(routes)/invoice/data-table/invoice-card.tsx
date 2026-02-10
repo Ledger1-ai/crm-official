@@ -44,7 +44,12 @@ export function InvoiceCard({ row }: InvoiceCardProps) {
                 </div>
                 <div className="flex items-center gap-2 font-medium">
                     <DollarSign className="h-3 w-3 text-muted-foreground" />
-                    <span>{invoice.invoice_amount} {invoice.invoice_currency}</span>
+                    <span>
+                        {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: invoice.invoice_currency || "USD",
+                        }).format(parseFloat(invoice.invoice_amount?.toString().replace(/,/g, "") || "0"))}
+                    </span>
                 </div>
                 {invoice.rossum_status && (
                     <div className="text-xs text-muted-foreground">

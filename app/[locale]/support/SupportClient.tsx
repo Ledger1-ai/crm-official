@@ -19,12 +19,12 @@ export default function SupportClient() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-20">
-                    {/* Knowledge Base */}
+                    {/* Help Hub */}
                     <SupportCard
                         icon={<BookOpen className="h-8 w-8 text-primary" />}
                         title="Documentation"
                         description="Browse our comprehensive guides and tutorials to find answers instantly."
-                        actionText="Visit Knowledge Base"
+                        actionText="Visit Help Hub"
                         href="/docs"
                     />
 

@@ -53,3 +53,125 @@ export async function generateSubmissionPdf(submission: any) {
         await closeBrowser(browser);
     }
 }
+
+export async function generateQuotePdf(quote: any) {
+    const browser = await launchBrowser();
+    try {
+        const page = await browser.newPage();
+
+        const itemsRows = quote.items.map((item: any) => `
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                    <div style="font-weight: bold; font-size: 14px;">${item.product.name}</div>
+                    <div style="font-size: 10px; color: #666; font-family: monospace;">${item.product.sku}</div>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">$${item.unitPrice.toLocaleString()}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.discount > 0 ? `<span style="color: #059669; font-weight: bold;">-${item.discount}%</span>` : '-'}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">$${item.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+            </tr>
+        `).join("");
+
+        const html = `
+            <html>
+                <head>
+                    <style>
+                        body { font-family: 'Helvetica', sans-serif; padding: 40px; color: #1e293b; line-height: 1.5; }
+                        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+                        .title { font-size: 32px; font-weight: 900; color: #000; margin: 0; }
+                        .quote-info { text-align: right; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+                        .info-box { padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
+                        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 8px; letter-spacing: 0.1em; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        th { background: #f1f5f9; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; }
+                        .totals { display: flex; justify-content: flex-end; }
+                        .totals-box { width: 250px; }
+                        .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+                        .grand-total { border-top: 2px solid #000; margin-top: 10px; padding-top: 10px; font-size: 20px; font-weight: 900; color: #2563eb; }
+                        .footer { margin-top: 60px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div>
+                            <h1 class="title">${quote.title}</h1>
+                            <div style="font-family: monospace; color: #64748b;">${quote.quoteNumber}</div>
+                        </div>
+                        <div class="quote-info">
+                            <div class="label">Proposal Date</div>
+                            <div style="font-weight: bold;">${format(new Date(quote.createdAt), "MMMM dd, yyyy")}</div>
+                            <div class="label" style="margin-top: 15px;">Valid Until</div>
+                            <div style="font-weight: bold; color: #e11d48;">${quote.expirationDate ? format(new Date(quote.expirationDate), "MMMM dd, yyyy") : "N/A"}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <div class="label">Prepared For</div>
+                            <div style="font-size: 18px; font-weight: bold;">${quote.account?.name || "No Account"}</div>
+                            ${quote.contact ? `<div style="color: #475569;">${quote.contact.first_name} ${quote.contact.last_name}</div>` : ""}
+                            ${quote.contact?.email ? `<div style="color: #2563eb; font-size: 12px;">${quote.contact.email}</div>` : ""}
+                        </div>
+                        <div class="info-box" style="text-align: right; background: #fff;">
+                            <div class="label">Issuing Entity</div>
+                            <div style="font-size: 18px; font-weight: bold;">Basalt Echo CRM</div>
+                            <div style="font-style: italic; color: #94a3b8; font-size: 12px;">Financial Services Division</div>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: center;">Disc %</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsRows}
+                        </tbody>
+                    </table>
+
+                    <div class="totals">
+                        <div class="totals-box">
+                            <div class="total-row">
+                                <span style="color: #64748b;">Subtotal</span>
+                                <span style="font-family: monospace;">$${quote.items.reduce((acc: number, i: any) => acc + (i.unitPrice * i.quantity), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div class="total-row" style="color: #059669;">
+                                <span>Volume Discount</span>
+                                <span style="font-family: monospace;">-$${(quote.items.reduce((acc: number, i: any) => acc + (i.unitPrice * i.quantity), 0) - quote.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div class="total-row grand-total">
+                                <span>TOTAL</span>
+                                <span style="font-family: monospace;">$${quote.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding: 20px; background: #f1f5f9; border-radius: 8px; font-size: 11px;">
+                        <div class="label">Terms & Conditions</div>
+                        <p style="margin: 5px 0; color: #475569;">1. All prices are in USD. 2. Subject to standard implementation timelines. 3. 12 months premium support included.</p>
+                    </div>
+
+                    <div class="footer">
+                        Generated by Basalt CRM Secure Proposal System | ${format(new Date(), "PP")}
+                    </div>
+                </body>
+            </html>
+        `;
+
+        await page.setContent(html);
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            margin: { top: "1cm", bottom: "1cm", left: "1cm", right: "1cm" },
+            printBackground: true
+        });
+        return pdfBuffer;
+    } finally {
+        await closeBrowser(browser);
+    }
+}
