@@ -3,6 +3,7 @@ import { prismadb } from "@/lib/prisma";
 import { format } from "date-fns";
 import crypto from "crypto";
 import sendEmail from "@/lib/sendmail";
+import { sendTeamEmail } from "@/lib/email/team-mailer";
 import { generateSubmissionPdf } from "@/lib/pdf-utils";
 
 const corsHeaders = {
@@ -376,9 +377,10 @@ export async function POST(req: NextRequest) {
                 const timestamp = format(new Date(), "HH:mm:ss");
                 for (const recipient of recipients) {
                     try {
-                        await sendEmail({
+                        await sendTeamEmail(form.team_id, {
                             to: recipient,
-                            from: process.env.EMAIL_FROM || "notifications@basalthq.com",
+                            // Use team's configured email if available, otherwise system default fallback
+                            from: undefined,
                             subject: `🟢 [NEW] ${form.name} | ${extracted_name || "New Applicant"} | ${timestamp}`,
                             text: `You have a new submission from ${form.name}.\n\nView in CRM: ${process.env.NEXT_PUBLIC_APP_URL}/crm/leads/${createdLeadId}`,
                             html: `
@@ -429,9 +431,9 @@ export async function POST(req: NextRequest) {
 
         if (extracted_email && (form.auto_respond || true)) { // User requested generic auto-reply, force enabled for now or verify form config
             try {
-                await sendEmail({
+                await sendTeamEmail(form.team_id, {
                     to: extracted_email,
-                    from: process.env.EMAIL_FROM || "hello@basalthq.com",
+                    from: undefined, // Use team config
                     subject: form.auto_respond_subject || `Received: ${form.name}`,
                     text: form.auto_respond_body || "Thank you for contacting us. We have received your message and will get back to you shortly.",
                 });

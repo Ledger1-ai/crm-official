@@ -3,7 +3,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Key, DollarSign, List, ChevronLeft } from "lucide-react";
+import { Key, DollarSign, List, ChevronLeft, Mail } from "lucide-react";
 import { NavigationCard } from "./NavigationCard";
 import { CreateTeamCard } from "./CreateTeamCard";
 import { SeedTeamCard } from "./SeedTeamCard";
@@ -48,6 +48,16 @@ export const PartnersNavigation = ({
             hidden: hideModelPricing
         },
         {
+            key: 'system-email',
+            title: "System Email",
+            description: "Manage global email config",
+            icon: Mail,
+            color: "from-blue-500/20 to-indigo-500/20",
+            iconColor: "text-blue-400",
+            href: "/partners/email-system-config",
+            hidden: hideSystemKeys
+        },
+        {
             key: 'manage-plans',
             title: "Manage Plans",
             description: "Configure subscription plans",
@@ -75,7 +85,7 @@ export const PartnersNavigation = ({
             )}
 
             {(visibleCards.length > 0 || !hideCreateTeam) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
                     {!hideCreateTeam && <CreateTeamCard availablePlans={availablePlans} />}
                     {!hideCreateTeam && <SeedTeamCard />}
                     {visibleCards.map((card) => (

@@ -31,9 +31,9 @@ export default async function CrmLayout({
 
         isMember = user?.team_role === "MEMBER";
 
-        const role = (user?.team_role || '').toUpperCase();
+        const role = (user?.team_role || '').trim().toUpperCase();
         // Check DB is_admin flag OR role-based access
-        isSuperAdmin = (user as any)?.is_admin || ['SUPER_ADMIN', 'OWNER', 'PLATFORM_ADMIN', 'SYSADM', 'PLATFORM ADMIN', 'ADMIN'].includes(role);
+        isSuperAdmin = (user as any)?.is_admin === true || ['SUPER_ADMIN', 'OWNER', 'PLATFORM_ADMIN', 'SYSADM', 'PLATFORM ADMIN', 'ADMIN'].includes(role);
 
         if (isSuperAdmin) {
             allowedModules = ['*'];

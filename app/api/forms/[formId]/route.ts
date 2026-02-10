@@ -157,7 +157,18 @@ export async function DELETE(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const teamId = (session.user as any).team_id;
+        const userId = session.user.id;
+        let teamId = (session.user as any).team_id;
+
+        // If no team_id on session, try to get from database
+        if (!teamId) {
+            const user = await prismadb.users.findUnique({
+                where: { id: userId },
+                select: { team_id: true },
+            });
+            teamId = user?.team_id;
+        }
+
         if (!teamId) {
             return NextResponse.json({ error: "No team associated" }, { status: 400 });
         }

@@ -102,7 +102,7 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
   const [wallet, setWallet] = useState('');
   const [prompt, setPrompt] = useState('');
 
-  const { hasAccess } = usePermission();
+  const { hasAccess, isSuperAdmin } = usePermission();
 
   const generated = useMemo(
     () =>
@@ -169,7 +169,7 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
   }
 
   // 1. Module Level Gate
-  if (!hasAccess('ai_lab') && !hasAccess('ai_lab.prompt_generator')) {
+  if (!isSuperAdmin && !hasAccess('ai_lab') && !hasAccess('ai_lab.prompt_generator')) {
     return (
       <div className="p-8 text-center text-muted-foreground">
         You do not have permission to access the Prompt Generator.

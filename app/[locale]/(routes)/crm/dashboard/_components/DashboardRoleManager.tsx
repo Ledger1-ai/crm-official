@@ -32,7 +32,7 @@ const DashboardRoleManager = async () => {
         select: { team_role: true, email: true, is_admin: true } // Email might be needed for hardcoded super admins if any
     });
 
-    const role = user?.team_role || "VIEWER";
+    const role = (user?.team_role || "VIEWER").trim().toUpperCase();
 
     // Platform Admin Check: Only specific team/users if requirement exists, otherwise maps to PLATFORM_ADMIN role
     // For now, treating PLATFORM_ADMIN and ADMIN similarly but with potential future separation.

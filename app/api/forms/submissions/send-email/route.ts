@@ -14,7 +14,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            console.error("[Send Email API] Failed to parse request body:", e);
+            return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+        }
         const { submissionId, to, subject, body: emailBody, includePdf } = body;
         console.log(`[Send Email API] To: ${to}, Subject: ${subject}, Include PDF: ${!!includePdf}`);
 

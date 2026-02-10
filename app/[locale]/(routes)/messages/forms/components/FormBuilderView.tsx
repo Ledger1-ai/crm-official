@@ -6,7 +6,7 @@ import {
     Plus, Copy, Code, Eye, Trash2, Settings, ChevronDown, ChevronRight,
     GripVertical, FileText, Lock, Globe, Users, Sparkles, Braces, Loader2,
     Palette, RefreshCw, Search, BarChart3, ExternalLink, MoreHorizontal, Shield,
-    LineChart, PenLine
+    LineChart, PenLine, Archive
 } from "lucide-react";
 import AnalyticsCharts from "@/app/[locale]/cms/(dashboard)/components/AnalyticsCharts";
 import { Button } from "@/components/ui/button";
@@ -308,7 +308,8 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
                 method: "DELETE",
             });
             if (!response.ok) {
-                throw new Error("Failed to delete form");
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || "Failed to delete form");
             }
             setForms(prev => prev.filter(f => f.id !== deleteConfirmForm.id));
             toast({ title: "Success", description: "Form deleted successfully" });
@@ -317,6 +318,27 @@ export function FormBuilderView({ forms: initialForms, projects, baseUrl, curren
             toast({ title: "Error", description: error.message || "Failed to delete form", variant: "destructive" });
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    // Archive form function
+    const handleArchiveForm = async (form: Form) => {
+        try {
+            const response = await fetch(`/api/forms/${form.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "ARCHIVED" }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || "Failed to archive form");
+            }
+
+            setForms(prev => prev.map(f => f.id === form.id ? { ...f, status: "ARCHIVED" } : f));
+            toast({ title: "Success", description: "Form archived successfully" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to archive form", variant: "destructive" });
         }
     };
 
@@ -1070,6 +1092,9 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                                             <DropdownMenuItem onClick={() => showEmbed(form)}>
                                                 <Code className="h-4 w-4 mr-2" /> Get Code
                                             </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleArchiveForm(form)}>
+                                                <Archive className="h-4 w-4 mr-2" /> Archive
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => setDeleteConfirmForm(form)}
                                                 className="text-destructive focus:text-destructive"
@@ -1123,6 +1148,9 @@ ${hasCaptcha ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => showEmbed(form)}>
                                                 <Code className="h-4 w-4 mr-2" /> Get Code
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleArchiveForm(form)}>
+                                                <Archive className="h-4 w-4 mr-2" /> Archive
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => setDeleteConfirmForm(form)}

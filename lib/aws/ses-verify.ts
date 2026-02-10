@@ -1,9 +1,24 @@
 import { SESv2Client, CreateEmailIdentityCommand, GetEmailIdentityCommand, DeleteEmailIdentityCommand } from "@aws-sdk/client-sesv2";
 
-const region = process.env.SES_REGION || process.env.AWS_REGION || "us-east-1";
+interface SESCredentials {
+    accessKeyId: string;
+    secretAccessKey: string;
+    region?: string;
+}
 
-// Singleton client (reusing if possible, though new allowed)
-const client = new SESv2Client({ region });
+const getClient = (creds?: SESCredentials) => {
+    if (creds?.accessKeyId && creds?.secretAccessKey) {
+        return new SESv2Client({
+            region: creds.region || "us-east-1",
+            credentials: {
+                accessKeyId: creds.accessKeyId,
+                secretAccessKey: creds.secretAccessKey,
+            }
+        });
+    }
+    // Fallback to system env
+    return new SESv2Client({ region: process.env.SES_REGION || process.env.AWS_REGION || "us-east-1" });
+}
 
 export type VerificationStatus = "PENDING" | "SUCCESS" | "FAILED" | "NOT_STARTED";
 
@@ -11,7 +26,8 @@ export type VerificationStatus = "PENDING" | "SUCCESS" | "FAILED" | "NOT_STARTED
  * Triggers a verification email to be sent to the specified address.
  * AWS SES will send a link that the user must click.
  */
-export async function verifyEmailIdentity(email: string): Promise<boolean> {
+export async function verifyEmailIdentity(email: string, creds?: SESCredentials): Promise<boolean> {
+    const client = getClient(creds);
     try {
         const command = new CreateEmailIdentityCommand({
             EmailIdentity: email,
@@ -31,7 +47,8 @@ export async function verifyEmailIdentity(email: string): Promise<boolean> {
 /**
  * Checks the current verification status of an email identity.
  */
-export async function getIdentityVerificationStatus(email: string): Promise<VerificationStatus> {
+export async function getIdentityVerificationStatus(email: string, creds?: SESCredentials): Promise<VerificationStatus> {
+    const client = getClient(creds);
     try {
         const command = new GetEmailIdentityCommand({
             EmailIdentity: email,
@@ -55,7 +72,8 @@ export async function getIdentityVerificationStatus(email: string): Promise<Veri
 /**
  * Remove an identity (stopped verifying or deleted config)
  */
-export async function deleteEmailIdentity(email: string) {
+export async function deleteEmailIdentity(email: string, creds?: SESCredentials) {
+    const client = getClient(creds);
     try {
         const command = new DeleteEmailIdentityCommand({
             EmailIdentity: email

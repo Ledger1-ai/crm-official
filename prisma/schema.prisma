@@ -1100,11 +1100,50 @@ model microsoft_Tokens {
   assigned_user Users? @relation(fields: [user], references: [id])
 }
 
+enum EmailProvider {
+  AWS_SES
+  RESEND
+  SENDGRID
+  MAILGUN
+  POSTMARK
+  SMTP
+}
+
 model TeamEmailConfig {
   id                  String @id @default(auto()) @map("_id") @db.ObjectId
   team_id             String @unique @db.ObjectId
+  
+  provider            EmailProvider @default(AWS_SES)
+  
+  // Common
+  from_name           String?
   from_email          String
-  aws_region          String @default("us-east-1")
+
+  // AWS SES Specific
+  aws_access_key_id     String?
+  aws_secret_access_key String?
+  aws_region            String @default("us-east-1")
+  
+  // RESEND Specific
+  resend_api_key      String?
+
+  // SENDGRID Specific
+  sendgrid_api_key    String?
+
+  // MAILGUN Specific
+  mailgun_api_key     String?
+  mailgun_domain      String?
+  mailgun_region      String?
+
+  // POSTMARK Specific
+  postmark_api_token  String?
+
+  // GENERIC SMTP Specific
+  smtp_host           String?
+  smtp_port           Int?
+  smtp_user           String?
+  smtp_password       String?
+
   verification_status String @default("PENDING") // PENDING, VERIFIED, FAILED
 
   createdAt DateTime @default(now()) @db.Date

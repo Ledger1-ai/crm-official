@@ -31,14 +31,14 @@ export async function getEffectiveRoleModules(teamId: string, role: string, scop
         // If role doesn't exist in ROLE_CONFIGS (e.g. SUPER_ADMIN), return empty or handle?
         // ROLE_CONFIGS excludes SUPER_ADMIN keys.
 
-        if (role === 'SUPER_ADMIN') return []; // SUPER_ADMIN usually has implicit full access
+        if (role === 'SUPER_ADMIN' || role === 'PLATFORM_ADMIN' || role === 'PLATFORM ADMIN') return ['*'];
 
         const config = ROLE_CONFIGS[role as Exclude<TeamRole, 'SUPER_ADMIN'>];
         return config ? config.defaultModules : [];
 
     } catch (error) {
         console.error("Failed to fetch effective permissions:", error);
-        if (role === 'SUPER_ADMIN') return [];
+        if (role === 'SUPER_ADMIN' || role === 'PLATFORM_ADMIN' || role === 'PLATFORM ADMIN') return ['*'];
         const config = ROLE_CONFIGS[role as Exclude<TeamRole, 'SUPER_ADMIN'>];
         return config ? config.defaultModules : [];
     }
