@@ -23,6 +23,7 @@ import {
 import { toast } from "react-hot-toast";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
+import Link from "next/link";
 
 interface LeadWizardQuickModalProps {
     open: boolean;
@@ -343,12 +344,12 @@ export const LeadWizardQuickModal = ({
                     {/* Hint */}
                     <p className="text-[10px] text-center text-white/20">
                         Need more control?{" "}
-                        <a
+                        <Link
                             href="/crm/lead-wizard"
                             className="text-cyan-500/60 hover:text-cyan-400 underline underline-offset-2 transition-colors"
                         >
                             Open the full wizard
-                        </a>{" "}
+                        </Link>{" "}
                         for guided and advanced modes.
                     </p>
                 </form>
