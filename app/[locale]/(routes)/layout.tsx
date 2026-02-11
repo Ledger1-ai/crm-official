@@ -9,6 +9,8 @@ import Footer from "./components/Footer";
 import { Metadata } from "next";
 import RecentActivityTracker from "@/components/RecentActivityTracker";
 import GlobalDialer from "@/components/voice/GlobalDialer";
+import { SmartBreadcrumb } from "@/components/SmartBreadcrumb";
+
 
 function getSafeMetadataBase(): URL {
   const envUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -94,10 +96,12 @@ export default async function AppLayout({
           avatar={session.user.image as string}
           lang={session.user.userLanguage as string}
         />
+        <SmartBreadcrumb />
         <div className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden">
           {children}
         </div>
         <Footer />
+
       </div>
       <GlobalDialer />
     </div>

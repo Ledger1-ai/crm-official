@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Users as UsersIcon, Edit, CalendarClock, Lock } from "lucide-react";
+import { Users as UsersIcon, Edit, CalendarClock, Lock, Search, Filter, ArrowUpDown, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,13 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
 import { updateTeamRenewal } from "@/actions/teams/update-team-renewal";
@@ -73,6 +80,12 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSeeding, setIsSeeding] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>("card");
+
+    // Search & Filter State
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("ALL");
+    const [sortOrder, setSortOrder] = useState("newest");
+
     const isMobile = useIsMobile();
 
     useEffect(() => {
@@ -128,7 +141,7 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
             if (res.error) {
                 toast.error(res.error);
             } else {
-                toast.success(`Internal Team Seeded! Updated ${res.count} users.`);
+                toast.success(`BasaltHQ Team Seeded! Updated ${res.count} users.`);
                 router.refresh();
             }
         } catch (error) {
@@ -142,7 +155,30 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
     const hasInternalTeam = teams.some(t => t.slug === 'internal' || t.slug === 'ledger1' || t.slug === 'basalt' || t.slug === 'basalthq');
 
     // Show all teams including internal ones
-    const filteredTeams = teams;
+    const filteredTeams = teams.filter(team => {
+        // Search Filter
+        const matchesSearch =
+            team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            team.slug.toLowerCase().includes(searchTerm.toLowerCase());
+
+        // Status Filter
+        let matchesStatus = true;
+        if (statusFilter !== "ALL") {
+            const status = team.status || "ACTIVE"; // Default to ACTIVE if null
+            if (statusFilter === "ACTIVE") matchesStatus = status === "ACTIVE";
+            else if (statusFilter === "PENDING") matchesStatus = status === "PENDING";
+            else if (statusFilter === "SUSPENDED") matchesStatus = status === "SUSPENDED";
+            else if (statusFilter === "OVERDUE") matchesStatus = status === "OVERDUE"; // Ensure this matches getEffectiveStatus if needed
+        }
+
+        return matchesSearch && matchesStatus;
+    }).sort((a, b) => {
+        if (sortOrder === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        if (sortOrder === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        if (sortOrder === "alphabetical") return a.name.localeCompare(b.name);
+        if (sortOrder === "members") return b.members.length - a.members.length;
+        return 0;
+    });
 
     const pendingCount = filteredTeams.filter(t => t.status === 'PENDING').length;
 
@@ -216,7 +252,7 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
                     {!hasInternalTeam && (
                         <Button variant="secondary" onClick={handleSeed} disabled={isSeeding}>
                             <Lock className={`w-4 h-4 mr-2 ${isSeeding ? "animate-spin" : ""}`} />
-                            <span className="hidden md:inline">Seed Internal Team</span>
+                            <span className="hidden md:inline">Seed BasaltHQ Team</span>
                             <span className="md:hidden">Seed</span>
                         </Button>
                     )}
@@ -226,7 +262,7 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
                         <LinkHref href={`/partners/${teams.find(t => ['internal', 'ledger1', 'basalt', 'basalthq'].includes(t.slug))?.id}`}>
                             <Button variant="secondary">
                                 <UsersIcon className="w-4 h-4 mr-2" />
-                                Manage Internal Team
+                                Manage BasaltHQ Team
                             </Button>
                         </LinkHref>
                     )}
@@ -236,6 +272,55 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
                 {/* View Toggle */}
                 <div className="flex items-center ml-2">
                     <ViewToggle value={viewMode} onChange={setViewMode} />
+                </div>
+            </div>
+
+            {/* Search & Filter Bar */}
+            <div className="flex flex-col md:flex-row gap-4 items-center bg-card p-4 rounded-lg border shadow-sm">
+                <div className="relative w-full md:w-1/3">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                        placeholder="Search teams..."
+                        className="pl-9"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={() => setSearchTerm("")}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    )}
+                </div>
+                <div className="flex gap-2 w-full md:w-auto ml-auto">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[140px]">
+                            <Filter className="w-4 h-4 mr-2" />
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ALL">All Statuses</SelectItem>
+                            <SelectItem value="ACTIVE">Active</SelectItem>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                            <SelectItem value="OVERDUE">Overdue</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={sortOrder} onValueChange={setSortOrder}>
+                        <SelectTrigger className="w-[160px]">
+                            <ArrowUpDown className="w-4 h-4 mr-2" />
+                            <SelectValue placeholder="Sort By" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="newest">Newest First</SelectItem>
+                            <SelectItem value="oldest">Oldest First</SelectItem>
+                            <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                            <SelectItem value="members">Member Count</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 

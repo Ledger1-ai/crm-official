@@ -5,10 +5,10 @@ import { revalidatePath } from "next/cache";
 
 export const seedInternalTeam = async () => {
     try {
-        // 1. Check if "Internal Team" exists
+        // 1. Check if "BasaltHQ" exists
         let internalTeam = await prismadb.team.findUnique({
             where: {
-                slug: "internal",
+                slug: "basalthq",
             },
         });
 
@@ -16,8 +16,8 @@ export const seedInternalTeam = async () => {
         if (!internalTeam) {
             internalTeam = await prismadb.team.create({
                 data: {
-                    name: "Internal Team",
-                    slug: "internal",
+                    name: "BasaltHQ",
+                    slug: "basalthq",
                 },
             });
         }

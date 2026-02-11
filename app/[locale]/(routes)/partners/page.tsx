@@ -33,15 +33,19 @@ const PartnersPage = async () => {
         return redirect("/");
     }
 
-    const [teams, plans, totalUsers] = await Promise.all([
+    const [teams, plans] = await Promise.all([
         getTeams(),
-        getPlans(),
-        prismadb.users.count({
-            where: {
-                team_id: { not: null }
-            }
-        })
+        getPlans()
     ]);
+
+    // Calculate total users from actual team members to ensure consistency
+    const uniqueUserIds = new Set<string>();
+    (teams as any[]).forEach(team => {
+        team.members.forEach((member: any) => {
+            if (member.id) uniqueUserIds.add(member.id);
+        });
+    });
+    const totalUsers = uniqueUserIds.size;
 
     const activeTeamsCount = (teams as any[]).filter(t => t.status === 'ACTIVE').length;
     const totalTeamsCount = (teams as any[]).length;
