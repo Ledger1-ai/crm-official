@@ -26,7 +26,19 @@ export const getAllCrmData = async () => {
   const users = await prismadb.users.findMany({
     where: usersWhere,
   });
-  const accounts = await (prismadb.crm_Accounts as any).findMany({ where: whereClause });
+
+  const accountsWhere = {
+    ...whereClause,
+    NOT: [
+      { name: { startsWith: "Email -" } },
+      { name: { startsWith: "Meeting" } },
+      { name: { startsWith: "Call" } },
+      { name: { startsWith: "Amazon SES" } },
+      { name: { startsWith: "Project Documents" } },
+    ],
+  };
+
+  const accounts = await (prismadb.crm_Accounts as any).findMany({ where: accountsWhere });
   const opportunities = await prismadb.crm_Opportunities.findMany({
     where: whereClause,
     include: {

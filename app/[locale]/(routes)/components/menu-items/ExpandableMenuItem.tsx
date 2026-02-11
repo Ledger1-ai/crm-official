@@ -129,11 +129,11 @@ const ExpandableMenuItem = ({ href, icon: Icon, title, isOpen, isActive, items, 
                             width: isOpen ? "auto" : 0,
                             display: isOpen ? "flex" : "none",
                         }}
-                        className="ml-3 flex-1 items-center justify-between overflow-hidden whitespace-nowrap z-10"
+                        className="ml-2.5 flex-1 items-center justify-between overflow-hidden whitespace-nowrap z-10"
                     >
                         <span className="truncate">{title}</span>
                         <div className="flex items-center gap-2 ml-auto shrink-0">
-                            {badge && badge > 0 && (
+                            {!!badge && badge > 0 && (
                                 <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-0.5 rounded-full bg-primary/20 text-primary text-[9px] font-bold leading-none">
                                     {badge > 99 ? "99+" : badge}
                                 </span>

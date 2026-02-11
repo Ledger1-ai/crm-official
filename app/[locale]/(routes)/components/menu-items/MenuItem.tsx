@@ -91,7 +91,7 @@ const MenuItem = ({ href, icon: Icon, title, isOpen, isActive, onClick, isMobile
                             display: isOpen ? "block" : "none",
                         }}
                         transition={{ duration: 0.2 }}
-                        className="ml-3 truncate whitespace-nowrap overflow-hidden z-10"
+                        className="ml-2.5 truncate whitespace-nowrap overflow-hidden z-10"
                     >
                         {title}
                     </motion.span>

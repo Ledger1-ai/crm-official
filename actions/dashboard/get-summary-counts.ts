@@ -76,6 +76,20 @@ export const getSummaryCounts = async (): Promise<DashboardCounts> => {
     return { status: "OPEN" };
   };
 
+  const getAccountFilter = () => {
+    const base = getFilter("assigned_to");
+    return {
+      ...base,
+      NOT: [
+        { name: { startsWith: "Email -" } },
+        { name: { startsWith: "Meeting" } },
+        { name: { startsWith: "Call" } },
+        { name: { startsWith: "Amazon SES" } },
+        { name: { startsWith: "Project Documents" } },
+      ]
+    };
+  };
+
   const [
     leads,
     tasks,
@@ -96,7 +110,7 @@ export const getSummaryCounts = async (): Promise<DashboardCounts> => {
     prismadb.tasks.count({ where: getFilter("user") }),
     prismadb.boards.count({ where: getFilter("user") }),
     prismadb.crm_Contacts.count({ where: getFilter("assigned_to") }),
-    prismadb.crm_Accounts.count({ where: getFilter("assigned_to") }),
+    prismadb.crm_Accounts.count({ where: getAccountFilter() }),
     prismadb.crm_Contracts.count({ where: getFilter("assigned_to") }),
     prismadb.invoices.count({ where: isGlobalAdmin ? {} : teamId ? { team_id: teamId } : { team_id: "no-team-fallback" } }), // Invoices stay team-level
     prismadb.documents.count({ where: getDocumentFilter() }), // Member-specific document filter

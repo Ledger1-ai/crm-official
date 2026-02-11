@@ -92,7 +92,7 @@ const AdminDashboard = ({
                             <div className="absolute top-[-2.5rem] right-0 z-10 font-sans">
                                 <EditDashboardButton availableEntities={crmEntities} />
                             </div>
-                            <JumpBackIn align="right" />
+                            <JumpBackIn align="right" userId={userId} />
                         </div>
                     </div>
 

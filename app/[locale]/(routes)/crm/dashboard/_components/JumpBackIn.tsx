@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { Clock } from "lucide-react";
 import { HistoryItem } from "@/components/RecentActivityTracker";
 import { cn } from "@/lib/utils";
@@ -24,15 +23,12 @@ function getBreadcrumbColor(label: string) {
 interface JumpBackInProps {
     align?: "left" | "right";
     className?: string;
+    userId: string;
 }
 
-export default function JumpBackIn({ align = "left", className }: JumpBackInProps) {
-    const { data: session } = useSession(); // Add session hook
+export default function JumpBackIn({ align = "left", className, userId }: JumpBackInProps) {
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [isMounted, setIsMounted] = useState(false);
-
-    // Get userId safely
-    const userId = session?.user?.id;
 
     useEffect(() => {
         setIsMounted(true);

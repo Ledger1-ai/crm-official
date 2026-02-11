@@ -49,12 +49,13 @@ type Props = {
   features: string[];
   isPartnerAdmin: boolean;
   teamRole?: string;
+  serviceBadge?: number;
 };
 
 // ─── Sidebar Animation Variants ──────────────────────────
 const sidebarVariants = {
   expanded: {
-    width: "12.5rem",
+    width: "11.25rem",
     transition: { type: "spring", stiffness: 200, damping: 25 } as const,
   },
   collapsed: {
@@ -74,7 +75,7 @@ const compactLogoVariants = {
 };
 
 // ─── Component ───────────────────────────────────────────
-const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBER" }: Props) => {
+const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBER", serviceBadge = 0 }: Props) => {
   const [open, setOpen] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
@@ -275,7 +276,7 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 isOpen={open}
                 isActive={isCrmCases}
                 items={serviceSubItems}
-                badge={3}
+                badge={serviceBadge}
               />
 
               {/* ══════ MARKETING HUB ══════ */}
@@ -300,7 +301,6 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                     isOpen={open}
                     isActive={isCrmLeads}
                     items={leadsSubItems}
-                    badge={12}
                   />
 
                   {hasModule("projects") && hasFeature("projects") && (
