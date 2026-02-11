@@ -235,14 +235,6 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
               <HubLabel label="Sales Hub" isOpen={open} />
 
               <ExpandableMenuItem
-                href="/crm/opportunities"
-                icon={Target}
-                title="Deals"
-                isOpen={open}
-                isActive={isCrmOpps}
-                items={oppsSubItems}
-              />
-              <ExpandableMenuItem
                 href="/crm/sales-command"
                 icon={Radio}
                 title="Command"
@@ -250,12 +242,13 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 isActive={isCrmCommand}
                 items={commandSubItems}
               />
-              <MenuItem
-                href="/crm/quotes"
-                icon={FileText}
-                title="Quotes"
+              <ExpandableMenuItem
+                href="/crm/opportunities"
+                icon={Target}
+                title="Deals"
                 isOpen={open}
-                isActive={isCrmQuotes}
+                isActive={isCrmOpps}
+                items={oppsSubItems}
               />
               <MenuItem
                 href="/crm/dialer"
@@ -263,6 +256,13 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 title="Dialer"
                 isOpen={open}
                 isActive={isCrmDialer}
+              />
+              <MenuItem
+                href="/crm/quotes"
+                icon={FileText}
+                title="Quotes"
+                isOpen={open}
+                isActive={isCrmQuotes}
               />
 
               {/* ══════ SERVICE HUB ══════ */}
@@ -283,6 +283,16 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 <>
                   <HubLabel label="Marketing Hub" isOpen={open} />
 
+                  {hasModule("messages") && hasFeature("messages") && (
+                    <MenuItem
+                      href="/messages/forms"
+                      icon={FormInput}
+                      title="Forms"
+                      isOpen={open}
+                      isActive={isCrmForms}
+                    />
+                  )}
+
                   <ExpandableMenuItem
                     href="/crm/leads"
                     icon={Users}
@@ -293,13 +303,13 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                     badge={12}
                   />
 
-                  {hasModule("messages") && hasFeature("messages") && (
+                  {hasModule("projects") && hasFeature("projects") && (
                     <MenuItem
-                      href="/messages/forms"
-                      icon={FormInput}
-                      title="Forms"
+                      href="/campaigns"
+                      icon={ServerIcon}
+                      title={dict.ModuleMenu.projects || "Projects"}
                       isOpen={open}
-                      isActive={isCrmForms}
+                      isActive={isCrmProjects}
                     />
                   )}
                 </>
@@ -330,15 +340,7 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 isActive={isCrmContracts}
                 items={contractsSubItems}
               />
-              {hasModule("projects") && hasFeature("projects") && isNonMember && (
-                <MenuItem
-                  href="/campaigns"
-                  icon={ServerIcon}
-                  title={dict.ModuleMenu.projects || "Projects"}
-                  isOpen={open}
-                  isActive={isCrmProjects}
-                />
-              )}
+
               <MenuItem
                 href="/crm/products"
                 icon={Package}
@@ -387,6 +389,13 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 <>
                   <HubLabel label="Automation" isOpen={open} />
 
+                  <MenuItem
+                    href="/crm/approvals"
+                    icon={CheckCircle2}
+                    title="Approvals"
+                    isOpen={open}
+                    isActive={isApprovals}
+                  />
                   <ExpandableMenuItem
                     href="/crm/workflows"
                     icon={Zap}
@@ -401,13 +410,6 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                     title="Guards"
                     isOpen={open}
                     isActive={isGuards}
-                  />
-                  <MenuItem
-                    href="/crm/approvals"
-                    icon={CheckCircle2}
-                    title="Approvals"
-                    isOpen={open}
-                    isActive={isApprovals}
                   />
                 </>
               )}
