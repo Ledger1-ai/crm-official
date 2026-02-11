@@ -445,7 +445,7 @@ model crm_Contracts {
   assigned_team Team?   @relation(fields: [team_id], references: [id])
 
   // Relations
-  deal_room     crm_DealRooms?
+  deal_room crm_DealRooms?
 }
 
 enum crm_Contracts_Status {
@@ -774,8 +774,14 @@ model Tasks {
   documents        Documents[]     @relation(fields: [documentIDs], references: [id])
   assigned_user    Users?          @relation(fields: [user], references: [id])
   assigned_section Sections?       @relation(fields: [section], references: [id])
+
+  // CRM Linkages
+  accountId     String?     @db.ObjectId
+  opportunityId String?     @db.ObjectId
+  contactId     String?     @db.ObjectId
+  leadId        String?     @db.ObjectId
   //Staus
-  taskStatus       taskStatus?     @default(ACTIVE)
+  taskStatus    taskStatus? @default(ACTIVE)
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
@@ -851,7 +857,7 @@ model Role {
 }
 
 model Users {
-  saved_reports SavedReport[]
+  saved_reports        SavedReport[]
   id                   String                   @id @default(auto()) @map("_id") @db.ObjectId
   v                    Int                      @default(0) @map("__v")
   account_name         String?
@@ -917,41 +923,41 @@ model Users {
   calendar_colors       Json?
 
   // Team / Partner
-  team_id          String?     @db.ObjectId
-  assigned_team    Team?       @relation(name: "TeamMembers", fields: [team_id], references: [id])
-  team_role        String?     @default("MEMBER") // SUPER_ADMIN, ADMIN, MEMBER, VIEWER
-  department_id    String?     @db.ObjectId // If assigned to a specific department
-  assigned_modules String[]
-  custom_role_id   String?     @db.ObjectId
-  custom_role      CustomRole? @relation(fields: [custom_role_id], references: [id])
-  created_workflows crm_Workflow[] @relation(name: "WorkflowCreator")
+  team_id                String?                  @db.ObjectId
+  assigned_team          Team?                    @relation(name: "TeamMembers", fields: [team_id], references: [id])
+  team_role              String?                  @default("MEMBER") // SUPER_ADMIN, ADMIN, MEMBER, VIEWER
+  department_id          String?                  @db.ObjectId // If assigned to a specific department
+  assigned_modules       String[]
+  custom_role_id         String?                  @db.ObjectId
+  custom_role            CustomRole?              @relation(fields: [custom_role_id], references: [id])
+  created_workflows      crm_Workflow[]           @relation(name: "WorkflowCreator")
   created_custom_objects CustomObjectDefinition[] @relation("CreatedCustomObjects")
 
   // Service Cloud relations
-  assigned_cases       crm_Cases[]            @relation(name: "CaseAssignedUser")
-  created_cases        crm_Cases[]            @relation(name: "CaseCreator")
-  case_comments        crm_Case_Comments[]    @relation(name: "CaseCommentAuthor")
-  case_status_changes  CaseStatusTransition[] @relation(name: "CaseStatusChanger")
+  assigned_cases      crm_Cases[]            @relation(name: "CaseAssignedUser")
+  created_cases       crm_Cases[]            @relation(name: "CaseCreator")
+  case_comments       crm_Case_Comments[]    @relation(name: "CaseCommentAuthor")
+  case_status_changes CaseStatusTransition[] @relation(name: "CaseStatusChanger")
 
   // Smart Router (Omni-Channel Routing)
-  agent_presence       AgentPresence?         @relation(name: "AgentPresenceUser")
-  agent_skills         AgentSkill[]           @relation(name: "AgentSkillUser")
-  routing_fallback     RoutingConfig[]        @relation(name: "RoutingFallbackUser")
+  agent_presence   AgentPresence?  @relation(name: "AgentPresenceUser")
+  agent_skills     AgentSkill[]    @relation(name: "AgentSkillUser")
+  routing_fallback RoutingConfig[] @relation(name: "RoutingFallbackUser")
 
   // Help Hub (Knowledge Base)
-  kb_articles          KnowledgeArticle[]     @relation(name: "KBArticleAuthor")
+  kb_articles KnowledgeArticle[] @relation(name: "KBArticleAuthor")
 
   // Phase 3: Guard Rules (Validation)
-  created_validation_rules ValidationRule[]    @relation(name: "ValidationRuleCreator")
+  created_validation_rules ValidationRule[] @relation(name: "ValidationRuleCreator")
 
   // Phase 3: Approval Process
-  created_approval_processes ApprovalProcess[] @relation(name: "ApprovalProcessCreator")
-  approval_step_approvals    ApprovalStep[]    @relation(name: "ApprovalStepApprover")
-  approval_submissions       ApprovalRequest[] @relation(name: "ApprovalSubmitter")
+  created_approval_processes ApprovalProcess[]       @relation(name: "ApprovalProcessCreator")
+  approval_step_approvals    ApprovalStep[]          @relation(name: "ApprovalStepApprover")
+  approval_submissions       ApprovalRequest[]       @relation(name: "ApprovalSubmitter")
   approval_actions           ApprovalRequestAction[] @relation(name: "ApprovalActor")
   notifications              Notification[]
   quotes                     crm_Quotes[]
-  dashboard_preference DashboardPreference?
+  dashboard_preference       DashboardPreference?
 }
 
 model Team {
@@ -1006,7 +1012,7 @@ model Team {
   custom_roles   CustomRole[]
   captcha_config TeamCaptchaConfig?
   RolePermission RolePermission[]
-  workflows      crm_Workflow[]   @relation(name: "WorkflowTeam")
+  workflows      crm_Workflow[]     @relation(name: "WorkflowTeam")
 
   // Dynamic Schema Engine
   custom_objects CustomObjectDefinition[]
@@ -1015,24 +1021,24 @@ model Team {
 
   // Service Cloud
   cases        crm_Cases[]
-  sla_policies SLA_Policy[]  // Service Commitments
+  sla_policies SLA_Policy[] // Service Commitments
 
   // Smart Router (Omni-Channel Routing)
-  agent_presences    AgentPresence[]
-  agent_skills       AgentSkill[]
-  routing_config     RoutingConfig?     @relation(name: "TeamRoutingConfig")
+  agent_presences AgentPresence[]
+  agent_skills    AgentSkill[]
+  routing_config  RoutingConfig?  @relation(name: "TeamRoutingConfig")
 
   // Help Hub (Knowledge Base)
-  kb_categories      KnowledgeCategory[]
-  kb_articles        KnowledgeArticle[]
+  kb_categories KnowledgeCategory[]
+  kb_articles   KnowledgeArticle[]
 
   // Phase 3: Intelligence & Automation
-  validation_rules     ValidationRule[]
-  approval_processes   ApprovalProcess[]
-  approval_requests    ApprovalRequest[]
-  notifications        Notification[]
-  products             crm_Products[]
-  quotes               crm_Quotes[]
+  validation_rules   ValidationRule[]
+  approval_processes ApprovalProcess[]
+  approval_requests  ApprovalRequest[]
+  notifications      Notification[]
+  products           crm_Products[]
+  quotes             crm_Quotes[]
 }
 
 model CustomRole {
@@ -1172,39 +1178,39 @@ enum EmailProvider {
 }
 
 model TeamEmailConfig {
-  id                  String @id @default(auto()) @map("_id") @db.ObjectId
-  team_id             String @unique @db.ObjectId
-  
-  provider            EmailProvider @default(AWS_SES)
-  
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  team_id String @unique @db.ObjectId
+
+  provider EmailProvider @default(AWS_SES)
+
   // Common
-  from_name           String?
-  from_email          String
+  from_name  String?
+  from_email String
 
   // AWS SES Specific
   aws_access_key_id     String?
   aws_secret_access_key String?
-  aws_region            String @default("us-east-1")
-  
+  aws_region            String  @default("us-east-1")
+
   // RESEND Specific
-  resend_api_key      String?
+  resend_api_key String?
 
   // SENDGRID Specific
-  sendgrid_api_key    String?
+  sendgrid_api_key String?
 
   // MAILGUN Specific
-  mailgun_api_key     String?
-  mailgun_domain      String?
-  mailgun_region      String?
+  mailgun_api_key String?
+  mailgun_domain  String?
+  mailgun_region  String?
 
   // POSTMARK Specific
-  postmark_api_token  String?
+  postmark_api_token String?
 
   // GENERIC SMTP Specific
-  smtp_host           String?
-  smtp_port           Int?
-  smtp_user           String?
-  smtp_password       String?
+  smtp_host     String?
+  smtp_port     Int?
+  smtp_user     String?
+  smtp_password String?
 
   verification_status String @default("PENDING") // PENDING, VERIFIED, FAILED
 
@@ -1371,7 +1377,6 @@ model TeamCaptchaConfig {
 
   assigned_team Team @relation(fields: [team_id], references: [id])
 }
-
 
 model chat_Sessions {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -1839,14 +1844,14 @@ model PageView {
 
 model SystemAuthConfig {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  provider     String   // "google", "github", "azure-ad"
+  provider     String // "google", "github", "azure-ad"
   clientId     String
   clientSecret String
-  tenantId     String?  // For Azure AD or optional logic
+  tenantId     String? // For Azure AD or optional logic
   enabled      Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
+
   @@unique([provider])
 }
 
@@ -1991,10 +1996,10 @@ model Form {
   slug        String  @unique // Used for public URL
 
   // Form configuration
-  status          FormStatus @default(DRAFT)
+  status              FormStatus         @default(DRAFT)
   submission_behavior SubmissionBehavior @default(MESSAGE)
-  success_message String?    @default("Thank you for your submission!")
-  redirect_url    String? // Optional redirect after submission
+  success_message     String?            @default("Thank you for your submission!")
+  redirect_url        String? // Optional redirect after submission
 
   // Branding
   primary_color String? @default("#F54029")
@@ -2039,12 +2044,12 @@ model Form {
 model FormView {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   form_id String @db.ObjectId
-  
+
   // Metadata
   ip_address String?
   user_agent String?
   referer    String?
-  
+
   // Timestamps
   viewedAt DateTime @default(now())
 
@@ -2344,17 +2349,17 @@ model RolePermission {
 }
 
 model SavedReport {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  type      String   @default("AI_SUMMARY")
-  content   String
-  prompt    String?
-  filters   Json?
-  
-  userId    String   @db.ObjectId
-  user      Users    @relation(fields: [userId], references: [id])
-  
-  teamId    String?  @db.ObjectId
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  title   String
+  type    String  @default("AI_SUMMARY")
+  content String
+  prompt  String?
+  filters Json?
+
+  userId String @db.ObjectId
+  user   Users  @relation(fields: [userId], references: [id])
+
+  teamId String? @db.ObjectId
   // Optional: team Team? @relation(fields: [teamId], references: [id])
 
   createdAt DateTime @default(now())
@@ -2363,52 +2368,52 @@ model SavedReport {
 
 // DealRoom Models (Phase 1)
 model crm_DealRooms {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  contract_id         String   @db.ObjectId @unique
-  contract            crm_Contracts @relation(fields: [contract_id], references: [id])
-  
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  contract_id String        @unique @db.ObjectId
+  contract    crm_Contracts @relation(fields: [contract_id], references: [id])
+
   // Security & Validity
-  slug                String   @unique // The UUID/Key for the public URL
-  password_protection String?  // Optional password (hashed or plain if simple)
+  slug                String    @unique // The UUID/Key for the public URL
+  password_protection String? // Optional password (hashed or plain if simple)
   valid_until         DateTime? @db.Date
-  
+
   // Customization
-  hero_video_url      String?  // Loom video etc.
-  welcome_message     String?
-  
+  hero_video_url  String? // Loom video etc.
+  welcome_message String?
+
   // Pricing Interaction
   interactive_pricing Boolean @default(true)
-  allowed_addons      Json?   // Array of { name: "Support", price: 500 }
-  selected_addons     Json?   // What the client has currently toggled ON
-  
+  allowed_addons      Json? // Array of { name: "Support", price: 500 }
+  selected_addons     Json? // What the client has currently toggled ON
+
   // Analytics Aggregated
-  total_views         Int      @default(0)
-  unique_visitors     Int      @default(0)
-  last_viewed_at      DateTime? @db.Date
-  engagement_score    Float    @default(0)
+  total_views      Int       @default(0)
+  unique_visitors  Int       @default(0)
+  last_viewed_at   DateTime? @db.Date
+  engagement_score Float     @default(0)
 
   // Status
-  is_active           Boolean  @default(true)
-  
+  is_active Boolean @default(true)
+
   // Relations
-  activities          crm_DealRoom_Activities[]
-  
-  createdAt           DateTime @default(now()) @db.Date
-  updatedAt           DateTime @updatedAt @db.Date
+  activities crm_DealRoom_Activities[]
+
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 }
 
 model crm_DealRoom_Activities {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  deal_room_id String   @db.ObjectId
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  deal_room_id String        @db.ObjectId
   deal_room    crm_DealRooms @relation(fields: [deal_room_id], references: [id])
-  
-  type         String   // OPENED, VIEWED_PRICING, DOWNLOADED_PDF, CHAT_STARTED
-  metadata     Json?    // e.g. { duration: 120, section: "Pricing" }
-  
-  visitor_ip   String?
+
+  type     String // OPENED, VIEWED_PRICING, DOWNLOADED_PDF, CHAT_STARTED
+  metadata Json? // e.g. { duration: 120, section: "Pricing" }
+
+  visitor_ip    String?
   visitor_agent String?
-  
-  occurredAt   DateTime @default(now()) @db.Date
+
+  occurredAt DateTime @default(now()) @db.Date
 }
 
 // =============================================================================
@@ -2432,61 +2437,61 @@ enum ExecutionStatus {
 }
 
 model crm_Workflow {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  v              Int?           @map("__v")
-  name           String
-  description    String?
-  status         WorkflowStatus @default(DRAFT)
-  
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int?           @map("__v")
+  name        String
+  description String?
+  status      WorkflowStatus @default(DRAFT)
+
   // Trigger configuration
-  trigger_type   String         // DEAL_ROOM_OPENED, SENTIMENT_NEGATIVE, LEAD_CREATED, FORM_SUBMITTED, MANUAL, RECORD_CREATED, RECORD_UPDATED, RECORD_DELETED, SCHEDULED, APPROVAL_RESPONSE
-  trigger_config Json?          // Trigger-specific configuration
-  
+  trigger_type   String // DEAL_ROOM_OPENED, SENTIMENT_NEGATIVE, LEAD_CREATED, FORM_SUBMITTED, MANUAL, RECORD_CREATED, RECORD_UPDATED, RECORD_DELETED, SCHEDULED, APPROVAL_RESPONSE
+  trigger_config Json? // Trigger-specific configuration
+
   // Phase 3: FlowState type classification
-  flow_type      String         @default("AUTO_FLOW") // AUTO_FLOW | INTERACTIVE | EVENT_DRIVEN | SCHEDULED | APPROVAL_CHAIN
-  
+  flow_type String @default("AUTO_FLOW") // AUTO_FLOW | INTERACTIVE | EVENT_DRIVEN | SCHEDULED | APPROVAL_CHAIN
+
   // Phase 3: Object binding (for Event-Driven and Interactive Flows)
-  object_type    String?        // e.g., "crm_Leads", "crm_Opportunities", "crm_Cases", or custom object apiName
-  record_trigger_event String?  // CREATED | UPDATED | DELETED (for Event-Driven flows)
-  record_filter  Json?          // Filter criteria: { field: "status", operator: "equals", value: "NEW" }
-  
+  object_type          String? // e.g., "crm_Leads", "crm_Opportunities", "crm_Cases", or custom object apiName
+  record_trigger_event String? // CREATED | UPDATED | DELETED (for Event-Driven flows)
+  record_filter        Json? // Filter criteria: { field: "status", operator: "equals", value: "NEW" }
+
   // Phase 3: Interactive Flow configuration
-  screen_config  Json?          // Interactive Flow wizard config: { screens: [...], currentScreen: 0 }
+  screen_config Json? // Interactive Flow wizard config: { screens: [...], currentScreen: 0 }
 
   // React Flow canvas data
-  nodes          Json           // Array of React Flow nodes
-  edges          Json           // Array of React Flow edges
-  
+  nodes Json // Array of React Flow nodes
+  edges Json // Array of React Flow edges
+
   // Ownership
-  team_id        String         @db.ObjectId
-  created_by     String         @db.ObjectId
-  
-  createdAt      DateTime       @default(now()) @db.Date
-  updatedAt      DateTime       @updatedAt @db.Date
-  
+  team_id    String @db.ObjectId
+  created_by String @db.ObjectId
+
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+
   // Relations
-  executions     crm_Workflow_Execution[]
-  assigned_team  Team?          @relation(name: "WorkflowTeam", fields: [team_id], references: [id])
-  creator        Users?         @relation(name: "WorkflowCreator", fields: [created_by], references: [id])
+  executions    crm_Workflow_Execution[]
+  assigned_team Team?                    @relation(name: "WorkflowTeam", fields: [team_id], references: [id])
+  creator       Users?                   @relation(name: "WorkflowCreator", fields: [created_by], references: [id])
 }
 
 model crm_Workflow_Execution {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  v               Int?            @map("__v")
-  workflow_id     String          @db.ObjectId
-  workflow        crm_Workflow    @relation(fields: [workflow_id], references: [id])
-  
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int?         @map("__v")
+  workflow_id String       @db.ObjectId
+  workflow    crm_Workflow @relation(fields: [workflow_id], references: [id])
+
   status          ExecutionStatus @default(RUNNING)
-  trigger_data    Json?           // Data that triggered the workflow
-  current_node    String?         // Current node being executed
-  completed_nodes String[]        // Already executed node IDs
-  node_outputs    Json?           // Output data from each node
+  trigger_data    Json? // Data that triggered the workflow
+  current_node    String? // Current node being executed
+  completed_nodes String[] // Already executed node IDs
+  node_outputs    Json? // Output data from each node
   scheduled_at    DateTime?       @db.Date // For delay nodes
   error           String?
-  
-  startedAt       DateTime        @default(now()) @db.Date
-  completedAt     DateTime?       @db.Date
-  
+
+  startedAt   DateTime  @default(now()) @db.Date
+  completedAt DateTime? @db.Date
+
   @@index([workflow_id, status])
 }
 
@@ -2513,105 +2518,105 @@ enum CustomFieldType {
 }
 
 model CustomObjectDefinition {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
-  
-  name        String   // Display Name (e.g. "Vehicle")
-  pluralName  String   // (e.g. "Vehicles")
-  apiName     String   // (e.g. "vehicle_c") - Unique per team
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
+
+  name        String // Display Name (e.g. "Vehicle")
+  pluralName  String // (e.g. "Vehicles")
+  apiName     String // (e.g. "vehicle_c") - Unique per team
   description String?
-  icon        String?  // Lucide icon name
-  
+  icon        String? // Lucide icon name
+
   // System flags
-  isSystem    Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  
+  isSystem Boolean @default(false)
+  isActive Boolean @default(true)
+
   // Audit
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
-  createdBy   String   @db.ObjectId
-  
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
+
   // Relations
-  fields      CustomFieldDefinition[]
-  records     CustomRecord[]
-  layouts     PageLayout[]
+  fields  CustomFieldDefinition[]
+  records CustomRecord[]
+  layouts PageLayout[]
 
   assigned_creator Users @relation("CreatedCustomObjects", fields: [createdBy], references: [id])
-  
+
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
-  
+
   @@unique([team_id, apiName])
 }
 
 model CustomFieldDefinition {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?            @map("__v")
-  
-  object_id   String          @db.ObjectId
-  
-  name        String          // Display Name (e.g. "License Plate")
-  apiName     String          // (e.g. "license_plate_c")
-  type        CustomFieldType
-  
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
+
+  object_id String @db.ObjectId
+
+  name    String // Display Name (e.g. "License Plate")
+  apiName String // (e.g. "license_plate_c")
+  type    CustomFieldType
+
   // Configuration
-  isRequired  Boolean         @default(false)
-  isUnique    Boolean         @default(false)
+  isRequired   Boolean @default(false)
+  isUnique     Boolean @default(false)
   defaultValue String?
-  helpText    String?
-  placeholder String?
-  
+  helpText     String?
+  placeholder  String?
+
   // Type specific config
-  options     Json?           // For SELECT/MULTI_SELECT: [{label: "Red", value: "red"}]
-  validation  Json?           // Regex patterns, min/max values
-  
+  options    Json? // For SELECT/MULTI_SELECT: [{label: "Red", value: "red"}]
+  validation Json? // Regex patterns, min/max values
+
   // UI Layout
-  order       Int             @default(0)
-  listColumn  Boolean         @default(true) // Show in list view?
-  
-  createdAt   DateTime        @default(now()) @db.Date
-  updatedAt   DateTime        @updatedAt @db.Date
-  
-  object      CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
-  
+  order      Int     @default(0)
+  listColumn Boolean @default(true) // Show in list view?
+
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+
+  object CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
+
   @@unique([object_id, apiName])
 }
 
 model CustomRecord {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
-  
-  object_id   String   @db.ObjectId
-  
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
+
+  object_id String @db.ObjectId
+
   // THE MAGIC: Dynamic data storage
-  data        Json     // { "license_plate_c": "XYZ-123", "year_c": 2024 }
-  
+  data Json // { "license_plate_c": "XYZ-123", "year_c": 2024 }
+
   // Standard Fields
-  name        String?  // Primary display field (denormalized)
-  
+  name String? // Primary display field (denormalized)
+
   // Audit
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
-  createdBy   String   @db.ObjectId
-  updatedBy   String?  @db.ObjectId
-  
-  object      CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
-  
-  @@index([object_id])
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
+  updatedBy String?  @db.ObjectId
+
+  object CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
+
+  @@index([object_id])
 }
 
 model PageLayout {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
-  
-  object_id   String   @db.ObjectId
-  
-  name        String   // e.g. "Sales Layout"
-  isDefault   Boolean  @default(false)
-  
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
+
+  object_id String @db.ObjectId
+
+  name      String // e.g. "Sales Layout"
+  isDefault Boolean @default(false)
+
   // The Layout Structure
   // [
   //   {
@@ -2621,19 +2626,19 @@ model PageLayout {
   //     "fields": ["name", "phone", "email", "industry_c"] // references apiNames
   //   }
   // ]
-  sections    Json
-  
+  sections Json
+
   // Relations
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
-  createdBy   String   @db.ObjectId
-  
-  object      CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
-  
-  @@index([object_id])
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
+
+  object CustomObjectDefinition @relation(fields: [object_id], references: [id], onDelete: Cascade)
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
+
+  @@index([object_id])
 }
 
 // =============================================================================
@@ -2677,56 +2682,56 @@ enum CaseType {
 }
 
 model crm_Cases {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
   // Core fields
-  case_number   String   @unique // Auto-generated: CS-00001
-  subject       String
-  description   String?
-  status        CaseStatus   @default(NEW)
-  priority      CasePriority @default(MEDIUM)
-  origin        CaseOrigin   @default(WEB)
-  type          CaseType?
-  reason        String?      // e.g., "Installation", "Billing", etc.
+  case_number String       @unique // Auto-generated: CS-00001
+  subject     String
+  description String?
+  status      CaseStatus   @default(NEW)
+  priority    CasePriority @default(MEDIUM)
+  origin      CaseOrigin   @default(WEB)
+  type        CaseType?
+  reason      String? // e.g., "Installation", "Billing", etc.
 
   // Relationships
-  contact_id    String?  @db.ObjectId
+  contact_id    String?       @db.ObjectId
   contact       crm_Contacts? @relation(fields: [contact_id], references: [id])
-  account_id    String?  @db.ObjectId
+  account_id    String?       @db.ObjectId
   account       crm_Accounts? @relation(fields: [account_id], references: [id])
-  assigned_to   String?  @db.ObjectId
-  assigned_user Users?   @relation(name: "CaseAssignedUser", fields: [assigned_to], references: [id])
+  assigned_to   String?       @db.ObjectId
+  assigned_user Users?        @relation(name: "CaseAssignedUser", fields: [assigned_to], references: [id])
 
   // Parent case for case hierarchies
-  parent_case_id String? @db.ObjectId
+  parent_case_id String?     @db.ObjectId
   parent_case    crm_Cases?  @relation("CaseHierarchy", fields: [parent_case_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   child_cases    crm_Cases[] @relation("CaseHierarchy")
 
   // Email-to-Case
-  source_email_id   String?  // Original email message ID
-  source_email_from String?  // Sender email
+  source_email_id      String? // Original email message ID
+  source_email_from    String? // Sender email
   source_email_subject String? // Original subject
 
   // Internal notes (not visible to customer)
   internal_notes String?
 
   // SLA tracking
-  sla_policy_id       String? @db.ObjectId
-  sla_policy           SLA_Policy? @relation(fields: [sla_policy_id], references: [id])
-  first_response_at    DateTime? @db.Date
-  first_response_due   DateTime? @db.Date
-  resolution_due       DateTime? @db.Date
-  sla_breached         Boolean  @default(false)
-  escalation_level     Int      @default(0)
+  sla_policy_id      String?     @db.ObjectId
+  sla_policy         SLA_Policy? @relation(fields: [sla_policy_id], references: [id])
+  first_response_at  DateTime?   @db.Date
+  first_response_due DateTime?   @db.Date
+  resolution_due     DateTime?   @db.Date
+  sla_breached       Boolean     @default(false)
+  escalation_level   Int         @default(0)
 
   // Timestamps
-  createdAt     DateTime  @default(now()) @db.Date
-  updatedAt     DateTime  @updatedAt @db.Date
-  createdBy     String    @db.ObjectId
-  updatedBy     String?   @db.ObjectId
-  closedAt      DateTime? @db.Date
-  resolvedAt    DateTime? @db.Date
+  createdAt  DateTime  @default(now()) @db.Date
+  updatedAt  DateTime  @updatedAt @db.Date
+  createdBy  String    @db.ObjectId
+  updatedBy  String?   @db.ObjectId
+  closedAt   DateTime? @db.Date
+  resolvedAt DateTime? @db.Date
 
   // Relations
   comments            crm_Case_Comments[]
@@ -2740,8 +2745,8 @@ model crm_Cases {
   article_links KnowledgeArticleLink[]
 
   // Team scoping
-  team_id       String? @db.ObjectId
-  assigned_team Team?   @relation(fields: [team_id], references: [id])
+  team_id                String? @db.ObjectId
+  assigned_team          Team?   @relation(fields: [team_id], references: [id])
   assigned_department_id String? @db.ObjectId
 
   creator Users @relation(name: "CaseCreator", fields: [createdBy], references: [id])
@@ -2755,68 +2760,68 @@ model crm_Cases {
 }
 
 model crm_Case_Comments {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  v         Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  case_id   String   @db.ObjectId
-  case      crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  case_id String    @db.ObjectId
+  case    crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
 
   body      String
-  is_public Boolean  @default(true) // false = internal note
-  is_system Boolean  @default(false) // auto-generated by system
+  is_public Boolean @default(true) // false = internal note
+  is_system Boolean @default(false) // auto-generated by system
 
   // For email replies
   email_message_id String?
 
   // Author
-  author_id   String  @db.ObjectId
-  author      Users   @relation(name: "CaseCommentAuthor", fields: [author_id], references: [id])
+  author_id String @db.ObjectId
+  author    Users  @relation(name: "CaseCommentAuthor", fields: [author_id], references: [id])
 
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
   @@index([case_id])
 }
 
 model CaseStatusTransition {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  case_id     String     @db.ObjectId
-  case        crm_Cases  @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  case_id String    @db.ObjectId
+  case    crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
 
   from_status CaseStatus
   to_status   CaseStatus
 
-  changed_by  String     @db.ObjectId
-  changed_by_user Users  @relation(name: "CaseStatusChanger", fields: [changed_by], references: [id])
-  reason      String?
+  changed_by      String  @db.ObjectId
+  changed_by_user Users   @relation(name: "CaseStatusChanger", fields: [changed_by], references: [id])
+  reason          String?
 
-  createdAt   DateTime   @default(now()) @db.Date
+  createdAt DateTime @default(now()) @db.Date
 
   @@index([case_id])
 }
 
 // Service Commitment (SLA) / Service Plan Engine
 model SLA_Policy {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  name        String   // e.g., "Gold Support", "Standard SLA"
+  name        String // e.g., "Gold Support", "Standard SLA"
   description String?
-  is_active   Boolean  @default(true)
-  is_default  Boolean  @default(false)
+  is_active   Boolean @default(true)
+  is_default  Boolean @default(false)
 
   // Response time limits (in minutes)
-  first_response_critical Int @default(60)    // 1 hour
-  first_response_high     Int @default(240)   // 4 hours
-  first_response_medium   Int @default(480)   // 8 hours
-  first_response_low      Int @default(1440)  // 24 hours
+  first_response_critical Int @default(60) // 1 hour
+  first_response_high     Int @default(240) // 4 hours
+  first_response_medium   Int @default(480) // 8 hours
+  first_response_low      Int @default(1440) // 24 hours
 
   // Resolution time limits (in minutes)
-  resolution_critical Int @default(240)    // 4 hours
-  resolution_high     Int @default(480)    // 8 hours
-  resolution_medium   Int @default(1440)   // 24 hours
-  resolution_low      Int @default(2880)   // 48 hours
+  resolution_critical Int @default(240) // 4 hours
+  resolution_high     Int @default(480) // 8 hours
+  resolution_medium   Int @default(1440) // 24 hours
+  resolution_low      Int @default(2880) // 48 hours
 
   // Business hours (JSON config)
   // { "timezone": "America/Denver", "hours": { "mon": ["09:00", "17:00"], ... }, "holidays": ["2026-12-25"] }
@@ -2826,13 +2831,13 @@ model SLA_Policy {
   // [{ "after_minutes": 30, "action": "notify", "target": "manager" }, { "after_minutes": 60, "action": "reassign", "target": "tier2" }]
   escalation_rules Json?
 
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
-  createdBy   String   @db.ObjectId
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
 
   // Relations
-  milestones  SLA_Milestone[]
-  cases       crm_Cases[]
+  milestones SLA_Milestone[]
+  cases      crm_Cases[]
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
@@ -2841,15 +2846,15 @@ model SLA_Policy {
 }
 
 model SLA_Milestone {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  v             Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  policy_id     String   @db.ObjectId
-  policy        SLA_Policy @relation(fields: [policy_id], references: [id], onDelete: Cascade)
+  policy_id String     @db.ObjectId
+  policy    SLA_Policy @relation(fields: [policy_id], references: [id], onDelete: Cascade)
 
-  name          String   // e.g., "First Response", "Resolution"
-  description   String?
-  
+  name        String // e.g., "First Response", "Resolution"
+  description String?
+
   // Trigger: how many minutes from case creation
   minutes_critical Int
   minutes_high     Int
@@ -2867,33 +2872,33 @@ model SLA_Milestone {
   // Warning threshold (% of time elapsed before warning fires, e.g. 75)
   warning_threshold Int @default(75)
 
-  order         Int @default(0)
+  order Int @default(0)
 
-  createdAt     DateTime @default(now()) @db.Date
-  updatedAt     DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
-  instances     SLA_MilestoneInstance[]
+  instances SLA_MilestoneInstance[]
 
   @@index([policy_id])
 }
 
 model SLA_MilestoneInstance {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  milestone_id    String   @db.ObjectId
-  milestone       SLA_Milestone @relation(fields: [milestone_id], references: [id], onDelete: Cascade)
+  milestone_id String        @db.ObjectId
+  milestone    SLA_Milestone @relation(fields: [milestone_id], references: [id], onDelete: Cascade)
 
-  case_id         String   @db.ObjectId
-  case            crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  case_id String    @db.ObjectId
+  case    crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
 
   // Tracking
-  target_date     DateTime @db.Date  // When this milestone is due
-  completed_date  DateTime? @db.Date // When it was actually completed
-  is_completed    Boolean  @default(false)
-  is_violated     Boolean  @default(false) // Breached SLA?
-  warning_sent    Boolean  @default(false)
+  target_date    DateTime  @db.Date // When this milestone is due
+  completed_date DateTime? @db.Date // When it was actually completed
+  is_completed   Boolean   @default(false)
+  is_violated    Boolean   @default(false) // Breached SLA?
+  warning_sent   Boolean   @default(false)
 
-  createdAt       DateTime @default(now()) @db.Date
+  createdAt DateTime @default(now()) @db.Date
 
   @@index([case_id])
   @@index([milestone_id])
@@ -2912,10 +2917,10 @@ enum AgentStatus {
 }
 
 enum RoutingStrategy {
-  ROUND_ROBIN      // Distribute evenly across agents
-  LEAST_BUSY       // Route to agent with lowest current load
-  SKILL_BASED      // Match required skills to agent skills
-  PRIORITY_QUEUE   // Critical cases go to senior agents first
+  ROUND_ROBIN // Distribute evenly across agents
+  LEAST_BUSY // Route to agent with lowest current load
+  SKILL_BASED // Match required skills to agent skills
+  PRIORITY_QUEUE // Critical cases go to senior agents first
 }
 
 enum ChannelType {
@@ -2927,52 +2932,52 @@ enum ChannelType {
 }
 
 model AgentPresence {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?        @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  user_id     String      @db.ObjectId @unique
-  user        Users       @relation(name: "AgentPresenceUser", fields: [user_id], references: [id])
+  user_id String @unique @db.ObjectId
+  user    Users  @relation(name: "AgentPresenceUser", fields: [user_id], references: [id])
 
-  status      AgentStatus @default(OFFLINE)
+  status AgentStatus @default(OFFLINE)
 
   // Capacity management
-  max_capacity     Int     @default(5)   // Max concurrent items agent can handle
-  current_load     Int     @default(0)   // Current active items
+  max_capacity     Int           @default(5) // Max concurrent items agent can handle
+  current_load     Int           @default(0) // Current active items
   channels_enabled ChannelType[] @default([CASE]) // Which channels this agent handles
 
   // Availability
   available_since  DateTime? @db.Date
-  last_heartbeat   DateTime? @db.Date  // Auto-set by client ping every 30s
+  last_heartbeat   DateTime? @db.Date // Auto-set by client ping every 30s
   auto_offline_min Int       @default(5) // Go OFFLINE if no heartbeat for N minutes
 
   // Stats (denormalized for fast routing decisions)
-  avg_handle_time_min Float?   // Average minutes to resolve an item
-  cases_resolved_today Int     @default(0)
-  csat_score          Float?   // Customer satisfaction score (1-5)
+  avg_handle_time_min  Float? // Average minutes to resolve an item
+  cases_resolved_today Int    @default(0)
+  csat_score           Float? // Customer satisfaction score (1-5)
 
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
-  team_id     String?  @db.ObjectId
-  assigned_team Team?  @relation(fields: [team_id], references: [id])
+  team_id       String? @db.ObjectId
+  assigned_team Team?   @relation(fields: [team_id], references: [id])
 
   @@index([team_id])
   @@index([status])
 }
 
 model AgentSkill {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  user_id     String   @db.ObjectId
-  user        Users    @relation(name: "AgentSkillUser", fields: [user_id], references: [id])
+  user_id String @db.ObjectId
+  user    Users  @relation(name: "AgentSkillUser", fields: [user_id], references: [id])
 
-  skill_name  String   // e.g., "billing", "technical", "spanish", "tier2"
-  proficiency Int      @default(3) // 1-5 scale
+  skill_name  String // e.g., "billing", "technical", "spanish", "tier2"
+  proficiency Int    @default(3) // 1-5 scale
 
-  createdAt   DateTime @default(now()) @db.Date
+  createdAt DateTime @default(now()) @db.Date
 
-  team_id     String?  @db.ObjectId
-  assigned_team Team?  @relation(fields: [team_id], references: [id])
+  team_id       String? @db.ObjectId
+  assigned_team Team?   @relation(fields: [team_id], references: [id])
 
   @@unique([user_id, skill_name])
   @@index([team_id])
@@ -2980,14 +2985,14 @@ model AgentSkill {
 }
 
 model RoutingConfig {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  v              Int?            @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  team_id        String          @db.ObjectId @unique
-  team           Team            @relation(name: "TeamRoutingConfig", fields: [team_id], references: [id])
+  team_id String @unique @db.ObjectId
+  team    Team   @relation(name: "TeamRoutingConfig", fields: [team_id], references: [id])
 
   // Default strategy for this team
-  strategy       RoutingStrategy @default(ROUND_ROBIN)
+  strategy RoutingStrategy @default(ROUND_ROBIN)
 
   // Per-priority overrides (JSON)
   // { "CRITICAL": "SKILL_BASED", "HIGH": "LEAST_BUSY", "MEDIUM": "ROUND_ROBIN", "LOW": "ROUND_ROBIN" }
@@ -3002,15 +3007,15 @@ model RoutingConfig {
   fallback_user    Users?  @relation(name: "RoutingFallbackUser", fields: [fallback_user_id], references: [id])
 
   // Auto-assignment settings
-  auto_assign_enabled  Boolean @default(true)
+  auto_assign_enabled      Boolean @default(true)
   auto_reassign_on_offline Boolean @default(true) // Re-route when agent goes offline
-  max_reassign_attempts Int    @default(3)
+  max_reassign_attempts    Int     @default(3)
 
   // Round-robin pointer (tracks who got the last assignment)
   last_assigned_user_id String? @db.ObjectId
 
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 }
 
 // =============================================================================
@@ -3025,72 +3030,72 @@ enum KBArticleStatus {
 }
 
 model KnowledgeCategory {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
   name        String
   slug        String
   description String?
-  icon        String?  // Lucide icon name
-  order       Int      @default(0)
+  icon        String? // Lucide icon name
+  order       Int     @default(0)
 
   // Hierarchy
-  parent_id   String?  @db.ObjectId
-  parent      KnowledgeCategory?  @relation("KBCategoryHierarchy", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children    KnowledgeCategory[] @relation("KBCategoryHierarchy")
+  parent_id String?             @db.ObjectId
+  parent    KnowledgeCategory?  @relation("KBCategoryHierarchy", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children  KnowledgeCategory[] @relation("KBCategoryHierarchy")
 
-  articles    KnowledgeArticle[]
+  articles KnowledgeArticle[]
 
-  team_id     String?  @db.ObjectId
-  assigned_team Team?  @relation(fields: [team_id], references: [id])
+  team_id       String? @db.ObjectId
+  assigned_team Team?   @relation(fields: [team_id], references: [id])
 
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
   @@unique([team_id, slug])
   @@index([team_id])
 }
 
 model KnowledgeArticle {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  v             Int?            @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  title         String
-  slug          String
-  summary       String?         // Short preview for search results
-  content       String          // Rich text / markdown body
-  status        KBArticleStatus @default(DRAFT)
+  title   String
+  slug    String
+  summary String? // Short preview for search results
+  content String // Rich text / markdown body
+  status  KBArticleStatus @default(DRAFT)
 
   // Categorization
-  category_id   String?  @db.ObjectId
-  category      KnowledgeCategory? @relation(fields: [category_id], references: [id])
-  tags          String[]
+  category_id String?            @db.ObjectId
+  category    KnowledgeCategory? @relation(fields: [category_id], references: [id])
+  tags        String[]
 
   // Search optimization: keywords that help surface this article
-  keywords      String[]
+  keywords String[]
 
   // Visibility
-  is_internal   Boolean  @default(false) // true = only visible to agents, false = also visible in portal
-  is_pinned     Boolean  @default(false) // Pinned to top of category
+  is_internal Boolean @default(false) // true = only visible to agents, false = also visible in portal
+  is_pinned   Boolean @default(false) // Pinned to top of category
 
   // Feedback & metrics
-  view_count    Int      @default(0)
-  helpful_count Int      @default(0)  // "Was this article helpful?" — Yes
-  not_helpful_count Int  @default(0)  // "Was this article helpful?" — No
+  view_count        Int @default(0)
+  helpful_count     Int @default(0) // "Was this article helpful?" — Yes
+  not_helpful_count Int @default(0) // "Was this article helpful?" — No
 
   // Authorship
-  author_id     String   @db.ObjectId
-  author        Users    @relation(name: "KBArticleAuthor", fields: [author_id], references: [id])
+  author_id String @db.ObjectId
+  author    Users  @relation(name: "KBArticleAuthor", fields: [author_id], references: [id])
 
   // Linked cases where this article was used
   article_links KnowledgeArticleLink[]
 
-  team_id       String?  @db.ObjectId
-  assigned_team Team?    @relation(fields: [team_id], references: [id])
+  team_id       String? @db.ObjectId
+  assigned_team Team?   @relation(fields: [team_id], references: [id])
 
-  createdAt     DateTime @default(now()) @db.Date
-  updatedAt     DateTime @updatedAt @db.Date
-  publishedAt   DateTime? @db.Date
+  createdAt   DateTime  @default(now()) @db.Date
+  updatedAt   DateTime  @updatedAt @db.Date
+  publishedAt DateTime? @db.Date
 
   @@unique([team_id, slug])
   @@index([team_id])
@@ -3099,21 +3104,21 @@ model KnowledgeArticle {
 
 // Tracks which articles were attached/suggested to which cases
 model KnowledgeArticleLink {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  article_id  String   @db.ObjectId
-  article     KnowledgeArticle @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  article_id String           @db.ObjectId
+  article    KnowledgeArticle @relation(fields: [article_id], references: [id], onDelete: Cascade)
 
-  case_id     String   @db.ObjectId
-  case        crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  case_id String    @db.ObjectId
+  case    crm_Cases @relation(fields: [case_id], references: [id], onDelete: Cascade)
 
   // How was this article linked?
   link_type   String   @default("MANUAL") // MANUAL | SUGGESTED | AUTO
   was_helpful Boolean? // Agent feedback: did this article help resolve the case?
 
-  linked_by   String   @db.ObjectId
+  linked_by String @db.ObjectId
 
-  createdAt   DateTime @default(now()) @db.Date
+  createdAt DateTime @default(now()) @db.Date
 
   @@unique([article_id, case_id])
   @@index([case_id])
@@ -3126,15 +3131,15 @@ model KnowledgeArticleLink {
 // =============================================================================
 
 model ValidationRule {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?     @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  name        String   // e.g., "Close Date Must Be Future"
+  name        String // e.g., "Close Date Must Be Future"
   description String?
-  is_active   Boolean  @default(true)
+  is_active   Boolean @default(true)
 
   // Which object does this rule apply to?
-  object_type String   // "crm_Leads", "crm_Opportunities", "crm_Cases", or custom object apiName
+  object_type String // "crm_Leads", "crm_Opportunities", "crm_Cases", or custom object apiName
 
   // The formula expression (evaluated by the engine)
   // Examples:
@@ -3142,7 +3147,7 @@ model ValidationRule {
   //   "discount > 30"       → error if discount exceeds 30%
   //   "ISBLANK(email)"      → error if email is empty
   //   "status == 'CLOSED' AND ISBLANK(resolution)"  → error if closed without resolution
-  formula     String
+  formula String
 
   // Error message shown to user when validation fails
   error_message String
@@ -3151,19 +3156,19 @@ model ValidationRule {
   // SAVE = run on create/update
   // CREATE_ONLY = only on create
   // UPDATE_ONLY = only on update
-  trigger_on  String   @default("SAVE") // SAVE | CREATE_ONLY | UPDATE_ONLY
+  trigger_on String @default("SAVE") // SAVE | CREATE_ONLY | UPDATE_ONLY
 
   // Priority order (lower = evaluated first)
-  order       Int      @default(0)
+  order Int @default(0)
 
   // Audit
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt @db.Date
-  createdBy   String   @db.ObjectId
-  creator     Users    @relation(name: "ValidationRuleCreator", fields: [createdBy], references: [id])
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
+  creator   Users    @relation(name: "ValidationRuleCreator", fields: [createdBy], references: [id])
 
   // Team scoping
-  team_id     String   @db.ObjectId
+  team_id       String @db.ObjectId
   assigned_team Team   @relation(fields: [team_id], references: [id])
 
   @@index([team_id, object_type])
@@ -3196,15 +3201,15 @@ enum ApprovalRequestStatus {
 }
 
 model ApprovalProcess {
-  id          String                @id @default(auto()) @map("_id") @db.ObjectId
-  v           Int?                  @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  name        String                // e.g., "Discount Approval", "Large Deal Approval"
+  name        String // e.g., "Discount Approval", "Large Deal Approval"
   description String?
   status      ApprovalProcessStatus @default(DRAFT)
 
   // Which object does this process apply to?
-  object_type String                // "crm_Opportunities", "crm_Contracts", etc.
+  object_type String // "crm_Opportunities", "crm_Contracts", etc.
 
   // Entry criteria: when should this approval be triggered?
   // JSON formula like ValidationRule
@@ -3223,100 +3228,100 @@ model ApprovalProcess {
   allow_recall Boolean @default(true)
 
   // Lock record while pending approval?
-  lock_record  Boolean @default(true)
+  lock_record Boolean @default(true)
 
   // Order for evaluation (if multiple processes match)
-  order        Int     @default(0)
+  order Int @default(0)
 
   // Audit
-  createdAt    DateTime @default(now()) @db.Date
-  updatedAt    DateTime @updatedAt @db.Date
-  createdBy    String   @db.ObjectId
-  creator      Users    @relation(name: "ApprovalProcessCreator", fields: [createdBy], references: [id])
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  createdBy String   @db.ObjectId
+  creator   Users    @relation(name: "ApprovalProcessCreator", fields: [createdBy], references: [id])
 
   // Relations
-  steps        ApprovalStep[]
-  requests     ApprovalRequest[]
+  steps    ApprovalStep[]
+  requests ApprovalRequest[]
 
   // Team scoping
-  team_id      String   @db.ObjectId
-  assigned_team Team    @relation(fields: [team_id], references: [id])
+  team_id       String @db.ObjectId
+  assigned_team Team   @relation(fields: [team_id], references: [id])
 
   @@index([team_id, object_type])
   @@index([status])
 }
 
 model ApprovalStep {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
-  v                 Int?            @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  process_id        String          @db.ObjectId
-  process           ApprovalProcess @relation(fields: [process_id], references: [id], onDelete: Cascade)
+  process_id String          @db.ObjectId
+  process    ApprovalProcess @relation(fields: [process_id], references: [id], onDelete: Cascade)
 
-  step_number       Int             // 1, 2, 3... sequential order
-  name              String          // e.g., "Manager Approval", "VP Approval"
+  step_number Int // 1, 2, 3... sequential order
+  name        String // e.g., "Manager Approval", "VP Approval"
 
   // Who approves at this step?
-  approver_type     String          // SPECIFIC_USER | MANAGER | ROLE | QUEUE
-  approver_user_id  String?         @db.ObjectId  // If SPECIFIC_USER
-  approver_user     Users?          @relation(name: "ApprovalStepApprover", fields: [approver_user_id], references: [id])
-  approver_role     String?         // If ROLE: e.g., "SUPER_ADMIN", "ADMIN"
+  approver_type    String // SPECIFIC_USER | MANAGER | ROLE | QUEUE
+  approver_user_id String? @db.ObjectId // If SPECIFIC_USER
+  approver_user    Users?  @relation(name: "ApprovalStepApprover", fields: [approver_user_id], references: [id])
+  approver_role    String? // If ROLE: e.g., "SUPER_ADMIN", "ADMIN"
 
   // Unanimous vs first-response
   // UNANIMOUS = all approvers at this step must approve
   // FIRST_RESPONSE = first approver's decision is final for this step
-  approval_mode     String          @default("FIRST_RESPONSE") // UNANIMOUS | FIRST_RESPONSE
+  approval_mode String @default("FIRST_RESPONSE") // UNANIMOUS | FIRST_RESPONSE
 
   // Auto-escalation
-  auto_escalate_hours Int?          // Auto-escalate if not responded within N hours
-  escalate_to_user_id String?       @db.ObjectId
+  auto_escalate_hours Int? // Auto-escalate if not responded within N hours
+  escalate_to_user_id String? @db.ObjectId
 
-  createdAt         DateTime        @default(now()) @db.Date
-  updatedAt         DateTime        @updatedAt @db.Date
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
   // Relations
-  request_actions   ApprovalRequestAction[]
+  request_actions ApprovalRequestAction[]
 
   @@index([process_id])
 }
 
 // Individual approval requests (one per record submission)
 model ApprovalRequest {
-  id              String                @id @default(auto()) @map("_id") @db.ObjectId
-  v               Int?                  @map("__v")
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  v  Int?   @map("__v")
 
-  process_id      String                @db.ObjectId
-  process         ApprovalProcess       @relation(fields: [process_id], references: [id])
+  process_id String          @db.ObjectId
+  process    ApprovalProcess @relation(fields: [process_id], references: [id])
 
   // The record being approved
-  record_id       String                // ObjectId of the record
-  record_type     String                // Model name, e.g., "crm_Opportunities"
+  record_id   String // ObjectId of the record
+  record_type String // Model name, e.g., "crm_Opportunities"
 
   // Current state
-  status          ApprovalRequestStatus @default(PENDING)
-  current_step    Int                   @default(1) // Which step is currently active
+  status       ApprovalRequestStatus @default(PENDING)
+  current_step Int                   @default(1) // Which step is currently active
 
   // Who submitted the record for approval
-  submitted_by    String                @db.ObjectId
-  submitter       Users                 @relation(name: "ApprovalSubmitter", fields: [submitted_by], references: [id])
+  submitted_by String @db.ObjectId
+  submitter    Users  @relation(name: "ApprovalSubmitter", fields: [submitted_by], references: [id])
 
   // Submission context
-  submit_comment  String?               // Optional comment from submitter
+  submit_comment String? // Optional comment from submitter
 
   // Snapshot of record data at submission time (for audit)
   record_snapshot Json?
 
   // Timestamps
-  createdAt       DateTime              @default(now()) @db.Date
-  updatedAt       DateTime              @updatedAt @db.Date
-  completedAt     DateTime?             @db.Date
+  createdAt   DateTime  @default(now()) @db.Date
+  updatedAt   DateTime  @updatedAt @db.Date
+  completedAt DateTime? @db.Date
 
   // Relations
-  actions         ApprovalRequestAction[]
+  actions ApprovalRequestAction[]
 
   // Team scoping
-  team_id         String                @db.ObjectId
-  assigned_team   Team                  @relation(fields: [team_id], references: [id])
+  team_id       String @db.ObjectId
+  assigned_team Team   @relation(fields: [team_id], references: [id])
 
   @@index([team_id])
   @@index([process_id])
@@ -3327,25 +3332,25 @@ model ApprovalRequest {
 
 // Individual approval/rejection actions within a request
 model ApprovalRequestAction {
-  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  request_id      String         @db.ObjectId
-  request         ApprovalRequest @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  request_id String          @db.ObjectId
+  request    ApprovalRequest @relation(fields: [request_id], references: [id], onDelete: Cascade)
 
-  step_id         String         @db.ObjectId
-  step            ApprovalStep   @relation(fields: [step_id], references: [id])
+  step_id String       @db.ObjectId
+  step    ApprovalStep @relation(fields: [step_id], references: [id])
 
   // Who took the action
-  actor_id        String         @db.ObjectId
-  actor           Users          @relation(name: "ApprovalActor", fields: [actor_id], references: [id])
+  actor_id String @db.ObjectId
+  actor    Users  @relation(name: "ApprovalActor", fields: [actor_id], references: [id])
 
-  action          ApprovalAction // APPROVE | REJECT | RECALL | REASSIGN
-  comment         String?
+  action  ApprovalAction // APPROVE | REJECT | RECALL | REASSIGN
+  comment String?
 
   // If REASSIGN
-  reassigned_to   String?        @db.ObjectId
+  reassigned_to String? @db.ObjectId
 
-  createdAt       DateTime       @default(now()) @db.Date
+  createdAt DateTime @default(now()) @db.Date
 
   @@index([request_id])
   @@index([step_id])
@@ -3363,78 +3368,78 @@ model Notification {
   createdAt DateTime @default(now()) @db.Date
   team_id   String?  @db.ObjectId
 
-  user      Users    @relation(fields: [userId], references: [id])
-  team      Team?    @relation(fields: [team_id], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+  team Team? @relation(fields: [team_id], references: [id])
 }
 
 // CPQ Models (Phase 6)
 model crm_Products {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  sku         String   @unique
+  sku         String  @unique
   description String?
   price       Float
   category    String?
-  active      Boolean  @default(true)
-  
-  team_id     String   @db.ObjectId
-  team        Team     @relation(fields: [team_id], references: [id])
-  
-  bundles     crm_ProductBundles[] @relation("ParentProduct")
-  includedIn  crm_ProductBundles[] @relation("ChildProduct")
-  quoteItems  crm_QuoteItems[]
+  active      Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  team_id String @db.ObjectId
+  team    Team   @relation(fields: [team_id], references: [id])
+
+  bundles    crm_ProductBundles[] @relation("ParentProduct")
+  includedIn crm_ProductBundles[] @relation("ChildProduct")
+  quoteItems crm_QuoteItems[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model crm_ProductBundles {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  parentProductId String   @db.ObjectId
-  childProductId  String   @db.ObjectId
-  quantity        Int      @default(1)
-  isRequired      Boolean  @default(false)
-  
-  parentProduct   crm_Products @relation("ParentProduct", fields: [parentProductId], references: [id])
-  childProduct    crm_Products @relation("ChildProduct", fields: [childProductId], references: [id])
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  parentProductId String  @db.ObjectId
+  childProductId  String  @db.ObjectId
+  quantity        Int     @default(1)
+  isRequired      Boolean @default(false)
+
+  parentProduct crm_Products @relation("ParentProduct", fields: [parentProductId], references: [id])
+  childProduct  crm_Products @relation("ChildProduct", fields: [childProductId], references: [id])
 }
 
 model crm_Quotes {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  title           String
-  quoteNumber     String   @unique
-  status          String   @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
-  totalAmount     Float    @default(0)
-  expirationDate  DateTime?
-  
-  accountId       String?  @db.ObjectId
-  contactId       String?  @db.ObjectId
-  opportunityId   String?  @db.ObjectId
-  createdBy       String   @db.ObjectId
-  team_id         String   @db.ObjectId
-  
-  account         crm_Accounts?     @relation(fields: [accountId], references: [id])
-  contact         crm_Contacts?     @relation(fields: [contactId], references: [id])
-  opportunity     crm_Opportunities? @relation(fields: [opportunityId], references: [id])
-  creator         Users             @relation(fields: [createdBy], references: [id])
-  team            Team          @relation(fields: [team_id], references: [id])
-  items           crm_QuoteItems[]
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  quoteNumber    String    @unique
+  status         String    @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
+  totalAmount    Float     @default(0)
+  expirationDate DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  accountId     String? @db.ObjectId
+  contactId     String? @db.ObjectId
+  opportunityId String? @db.ObjectId
+  createdBy     String  @db.ObjectId
+  team_id       String  @db.ObjectId
+
+  account     crm_Accounts?      @relation(fields: [accountId], references: [id])
+  contact     crm_Contacts?      @relation(fields: [contactId], references: [id])
+  opportunity crm_Opportunities? @relation(fields: [opportunityId], references: [id])
+  creator     Users              @relation(fields: [createdBy], references: [id])
+  team        Team               @relation(fields: [team_id], references: [id])
+  items       crm_QuoteItems[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model crm_QuoteItems {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  quoteId     String   @db.ObjectId
-  productId   String   @db.ObjectId
-  quantity    Int      @default(1)
-  unitPrice   Float
-  discount    Float    @default(0)
-  totalPrice  Float
-  
-  quote       crm_Quotes   @relation(fields: [quoteId], references: [id])
-  product     crm_Products @relation(fields: [productId], references: [id])
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  quoteId    String @db.ObjectId
+  productId  String @db.ObjectId
+  quantity   Int    @default(1)
+  unitPrice  Float
+  discount   Float  @default(0)
+  totalPrice Float
+
+  quote   crm_Quotes   @relation(fields: [quoteId], references: [id])
+  product crm_Products @relation(fields: [productId], references: [id])
 }
 
 model DashboardPreference {

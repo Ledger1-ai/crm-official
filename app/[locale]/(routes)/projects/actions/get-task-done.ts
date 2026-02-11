@@ -8,3 +8,11 @@ export const getTaskDone = async (taskId: string) => {
     console.log(error);
   }
 };
+
+export const undoTaskDone = async (taskId: string) => {
+  try {
+    await axios.post(`/api/projects/tasks/mark-task-as-active/${taskId}`);
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { getTaskDone } from "@/app/[locale]/(routes)/projects/actions/get-task-done";
+import { getTaskDone, undoTaskDone } from "@/app/[locale]/(routes)/projects/actions/get-task-done";
 import { Badge } from "@/components/ui/badge";
-import { CheckSquare, Pencil, Building, UserPlus } from "lucide-react";
+import { CheckSquare, Pencil, Building, UserPlus, Undo2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UpdateTaskDialog from "@/app/[locale]/(routes)/projects/dialogs/UpdateTask";
@@ -57,6 +57,24 @@ const TaskViewActions = ({
     }
   };
 
+  const onUndo = async () => {
+    setIsLoading(true);
+    try {
+      await undoTaskDone(taskId);
+      toast({
+        title: "Success, task marked as active.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error, task not marked as active.",
+      });
+    } finally {
+      setIsLoading(false);
+      router.refresh();
+    }
+  };
+
   const onConvert = async () => {
     setIsConverting(true);
     try {
@@ -91,7 +109,7 @@ const TaskViewActions = ({
     <div className="space-x-2 pb-2">
       Task Actions:
       <Separator className="mb-5" />
-      {initialData.taskStatus !== "COMPLETE" && (
+      {initialData.taskStatus !== "COMPLETE" ? (
         <Badge
           variant={"outline"}
           onClick={onDone}
@@ -103,6 +121,20 @@ const TaskViewActions = ({
             <Icons.spinner className="animate-spin w-4 h-4 mr-2" />
           ) : (
             "Mark as done"
+          )}
+        </Badge>
+      ) : (
+        <Badge
+          variant={"outline"}
+          onClick={onUndo}
+          className="cursor-pointer"
+          aria-disabled={isLoading}
+        >
+          <Undo2 className="w-4 h-4 mr-2" />
+          {isLoading ? (
+            <Icons.spinner className="animate-spin w-4 h-4 mr-2" />
+          ) : (
+            "Mark as Active"
           )}
         </Badge>
       )}

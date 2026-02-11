@@ -96,7 +96,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
             iconColor="text-emerald-400"
             onSearch={setSearchTerm}
             searchValue={searchTerm}
-            footerHref={`/campaigns/tasks/${userId}`}
+            footerHref={`/projects/tasks/${userId}`}
             footerLabel="View All Tasks"
             count={tasks.length}
             rightAction={rightAction}
@@ -148,7 +148,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
 
                             <div className="shrink-0 pt-1">
                                 {task.assigned_section?.board && (
-                                    <Link href={`/campaigns/boards/${task.assigned_section.board}`}>
+                                    <Link href={`/projects/boards/${task.assigned_section.board}`}>
                                         <Button
                                             size="icon"
                                             variant="ghost"

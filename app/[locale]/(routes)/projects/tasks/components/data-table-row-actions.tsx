@@ -19,6 +19,8 @@ import { useToast } from "@/components/ui/use-toast";
 import AlertModal from "@/components/modals/alert-modal";
 
 import { taskSchema } from "../data/schema";
+import { Check, Undo2 } from "lucide-react";
+import { getTaskDone, undoTaskDone } from "../../actions/get-task-done";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -84,25 +86,30 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem
-            onClick={() => router.push(`/campaigns/tasks/viewtask/${task?.id}`)}
+            onClick={() => router.push(`/projects/tasks/viewtask/${task?.id}`)}
           >
             View
           </DropdownMenuItem>
-          {/*           <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem> */}
           <DropdownMenuSeparator />
-          {/*  <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuRadioGroup value={task.label}>
-              {labels.map((label) => (
-                <DropdownMenuRadioItem key={label.value} value={label.value}>
-                  {label.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub> */}
+          {task.taskStatus !== "COMPLETE" ? (
+            <DropdownMenuItem onClick={async () => {
+              await getTaskDone(task.id);
+              router.refresh();
+              toast({ title: "Task marked as done" });
+            }}>
+              <Check className="h-4 w-4 mr-2" />
+              Mark as Done
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem onClick={async () => {
+              await undoTaskDone(task.id);
+              router.refresh();
+              toast({ title: "Task marked as active" });
+            }}>
+              <Undo2 className="h-4 w-4 mr-2" />
+              Mark as Active
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>
             Delete

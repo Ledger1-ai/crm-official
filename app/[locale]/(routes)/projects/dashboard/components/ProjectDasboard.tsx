@@ -123,18 +123,18 @@ const ProjectDashboardCockpit = ({
                     task.priority === "normal"
                       ? `text-yellow-500`
                       : task.priority === "high"
-                      ? `text-red-500`
-                      : task.priority === "low"
-                      ? `text-green-500`
-                      : `text-slate-600`
+                        ? `text-red-500`
+                        : task.priority === "low"
+                          ? `text-green-500`
+                          : `text-slate-600`
                   }
                 >
-                  Priorit: {task.priority}
+                  Priority: {task.priority}
                 </p>
               </div>
             </CardContent>
             <CardFooter className="space-x-2 ">
-              <Link href={`/campaigns/tasks/viewtask/${task.id}`}>
+              <Link href={`/projects/tasks/viewtask/${task.id}`}>
                 <Badge variant={"outline"}>
                   <Eye className="w-4 h-4 mr-2" />
                   <span>View task</span>
@@ -225,10 +225,10 @@ const ProjectDashboardCockpit = ({
                     task.priority === "normal"
                       ? `text-yellow-500`
                       : task.priority === "high"
-                      ? `text-red-500`
-                      : task.priority === "low"
-                      ? `text-green-500`
-                      : `text-slate-600`
+                        ? `text-red-500`
+                        : task.priority === "low"
+                          ? `text-green-500`
+                          : `text-slate-600`
                   }
                 >
                   Priority: {task.priority}
@@ -236,7 +236,7 @@ const ProjectDashboardCockpit = ({
               </div>
             </CardContent>
             <CardFooter className="space-x-2">
-              <Link href={`/campaigns/tasks/viewtask/${task.id}`}>
+              <Link href={`/projects/tasks/viewtask/${task.id}`}>
                 <Badge variant={"outline"}>
                   <Eye className="w-4 h-4 mr-2" />
                   <span>View task</span>

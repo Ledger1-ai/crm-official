@@ -44,6 +44,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { priorities } from "../tasks/data/data";
 
 type Props = {
   users: any;
@@ -299,10 +300,14 @@ const NewTaskDialog = ({ users, boards, customTrigger }: Props) => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="critical">Critical</SelectItem>
+                            {priorities.map((p: any) => (
+                              <SelectItem key={p.value} value={p.value} className={cn("capitalize", p.color)}>
+                                <div className="flex items-center gap-2">
+                                  <div className={cn("h-2 w-2 rounded-full", p.dotColor)} />
+                                  {p.label}
+                                </div>
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

@@ -51,13 +51,12 @@ function Calendar({
         week: "flex w-full mt-2",
         day: "h-8 w-8 sm:h-9 sm:w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
         day_button: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal aria-selected:opacity-100"
+          "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
         ),
         range_start: "day-range-start rounded-l-md",
         range_end: "day-range-end rounded-r-md",
         selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground font-bold",
+          "bg-primary !bg-primary text-background !text-background hover:!bg-primary hover:!text-background focus:!bg-primary focus:!text-background font-bold rounded-md",
         today: "bg-accent text-accent-foreground",
         outside:
           "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",

@@ -10,6 +10,7 @@ import { Task } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import moment from "moment";
+import { cn } from "@/lib/utils";
 
 export const columns: ColumnDef<Task>[] = [
   /*   {
@@ -100,10 +101,12 @@ export const columns: ColumnDef<Task>[] = [
 
       return (
         <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{status.label}</span>
+          <Badge variant="outline" className={cn("gap-1.5 font-medium border-0", status.bgColor, status.color)}>
+            {status.icon && (
+              <status.icon className="h-3.5 w-3.5" />
+            )}
+            <span>{status.label}</span>
+          </Badge>
         </div>
       );
     },
@@ -127,10 +130,10 @@ export const columns: ColumnDef<Task>[] = [
 
       return (
         <div className="flex items-center">
-          {priority.icon && (
-            <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{priority.label}</span>
+          <Badge variant="outline" className={cn("gap-1.5 font-medium border-0", priority.bgColor, priority.color)}>
+            <div className={cn("h-1.5 w-1.5 rounded-full", priority.dotColor)} />
+            {priority.label}
+          </Badge>
         </div>
       );
     },

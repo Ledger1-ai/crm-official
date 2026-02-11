@@ -19,6 +19,7 @@ export const getTask = async (taskId: string) => {
           document_file_url: true,
         },
       },
+      assigned_section: true,
       comments: {
         select: {
           id: true,

@@ -45,6 +45,14 @@ export async function PUT(req: Request) {
         }
       }
 
+      const destinationSection = await prismadb.sections.findUnique({
+        where: { id: destinationSectionId },
+        select: { title: true },
+      });
+
+      const isComplete = destinationSection?.title?.toLowerCase().includes("complete") ||
+        destinationSection?.title?.toLowerCase().includes("done");
+
       for (let key: any = 0; key < destinationListReverse.length; key++) {
         const task = destinationListReverse[key];
         const position = parseInt(key);
@@ -56,20 +64,15 @@ export async function PUT(req: Request) {
           data: {
             section: destinationSectionId,
             position: position,
+            taskStatus: isComplete ? "COMPLETE" : (task.taskStatus === "COMPLETE" ? "ACTIVE" : task.taskStatus),
             updatedBy: session.user.id,
           },
         });
       }
 
-      // AUTOMATION: Check if moved to "Account Ready"
-      const destinationSection = await prismadb.sections.findUnique({
-        where: { id: destinationSectionId },
-        select: { title: true },
-      });
-
       if (
         destinationSection?.title?.toLowerCase() === "account ready" ||
-        destinationSection?.title?.toLowerCase() === "complete"
+        isComplete
       ) {
         for (const taskItem of destinationList) {
           try {

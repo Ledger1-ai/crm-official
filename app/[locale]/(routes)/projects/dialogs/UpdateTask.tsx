@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { priorities, statuses } from "../tasks/data/data";
 
 type Props = {
   users: any;
@@ -72,6 +73,7 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
     boardId: z.string().min(3).max(255),
     board: z.string().min(3).max(255),
     opportunityId: z.string().optional(),
+    taskStatus: z.string().min(3).max(20).optional().nullable(),
   });
 
   type UpdatedTaskForm = z.infer<typeof formSchema>;
@@ -80,13 +82,14 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData.title,
-      user: initialData.user,
-      dueDateAt: initialData.dueDateAt,
+      user: initialData.user || initialData.assigned_user?.id || "",
+      dueDateAt: initialData.dueDateAt ? new Date(initialData.dueDateAt) : new Date(),
       priority: initialData.priority,
       content: initialData.content,
       boardId: boardId,
       board: boardId,
       opportunityId: undefined,
+      taskStatus: initialData.taskStatus || "ACTIVE",
     },
   });
 
@@ -149,7 +152,7 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
           variant="outline"
           size="sm"
           className="h-7 gap-1.5 text-xs"
-          onClick={() => router.push(`/campaigns/tasks/viewtask/${initialData.id}`)}
+          onClick={() => router.push(`/projects/tasks/viewtask/${initialData.id}`)}
         >
           <ExternalLink className="w-3 h-3" />
           Full Page
@@ -248,10 +251,14 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="low" className="text-emerald-600">Low</SelectItem>
-                          <SelectItem value="medium" className="text-yellow-600">Medium</SelectItem>
-                          <SelectItem value="high" className="text-orange-600">High</SelectItem>
-                          <SelectItem value="critical" className="text-red-600 font-medium">Critical</SelectItem>
+                          {priorities.map((p) => (
+                            <SelectItem key={p.value} value={p.value} className={cn("capitalize", p.color)}>
+                              <div className="flex items-center gap-2">
+                                <div className={cn("h-2 w-2 rounded-full", p.dotColor)} />
+                                {p.label}
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -308,6 +315,34 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
                           {opps.map((o) => (
                             <SelectItem key={o.id} value={o.id}>
                               {o.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="taskStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {statuses.map((s) => (
+                            <SelectItem key={s.value} value={s.value} className={cn("capitalize", s.color)}>
+                              <div className="flex items-center gap-2">
+                                {s.icon && <s.icon className="h-4 w-4" />}
+                                {s.label}
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>

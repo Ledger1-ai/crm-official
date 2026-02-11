@@ -43,7 +43,7 @@ import { Badge } from "@/components/ui/badge";
 
 import NewSectionForm from "../forms/NewSection";
 import UpdateTaskDialog from "../../../dialogs/UpdateTask";
-import { getTaskDone } from "../../../actions/get-task-done";
+import { getTaskDone, undoTaskDone } from "../../../actions/get-task-done";
 import KanbanColumn from "./KanbanColumn";
 
 let timer: any;
@@ -295,6 +295,24 @@ const Kanban = (props: any) => {
     }
   };
 
+  const onUndo = async (id: string) => {
+    setIsLoading(true);
+    try {
+      await undoTaskDone(id);
+      toast({
+        title: "Success, task marked as incomplete.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error, task not marked as incomplete.",
+      });
+    } finally {
+      setIsLoading(false);
+      router.refresh();
+    }
+  };
+
   const onDelete = async () => {
     setOpen(false);
     setIsLoading(true);
@@ -464,10 +482,11 @@ const Kanban = (props: any) => {
                             onUpdateTitle={updateSectionTitle}
                             onDeleteSection={(id) => { setSectionId(id); setOpenSectionAlert(true); }}
                             onCreateTask={createTask}
-                            onViewTask={(task) => router.push(`/campaigns/tasks/viewtask/${task.id}`)}
+                            onViewTask={(task) => router.push(`/projects/tasks/viewtask/${task.id}`)}
                             onEditTask={(task) => { setSelectedTask(task); setUpdateOpenSheet(true); }}
                             onDeleteTask={(task) => { setSelectedTask(task); setOpen(true); }}
                             onDoneTask={(task) => onDone(task.id)}
+                            onUndoTask={(task) => onUndo(task.id)}
                           />
                         </div>
                       )}

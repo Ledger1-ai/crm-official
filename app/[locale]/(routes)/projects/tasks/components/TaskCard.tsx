@@ -13,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { statuses, priorities } from "../data/data";
+import { cn } from "@/lib/utils";
 import moment from "moment";
 import Link from "next/link";
 
@@ -53,11 +54,11 @@ export default function TaskCard({ task }: TaskCardProps) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                                <Link href={`/campaigns/tasks/viewtask/${task.id}`}>View Task</Link>
+                                <Link href={`/projects/tasks/viewtask/${task.id}`}>View Task</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                                <Link href={`/campaigns/tasks/viewtask/${task.id}?edit=true`}>Edit</Link>
+                                <Link href={`/projects/tasks/viewtask/${task.id}?edit=true`}>Edit</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -80,14 +81,14 @@ export default function TaskCard({ task }: TaskCardProps) {
                 {/* Status and Priority */}
                 <div className="flex flex-wrap gap-2 pt-1">
                     {status && (
-                        <Badge variant="secondary" className="text-[10px] gap-1">
+                        <Badge variant="secondary" className={cn("text-[10px] gap-1 border-0 shadow-none", status.bgColor, status.color)}>
                             {status.icon && <status.icon className="h-3 w-3" />}
                             {status.label}
                         </Badge>
                     )}
                     {priority && (
-                        <Badge variant="outline" className="text-[10px] gap-1">
-                            {priority.icon && <priority.icon className="h-3 w-3" />}
+                        <Badge variant="outline" className={cn("text-[10px] gap-1.5 border-0 shadow-none", priority.bgColor, priority.color)}>
+                            <div className={cn("h-1.5 w-1.5 rounded-full", priority.dotColor)} />
                             {priority.label}
                         </Badge>
                     )}

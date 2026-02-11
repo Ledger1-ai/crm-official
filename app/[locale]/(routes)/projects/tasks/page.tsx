@@ -31,12 +31,12 @@ const TasksPage = async () => {
     },
     {
       title: "My Tasks",
-      description: "View certain tasks assigned to me",
+      description: "View my assigned tasks",
       icon: Layout,
       color: "from-violet-500/20 to-purple-500/20",
       iconColor: "text-violet-400",
       type: "link",
-      href: `/campaigns/tasks/${session?.user.id}`
+      href: `/projects/tasks/${session?.user.id}`
     }
   ];
 

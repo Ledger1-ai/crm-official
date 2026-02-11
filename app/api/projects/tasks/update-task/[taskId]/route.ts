@@ -29,6 +29,7 @@ export async function PUT(req: Request, props: { params: Promise<{ taskId: strin
     content,
     notionUrl,
     dueDateAt,
+    taskStatus,
   } = body;
 
   const taskId = params.taskId;
@@ -46,25 +47,44 @@ export async function PUT(req: Request, props: { params: Promise<{ taskId: strin
   }
 
   try {
-    //Get first section from board where position is smallest
-    const sectionId = await prismadb.sections.findFirst({
-      where: {
-        board: board,
-      },
-      orderBy: {
-        position: "asc",
-      },
+    const currentTask = await prismadb.tasks.findUnique({
+      where: { id: taskId },
+      include: { assigned_section: true }
     });
 
-    if (!sectionId) {
-      return new NextResponse("No section found", { status: 400 });
+    if (!currentTask) {
+      return new NextResponse("Task not found", { status: 404 });
     }
 
-    const tasksCount = await prismadb.tasks.count({
-      where: {
-        section: sectionId.id,
-      },
-    });
+    let targetSectionId = currentTask.section;
+
+    // Movement logic based on status change
+    if (taskStatus && taskStatus !== currentTask.taskStatus) {
+      const boardIdToUse = boardId || currentTask.assigned_section?.board;
+      if (boardIdToUse) {
+        const sections = await prismadb.sections.findMany({
+          where: { board: boardIdToUse },
+          orderBy: { position: "asc" }
+        });
+
+        if (taskStatus === "COMPLETE") {
+          const completeSection = sections.find(s =>
+            s.title.toLowerCase().includes("complete") ||
+            s.title.toLowerCase().includes("done")
+          );
+          if (completeSection) targetSectionId = completeSection.id;
+        } else if (taskStatus === "ACTIVE") {
+          const activeSection = sections.find(s =>
+            s.title.toLowerCase().includes("progress") ||
+            s.title.toLowerCase().includes("doing")
+          ) || sections.find(s =>
+            s.title.toLowerCase().includes("to do") ||
+            s.title.toLowerCase().includes("incom")
+          ) || sections[0];
+          if (activeSection) targetSectionId = activeSection.id;
+        }
+      }
+    }
 
     let contentUpdated = content;
 
@@ -83,18 +103,22 @@ export async function PUT(req: Request, props: { params: Promise<{ taskId: strin
         updatedBy: user,
         dueDateAt: dueDateAt,
         user: user,
+        taskStatus: taskStatus,
+        section: targetSectionId,
       },
     });
 
     //Update Board updated at field
-    await prismadb.boards.update({
-      where: {
-        id: boardId,
-      },
-      data: {
-        updatedAt: new Date(),
-      },
-    });
+    if (boardId || currentTask.assigned_section?.board) {
+      await prismadb.boards.update({
+        where: {
+          id: boardId || currentTask.assigned_section?.board,
+        },
+        data: {
+          updatedAt: new Date(),
+        },
+      });
+    }
 
     //Notification to user who is not a task creator
     if (user !== session.user.id) {

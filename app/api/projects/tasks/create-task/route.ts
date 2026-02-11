@@ -26,8 +26,12 @@ export async function POST(req: Request) {
     priority,
     content,
     notionUrl,
-    account,
     dueDateAt,
+    accountId,
+    opportunityId,
+    contactId,
+    leadId,
+    taskStatus,
   } = body;
 
   if (!session) {
@@ -81,7 +85,11 @@ export async function POST(req: Request) {
         updatedBy: session.user.id,
         position: tasksCount > 0 ? tasksCount : 0,
         user: user,
-        taskStatus: "ACTIVE",
+        taskStatus: taskStatus || "ACTIVE", // Use provided status or default
+        accountId: accountId || null,
+        opportunityId: opportunityId || null,
+        contactId: contactId || null,
+        leadId: leadId || null,
       },
     });
 

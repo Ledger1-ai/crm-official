@@ -10,12 +10,23 @@ import { DataTableViewOptions } from "./data-table-view-options";
 import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
+import { ViewToggle, type ViewMode } from "@/components/ViewToggle";
+import { PanelTopClose, PanelTopOpen } from "lucide-react";
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+  hide: boolean;
+  setHide: (hide: boolean) => void;
 }
 
 export function DataTableToolbar<TData>({
   table,
+  viewMode,
+  setViewMode,
+  hide,
+  setHide,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -57,7 +68,22 @@ export function DataTableToolbar<TData>({
           )}
         </div>
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex items-center gap-2">
+        <ViewToggle value={viewMode} onChange={setViewMode} />
+        <DataTableViewOptions table={table} />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={() => setHide(!hide)}
+        >
+          {hide ? (
+            <PanelTopOpen className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <PanelTopClose className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

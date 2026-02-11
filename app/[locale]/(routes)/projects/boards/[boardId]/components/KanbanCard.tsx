@@ -1,7 +1,7 @@
 "use client";
 
 import { Draggable } from "@hello-pangea/dnd";
-import { Check, EyeIcon, Pencil, TrashIcon, AlertTriangle, Calendar } from "lucide-react";
+import { Check, EyeIcon, Pencil, TrashIcon, AlertTriangle, Calendar, Undo2 } from "lucide-react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import moment from "moment";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import React from "react";
+import { priorities } from "../../../tasks/data/data";
 
 interface Task {
     id: string;
@@ -42,6 +43,7 @@ interface KanbanCardProps {
     onEdit: (task: Task) => void;
     onDelete: (task: Task) => void;
     onDone: (task: Task) => void;
+    onUndo: (task: Task) => void;
 }
 
 interface KanbanCardContentProps {
@@ -52,6 +54,7 @@ interface KanbanCardContentProps {
     onEdit: (task: Task) => void;
     onDelete: (task: Task) => void;
     onDone: (task: Task) => void;
+    onUndo: (task: Task) => void;
     style?: React.CSSProperties;
     dragHandleProps?: any;
 }
@@ -64,6 +67,7 @@ export function KanbanCardContent({
     onEdit,
     onDelete,
     onDone,
+    onUndo,
     style,
     dragHandleProps
 }: KanbanCardContentProps) {
@@ -77,12 +81,10 @@ export function KanbanCardContent({
 
     const priority = (task.priority || "normal").toLowerCase();
 
-    const priorityColor =
-        priority === "high" || priority === "critical"
-            ? "bg-red-100 text-red-700 border-red-200"
-            : priority === "low"
-                ? "bg-green-100 text-green-700 border-green-200"
-                : "bg-yellow-100 text-yellow-700 border-yellow-200"; // normal
+    const priorityItem = priorities.find(p => p.value === priority);
+    const priorityColor = priorityItem?.color && priorityItem?.bgColor
+        ? `${priorityItem.bgColor} ${priorityItem.color} border-${priorityItem.color.split('-')[1]}-200`
+        : "bg-yellow-100 text-yellow-700 border-yellow-200";
 
     return (
         <div
@@ -117,16 +119,19 @@ export function KanbanCardContent({
                             <EyeIcon className="w-4 h-4 mr-2 opacity-70" />
                             View
                         </DropdownMenuItem>
-                        {!isComplete && (
-                            <DropdownMenuItem onClick={() => onEdit(task)}>
-                                <Pencil className="w-4 h-4 mr-2 opacity-70" />
-                                Edit
-                            </DropdownMenuItem>
-                        )}
-                        {!isComplete && (
+                        <DropdownMenuItem onClick={() => onEdit(task)}>
+                            <Pencil className="w-4 h-4 mr-2 opacity-70" />
+                            Edit
+                        </DropdownMenuItem>
+                        {!isComplete ? (
                             <DropdownMenuItem onClick={() => onDone(task)}>
                                 <Check className="w-4 h-4 mr-2 opacity-70" />
                                 Mark as Done
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem onClick={() => onUndo(task)}>
+                                <Undo2 className="w-4 h-4 mr-2 opacity-70 text-emerald-600" />
+                                Mark as Active
                             </DropdownMenuItem>
                         )}
                         <DropdownMenuItem onClick={() => onDelete(task)} className="text-destructive focus:text-destructive">

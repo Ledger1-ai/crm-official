@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import fetcher from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,12 @@ import {
     Calendar as CalendarIcon,
     List,
     LayoutGrid,
+    Clock,
+    CheckCircle2,
+    ArrowRight,
+    LayoutDashboard,
+    Users,
+    Zap
 } from "lucide-react";
 import {
     format,
@@ -52,6 +58,22 @@ import {
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DialogDescription } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { priorities, statuses } from "../../tasks/data/data";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import { Building2, Target, Search, Check, ChevronsUpDown } from "lucide-react";
+import useDebounce from "@/hooks/useDebounce";
 
 type Props = { userId: string };
 
@@ -65,6 +87,8 @@ interface TaskEvent {
     projectTitle?: string;
     projectId?: string;
     taskStatus?: string;
+    assignedUserId?: string;
+    createdBy?: string;
 }
 
 export default function ProjectCalendarView({ userId }: Props) {
@@ -75,6 +99,44 @@ export default function ProjectCalendarView({ userId }: Props) {
     const [fullDialogOpen, setFullDialogOpen] = useState(false);
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskPriority, setNewTaskPriority] = useState("normal");
+    const [newTaskStatus, setNewTaskStatus] = useState("ACTIVE");
+    const [todayTasksOpen, setTodayTasksOpen] = useState(false);
+    const [newTaskProjectId, setNewTaskProjectId] = useState("");
+    const [newTaskDescription, setNewTaskDescription] = useState("");
+    const [linkedRecordId, setLinkedRecordId] = useState("");
+    const [linkedRecordType, setLinkedRecordType] = useState(""); // 'account' | 'opportunity' | 'contact' etc
+    const [linkedRecordName, setLinkedRecordName] = useState("");
+
+    // Search State
+    const [projectSearchOpen, setProjectSearchOpen] = useState(false);
+    const [linkSearchOpen, setLinkSearchOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+    const debouncedSearch = useDebounce(searchValue, 300);
+    const [searchResults, setSearchResults] = useState<any>(null);
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Global Search API logic
+    useEffect(() => {
+        const fetchGlobalResults = async () => {
+            if (!debouncedSearch || debouncedSearch.length < 2) {
+                setSearchResults(null);
+                return;
+            }
+            if (!projectSearchOpen && !linkSearchOpen) return;
+
+            setIsSearching(true);
+            try {
+                const response = await axios.post("/api/fulltext-search", { data: debouncedSearch });
+                setSearchResults(response.data.data);
+            } catch (err) {
+                console.error("Search failed", err);
+            } finally {
+                setIsSearching(false);
+            }
+        };
+
+        fetchGlobalResults();
+    }, [debouncedSearch, projectSearchOpen, linkSearchOpen]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Fetch all tasks
@@ -100,12 +162,30 @@ export default function ProjectCalendarView({ userId }: Props) {
                 id: t.id,
                 title: t.title || "Untitled",
                 dueDateAt: new Date(t.dueDateAt),
-                priority: t.priority,
+                priority: t.priority?.toLowerCase() || "normal",
                 projectTitle: t.board?.title,
                 projectId: t.board?.id,
                 taskStatus: t.taskStatus,
+                assignedUserId: t.assigned_user?.id || t.user,
+                createdBy: t.createdBy,
             }));
     }, [tasksData]);
+
+    const todayTasks = useMemo(() => {
+        const today = new Date();
+        const todayStr = format(today, "yyyy-MM-dd");
+
+        return events.filter(e => {
+            const taskDateStr = format(e.dueDateAt, "yyyy-MM-dd");
+            const isTodayMatch = taskDateStr === todayStr;
+            if (!isTodayMatch) return false;
+
+            const isAssigned = e.assignedUserId?.toString() === userId?.toString();
+            const isCreator = e.createdBy?.toString() === userId?.toString();
+
+            return isAssigned || isCreator;
+        });
+    }, [events, userId]);
 
     // Get days based on view
     const viewDays = useMemo(() => {
@@ -131,28 +211,72 @@ export default function ProjectCalendarView({ userId }: Props) {
         return events.filter((e) => isSameDay(e.dueDateAt, day));
     };
 
-    // Agenda events (starting from current view date)
+    // Agenda events (for the entire selected month)
     const agendaEvents = useMemo(() => {
-        const start = currentMonth;
-        const end = new Date(start.getTime() + 30 * 86400000); // Show next 30 days from selected date
+        const start = startOfMonth(currentMonth);
+        const end = endOfMonth(currentMonth);
         return events
             .filter((e) => e.dueDateAt >= start && e.dueDateAt <= end)
             .sort((a, b) => a.dueDateAt.getTime() - b.dueDateAt.getTime());
     }, [events, currentMonth]);
 
-    const priorityColors: Record<string, string> = {
-        high: "bg-red-500",
-        critical: "bg-red-600",
-        normal: "bg-yellow-500",
-        medium: "bg-yellow-500",
-        low: "bg-green-500",
+    const groupedAgendaEvents = useMemo(() => {
+        const groups: Record<string, { date: Date, tasks: TaskEvent[] }> = {};
+        agendaEvents.forEach(event => {
+            const dateStr = format(event.dueDateAt, 'yyyy-MM-dd');
+            if (!groups[dateStr]) {
+                groups[dateStr] = {
+                    date: event.dueDateAt,
+                    tasks: []
+                };
+            }
+            groups[dateStr].tasks.push(event);
+        });
+        return Object.values(groups);
+    }, [agendaEvents]);
+
+    const priorityColors = useMemo(() => {
+        const colors: Record<string, string> = {};
+        priorities.forEach(p => {
+            colors[p.value] = p.dotColor || "bg-muted-foreground";
+        });
+        return colors;
+    }, []);
+
+    const priorityLabels = useMemo(() => {
+        const labels: Record<string, string> = {};
+        priorities.forEach(p => {
+            labels[p.value] = p.label;
+        });
+        return labels;
+    }, []);
+
+    const getPriorityBadgeVariant = (priority: string) => {
+        const p = priority?.toLowerCase();
+        if (p === "high" || p === "critical") return "destructive";
+        if (p === "low") return "secondary";
+        return "default";
+    };
+
+    const StatusDot = ({ priority, size = "md" }: { priority?: string, size?: "sm" | "md" | "lg" }) => {
+        const colorClass = priorityColors[priority?.toLowerCase() || "normal"] || "bg-muted-foreground";
+        const sizeClasses = {
+            sm: "h-2 w-2",
+            md: "h-2.5 w-2.5",
+            lg: "h-3 w-3"
+        };
+        return <div className={`${sizeClasses[size]} rounded-full shrink-0 ${colorClass}`} />;
     };
 
     const handleDayClick = (day: Date) => {
         setQuickAddDate(day);
+        setSearchValue("");
+        setNewTaskProjectId(boards[0]?.id || "");
         setQuickAddOpen(true);
         setNewTaskTitle("");
+        setNewTaskDescription("");
         setNewTaskPriority("normal");
+        setNewTaskStatus("ACTIVE");
     };
 
     const handleQuickAdd = async () => {
@@ -162,15 +286,26 @@ export default function ProjectCalendarView({ userId }: Props) {
             await axios.post("/api/projects/tasks/create-task", {
                 title: newTaskTitle,
                 priority: newTaskPriority,
+                taskStatus: newTaskStatus,
                 dueDateAt: quickAddDate,
-                content: "",
+                content: newTaskDescription,
                 user: userId,
-                board: boards[0]?.id || "",
+                board: newTaskProjectId || boards[0]?.id || "",
+                accountId: linkedRecordType === 'account' ? linkedRecordId : undefined,
+                opportunityId: linkedRecordType === 'opportunity' ? linkedRecordId : undefined,
+                contactId: linkedRecordType === 'contact' ? linkedRecordId : undefined,
+                leadId: linkedRecordType === 'lead' ? linkedRecordId : undefined,
             });
             toast.success("Task created!");
             mutate("/api/projects/tasks");
             setQuickAddOpen(false);
             setNewTaskTitle("");
+            setLinkedRecordId("");
+            setLinkedRecordType("");
+            setLinkedRecordName("");
+            setNewTaskStatus("ACTIVE");
+            setNewTaskPriority("normal");
+            setNewTaskDescription("");
         } catch (error: any) {
             toast.error(error?.response?.data || "Failed to create task");
         } finally {
@@ -259,11 +394,24 @@ export default function ProjectCalendarView({ userId }: Props) {
                         </button>
                     </div>
 
-                    <Button variant="outline" onClick={() => setCurrentMonth(new Date())}>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            setCurrentMonth(new Date());
+                            setTodayTasksOpen(true);
+                        }}
+                    >
                         Today
                     </Button>
 
-                    <Button onClick={() => { setQuickAddDate(new Date()); setQuickAddOpen(true); }}>
+                    <Button onClick={() => {
+                        setQuickAddDate(new Date());
+                        setQuickAddOpen(true);
+                        setNewTaskTitle("");
+                        setNewTaskDescription("");
+                        setNewTaskPriority("normal");
+                        setNewTaskStatus("ACTIVE");
+                    }}>
                         <Plus className="h-4 w-4 mr-1" />
                         Add Task
                     </Button>
@@ -272,36 +420,257 @@ export default function ProjectCalendarView({ userId }: Props) {
 
             {/* Quick Add Popover */}
             <Dialog open={quickAddOpen} onOpenChange={setQuickAddOpen}>
-                <DialogContent className="sm:max-w-[400px]">
+                <DialogContent className="sm:max-w-[450px]">
                     <DialogHeader>
-                        <DialogTitle>
-                            Quick Add Task - {quickAddDate ? format(quickAddDate, "EEEE, MMM d") : ""}
+                        <DialogTitle className="flex items-center gap-2">
+                            <Plus className="h-5 w-5 text-primary" />
+                            Create New Task
                         </DialogTitle>
+                        <DialogDescription>
+                            Quickly add a task to your schedule.
+                        </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 pt-2">
-                        <Input
-                            placeholder="Task title..."
-                            value={newTaskTitle}
-                            onChange={(e) => setNewTaskTitle(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleQuickAdd()}
-                            autoFocus
-                        />
-                        <Select value={newTaskPriority} onValueChange={setNewTaskPriority}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Priority" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="low">Low</SelectItem>
-                                <SelectItem value="normal">Normal</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
-                                <SelectItem value="critical">Critical</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setQuickAddOpen(false)}>
+                    <div className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Title</label>
+                            <Input
+                                placeholder="What needs to be done?"
+                                value={newTaskTitle}
+                                onChange={(e) => setNewTaskTitle(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleQuickAdd()}
+                                autoFocus
+                                className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Description (Optional)</label>
+                            <textarea
+                                placeholder="Add more details..."
+                                value={newTaskDescription}
+                                onChange={(e) => setNewTaskDescription(e.target.value)}
+                                className="w-full min-h-[80px] p-3 rounded-md text-sm bg-muted/30 border border-border/50 focus:border-primary/50 focus:outline-none transition-colors"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</label>
+                                <Select value={newTaskStatus} onValueChange={setNewTaskStatus}>
+                                    <SelectTrigger className="bg-muted/30 border-border/50">
+                                        <SelectValue placeholder="Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {statuses.map((status) => (
+                                            <SelectItem key={status.value} value={status.value}>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-2 w-2 rounded-full ${status.color.replace("text-", "bg-")}`} />
+                                                    {status.label}
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Due Date</label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal bg-muted/30 border-border/50 h-9 px-3 text-sm",
+                                                !quickAddDate && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {quickAddDate ? format(quickAddDate, "MMM d") : <span>Pick date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={quickAddDate || undefined}
+                                            onSelect={(date) => setQuickAddDate(date || new Date())}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Priority</label>
+                                <Select value={newTaskPriority} onValueChange={setNewTaskPriority}>
+                                    <SelectTrigger className="bg-muted/30 border-border/50">
+                                        <SelectValue placeholder="Priority" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {priorities.map((priority) => (
+                                            <SelectItem key={priority.value} value={priority.value}>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-2 w-2 rounded-full ${priority.dotColor}`} />
+                                                    {priority.label}
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Project Selection */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Project / Board</label>
+                                <Popover open={projectSearchOpen} onOpenChange={setProjectSearchOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className="w-full justify-between bg-muted/30 border-border/50 font-normal h-9 text-xs"
+                                        >
+                                            <span className="truncate">
+                                                {newTaskProjectId
+                                                    ? boards.find((b: any) => b.id === newTaskProjectId)?.title || "Selected Project"
+                                                    : "Search projects..."}
+                                            </span>
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[300px] p-0" align="start">
+                                        <Command shouldFilter={false}>
+                                            <CommandInput
+                                                placeholder="Type to search projects..."
+                                                onValueChange={setSearchValue}
+                                            />
+                                            <CommandList>
+                                                <CommandEmpty>{isSearching ? "Searching..." : "No projects found."}</CommandEmpty>
+                                                <CommandGroup heading="Suggestions">
+                                                    {boards.slice(0, 5).map((board: any) => (
+                                                        <CommandItem
+                                                            key={board.id}
+                                                            value={board.id}
+                                                            onSelect={() => {
+                                                                setNewTaskProjectId(board.id);
+                                                                setProjectSearchOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check className={cn("mr-2 h-4 w-4", newTaskProjectId === board.id ? "opacity-100" : "opacity-0")} />
+                                                            {board.title}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                                {searchResults?.projects?.length > 0 && (
+                                                    <CommandGroup heading="Search Results">
+                                                        {searchResults.projects.map((p: any) => (
+                                                            <CommandItem
+                                                                key={p.id}
+                                                                value={p.id}
+                                                                onSelect={() => {
+                                                                    setNewTaskProjectId(p.id);
+                                                                    setProjectSearchOpen(false);
+                                                                }}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <LayoutDashboard className="h-4 w-4 opacity-50" />
+                                                                    {p.title}
+                                                                </div>
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                )}
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+
+                            {/* CRM Linkage */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">CRM Linkage</label>
+                                <Popover open={linkSearchOpen} onOpenChange={setLinkSearchOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full justify-between bg-muted/30 border-border/50 font-normal h-9 text-xs"
+                                        >
+                                            <div className="flex items-center gap-2 truncate">
+                                                {linkedRecordType === 'account' && <Building2 className="h-3 w-3 text-blue-400" />}
+                                                {linkedRecordType === 'opportunity' && <Target className="h-3 w-3 text-purple-400" />}
+                                                <span className="truncate">{linkedRecordName || "Optional Link..."}</span>
+                                            </div>
+                                            <Search className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[300px] p-0" align="end">
+                                        <Command shouldFilter={false}>
+                                            <CommandInput
+                                                placeholder="Search accounts or opportunities..."
+                                                onValueChange={setSearchValue}
+                                            />
+                                            <CommandList>
+                                                <CommandEmpty>{isSearching ? "Searching..." : "No results found."}</CommandEmpty>
+
+                                                {(searchResults?.accounts?.length > 0 || searchResults?.opportunities?.length > 0) ? (
+                                                    <>
+                                                        {searchResults?.accounts?.length > 0 && (
+                                                            <CommandGroup heading="Accounts">
+                                                                {searchResults.accounts.map((a: any) => (
+                                                                    <CommandItem key={a.id} onSelect={() => {
+                                                                        setLinkedRecordId(a.id);
+                                                                        setLinkedRecordType('account');
+                                                                        setLinkedRecordName(a.name);
+                                                                        setLinkSearchOpen(false);
+                                                                    }}>
+                                                                        <Building2 className="mr-2 h-4 w-4 text-blue-400" />
+                                                                        {a.name}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )}
+                                                        {searchResults?.contacts?.length > 0 && (
+                                                            <CommandGroup heading="Contacts">
+                                                                {searchResults.contacts.map((c: any) => (
+                                                                    <CommandItem key={c.id} onSelect={() => {
+                                                                        setLinkedRecordId(c.id);
+                                                                        setLinkedRecordType('contact');
+                                                                        setLinkedRecordName(`${c.first_name || ""} ${c.last_name || ""}`);
+                                                                        setLinkSearchOpen(false);
+                                                                    }}>
+                                                                        <Users className="mr-2 h-4 w-4 text-emerald-400" />
+                                                                        {c.first_name} {c.last_name}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )}
+                                                        {searchResults?.leads?.length > 0 && (
+                                                            <CommandGroup heading="Leads">
+                                                                {searchResults.leads.map((l: any) => (
+                                                                    <CommandItem key={l.id} onSelect={() => {
+                                                                        setLinkedRecordId(l.id);
+                                                                        setLinkedRecordType('lead');
+                                                                        setLinkedRecordName(`${l.firstName || ""} ${l.lastName || ""}`);
+                                                                        setLinkSearchOpen(false);
+                                                                    }}>
+                                                                        <Zap className="mr-2 h-4 w-4 text-amber-400" />
+                                                                        {l.firstName} {l.lastName}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )}
+                                                    </>
+                                                ) : null}
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-2">
+                            <Button variant="ghost" onClick={() => setQuickAddOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button onClick={handleQuickAdd} disabled={isSubmitting || !newTaskTitle.trim()}>
+                            <Button onClick={handleQuickAdd} disabled={isSubmitting || !newTaskTitle.trim()} className="px-8 shadow-lg shadow-primary/20">
                                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Task"}
                             </Button>
                         </div>
@@ -311,39 +680,54 @@ export default function ProjectCalendarView({ userId }: Props) {
 
             {/* Agenda View */}
             {view === "agenda" && (
-                <div className="space-y-2">
-                    {agendaEvents.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground">
-                            No upcoming tasks in the next 30 days
+                <div className="space-y-6">
+                    {groupedAgendaEvents.length === 0 ? (
+                        <div className="text-center py-12 text-muted-foreground border rounded-xl bg-muted/20">
+                            No tasks scheduled for {format(currentMonth, "MMMM yyyy")}
                         </div>
                     ) : (
-                        agendaEvents.map((event) => (
-                            <Link
-                                key={event.id}
-                                href={`/campaigns/tasks/viewtask/${event.id}`}
-                                className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
-                            >
-                                <div className="text-center min-w-[60px]">
-                                    <div className="text-2xl font-bold">{format(event.dueDateAt, "d")}</div>
-                                    <div className="text-xs text-muted-foreground uppercase">{format(event.dueDateAt, "MMM")}</div>
-                                </div>
-                                <div className="flex-1">
+                        groupedAgendaEvents.map((group) => {
+                            const isDateToday = isToday(group.date);
+                            return (
+                                <div key={format(group.date, 'yyyy-MM-dd')} className="space-y-3">
                                     <div className="flex items-center gap-2">
-                                        <Circle
-                                            className={`h-2 w-2 shrink-0 ${priorityColors[event.priority || "normal"]}`}
-                                            fill="currentColor"
-                                        />
-                                        <span className="font-medium">{event.title}</span>
+                                        <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isDateToday ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                            }`}>
+                                            {format(group.date, "EEEE, MMM d")}
+                                            {isDateToday && " • Today"}
+                                        </div>
+                                        <div className="h-px bg-border flex-1" />
                                     </div>
-                                    {event.projectTitle && (
-                                        <div className="text-xs text-muted-foreground mt-0.5">{event.projectTitle}</div>
-                                    )}
+                                    <div className="grid gap-2">
+                                        {group.tasks.map((event) => (
+                                            <Link
+                                                key={event.id}
+                                                href={`/projects/tasks/viewtask/${event.id}`}
+                                                className={`flex items-center gap-4 p-3 rounded-xl border transition-all hover:shadow-md ${isDateToday ? "bg-primary/5 border-primary/20" : "bg-card hover:bg-muted/50"
+                                                    }`}
+                                            >
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <StatusDot priority={event.priority} />
+                                                        <span className="font-semibold">{event.title}</span>
+                                                        <Badge variant={getPriorityBadgeVariant(event.priority || "normal") as any} className="text-[10px] h-4 px-1.5 ml-auto sm:ml-0">
+                                                            {event.priority}
+                                                        </Badge>
+                                                    </div>
+                                                    {event.projectTitle && (
+                                                        <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                                            <span className="opacity-70">Project:</span>
+                                                            <span className="font-medium">{event.projectTitle}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <ArrowRight className="h-4 w-4 text-muted-foreground opacity-30 group-hover:opacity-100" />
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground">
-                                    {format(event.dueDateAt, "EEEE")}
-                                </div>
-                            </Link>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             )}
@@ -392,17 +776,12 @@ export default function ProjectCalendarView({ userId }: Props) {
                                         {dayEvents.slice(0, view === "week" ? 5 : 3).map((event) => (
                                             <Link
                                                 key={event.id}
-                                                href={`/campaigns/tasks/viewtask/${event.id}`}
+                                                href={`/projects/tasks/viewtask/${event.id}`}
                                                 className="block"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
-                                                <div className="flex items-center gap-1 text-xs p-1 rounded bg-muted/50 hover:bg-muted transition-colors truncate">
-                                                    <Circle
-                                                        className={`h-2 w-2 shrink-0 ${priorityColors[event.priority || "normal"] ||
-                                                            "bg-muted-foreground"
-                                                            }`}
-                                                        fill="currentColor"
-                                                    />
+                                                <div className="flex items-center gap-1.5 text-xs p-1 rounded bg-muted/60 hover:bg-muted transition-colors truncate">
+                                                    <StatusDot priority={event.priority} size="sm" />
                                                     <span className="truncate">{event.title}</span>
                                                 </div>
                                             </Link>
@@ -421,21 +800,74 @@ export default function ProjectCalendarView({ userId }: Props) {
             )}
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                    <Circle className="h-3 w-3 text-red-500" fill="currentColor" />
-                    <span>High/Critical</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Circle className="h-3 w-3 text-yellow-500" fill="currentColor" />
-                    <span>Normal</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Circle className="h-3 w-3 text-green-500" fill="currentColor" />
-                    <span>Low</span>
-                </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                {Object.entries(priorityLabels)
+                    .reverse()
+                    .map(([key, label]) => (
+                        <div key={key} className="flex items-center gap-2">
+                            <StatusDot priority={key} size="md" />
+                            <span>{label}</span>
+                        </div>
+                    ))}
                 <div className="text-xs ml-auto">Click on any day to add a task</div>
             </div>
+            {/* Today's Tasks Modal */}
+            <Dialog open={todayTasksOpen} onOpenChange={setTodayTasksOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Clock className="h-5 w-5 text-primary" />
+                            Todays Agenda
+                        </DialogTitle>
+                        <DialogDescription>
+                            {todayTasks.length > 0
+                                ? `You have ${todayTasks.length} task${todayTasks.length === 1 ? '' : 's'} assigned to you or created by you for today.`
+                                : "You're all caught up! No tasks found for you today."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <ScrollArea className="max-h-[60vh] mt-4 pr-4">
+                        <div className="space-y-3">
+                            {todayTasks.length === 0 && (
+                                <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground opacity-60">
+                                    <CheckCircle2 className="h-12 w-12 mb-3" />
+                                    <p>No tasks for today</p>
+                                </div>
+                            )}
+
+                            {todayTasks.map((task) => (
+                                <div key={task.id} className="group flex items-start justify-between gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors">
+                                    <div className="space-y-1.5 overflow-hidden">
+                                        <div className="flex items-center gap-2">
+                                            <StatusDot priority={task.priority} />
+                                            <span className="font-medium truncate block text-sm">{task.title}</span>
+                                            <Badge variant={getPriorityBadgeVariant(task.priority || "normal") as any} className="text-[10px] h-5 px-1.5 capitalize">
+                                                {task.priority}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                            {task.projectTitle && (
+                                                <span className="flex items-center gap-1">
+                                                    {task.projectTitle}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="shrink-0 pt-0.5">
+                                        <Link href={`/projects/tasks/viewtask/${task.id}`}>
+                                            <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <ArrowRight className="h-4 w-4" />
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

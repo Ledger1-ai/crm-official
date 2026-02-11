@@ -37,6 +37,7 @@ interface KanbanColumnProps {
     onEditTask: (task: Task) => void;
     onDeleteTask: (task: Task) => void;
     onDoneTask: (task: Task) => void;
+    onUndoTask: (task: Task) => void;
 }
 
 export default function KanbanColumn({
@@ -50,6 +51,7 @@ export default function KanbanColumn({
     onEditTask,
     onDeleteTask,
     onDoneTask,
+    onUndoTask,
 }: KanbanColumnProps) {
     return (
         <div className="flex flex-col h-full w-80 min-w-[320px] bg-muted/20 rounded-xl border shadow-sm backdrop-blur-sm snap-center">
@@ -106,6 +108,7 @@ export default function KanbanColumn({
                             onEdit={(t) => onEditTask(t)}
                             onDelete={(t) => onDeleteTask(t)}
                             onDone={(t) => onDoneTask(t)}
+                            onUndo={(t) => onUndoTask(t)}
                         />
                     );
                 }}
@@ -129,6 +132,7 @@ export default function KanbanColumn({
                                     onEdit={onEditTask}
                                     onDelete={onDeleteTask}
                                     onDone={onDoneTask}
+                                    onUndo={onUndoTask}
                                 />
                             ))}
                             {provided.placeholder}

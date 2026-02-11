@@ -78,23 +78,6 @@ export function TasksDataTable<TData, TValue>({
 
   return (
     <div className="space-y-4 w-full overflow-hidden">
-      <div className="flex justify-between items-start gap-3">
-        <div></div>
-        <div className="flex justify-end items-center space-x-2">
-          <ViewToggle value={viewMode} onChange={setViewMode} />
-          {hide ? (
-            <PanelTopOpen
-              onClick={() => setHide(!hide)}
-              className="text-muted-foreground cursor-pointer"
-            />
-          ) : (
-            <PanelTopClose
-              onClick={() => setHide(!hide)}
-              className="text-muted-foreground cursor-pointer"
-            />
-          )}
-        </div>
-      </div>
 
       {hide ? (
         <div className="flex gap-2 text-sm text-muted-foreground">
@@ -102,7 +85,13 @@ export function TasksDataTable<TData, TValue>({
         </div>
       ) : (
         <>
-          <DataTableToolbar table={table} />
+          <DataTableToolbar
+            table={table}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            hide={hide}
+            setHide={setHide}
+          />
 
           {/* Table View */}
           {viewMode === "table" && (
