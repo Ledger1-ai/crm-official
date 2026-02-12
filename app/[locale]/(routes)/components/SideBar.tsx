@@ -1,10 +1,11 @@
+import { getNavigationConfig } from "@/actions/navigation/get-navigation-config";
+import { DEFAULT_NAV_STRUCTURE, NavItem } from "@/lib/navigation-defaults";
+import DynamicModuleMenu from "./dynamic-navigation/DynamicModuleMenu";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getModules } from "@/actions/get-modules";
 import { prismadb } from "@/lib/prisma";
 import { getCaseStats } from "@/actions/crm/cases/get-case-stats";
-
-import ModuleMenu from "./ModuleMenu";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { getDictionary } from "@/dictionaries";
 
 const SideBar = async () => {
@@ -12,7 +13,7 @@ const SideBar = async () => {
 
   if (!session?.user?.id) return null;
 
-  const [modules, user, caseStats] = await Promise.all([
+  const [modules, user, caseStats, dbNavConfig] = await Promise.all([
     getModules(),
     (prismadb.users as any).findUnique({
       where: { id: session.user.id },
@@ -23,6 +24,7 @@ const SideBar = async () => {
       }
     }),
     getCaseStats(),
+    getNavigationConfig()
   ]);
 
   if (!modules) return null;
@@ -50,7 +52,11 @@ const SideBar = async () => {
   const teamRole = (user as any)?.team_role || "MEMBER";
   const isPartnerAdmin = (user as any).is_admin || teamRole === "PLATFORM_ADMIN" || (user as any).assigned_team?.slug === "basalt" || (user as any).assigned_team?.slug === "basalthq";
 
-  return <ModuleMenu
+  // Resolve Navigation Structure
+  const activeNavStructure = (dbNavConfig as NavItem[]) || DEFAULT_NAV_STRUCTURE;
+
+  return <DynamicModuleMenu
+    navStructure={activeNavStructure}
     modules={modules}
     dict={dict}
     features={features}

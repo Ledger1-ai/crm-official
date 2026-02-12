@@ -78,8 +78,8 @@ const LeadsPage = async ({ searchParams }: LeadsPageProps) => {
       case "manager":
       default:
         return {
-          title: "Leads Manager",
-          description: "Everything you need to know about your leads"
+          title: "Calendar",
+          description: "Manage your schedule and lead interactions"
         };
     }
   };

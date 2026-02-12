@@ -8,7 +8,6 @@ import SideBar from "./components/SideBar";
 import Footer from "./components/Footer";
 import { Metadata } from "next";
 import RecentActivityTracker from "@/components/RecentActivityTracker";
-import GlobalDialer from "@/components/voice/GlobalDialer";
 import { SmartBreadcrumb } from "@/components/SmartBreadcrumb";
 import UtilityBar from "@/components/UtilityBar";
 
@@ -103,9 +102,7 @@ export default async function AppLayout({
         </div>
         <UtilityBar />
         <Footer />
-
       </div>
-      <GlobalDialer />
     </div>
   );
 }

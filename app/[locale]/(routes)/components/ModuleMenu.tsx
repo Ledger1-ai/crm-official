@@ -279,6 +279,16 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                 badge={serviceBadge}
               />
 
+              {hasModule("messages") && (
+                <MenuItem
+                  href="/messages"
+                  icon={MessageSquare}
+                  title="Messages"
+                  isOpen={open}
+                  isActive={isPath(/^\/([a-z]{2}\/)?messages\/?$/)}
+                />
+              )}
+
               {/* ══════ MARKETING HUB ══════ */}
               {isNonMember && (
                 <>

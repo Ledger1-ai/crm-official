@@ -10,7 +10,9 @@ import {
     ChevronDown,
     X,
     Maximize2,
-    Minimize2
+    Minimize2,
+    ChevronRight,
+    Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,11 +22,13 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import DialerPanel from "@/app/[locale]/(routes)/crm/dialer/DialerPanel";
 
 export default function UtilityBar() {
     const [isMinimized, setIsMinimized] = useState(false);
     const [notes, setNotes] = useState("");
     const [tasks, setTasks] = useState<{ id: string, text: string, completed: boolean }[]>([]);
+    const [isDialerOpen, setIsDialerOpen] = useState(false);
 
     useEffect(() => {
         const savedNotes = localStorage.getItem("crm-utility-notes");
@@ -85,11 +89,11 @@ export default function UtilityBar() {
                 </div>
 
                 <div className="flex items-center gap-1 sm:gap-4">
-                    {/* Leads Manager */}
-                    <Link href="/crm/leads">
-                        <Button variant="ghost" size="sm" className="gap-2 text-xs font-semibold hover:bg-primary/10 hover:text-primary transition-all">
-                            <Users className="h-4 w-4" />
-                            <span className="hidden md:inline">Leads Manager</span>
+                    {/* Calendar */}
+                    <Link href="/crm/calendar">
+                        <Button variant="ghost" size="sm" className="gap-2 text-xs font-semibold hover:bg-blue-500/10 hover:text-blue-500 transition-all">
+                            <Calendar className="h-4 w-4" />
+                            <span className="hidden md:inline">Calendar</span>
                         </Button>
                     </Link>
 
@@ -178,10 +182,36 @@ export default function UtilityBar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-muted rounded-md border text-[10px] font-mono">
-                        <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                        SYSTEM READY
-                    </div>
+                    <Popover open={isDialerOpen} onOpenChange={setIsDialerOpen}>
+                        <PopoverTrigger asChild>
+                            <div className={cn(
+                                "hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full transition-all cursor-pointer group",
+                                isDialerOpen
+                                    ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                                    : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 hover:text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/50"
+                            )}>
+                                <Phone className="h-3.5 w-3.5" />
+                                <span className="text-xs font-semibold">Numpad</span>
+                                <div className={cn("h-3 w-px mx-1", isDialerOpen ? "bg-white/20" : "bg-emerald-500/20")} />
+                                {isDialerOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            </div>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[320px] p-0 border-amber-500/20 bg-background/95 backdrop-blur-xl text-foreground shadow-2xl overflow-hidden shadow-amber-500/20" side="top" align="end" sideOffset={12}>
+                            <div className="flex items-center justify-between px-3 py-2 border-b border-white/10 bg-white/5">
+                                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                                    <span className="text-amber-500">:::</span>
+                                    <span className="tracking-widest uppercase text-[9px]">Comm Terminal</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[8px] text-emerald-500 font-bold uppercase tracking-tight">Active</span>
+                                </div>
+                            </div>
+                            <div className="bg-black/20">
+                                <DialerPanel isCompact={true} />
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
         </div>

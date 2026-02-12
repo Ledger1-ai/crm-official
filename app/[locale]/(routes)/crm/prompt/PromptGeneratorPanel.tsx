@@ -14,6 +14,8 @@ import {
 import { toast } from 'react-hot-toast';
 import CustomCCP from '@/components/voice/CustomCCP';
 import { usePermission } from '@/components/providers/permissions-provider';
+import { useSession } from 'next-auth/react';
+import { Shield } from 'lucide-react';
 
 type RolePreset = {
   key: string;
@@ -103,6 +105,7 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
   const [prompt, setPrompt] = useState('');
 
   const { hasAccess, isSuperAdmin } = usePermission();
+  const { data: session } = useSession();
 
   const generated = useMemo(
     () =>
@@ -169,10 +172,14 @@ export default function PromptGeneratorPanel({ embedded = false, showSoftphone =
   }
 
   // 1. Module Level Gate
-  if (!isSuperAdmin && !hasAccess('ai_lab') && !hasAccess('ai_lab.prompt_generator')) {
+  const isAdmin = (session?.user as any)?.isAdmin === true;
+
+  if (!isAdmin && !isSuperAdmin && !hasAccess('ai_lab') && !hasAccess('ai_lab.prompt_generator')) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
-        You do not have permission to access the Prompt Generator.
+      <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center min-h-[200px] space-y-2">
+        <Shield className="h-8 w-8 text-red-500/50 mb-2" />
+        <p className="text-sm font-semibold text-foreground">Access Restricted</p>
+        <p className="text-xs">You do not have permission to access the Prompt Generator.</p>
       </div>
     );
   }

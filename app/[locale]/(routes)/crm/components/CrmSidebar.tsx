@@ -21,6 +21,7 @@ import {
     Shield,
     CheckCircle2,
     Zap,
+    Calendar,
 } from "lucide-react";
 
 interface CrmSidebarProps {
@@ -70,7 +71,9 @@ export default function CrmSidebar({ isMember = false, allowedModules = [] }: Cr
         { id: 'contacts', label: "Contacts", href: "/crm/contacts", icon: Contact },
         { id: 'contracts', label: "Contracts", href: "/crm/contracts", icon: FileText },
         { id: 'dialer', label: "Dialer", href: "/crm/dialer", icon: Phone },
-        { id: 'leads', label: "Leads Manager", href: "/crm/leads", icon: Users },
+        { id: 'contracts', label: "Contracts", href: "/crm/contracts", icon: FileText },
+        { id: 'dialer', label: "Dialer", href: "/crm/dialer", icon: Phone },
+        { id: 'leads', label: "Calendar", href: "/crm/calendar", icon: Calendar },
         { id: 'projects', label: "Projects", href: "/crm/my-projects", icon: Folder },
         { id: 'opportunities', label: "Opportunities", href: "/crm/opportunities", icon: Target },
         { id: 'sales-command', label: "Sales Command", href: "/crm/sales-command", icon: Radio },

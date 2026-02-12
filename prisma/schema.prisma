@@ -957,7 +957,9 @@ model Users {
   approval_actions           ApprovalRequestAction[] @relation(name: "ApprovalActor")
   notifications              Notification[]
   quotes                     crm_Quotes[]
+
   dashboard_preference       DashboardPreference?
+  navigation_preferences     NavigationConfig[]
 }
 
 model Team {
@@ -1038,7 +1040,9 @@ model Team {
   approval_requests  ApprovalRequest[]
   notifications      Notification[]
   products           crm_Products[]
+
   quotes             crm_Quotes[]
+  navigation_configs NavigationConfig[]
 }
 
 model CustomRole {
@@ -3449,4 +3453,22 @@ model DashboardPreference {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      Users    @relation(fields: [userId], references: [id])
+}
+
+model NavigationConfig {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  team_id   String   @db.ObjectId
+  user_id   String?  @db.ObjectId // Optional: If set, it's a specific user preference override
+  
+  // The structure of the sidebar
+  // Format: Array of { id, type: 'item'|'group', label, icon, href, children: [], permissions: [], hidden: boolean }
+  structure Json     
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assigned_team Team   @relation(fields: [team_id], references: [id])
+  assigned_user Users? @relation(fields: [user_id], references: [id])
+
+  @@index([team_id, user_id])
 }

@@ -25,9 +25,11 @@ type ExpandableMenuItemProps = {
     isMobile?: boolean;
     /** Optional notification badge count */
     badge?: number;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
 };
 
-const ExpandableMenuItem = ({ href, icon: Icon, title, isOpen, isActive, items, isMobile = false, badge }: ExpandableMenuItemProps) => {
+const ExpandableMenuItem = ({ href, icon: Icon, title, isOpen, isActive, items, isMobile = false, badge, onMouseEnter, onMouseLeave }: ExpandableMenuItemProps) => {
     const pathname = usePathname();
     const router = useRouter();
 
@@ -54,11 +56,13 @@ const ExpandableMenuItem = ({ href, icon: Icon, title, isOpen, isActive, items, 
         if (hideTimer.current) clearTimeout(hideTimer.current);
         updatePosition();
         setShowFlyout(true);
-    }, [updatePosition]);
+        onMouseEnter?.();
+    }, [updatePosition, onMouseEnter]);
 
     const handleMouseLeave = useCallback(() => {
         hideTimer.current = setTimeout(() => setShowFlyout(false), 120);
-    }, []);
+        onMouseLeave?.();
+    }, [onMouseLeave]);
 
     const handleFlyoutEnter = useCallback(() => {
         if (hideTimer.current) clearTimeout(hideTimer.current);

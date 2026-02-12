@@ -62,7 +62,7 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
 
   // Layer 3: Leads Manager Tabs
   const allNavItems = [
-    { id: "manager", label: "Leads Manager", icon: LayoutDashboard },
+    { id: "manager", label: "Calendar", icon: LayoutDashboard },
     { id: "wizard", label: "LeadGen Wizard", icon: Wand2 },
     { id: "pools", label: "Lead Pools", icon: Users },
     { id: "campaigns", label: "Sequences", icon: Mail },
@@ -102,9 +102,9 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
                 className={cn(
                   "group flex items-center relative transition-all duration-200 rounded-lg",
                   isCollapsed
-                    ? "w-8 h-8 justify-center mx-auto hover:bg-white/10 hover:ring-1 hover:ring-primary/50"
+                    ? "w-8 h-8 justify-center mx-auto hover:bg-primary/10 hover:ring-1 hover:ring-primary/50"
                     : "justify-start px-4 py-2 gap-3 w-full",
-                  selected === item.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  selected === item.id ? "text-primary" : "text-primary/70 hover:text-primary"
                 )}
                 title={isCollapsed ? undefined : item.label}
               >
@@ -127,14 +127,15 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
 
             {/* Dynamic Bottom Label (Collapsed Mode) */}
             {isCollapsed && (
-              <div className="absolute bottom-12 left-0 right-0 flex justify-center pointer-events-none">
+              <div className="absolute bottom-12 left-0 right-0 flex justify-center pointer-events-none pb-4">
                 <span
                   className={cn(
-                    "text-[10px] uppercase tracking-widest font-semibold whitespace-nowrap [writing-mode:vertical-rl] rotate-180 transition-opacity duration-200 text-primary",
-                    hoveredLabel ? "opacity-100" : "opacity-0"
+                    "text-[10px] uppercase tracking-widest font-semibold whitespace-nowrap [writing-mode:vertical-rl] rotate-180 transition-all duration-300",
+                    hoveredLabel || leadsNavItems.find(i => i.id === selected)?.label ? "opacity-100" : "opacity-0",
+                    hoveredLabel ? "text-primary scale-105" : "text-primary/70"
                   )}
                 >
-                  {hoveredLabel}
+                  {hoveredLabel || leadsNavItems.find(i => i.id === selected)?.label}
                 </span>
               </div>
             )}
@@ -143,9 +144,9 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
           {/* Toggle Button - Outside overflow container */}
           <button
             onClick={toggleSidebar}
-            className="absolute -right-3 top-6 bg-background/60 backdrop-blur-xl border border-border rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-[100]"
+            className="absolute -right-3 top-6 bg-background/60 backdrop-blur-xl border border-primary/20 rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-[100]"
           >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {isCollapsed ? <ChevronRight className="w-4 h-4 text-primary" /> : <ChevronLeft className="w-4 h-4 text-primary" />}
           </button>
         </div>
       )}
@@ -176,7 +177,7 @@ export default function TabsContainer({ title, description, managerSlot, wizardS
                 className={cn(
                   "flex flex-col items-center justify-center min-w-[60px] gap-0.5 transition-colors relative",
                   isMobileExpanded ? "h-14 justify-end pb-1" : "h-full justify-center",
-                  selected === item.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  selected === item.id ? "text-primary" : "text-primary/60 hover:text-primary"
                 )}
               >
                 <Icon className="w-4 h-4" />

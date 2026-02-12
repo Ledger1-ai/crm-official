@@ -56,9 +56,9 @@ export const CRM_MODULES: CrmModule[] = [
     },
     {
         id: 'leads',
-        name: 'Leads Manager',
-        route: '/crm/leads',
-        description: 'Lead management and tracking',
+        name: 'Calendar',
+        route: '/crm/calendar',
+        description: 'Global task and event management',
         children: [
             {
                 id: 'leads.tabs',

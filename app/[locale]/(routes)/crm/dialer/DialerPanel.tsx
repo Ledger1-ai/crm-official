@@ -10,7 +10,7 @@ import PromptGeneratorPanel from '../prompt/PromptGeneratorPanel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useVaruniLink } from '@/app/hooks/use-varuni-link';
-import { Zap, Shield, XCircle } from 'lucide-react';
+import { Zap, Shield, XCircle, Phone } from 'lucide-react';
 
 function isE164(num: string) {
   return /^\+[1-9]\d{1,14}$/.test(num);
@@ -43,6 +43,9 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
   const [listRaw, setListRaw] = useState<string>('');
   const [running, setRunning] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [status, setStatus] = useState<'available' | 'break' | 'offline'>('available');
+  const [callActive, setCallActive] = useState<boolean>(false);
+
   const [results, setResults] = useState<{ phone: string; leadId?: string; ok: boolean; transactionId?: string; error?: string }[]>([]);
   const stopRef = useRef<boolean>(false);
 
@@ -408,56 +411,124 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
 
   // Compact Layout (Tabs)
   return (
-    <div className="w-full h-full flex flex-col">
-      <Tabs defaultValue="dial" className="w-full flex-1 flex flex-col">
-        <div className="px-4 py-2 border-b bg-muted/20">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dial">Phone</TabsTrigger>
-            <TabsTrigger value="list">List</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="settings">Config</TabsTrigger>
+    <div className={cn("w-full flex flex-col", isCompact ? "h-[480px]" : "h-full")}>
+      <Tabs defaultValue="dial" className="w-full h-full flex flex-col min-h-0">
+        <div className="px-3 py-1.5 border-b bg-muted/20 flex-none">
+          <TabsList className="grid w-full grid-cols-4 h-8">
+            <TabsTrigger value="dial" className="text-[10px] py-1">Phone</TabsTrigger>
+            <TabsTrigger value="list" className="text-[10px] py-1">List</TabsTrigger>
+            <TabsTrigger value="history" className="text-[10px] py-1">History</TabsTrigger>
+            <TabsTrigger value="settings" className="text-[10px] py-1">Config</TabsTrigger>
           </TabsList>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <TabsContent value="dial" className="mt-0 space-y-4">
-            {/* Softphone */}
-            <div className="rounded-lg border bg-card/50 p-3 shadow-sm">
-              <CustomCCP theme="dark" title="Softphone" subtitle="Connected" />
+        <div className="flex-1 flex flex-col min-h-0">
+          <TabsContent value="dial" className="mt-0 p-3 space-y-2 overflow-hidden flex-none">
+            {/* Status Controls */}
+            <div className="grid grid-cols-3 gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setStatus('available')}
+                className={cn(
+                  "flex flex-col h-11 gap-0.5 border-amber-500/10 bg-amber-500/5 hover:bg-amber-500/10",
+                  status === 'available' && "border-amber-500 ring-0.5 ring-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.15)]"
+                )}
+              >
+                <div className="h-1 w-1 rounded-full bg-amber-500 shadow-[0_0_3px_rgba(245,158,11,1)]" />
+                <span className="text-[9px] uppercase font-bold tracking-tighter">Available</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setStatus('break')}
+                className={cn(
+                  "flex flex-col h-11 gap-0.5 border-amber-500/10 bg-amber-500/5 hover:bg-amber-500/10",
+                  status === 'break' && "border-amber-500 ring-0.5 ring-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.15)]"
+                )}
+              >
+                <Zap className="h-2.5 w-2.5 text-amber-500" />
+                <span className="text-[9px] uppercase font-bold tracking-tighter">Break</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setStatus('offline')}
+                className={cn(
+                  "flex flex-col h-11 gap-0.5 border-amber-500/10 bg-amber-500/5 hover:bg-amber-500/10",
+                  status === 'offline' && "border-amber-500 ring-0.5 ring-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.15)]"
+                )}
+              >
+                <XCircle className="h-2.5 w-2.5 text-amber-500" />
+                <span className="text-[9px] uppercase font-bold tracking-tighter">Offline</span>
+              </Button>
             </div>
 
-            {/* Single Dial Form */}
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Number</label>
-                <Input
-                  placeholder="+1..."
-                  value={singlePhone}
-                  onChange={(e) => setSinglePhone(e.target.value)}
-                  className="text-lg font-mono h-11"
-                />
+            {/* Active Call Section */}
+            <div className="p-2 bg-white/5 rounded-lg border border-white/10">
+              <div className="grid grid-cols-3 gap-1.5">
+                <Button variant="outline" size="sm" className="bg-emerald-500/5 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 h-7 gap-1 px-1">
+                  <Phone className="h-2.5 w-2.5" /> <span className="text-[9px] font-bold tracking-tighter">Answer</span>
+                </Button>
+                <Button variant="outline" size="sm" className="bg-red-500/5 border-red-500/30 text-red-500 hover:bg-red-500/10 h-7 gap-1 px-1">
+                  <XCircle className="h-2.5 w-2.5" /> <span className="text-[9px] font-bold tracking-tighter">End</span>
+                </Button>
+                <Button variant="outline" size="sm" className="bg-amber-500/5 border-amber-500/30 text-amber-500 hover:bg-amber-500/10 h-7 gap-1 px-1">
+                  <XCircle className="h-2.5 w-2.5 rotate-45" /> <span className="text-[9px] font-bold tracking-tighter">Close</span>
+                </Button>
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Lead ID (Opt)</label>
+            </div>
+
+            {/* Keypad Section */}
+            <div className="p-2 bg-black/20 rounded-xl border border-white/5 space-y-2.5 shadow-inner">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="relative col-span-2">
+                  <Input
+                    placeholder="Enter Number..."
+                    value={singlePhone}
+                    onChange={(e) => setSinglePhone(e.target.value)}
+                    className="h-9 bg-black/40 border-amber-500/20 text-center text-lg font-mono tracking-widest focus-visible:ring-amber-500/30 pr-8"
+                  />
+                  <button
+                    onClick={backspaceDial}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <XCircle className="h-3.5 w-3.5" />
+                  </button>
+                </div>
                 <Input
-                  placeholder="lead-123"
+                  placeholder="Lead ID (Opt)"
                   value={singleLeadId}
                   onChange={(e) => setSingleLeadId(e.target.value)}
-                  className="h-9 text-sm"
+                  className="h-8 bg-black/40 border-white/10 text-[10px] col-span-2"
                 />
               </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, '+', 0, 'CLR'].map(key => (
+                  <Button
+                    key={key}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => key === 'CLR' ? clearDial() : appendDial(String(key))}
+                    className="h-8 bg-white/[0.03] border border-white/[0.05] hover:bg-amber-500/10 hover:border-amber-500/30 text-base font-bold transition-all p-0"
+                  >
+                    {key}
+                  </Button>
+                ))}
+              </div>
+
               <Button
-                size="lg"
-                className="w-full font-semibold text-base mt-2"
                 onClick={runSingle}
-                disabled={!singlePhone.trim() || !singleLeadId.trim() || gateCheckingSingle || !gateOkSingle}
+                className="w-full h-9 bg-amber-600 hover:bg-amber-500 text-white font-bold gap-2 shadow-lg shadow-amber-900/20"
+                disabled={!singlePhone.trim() || !gateOkSingle}
               >
-                Call Now
+                <Phone className="h-3.5 w-3.5" /> CALL
               </Button>
             </div>
           </TabsContent>
 
-          <TabsContent value="list" className="mt-0 space-y-3">
+          <TabsContent value="list" className="mt-0 p-4 space-y-3 overflow-y-auto flex-1 min-h-0">
             <div className="space-y-2">
               <label className="text-xs font-medium">Bulk Dial List</label>
               <Textarea
@@ -476,16 +547,16 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
             </div>
           </TabsContent>
 
-          <TabsContent value="history" className="mt-0">
+          <TabsContent value="history" className="mt-0 p-4 overflow-y-auto flex-1 min-h-0">
             <div className="space-y-2">
               {results.length === 0 && <div className="text-sm text-center py-8 text-muted-foreground">No recent calls</div>}
               {results.map((r, i) => (
-                <div key={i} className="flex items-start justify-between p-2 rounded border bg-card/50 text-xs">
+                <div key={i} className="flex items-start justify-between p-2 rounded border bg-card/50 text-xs text-[10px]">
                   <div>
                     <div className="font-mono font-medium">{r.phone}</div>
-                    {r.leadId && <div className="text-muted-foreground">{r.leadId}</div>}
+                    {r.leadId && <div className="text-muted-foreground opacity-60 text-[9px]">{r.leadId}</div>}
                   </div>
-                  <div className={cn("px-1.5 py-0.5 rounded font-bold", r.ok ? "bg-emerald-500/20 text-emerald-500" : "bg-red-500/20 text-red-500")}>
+                  <div className={cn("px-1 py-0.5 rounded font-bold text-[8px]", r.ok ? "bg-emerald-500/20 text-emerald-500" : "bg-red-500/20 text-red-500")}>
                     {r.ok ? 'OK' : 'ERR'}
                   </div>
                 </div>
@@ -493,9 +564,9 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
             </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="mt-0 h-full">
+          <TabsContent value="settings" className="mt-0 p-4 h-full overflow-y-auto flex-1 min-h-0">
             {/* Embedded Prompt Gen but scaled down? Or just hidden if too complex */}
-            <div className="text-xs text-muted-foreground mb-4">
+            <div className="text-[10px] text-muted-foreground mb-4 opacity-70">
               Configure agent prompts and settings. call scripts.
             </div>
             <PromptGeneratorPanel embedded={true} showSoftphone={false} />

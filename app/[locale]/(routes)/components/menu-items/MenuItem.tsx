@@ -14,11 +14,12 @@ type MenuItemProps = {
     isActive: boolean;
     onClick?: () => void;
     isMobile?: boolean;
-    /** Optional notification badge count */
     badge?: number;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
 };
 
-const MenuItem = ({ href, icon: Icon, title, isOpen, isActive, onClick, isMobile = false, badge }: MenuItemProps) => {
+const MenuItem = ({ href, icon: Icon, title, isOpen, isActive, onClick, isMobile = false, badge, onMouseEnter, onMouseLeave }: MenuItemProps) => {
     // Determine label for collapsed/mobile view
     // Specific override: Dashboard -> Home
     const rawLabel = title;
@@ -51,7 +52,7 @@ const MenuItem = ({ href, icon: Icon, title, isOpen, isActive, onClick, isMobile
 
     // ─── Desktop ───
     return (
-        <div className="w-full">
+        <div className="w-full" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             <Link href={href} onClick={onClick}>
                 <div
                     className={cn(
