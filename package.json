@@ -1,6 +1,6 @@
 {
   "name": "basaltcrm-app",
-  "version": "1.1.7p",
+  "version": "1.1.7r",
   "author": "Michael Milton (BasaltHQ)",
   "private": true,
   "scripts": {
@@ -77,7 +77,6 @@
     "amazon-connect-streams": "^2.22.0",
     "aws-crt": "^1.28.1",
     "axios": "^1.13.2",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -136,7 +135,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tesseract.js": "^7.0.0",
     "uuid": "^13.0.0",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "xlsx": "^0.18.5",
     "xmlbuilder2": "^4.0.3",
     "zod": "^4.3.5",
     "zustand": "^5.0.9"

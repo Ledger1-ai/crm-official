@@ -155,7 +155,7 @@ export const authOptions: NextAuthOptions = {
               is_account_admin: false,
               lastLoginAt: new Date(),
               userStatus:
-                process.env.NEXT_PUBLIC_APP_URL === "https://crm.basalthq.com"
+                process.env.ALLOW_OPEN_REGISTRATION === "true"
                   ? "ACTIVE"
                   : "PENDING",
             },
