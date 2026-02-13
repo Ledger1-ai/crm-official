@@ -65,12 +65,11 @@ export default function JumpBackIn({ align = "left", className, userId }: JumpBa
 
     if (!isMounted) return null;
 
-    // Filter out "Dashboard" as requested (redundant)
+    // Filter out redundant "Dashboard" entries
     const filteredHistory = history.filter(item =>
         !item.label.toLowerCase().includes('dashboard') &&
-        !item.href.includes('/crm/sales-command') &&
         !item.href.endsWith('/crm/dashboard')
-    ).slice(0, 5); // Limit to 5 max
+    ).slice(0, 5); // Limit to 5 max as requested
 
     if (filteredHistory.length === 0) return null;
 

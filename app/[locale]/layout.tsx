@@ -15,6 +15,7 @@ import { ToastProvider } from "@/app/providers/ToastProvider";
 import NextTopLoader from "nextjs-toploader";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import SuspensionCheck from "@/components/SuspensionCheck";
+import RecentActivityTracker from "@/components/RecentActivityTracker";
 import { SessionProvider } from "@/app/providers/SessionProvider";
 import { SWRSessionProvider } from "@/components/providers/swr-session-provider";
 import { getServerSession } from "next-auth";
@@ -146,6 +147,7 @@ export default async function RootLayout(props: Props) {
           <SessionProvider session={session}>
             <SWRSessionProvider>
               <ThemeProvider>
+                <RecentActivityTracker />
                 {children}
                 {/* Team Suspension Check */}
                 <SuspensionCheck />

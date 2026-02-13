@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 const MAX_HISTORY_ITEMS = 5;
-const IGNORED_PATHS = ["/crm/dashboard", "/sign-in", "/admin/login"];
+const IGNORED_PATHS = ["/sign-in", "/admin/login", "/register", "/pending", "/inactive"];
 
 export interface HistoryItem {
     href: string;
@@ -74,8 +74,10 @@ export default function RecentActivityTracker() {
             const stored = localStorage.getItem(storageKey);
             let history: HistoryItem[] = stored ? JSON.parse(stored) : [];
 
-            // Remove existing entry for the same path or label to avoid duplicates and bubble to top
-            history = history.filter((item) => item.href !== fullPath && item.label !== label);
+            // Remove existing entry for the same path to avoid duplicates and bubble to top
+            // IMPORTANT: Don't filter by label here anymore, as multiple items (e.g., different leads)
+            // might share the same generic "Lead Item" label but have different hrefs.
+            history = history.filter((item) => item.href !== fullPath);
 
             // Add new item to the beginning
             history.unshift(newItem);
