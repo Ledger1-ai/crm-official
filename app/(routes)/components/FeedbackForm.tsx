@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod";
-import axios from "axios";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,7 +42,23 @@ const FeedbackForm = ({ setOpen }: FeedbackFormProps) => {
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await axios.post("/api/feedback", data);
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send feedback");
+      }
+
+      toast({
+        title: "Success",
+        description: "Thank you for your feedback.",
+      });
+      setOpen(false);
     } catch (error) {
       console.error(error);
       toast({
@@ -51,11 +67,6 @@ const FeedbackForm = ({ setOpen }: FeedbackFormProps) => {
         description: "Something went wrong. Please try again later.",
       });
     } finally {
-      toast({
-        title: "Success",
-        description: "Thank you for your feedback.",
-      });
-      setOpen(false);
       setLoading(false);
     }
   };
@@ -68,7 +79,7 @@ const FeedbackForm = ({ setOpen }: FeedbackFormProps) => {
           name="feedback"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Send us a feedback</FormLabel>
+              <FormLabel>Send us feedback</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Your feedback"
@@ -77,7 +88,7 @@ const FeedbackForm = ({ setOpen }: FeedbackFormProps) => {
                 />
               </FormControl>
               <FormDescription className="text-xs text-muted-foreground">
-                We appreciate every feedback. Thank you for helping us make this
+                We appreciate your feedback. Thank you for helping us make this
                 app better
               </FormDescription>
               <FormMessage />

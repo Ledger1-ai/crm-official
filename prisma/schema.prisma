@@ -968,6 +968,7 @@ model Users {
 
   dashboard_preference       DashboardPreference?
   navigation_preferences     NavigationConfig[]
+  ai_usage_logs              crm_AiUsageLog[]    @relation(name: "AiUsageUser")
 }
 
 model Team {
@@ -1051,6 +1052,8 @@ model Team {
 
   quotes             crm_Quotes[]
   team_subscriptions crm_Subscriptions[]
+  billing_invoices   crm_BillingInvoice[]
+  ai_usage_logs      crm_AiUsageLog[]
   navigation_configs NavigationConfig[]
   integrations       Tenant_Integrations?
 }
@@ -3544,6 +3547,83 @@ model crm_Subscriptions {
   last_charge_status   String?
   last_transaction_id  String?
   metadata             Json?
+
+  // Billing invoices for this subscription
+  invoices crm_BillingInvoice[]
   
   @@index([next_billing_date])
+}
+
+// Per-cycle billing invoices (subscription receipts)
+model crm_BillingInvoice {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int      @default(0) @map("__v")
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+
+  tenant_id String @db.ObjectId
+  team      Team   @relation(fields: [tenant_id], references: [id])
+
+  subscription_id String?            @db.ObjectId
+  subscription    crm_Subscriptions? @relation(fields: [subscription_id], references: [id])
+
+  // Invoice details
+  invoice_number String  @unique
+  type           String  @default("SUBSCRIPTION") // SUBSCRIPTION, AI_USAGE, ECHO_CREDITS, ONE_TIME
+  description    String?
+  period_start   DateTime  @db.Date
+  period_end     DateTime  @db.Date
+
+  // Amounts
+  subtotal       Float
+  discount       Float   @default(0)
+  tax            Float   @default(0)
+  total          Float
+
+  // Payment info
+  payment_method String? // "CARD", "CRYPTO", "SYSTEM_CREDIT"
+  payment_status String  @default("PENDING") // PENDING, PAID, FAILED, REFUNDED, WAIVED
+  transaction_id String?
+  paid_at        DateTime? @db.Date
+
+  // Line items stored as JSON array
+  // [{ description: string, quantity: number, unit_price: number, total: number }]
+  line_items Json?
+
+  // PDF generation
+  pdf_url String?
+
+  @@index([tenant_id])
+  @@index([subscription_id])
+  @@index([type])
+  @@index([payment_status])
+  @@index([period_start])
+}
+
+// Monthly AI consumption tracking (platform AI: text gen, email, Varuni — NOT BasaltECHO)
+model crm_AiUsageLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now()) @db.Date
+
+  tenant_id String @db.ObjectId
+  team      Team   @relation(fields: [tenant_id], references: [id])
+
+  user_id   String? @db.ObjectId
+  user      Users?  @relation(name: "AiUsageUser", fields: [user_id], references: [id], onDelete: SetNull)
+
+  // Usage details
+  service    String // "text_generation", "email_ai", "varuni", "enrichment", "lead_scoring", etc.
+  model_used String? // "gpt-4o", "claude-3.5-sonnet", etc.
+  tokens_in  Int     @default(0)
+  tokens_out Int     @default(0)
+  cost       Float   @default(0) // Calculated cost in USD
+
+  // Context
+  description String? // e.g., "Email compose for lead John Doe"
+  metadata    Json?
+
+  @@index([tenant_id])
+  @@index([user_id])
+  @@index([service])
+  @@index([createdAt])
 }

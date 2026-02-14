@@ -1,32 +1,35 @@
 export const SUBSCRIPTION_PLANS = {
     FREE: {
-        name: "Free",
+        name: "Testing Plan",
         slug: "FREE",
+        price: 2, // From screenshot
         features: ["crm", "projects", "documents"],
         limits: {
-            max_users: 3,
-            max_storage: 1000, // MB
-            credits: 100, // General monthly credits
+            max_users: 1,
+            max_storage: 500, // MB
+            credits: 50, // General monthly credits
         }
     },
-    TEAM: {
-        name: "Team",
-        slug: "TEAM",
-        features: ["crm", "projects", "documents", "invoices", "reports", "openai", "emails"], // Added emails
+    INDIVIDUAL_BASIC: {
+        name: "Individual Basic",
+        slug: "INDIVIDUAL_BASIC",
+        price: 50,
+        features: ["crm", "projects", "documents", "invoices", "reports", "openai", "emails"],
         limits: {
-            max_users: 10,
-            max_storage: 10000,
-            credits: 5000,
+            max_users: 2,
+            max_storage: 5000,
+            credits: 1000,
         }
     },
-    ENTERPRISE: {
-        name: "Enterprise",
-        slug: "ENTERPRISE",
+    INDIVIDUAL_PRO: {
+        name: "Individual Pro",
+        slug: "INDIVIDUAL_PRO",
+        price: 150,
         features: ["all"],
         limits: {
-            max_users: 9999,
-            max_storage: 100000,
-            credits: 50000,
+            max_users: 4,
+            max_storage: 50000,
+            credits: 10000,
         }
     }
 };

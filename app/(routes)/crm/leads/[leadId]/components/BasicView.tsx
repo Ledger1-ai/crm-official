@@ -125,7 +125,7 @@ export function BasicView({ data }: OppsViewProps) {
                   <Globe2 size={16} />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Website / Source</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Website</p>
                   <div className="text-sm font-medium text-white/90">
                     {data.lead_source ? (
                       <Link href={data.lead_source} target="_blank" className="hover:underline text-blue-500 flex items-center gap-1">
@@ -187,7 +187,7 @@ export function BasicView({ data }: OppsViewProps) {
                   <CoinsIcon size={16} />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Lead Type</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Lead Source</p>
                   <p className="text-sm font-medium text-white/90">{data.type || "N/A"}</p>
                 </div>
               </div>

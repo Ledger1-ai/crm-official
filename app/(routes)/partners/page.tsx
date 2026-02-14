@@ -12,6 +12,7 @@ import Link from "next/link";
 import { PartnersNavigation } from "./_components/PartnersNavigation";
 
 import { getAllSubscriptions } from "@/actions/billing/get-all-subscriptions";
+import { getAllBillingInvoices } from "@/actions/billing/get-team-billing-invoices";
 import { BillingHistoryView } from "./_components/BillingHistoryView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users as UsersIcon, History, CheckCircle2 } from "lucide-react";
@@ -38,10 +39,11 @@ const PartnersPage = async () => {
         return redirect("/");
     }
 
-    const [teams, plans, subscriptions] = await Promise.all([
+    const [teams, plans, subscriptions, billingInvoices] = await Promise.all([
         getTeams(),
         getPlans(),
-        getAllSubscriptions()
+        getAllSubscriptions(),
+        getAllBillingInvoices()
     ]);
 
     // Calculate total users from actual team members to ensure consistency
@@ -126,7 +128,7 @@ const PartnersPage = async () => {
                     </TabsContent>
 
                     <TabsContent value="billing" className="mt-0">
-                        <BillingHistoryView subscriptions={subscriptions} />
+                        <BillingHistoryView subscriptions={subscriptions} invoices={billingInvoices} />
                     </TabsContent>
                 </Tabs>
             </div>

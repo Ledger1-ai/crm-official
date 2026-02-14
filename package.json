@@ -1,6 +1,6 @@
 {
   "name": "basaltcrm-app",
-  "version": "1.1.8",
+  "version": "1.1.8c",
   "author": "Michael Milton (BasaltHQ)",
   "private": true,
   "scripts": {
@@ -12,8 +12,7 @@
     "permissions:check": "ts-node scripts/check-permissions.ts",
     "doc:agent": "npx ts-node scripts/generate-agent-docs.ts",
     "doc:crm": "npx ts-node scripts/generate-module-docs.ts",
-    "doc:sync": "npm run doc:agent && npm run doc:crm && npm run permissions:check",
-    "billing:collect": "ts-node scripts/process-subscriptions.ts"
+    "doc:sync": "npm run doc:agent && npm run doc:crm && npm run permissions:check"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.57",
@@ -63,11 +62,13 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@rainbow-me/rainbowkit": "^2.2.10",
     "@react-email/components": "^1.0.3",
     "@react-email/markdown": "0.0.17",
     "@react-email/render": "^2.0.1",
     "@sparticuz/chromium": "^143.0.4",
     "@swc/helpers": "^0.5.18",
+    "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
     "@tremor/react": "^3.18.7",
     "@types/react-syntax-highlighter": "^15.5.13",
@@ -96,6 +97,7 @@
     "imap": "^0.8.19",
     "isomorphic-dompurify": "^3.0.0-rc.2",
     "jotai": "^2.16.1",
+    "jspdf": "^4.1.0",
     "lucide-react": "^0.556.0",
     "mailparser": "^3.9.1",
     "mermaid": "^10.9.5",
@@ -135,6 +137,8 @@
     "tailwindcss-animate": "^1.0.7",
     "tesseract.js": "^7.0.0",
     "uuid": "^13.0.0",
+    "viem": "^2.45.3",
+    "wagmi": "^2.19.5",
     "xlsx": "^0.18.5",
     "xmlbuilder2": "^4.0.3",
     "zod": "^4.3.5",

@@ -242,6 +242,19 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
         return team.status || "ACTIVE";
     };
 
+    const getDisplayPlan = (team: Team) => {
+        const isExempt = ['basalt', 'basalthq', 'ledger1'].includes(team.slug.toLowerCase());
+        const sub = (team as any).team_subscriptions?.[0];
+
+        if (isExempt) return "Exempt";
+        if (sub?.plan_name === "PLATFORM_ADMIN") return "Platform Admin";
+
+        if (team.assigned_plan?.name) return team.assigned_plan.name;
+        if (sub?.plan_name) return sub.plan_name;
+
+        return null;
+    };
+
     return (
         <div className="space-y-6">
             {pendingCount > 0 && (
@@ -438,11 +451,9 @@ const PartnersView = ({ initialTeams, availablePlans = [] }: Props) => {
                                                 </span>
                                             )}
                                         </span>
-                                        {team.assigned_plan && (
-                                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs shadow-sm">
-                                                {team.assigned_plan.name}
-                                            </Badge>
-                                        )}
+                                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs shadow-sm">
+                                            {getDisplayPlan(team) || "Free"}
+                                        </Badge>
                                     </div>
                                     <div className="flex gap-2">
                                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openRenewalDialog(team)}>

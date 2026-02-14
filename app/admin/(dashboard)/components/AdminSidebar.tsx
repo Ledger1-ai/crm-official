@@ -17,6 +17,7 @@ import {
     Database,
     Layout,
     Zap,
+    Receipt,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -59,6 +60,7 @@ export default function AdminSidebar({ showModules = false }: AdminSidebarProps)
         { label: "AI Settings", href: "/admin/ai-settings", icon: Bot },
         { label: "Navigation", href: "/admin/navigation", icon: Layout },
         { label: "Integrations", href: "/admin/integrations", icon: Zap },
+        { label: "Billing", href: "/admin/billing", icon: Receipt },
         ...(showModules ? [{ label: "Modules", href: "/admin/modules", icon: Package }] : []),
     ];
 

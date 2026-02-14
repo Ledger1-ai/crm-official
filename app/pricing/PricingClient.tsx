@@ -8,14 +8,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function PricingClient() {
     const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-    const [activeTab, setActiveTab] = useState<"individual" | "professional">("individual");
+
 
     const plans = {
         individual: [
             {
-                title: "Free",
-                price: "$0",
-                period: "forever",
+                title: "Testing Plan",
+                price: billingCycle === "monthly" ? "$2" : "$18",
+                period: billingCycle === "monthly" ? "/ month" : "/ year",
                 description: "Perfect for testing the waters.",
                 features: [
                     "Basic CRM Features",
@@ -30,7 +30,7 @@ export default function PricingClient() {
             },
             {
                 title: "Individual Basic",
-                price: billingCycle === "monthly" ? "$50" : "$576",
+                price: billingCycle === "monthly" ? "$50" : "$450",
                 period: billingCycle === "monthly" ? "/ month" : "/ year",
                 description: "Essential tools for solo professionals.",
                 features: [
@@ -39,6 +39,7 @@ export default function PricingClient() {
                     "Basic AI Lead Enrichment",
                     "Workflow Automation",
                     "Standard Support",
+                    "2 Users",
                 ],
                 buttonText: "Start Basic",
                 buttonVariant: "outline" as const,
@@ -46,7 +47,7 @@ export default function PricingClient() {
             },
             {
                 title: "Individual Pro",
-                price: billingCycle === "monthly" ? "$800" : "$9,600",
+                price: billingCycle === "monthly" ? "$150" : "$1,350",
                 period: billingCycle === "monthly" ? "/ month" : "/ year",
                 description: "Power user features for maximum growth.",
                 features: [
@@ -56,6 +57,7 @@ export default function PricingClient() {
                     "VoiceHub AI Calling (billed per minute)",
                     "SMS Campaigns add-on",
                     "Priority Support & Advanced Reporting",
+                    "4 Users",
                 ],
                 buttonText: "Start Pro",
                 buttonVariant: "primary" as const,
@@ -64,61 +66,7 @@ export default function PricingClient() {
                 glowColor: "cyan",
             },
         ],
-        professional: [
-            {
-                title: "Professional Starter",
-                price: billingCycle === "monthly" ? "$3,000" : "$36,000",
-                period: billingCycle === "monthly" ? "/ month" : "/ year",
-                description: "For small teams ready to scale.",
-                features: [
-                    "Lead Generation: 12,000 / month",
-                    "Email Campaigns: 100,000 / month",
-                    "Advanced AI Lead Enrichment",
-                    "Multi-user Workflows (up to 5)",
-                    "Team Analytics",
-                    "Dedicated Support",
-                ],
-                buttonText: "Get Started",
-                buttonVariant: "outline" as const,
-                popular: false,
-            },
-            {
-                title: "Professional Growth",
-                price: billingCycle === "monthly" ? "$7,500" : "$90,000",
-                period: billingCycle === "monthly" ? "/ month" : "/ year",
-                description: "Full-scale solution for growing companies.",
-                features: [
-                    "Lead Generation: 50,000 / month",
-                    "Email Campaigns: 400,000 / month",
-                    "Advanced VoiceHub Features",
-                    "Custom Reporting & Analytics",
-                    "Priority 24/7 Support",
-                    "API Access (up to 20 users)",
-                ],
-                buttonText: "Get Started",
-                buttonVariant: "primary" as const,
-                popular: true,
-                badge: "BEST VALUE",
-                glowColor: "purple", // Or keep cyan/primary if preferred, using primary for consistency
-            },
-            {
-                title: "Enterprise",
-                price: "Custom",
-                period: "Pricing",
-                description: "Tailored solutions for large organizations.",
-                features: [
-                    "Unlimited Lead Generation",
-                    "Unlimited Email Campaigns",
-                    "Custom AI Models",
-                    "Unlimited Users",
-                    "SLA & SSO",
-                    "Dedicated Success Manager",
-                ],
-                buttonText: "Contact Sales",
-                buttonVariant: "outline" as const,
-                popular: false,
-            },
-        ],
+
     };
 
     return (
@@ -131,30 +79,6 @@ export default function PricingClient() {
                 <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
                     Choose the plan that fits your business needs. No hidden fees.
                 </p>
-
-                {/* Tabs */}
-                <div className="flex justify-center mb-8">
-                    <div className="bg-white/5 p-1 rounded-full-button-frame inline-flex">
-                        <button
-                            onClick={() => setActiveTab("individual")}
-                            className={`px-6 py-2 rounded-full-button-frame text-sm font-medium transition-all duration-300 ${activeTab === "individual"
-                                ? "bg-primary text-primary-foreground shadow-lg"
-                                : "text-gray-400 hover:text-white"
-                                }`}
-                        >
-                            Individual & Small Teams
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("professional")}
-                            className={`px-6 py-2 rounded-full-button-frame text-sm font-medium transition-all duration-300 ${activeTab === "professional"
-                                ? "bg-primary text-primary-foreground shadow-lg"
-                                : "text-gray-400 hover:text-white"
-                                }`}
-                        >
-                            Professional & Enterprise
-                        </button>
-                    </div>
-                </div>
 
                 {/* Monthly/Annual Toggle */}
                 <div className="flex items-center justify-center space-x-4 mb-16">
@@ -173,7 +97,7 @@ export default function PricingClient() {
                         />
                     </button>
                     <span className={`text-sm ${billingCycle === "annual" ? "text-white" : "text-gray-400"}`}>
-                        Annual <span className="text-primary text-xs ml-1">(Save ~20%)</span>
+                        Annual <span className="text-primary text-xs ml-1">(Save 25%)</span>
                     </span>
                 </div>
             </section>
@@ -182,14 +106,14 @@ export default function PricingClient() {
             <section className="container mx-auto px-4 max-w-7xl mb-24">
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={activeTab}
+                        key="plans"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                         className="grid grid-cols-1 md:grid-cols-3 gap-8"
                     >
-                        {plans[activeTab].map((plan, index) => (
+                        {plans.individual.map((plan, index) => (
                             <PricingCard key={index} {...plan} />
                         ))}
                     </motion.div>
@@ -235,17 +159,13 @@ export default function PricingClient() {
                 <h2 className="text-3xl font-bold text-center mb-12">Feature Comparison</h2>
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={activeTab}
+                        key="comparison"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                     >
-                        {activeTab === "individual" ? (
-                            <IndividualComparisonTable />
-                        ) : (
-                            <ProfessionalComparisonTable />
-                        )}
+                        <IndividualComparisonTable />
                     </motion.div>
                 </AnimatePresence>
             </section>
@@ -465,7 +385,7 @@ function IndividualComparisonTable() {
         },
         {
             category: "Users",
-            values: ["1", "1", "1"]
+            values: ["1", "2", "4"]
         },
         {
             category: "Support",
@@ -484,7 +404,7 @@ function IndividualComparisonTable() {
                     <thead>
                         <tr className="border-b border-white/10">
                             <th className="text-left p-6 text-gray-400 font-medium">Feature</th>
-                            <th className="p-6 text-center font-bold">Free</th>
+                            <th className="p-6 text-center font-bold">Testing Plan</th>
                             <th className="p-6 text-center font-bold">Individual Basic</th>
                             <th className="p-6 text-center font-bold bg-primary/5 border-l border-r border-primary/30 relative">
                                 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
@@ -511,83 +431,4 @@ function IndividualComparisonTable() {
     );
 }
 
-function ProfessionalComparisonTable() {
-    const features = [
-        {
-            category: "Lead Generation",
-            values: ["12,000 / month", "50,000 / month", "Unlimited"]
-        },
-        {
-            category: "Email Campaigns",
-            values: ["100,000 / month", "400,000 / month", "Unlimited"]
-        },
-        {
-            category: "AI Lead Enrichment",
-            values: ["Advanced", "Advanced", "Custom AI Models"]
-        },
-        {
-            category: "VoiceHub AI Calling",
-            values: ["Standard features", "Advanced features", "Custom integrations"]
-        },
-        {
-            category: "SMS Campaigns",
-            values: ["Add-on available", "Add-on available", "Included"]
-        },
-        {
-            category: "Workflow Automation",
-            values: ["✓", "✓", "✓ Custom"]
-        },
-        {
-            category: "Users",
-            values: ["Up to 5", "Up to 20", "Unlimited"]
-        },
-        {
-            category: "Support",
-            values: ["Dedicated", "Priority 24/7", "Dedicated Success Manager"]
-        },
-        {
-            category: "Reporting & Analytics",
-            values: ["Team Analytics", "Custom Reporting", "Enterprise Analytics"]
-        },
-        {
-            category: "API Access",
-            values: ["—", "✓", "✓ Advanced"]
-        },
-        {
-            category: "Security & Compliance",
-            values: ["Standard", "Enhanced", "SLA & SSO"]
-        },
-    ];
 
-    return (
-        <div className="bg-[#0A0A12] border border-white/10 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-white/10">
-                            <th className="text-left p-6 text-gray-400 font-medium">Feature</th>
-                            <th className="p-6 text-center font-bold">Professional Starter</th>
-                            <th className="p-6 text-center font-bold bg-primary/5 border-l border-r border-primary/30 relative">
-                                <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
-                                <span className="relative text-primary">Professional Growth</span>
-                            </th>
-                            <th className="p-6 text-center font-bold">Enterprise</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {features.map((feature, index) => (
-                            <tr key={index} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                <td className="p-6 text-gray-300 font-medium">{feature.category}</td>
-                                <td className="p-6 text-center text-gray-400">{feature.values[0]}</td>
-                                <td className="p-6 text-center bg-primary/5 border-l border-r border-primary/20 text-cyan-400 font-medium">
-                                    {feature.values[1]}
-                                </td>
-                                <td className="p-6 text-center text-gray-400">{feature.values[2]}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-}

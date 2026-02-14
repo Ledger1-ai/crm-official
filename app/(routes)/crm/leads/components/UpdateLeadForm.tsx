@@ -486,15 +486,26 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isLoading}
-                          placeholder="Social networks"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
+                      <FormLabel>Lead Source</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value ?? undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select source" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Website">Website</SelectItem>
+                          <SelectItem value="Referral">Referral</SelectItem>
+                          <SelectItem value="Social Media">Social Media</SelectItem>
+                          <SelectItem value="Cold Call">Cold Call</SelectItem>
+                          <SelectItem value="Advertisement">Advertisement</SelectItem>
+                          <SelectItem value="Event">Event</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
