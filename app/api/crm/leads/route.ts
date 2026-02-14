@@ -116,6 +116,7 @@ export async function POST(req: Request) {
         accountsIDs: accountIDs || undefined,
         status: "NEW",
         type: "DEMO",
+        project: body.project || undefined,
       },
     });
 
@@ -184,6 +185,7 @@ export async function PUT(req: Request) {
       social_twitter,
       social_facebook,
       social_linkedin,
+      project,
     } = body;
 
     const updatedLead = await prismadb.crm_Leads.update({
@@ -210,6 +212,7 @@ export async function PUT(req: Request) {
         accountsIDs: accountIDs,
         status,
         type,
+        project,
       },
     });
 

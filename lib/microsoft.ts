@@ -12,6 +12,7 @@ const REDIRECT_URI = `${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_
 const SCOPES = [
     "User.Read",
     "Calendars.ReadWrite",
+    "Mail.Read",
     "offline_access" // Crucial for refresh tokens
 ].join(" ");
 

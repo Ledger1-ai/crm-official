@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma";
 
-// GET /api/leads/notes/:leadId
+// GET /api/crm/leads/:leadId/notes
 // Returns recent notes (lead activities of type "note"). Non-admins only for their assigned leads.
 type Params = { params: Promise<{ leadId: string }> };
 export async function GET(_req: Request, { params }: Params) {
@@ -44,7 +44,7 @@ export async function GET(_req: Request, { params }: Params) {
   }
 }
 
-// POST /api/leads/notes/:leadId
+// POST /api/crm/leads/:leadId/notes
 // Body: { text: string, mentions?: string[] }
 // Creates a lead activity of type "note" with metadata storing text and mentions.
 export async function POST(req: Request, { params }: Params) {

@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Popover,
   PopoverContent,
@@ -49,11 +50,12 @@ import {
 type NewTaskFormProps = {
   users: any[];
   accounts: any[];
+  projects?: any[];
   onFinish?: () => void;
   redirectOnSuccess?: boolean;
 };
 
-export function NewLeadForm({ users, accounts, onFinish, redirectOnSuccess = true }: NewTaskFormProps) {
+export function NewLeadForm({ users, accounts, projects = [], onFinish, redirectOnSuccess = true }: NewTaskFormProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -96,8 +98,9 @@ export function NewLeadForm({ users, accounts, onFinish, redirectOnSuccess = tru
     social_twitter: z.string().optional(),
     social_facebook: z.string().optional(),
     social_linkedin: z.string().optional(),
-    assigned_to: z.string().optional(),
-    accountIDs: z.string().optional(),
+    assigned_to: z.string().optional().nullable(),
+    accountIDs: z.string().optional().nullable(),
+    project: z.string().optional().nullable(),
   });
 
   type NewLeadFormValues = z.infer<typeof formSchema>;
@@ -117,8 +120,9 @@ export function NewLeadForm({ users, accounts, onFinish, redirectOnSuccess = tru
       social_twitter: "",
       social_facebook: "",
       social_linkedin: "",
-      assigned_to: "",
-      accountIDs: "",
+      assigned_to: null,
+      accountIDs: null,
+      project: null,
     },
   });
 
@@ -315,28 +319,25 @@ export function NewLeadForm({ users, accounts, onFinish, redirectOnSuccess = tru
             />
           </div>
 
-          {/* Assigned To & Account */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Assigned To, Account & Project */}
+          <div className="grid grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="assigned_to"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Assigned To</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select user" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users?.map((user: any) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name || user.email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Combobox
+                      options={users?.map((user: any) => ({
+                        label: user.name || user.email,
+                        value: user.id,
+                      })) || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select user"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -345,22 +346,40 @@ export function NewLeadForm({ users, accounts, onFinish, redirectOnSuccess = tru
               control={form.control}
               name="accountIDs"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Account</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select account" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {accounts?.map((account: any) => (
-                        <SelectItem key={account.id} value={account.id}>
-                          {account.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Combobox
+                      options={accounts?.map((account: any) => ({
+                        label: account.name,
+                        value: account.id,
+                      })) || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select account"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="project"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Project</FormLabel>
+                  <FormControl>
+                    <Combobox
+                      options={projects?.map((project: any) => ({
+                        label: project.title,
+                        value: project.id,
+                      })) || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select project"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Combobox } from "@/components/ui/combobox";
 
 import { Switch } from "@/components/ui/switch";
 import fetcher from "@/lib/fetcher";
@@ -72,7 +73,7 @@ export function UpdateContactForm({ initialData, setOpen }: NewTaskFormProps) {
     position: z.string().nullable().optional(),
     status: z.boolean(),
     type: z.string(),
-    assigned_to: z.string(),
+    assigned_to: z.string().optional().nullable(),
     accountsIDs: z.string().nullable().optional(),
     assigned_account: z.string().nullable().optional(),
     social_twitter: z.string().nullable().optional(),
@@ -373,38 +374,19 @@ export function UpdateContactForm({ initialData, setOpen }: NewTaskFormProps) {
                   control={form.control}
                   name="assigned_to"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assigned user</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose an user " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="h-96 overflow-y-auto">
-                          {/*                {
-                            //TODO: fix this
-                            users.map((user: any) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {user.name}
-                              </SelectItem>
-                            ))
-                          } */}
-                          <Input
-                            type="text"
-                            placeholder="Search in users ..."
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                          />
-                          {filteredData.map((item: any) => (
-                            <SelectItem key={item.id} value={item.id}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={users?.map((user: any) => ({
+                            label: user.name || user.email,
+                            value: user.id,
+                          })) || []}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select assigned user"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -413,28 +395,19 @@ export function UpdateContactForm({ initialData, setOpen }: NewTaskFormProps) {
                   control={form.control}
                   name="assigned_account"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assign an Account</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose assigned account " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          {
-                            //TODO: fix this
-                            accounts.map((account: any) => (
-                              <SelectItem key={account.id} value={account.id}>
-                                {account.name}
-                              </SelectItem>
-                            ))
-                          }
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={accounts?.map((account: any) => ({
+                            label: account.name,
+                            value: account.id,
+                          })) || []}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select assigned account"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

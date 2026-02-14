@@ -35,9 +35,12 @@ export default function LeadsManagerTabs({ leads: initialLeads, crmData, default
     allPermissions: permissions
   });
 
+  const { data: projectResponse } = useSWR("/api/projects", fetcher);
+
   const leads = leadsData || [];
   const users = crmData?.users || [];
   const accounts = crmData?.accounts || [];
+  const projects = projectResponse?.projects || [];
 
   // Define Cards with Permission Checks
   const navCards = [
@@ -136,7 +139,7 @@ export default function LeadsManagerTabs({ leads: initialLeads, crmData, default
             title="Create New Lead"
             description="Fill out the form below to add a new lead to your CRM."
           >
-            <NewLeadForm users={users} accounts={accounts} />
+            <NewLeadForm users={users} accounts={accounts} projects={projects} />
           </RightViewModal>
         )}
       </div>

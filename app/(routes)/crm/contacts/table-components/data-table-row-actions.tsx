@@ -26,6 +26,7 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import RightViewModalNoTrigger from "@/components/modals/right-view-notrigger";
 import { UpdateContactForm } from "../components/UpdateContactForm";
+import { SmartEmailModal } from "@/components/modals/SmartEmailModal";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -40,6 +41,7 @@ export function DataTableRowActions<TData>({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -87,6 +89,13 @@ export function DataTableRowActions<TData>({
       >
         <UpdateContactForm initialData={row.original} setOpen={setUpdateOpen} />
       </RightViewModalNoTrigger>
+      <SmartEmailModal
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        recipientEmail={(row.original as any).email || ""}
+        recipientName={`${contact?.first_name} ${contact?.last_name}`}
+        contactId={contact?.id}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -105,6 +114,9 @@ export function DataTableRowActions<TData>({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setUpdateOpen(true)}>
             Update
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setEmailOpen(true)}>
+            Send Email
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>

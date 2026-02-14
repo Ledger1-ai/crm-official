@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { getTaskDone, undoTaskDone } from "@/app/(routes)/projects/actions/get-task-done";
 import { Badge } from "@/components/ui/badge";
-import { CheckSquare, Pencil, Building, UserPlus, Undo2 } from "lucide-react";
+import { CheckSquare, Pencil, Undo2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import UpdateTaskDialog from "@/app/(routes)/projects/dialogs/UpdateTask";
 import { getActiveUsers } from "@/actions/get-users";
 import { useState } from "react";
 import { Icons } from "@/components/ui/icons";
-import { convertTaskToAccount } from "@/actions/projects/convert-task-to-account";
 
 
 const TaskViewActions = ({
@@ -33,7 +32,6 @@ const TaskViewActions = ({
 
   const [openEdit, setOpenEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isConverting, setIsConverting] = useState(false);
 
   //console.log(initialData, "initialData");
   //console.log(openEdit, "openEdit");
@@ -75,35 +73,7 @@ const TaskViewActions = ({
     }
   };
 
-  const onConvert = async () => {
-    setIsConverting(true);
-    try {
-      const result = await convertTaskToAccount(taskId);
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        });
-        // Optional: Redirect to account?
-        // router.push(`/crm/accounts/${result.accountId}`);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.message,
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Something went wrong during conversion.",
-      });
-    } finally {
-      setIsConverting(false);
-      router.refresh();
-    }
-  };
+
 
   return (
     <div className="space-x-2 pb-2">
@@ -138,18 +108,6 @@ const TaskViewActions = ({
           )}
         </Badge>
       )}
-      <Badge
-        variant={"outline"}
-        className="cursor-pointer"
-        onClick={onConvert}
-      >
-        {isConverting ? (
-          <Icons.spinner className="animate-spin w-4 h-4 mr-2" />
-        ) : (
-          <Building className="w-4 h-4 mr-2" />
-        )}
-        Convert to Account
-      </Badge>
       <Badge
         variant={"outline"}
         className="cursor-pointer"

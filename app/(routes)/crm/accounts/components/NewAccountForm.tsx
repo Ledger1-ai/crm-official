@@ -22,12 +22,12 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Combobox } from "@/components/ui/combobox";
 
 type Props = {
   industries: any[];
@@ -59,11 +59,11 @@ export function NewAccountForm({ industries, users, onFinish }: Props) {
     shipping_state: z.string().optional(),
     shipping_country: z.string().optional(),
     description: z.string().min(3).max(1000).optional(),
-    assigned_to: z.string().min(3).max(50),
     status: z.string().min(3).max(50).optional(),
     annual_revenue: z.string().min(3).max(50).optional(),
     member_of: z.string().min(3).max(50).optional(),
-    industry: z.string().min(3).max(50),
+    industry: z.string().optional().nullable(),
+    assigned_to: z.string().optional().nullable(),
   });
 
   type NewAccountFormValues = z.infer<typeof formSchema>;
@@ -451,25 +451,19 @@ export function NewAccountForm({ industries, users, onFinish }: Props) {
                 control={form.control}
                 name="industry"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Choose industry</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select new account industry" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="flex overflow-y-auto h-56">
-                        {industries.map((industry) => (
-                          <SelectItem key={industry.id} value={industry.id}>
-                            {industry.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Combobox
+                        options={industries.map((industry) => ({
+                          label: industry.name,
+                          value: industry.id,
+                        }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select industry"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -478,25 +472,19 @@ export function NewAccountForm({ industries, users, onFinish }: Props) {
                 control={form.control}
                 name="assigned_to"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Assigned to</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a user to assign the account" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="overflow-y-auto h-56">
-                        {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Combobox
+                        options={users.map((user) => ({
+                          label: user.name,
+                          value: user.id,
+                        }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select a user"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

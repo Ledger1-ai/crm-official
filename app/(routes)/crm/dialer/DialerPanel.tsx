@@ -81,7 +81,7 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
       return;
     }
     setGateCheckingSingle(true);
-    fetch(`/api/leads/activities/${encodeURIComponent(lid)}`)
+    fetch(`/api/crm/leads/${encodeURIComponent(lid)}/activities`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Gate check failed"))))
       .then((d) => {
         const ok = Array.isArray(d?.activities) && d.activities.some((a: any) => a?.type === "email_sent");
@@ -188,7 +188,7 @@ export default function DialerPanel({ isCompact = false }: { isCompact?: boolean
           throw new Error('Lead ID required for gated calls');
         }
         {
-          const gateRes = await fetch(`/api/leads/activities/${encodeURIComponent(leadId)}`);
+          const gateRes = await fetch(`/api/crm/leads/${encodeURIComponent(leadId)}/activities`);
           if (!gateRes.ok) throw new Error('Gate check failed');
           const d = await gateRes.json();
           const okGate = Array.isArray(d?.activities) && d.activities.some((a: any) => a?.type === 'email_sent');

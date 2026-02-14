@@ -33,7 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 
 import { format } from "date-fns";
-import { CalendarIcon, ExternalLink } from "lucide-react";
+import { CalendarIcon, ExternalLink, Search, UserPlus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -55,11 +55,22 @@ type Opportunity = {
   status?: string;
 };
 
+interface Lead {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  company: string | null;
+  email: string | null;
+}
+
 const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   const [opps, setOpps] = useState<Opportunity[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadSearch, setLeadSearch] = useState("");
+  const [leadDropdownOpen, setLeadDropdownOpen] = useState(false);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -74,6 +85,8 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
     board: z.string().min(3).max(255),
     opportunityId: z.string().optional(),
     taskStatus: z.string().min(3).max(20).optional().nullable(),
+    leadId: z.string().optional().nullable(),
+    dueTime: z.string().optional(),
   });
 
   type UpdatedTaskForm = z.infer<typeof formSchema>;
@@ -86,10 +99,12 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
       dueDateAt: initialData.dueDateAt ? new Date(initialData.dueDateAt) : new Date(),
       priority: initialData.priority,
       content: initialData.content,
-      boardId: boardId,
-      board: boardId,
-      opportunityId: undefined,
+      boardId: boardId || initialData.section?.board || "",
+      board: boardId || initialData.section?.board || "",
+      opportunityId: initialData.opportunityId || undefined,
       taskStatus: initialData.taskStatus || "ACTIVE",
+      leadId: initialData.leadId || "",
+      dueTime: initialData.dueDateAt ? format(new Date(initialData.dueDateAt), "HH:mm") : "",
     },
   });
 
@@ -97,20 +112,47 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
     setIsMounted(true);
   }, []);
 
+  const board = form.watch("board");
+
   useEffect(() => {
     // Load project-scoped opportunities for this board
     async function loadOpps() {
-      if (!boardId) return;
+      if (!board) return;
       try {
-        const res = await fetch(`/api/projects/${encodeURIComponent(boardId)}/opportunities`, { cache: "no-store" });
+        const res = await fetch(`/api/projects/${encodeURIComponent(board)}/opportunities`, { cache: "no-store" });
         if (res.ok) {
           const j = await res.json();
           setOpps((j?.opportunities || []) as Opportunity[]);
         }
       } catch { }
     }
+    async function loadLeads() {
+      try {
+        const res = await axios.get("/api/crm/leads");
+        setLeads(res.data || []);
+      } catch { }
+    }
     loadOpps();
-  }, [boardId]);
+    loadLeads();
+  }, [board]);
+
+  const filteredLeads = useMemo(() => {
+    if (!leadSearch) return leads;
+    const q = leadSearch.toLowerCase();
+    return leads.filter((l) => {
+      const name = `${l.firstName || ""} ${l.lastName || ""}`.toLowerCase();
+      const company = (l.company || "").toLowerCase();
+      const email = (l.email || "").toLowerCase();
+      return name.includes(q) || company.includes(q) || email.includes(q);
+    });
+  }, [leads, leadSearch]);
+
+  const getLeadLabel = (id: string) => {
+    const lead = leads.find((l) => l.id === id);
+    if (!lead) return "";
+    const name = [lead.firstName, lead.lastName].filter(Boolean).join(" ");
+    return name || lead.company || lead.email || "Unnamed Lead";
+  };
 
   if (!isMounted) {
     return null;
@@ -122,8 +164,16 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
   const onSubmit = async (data: UpdatedTaskForm) => {
     setIsLoading(true);
     try {
+      // Merge date + time into a single DateTime
+      const finalDate = new Date(data.dueDateAt);
+      if (data.dueTime) {
+        const [hours, minutes] = data.dueTime.split(":").map(Number);
+        finalDate.setHours(hours, minutes, 0, 0);
+      }
+      const payload = { ...data, dueDateAt: finalDate, leadId: data.leadId || undefined };
+
       // Update task core fields
-      await axios.put(`/api/projects/tasks/update-task/${initialData.id}`, data);
+      await axios.put(`/api/projects/tasks/update-task/${initialData.id}`, payload);
 
       // If an opportunity was chosen, link it to this task
       if (data.opportunityId && boardId) {
@@ -272,28 +322,132 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel className="text-xs">Due Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn("w-full pl-3 text-left font-normal bg-background", !field.value && "text-muted-foreground")}
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn("flex-1 pl-3 text-left font-normal bg-background", !field.value && "text-muted-foreground")}
+                              >
+                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="end">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date < new Date("1900-01-01")}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormField
+                          control={form.control}
+                          name="dueTime"
+                          render={({ field: timeField }) => (
+                            <div className="w-[120px]">
+                              <Input
+                                type="time"
+                                disabled={isLoading}
+                                className="bg-background"
+                                style={{ colorScheme: "dark" }}
+                                {...timeField}
+                                value={timeField.value ?? ""}
+                              />
+                            </div>
+                          )}
+                        />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="leadId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Assign to lead</FormLabel>
+                      <div className="relative">
+                        {field.value ? (
+                          <div className="flex items-center justify-between h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
+                            <div className="flex items-center gap-2 truncate">
+                              <UserPlus className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="truncate">{getLeadLabel(field.value)}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                field.onChange("");
+                                setLeadSearch("");
+                              }}
+                              className="ml-2 shrink-0 rounded-full p-0.5 hover:bg-white/10 transition-colors"
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="end">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                              <X className="h-3.5 w-3.5 text-muted-foreground" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                              <Input
+                                placeholder="Search leads by name, company, or email..."
+                                className="pl-9 bg-background"
+                                value={leadSearch}
+                                onChange={(e) => {
+                                  setLeadSearch(e.target.value);
+                                  setLeadDropdownOpen(true);
+                                }}
+                                onFocus={() => setLeadDropdownOpen(true)}
+                                onBlur={() => {
+                                  // Delay to allow click on item
+                                  setTimeout(() => setLeadDropdownOpen(false), 200);
+                                }}
+                              />
+                            </div>
+                            {leadDropdownOpen && (
+                              <div className="absolute z-50 w-full mt-1 max-h-40 overflow-y-auto rounded-md border border-white/10 bg-popover shadow-lg">
+                                {filteredLeads.length === 0 ? (
+                                  <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+                                    {leads.length === 0 ? "No leads available" : "No matching leads"}
+                                  </div>
+                                ) : (
+                                  filteredLeads.map((lead) => {
+                                    const name = [lead.firstName, lead.lastName].filter(Boolean).join(" ");
+                                    return (
+                                      <button
+                                        key={lead.id}
+                                        type="button"
+                                        className="w-full text-left px-3 py-2 hover:bg-white/5 transition-colors flex items-center justify-between gap-2"
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => {
+                                          field.onChange(lead.id);
+                                          setLeadSearch("");
+                                          setLeadDropdownOpen(false);
+                                        }}
+                                      >
+                                        <div className="flex flex-col gap-0.5 overflow-hidden">
+                                          <span className="text-sm font-medium truncate">
+                                            {name || lead.company || "Unnamed Lead"}
+                                          </span>
+                                          <span className="text-[10px] text-muted-foreground truncate">
+                                            {[lead.company, lead.email].filter(Boolean).join(" · ")}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -305,7 +459,7 @@ const UpdateTaskDialog = ({ users, boards, boardId, initialData, onDone }: Props
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-xs">Linked Opportunity</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
                           <SelectTrigger className="bg-background">
                             <SelectValue placeholder="None" />

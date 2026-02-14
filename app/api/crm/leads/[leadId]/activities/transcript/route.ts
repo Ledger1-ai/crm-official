@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma";
 
-// POST /api/leads/activities/:leadId/transcript
+// POST /api/crm/leads/:leadId/activities/transcript
 // Body: { text: string; contactId?: string; role?: string; segmentAt?: string | number; extra?: any }
 // Creates an activity entry for a transcript segment during a live call
 

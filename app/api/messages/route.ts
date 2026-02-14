@@ -3,6 +3,7 @@ import sendEmail from "@/lib/sendmail";
 import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prismadb } from "@/lib/prisma";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
     try {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        let { recipient_ids, subject, body_text, body_html, priority, labels, status, send_email, recipient_email } = body;
+        let { recipient_ids, subject, body_text, body_html, priority, labels, status, send_email, recipient_email, trackClicks, trackOpens } = body;
 
         // Normalize recipient_ids
         if (!recipient_ids) recipient_ids = [];
@@ -143,11 +144,71 @@ export async function POST(req: NextRequest) {
 
             await Promise.all(Array.from(allEmails).map(async (email) => {
                 try {
+                    const trackingToken = crypto.randomBytes(16).toString("hex");
+                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+                    let processedHtml = body_html || `<p>${body_text || ""}</p><br/><p><small>Sent by ${sender?.name}</small></p>`;
+                    processedHtml = processedHtml.replace(/\n/g, '<br/>');
+
+                    // CTR Tracking
+                    if (trackClicks) {
+                        processedHtml = processedHtml.replace(
+                            /https?:\/\/[^\s<]+/g,
+                            (url: string) => `${baseUrl}/api/email/track/click?token=${trackingToken}&url=${encodeURIComponent(url)}`
+                        );
+                    }
+
+                    // Open Tracking
+                    if (trackOpens) {
+                        processedHtml += `<img src="${baseUrl}/api/email/track/open?token=${trackingToken}" width="1" height="1" style="display:none;" />`;
+                    }
+
+                    // Try to find a lead or contact with this email to log activity
+                    const lead = await prismadb.crm_Leads.findFirst({ where: { email } });
+                    const contact = await prismadb.crm_Contacts.findFirst({ where: { email } });
+
+                    if (lead) {
+                        await prismadb.crm_Lead_Activities.create({
+                            data: {
+                                lead: lead.id,
+                                user: userId,
+                                type: "EMAIL",
+                                metadata: { subject, trackingToken, recipient: email }
+                            }
+                        });
+
+                        // Create an Outreach Item for tracking
+                        let adhocCampaign = await prismadb.crm_Outreach_Campaigns.findFirst({
+                            where: { name: "Ad-hoc Emails", user: userId }
+                        });
+
+                        if (!adhocCampaign) {
+                            adhocCampaign = await prismadb.crm_Outreach_Campaigns.create({
+                                data: { name: "Ad-hoc Emails", user: userId, status: "ACTIVE", v: 0 }
+                            });
+                        }
+
+                        await prismadb.crm_Outreach_Items.create({
+                            data: {
+                                campaign: adhocCampaign.id,
+                                lead: lead.id,
+                                channel: "EMAIL",
+                                status: "SENT",
+                                subject,
+                                body_text: body_text || "",
+                                body_html: processedHtml,
+                                tracking_token: trackingToken,
+                                sentAt: new Date(),
+                                v: 0
+                            }
+                        });
+                    }
+
                     await sendEmail({
                         to: email,
-                        subject: `New Message: ${subject}`,
+                        subject: subject, // Removed "New Message:" prefix to match SmartEmail style
                         text: body_text || "You have a new message.",
-                        html: body_html || `<p>${body_text}</p><br/><p><small>Sent by ${sender?.name}</small></p>`
+                        html: processedHtml
                     });
                 } catch (err) {
                     console.error(`Failed to send email to ${email}:`, err);

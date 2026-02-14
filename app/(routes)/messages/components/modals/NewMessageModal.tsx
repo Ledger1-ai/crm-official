@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2, MousePointerClick, Eye, ShieldCheck } from "lucide-react";
 
 interface NewMessageModalProps {
     customTrigger?: React.ReactNode;
@@ -39,6 +39,8 @@ export const NewMessageModal = ({ customTrigger }: NewMessageModalProps) => {
     const [subject, setSubject] = useState("");
     const [body, setBody] = useState("");
     const [sendEmail, setSendEmail] = useState(false);
+    const [trackClicks, setTrackClicks] = useState(true);
+    const [trackOpens, setTrackOpens] = useState(true);
     const [isEnhancing, setIsEnhancing] = useState(false);
     const router = useRouter();
 
@@ -78,7 +80,9 @@ export const NewMessageModal = ({ customTrigger }: NewMessageModalProps) => {
                     body_text: body,
                     status: "SENT",
                     send_email: sendEmail,
-                    recipient_email: sendEmail && toUserId.includes("@") ? toUserId : undefined // Hint to backend
+                    recipient_email: sendEmail && toUserId.includes("@") ? toUserId : undefined, // Hint to backend
+                    trackClicks: sendEmail ? trackClicks : false,
+                    trackOpens: sendEmail ? trackOpens : false,
                 }),
             });
 
@@ -173,6 +177,34 @@ export const NewMessageModal = ({ customTrigger }: NewMessageModalProps) => {
                             Send as Email
                         </Label>
                     </div>
+
+                    {sendEmail && (
+                        <div className="grid grid-cols-2 gap-3 bg-white/[0.03] rounded-xl p-3 border border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                                <div className="flex items-center gap-2">
+                                    <div className="h-7 w-7 rounded-md bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                                        <MousePointerClick className="h-3.5 w-3.5 text-orange-400" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-white/70 uppercase">CTR</span>
+                                    </div>
+                                </div>
+                                <Switch checked={trackClicks} onCheckedChange={setTrackClicks} className="scale-75" />
+                            </div>
+
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                                <div className="flex items-center gap-2">
+                                    <div className="h-7 w-7 rounded-md bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                        <Eye className="h-3.5 w-3.5 text-blue-400" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-white/70 uppercase">Open</span>
+                                    </div>
+                                </div>
+                                <Switch checked={trackOpens} onCheckedChange={setTrackOpens} className="scale-75" />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-2">
                         <Label htmlFor="to" className="text-white/80">To</Label>

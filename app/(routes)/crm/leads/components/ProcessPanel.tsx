@@ -60,7 +60,7 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
     if (!id) return;
     try {
       setLoadingActivities(true);
-      const res = await fetch(`/api/leads/activities/${encodeURIComponent(id)}`);
+      const res = await fetch(`/api/crm/leads/${encodeURIComponent(id)}/activities`);
       if (res.ok) {
         const j = await res.json();
         setActivities(Array.isArray(j?.activities) ? j.activities : []);
@@ -77,7 +77,7 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
     if (leadsProp && leadsProp.length) return;
     (async () => {
       try {
-        const res = await fetch("/api/leads/team-members"); // placeholder; replace with dedicated leads endpoint when available
+        const res = await fetch("/api/crm/leads/team-members"); // placeholder; replace with dedicated leads endpoint when available
         if (res.ok) {
           const j = await res.json();
           const fetched: LeadLite[] = Array.isArray(j?.leads) ? j.leads : [];
@@ -138,7 +138,7 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
     if (!id) return;
     try {
       setLoadingNotes(true);
-      const res = await fetch(`/api/leads/notes/${encodeURIComponent(id)}`);
+      const res = await fetch(`/api/crm/leads/${encodeURIComponent(id)}/notes`);
       if (res.ok) {
         const j = await res.json();
         setNotes(Array.isArray(j?.notes) ? j.notes : []);
@@ -155,7 +155,7 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
     if (!id || !noteText.trim()) return;
     try {
       const mentions = Array.from(noteText.matchAll(/@([\w.-]{2,64})/g)).map((m) => m[1]);
-      const res = await fetch(`/api/leads/notes/${encodeURIComponent(id)}`,
+      const res = await fetch(`/api/crm/leads/${encodeURIComponent(id)}/notes`,
         { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: noteText, mentions }) });
       if (res.ok) {
         setNoteText("");

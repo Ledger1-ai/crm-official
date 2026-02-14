@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SmartEmailModal } from '@/components/modals/SmartEmailModal';
 
 type Lead = {
   id: string;
@@ -153,6 +154,8 @@ export default function LeadsView({ data, isMember = false }: Props) {
   // View mode toggle: table (default list), compact (grid), card (large cards)
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [detailsLead, setDetailsLead] = useState<Lead | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedEmailLead, setSelectedEmailLead] = useState<Lead | null>(null);
 
   // Optimize data fetching with SWR - 30s polling for fresh pool data
   const { data: poolsResponse, error: poolsError } = useSWR('/api/leads/pools', fetcher, {
@@ -439,6 +442,13 @@ export default function LeadsView({ data, isMember = false }: Props) {
 
   return (
     <div className="space-y-4">
+      <SmartEmailModal
+        open={emailModalOpen}
+        onOpenChange={setEmailModalOpen}
+        recipientEmail={selectedEmailLead?.email || ""}
+        recipientName={`${selectedEmailLead?.firstName || ""} ${selectedEmailLead?.lastName || ""}`}
+        leadId={selectedEmailLead?.id}
+      />
       {/* Bulk toolbar */}
       <div className="rounded-md border bg-card p-3">
         <div className="flex flex-col gap-4">
@@ -738,7 +748,18 @@ export default function LeadsView({ data, isMember = false }: Props) {
                             <Button size="icon" variant="ghost" className="h-6 w-6 text-purple-500 hover:text-purple-600" onClick={(e) => { e.stopPropagation(); openMeeting(lead.id); }} title="Meeting Link">
                               <ExternalLink className="h-3 w-3" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-6 w-6 text-emerald-500 hover:text-emerald-600" onClick={(e) => { e.stopPropagation(); composeEmail(lead.email); }} disabled={!canSend} title="Send Email">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-6 w-6 text-emerald-500 hover:text-emerald-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedEmailLead(lead);
+                                setEmailModalOpen(true);
+                              }}
+                              disabled={!canSend}
+                              title="Send Email"
+                            >
                               <Mail className="h-3 w-3" />
                             </Button>
                             <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-500 hover:text-indigo-600" onClick={(e) => { e.stopPropagation(); setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">

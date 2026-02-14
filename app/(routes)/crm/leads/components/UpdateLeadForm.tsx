@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Combobox } from "@/components/ui/combobox";
 
 import fetcher from "@/lib/fetcher";
 import useSWR from "swr";
@@ -52,10 +53,18 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
     fetcher
   );
 
-  const { data: users, isLoading: isLoadingUsers } = useSWR(
-    "/api/user",
+  const { data: userResponse, isLoading: isLoadingUsers } = useSWR(
+    "/api/team/members",
     fetcher
   );
+
+  const { data: projectResponse, isLoading: isLoadingProjects } = useSWR(
+    "/api/projects",
+    fetcher
+  );
+
+  const users = userResponse?.members || [];
+  const projects = projectResponse?.projects || [];
 
   const formSchema = z.object({
     id: z.string().min(5).max(30),
@@ -72,11 +81,12 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
     social_twitter: z.string().optional().nullable(),
     social_facebook: z.string().optional().nullable(),
     social_linkedin: z.string().optional().nullable(),
-    assigned_to: z.string().optional(),
+    assigned_to: z.string().optional().nullable(),
     status: z.string(),
     //TODO: add type schema from db as data source
-    type: z.string().optional(),
-    accountIDs: z.string().optional(),
+    type: z.string().optional().nullable(),
+    accountIDs: z.string().optional().nullable(),
+    project: z.string().optional().nullable(),
   });
 
   type NewLeadFormValues = z.infer<typeof formSchema>;
@@ -114,14 +124,14 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
     { name: "Completed", id: "COMPLETED" },
   ];
 
-  if (isLoadingUsers || isLoadingAccounts)
+  if (isLoadingUsers || isLoadingAccounts || isLoadingProjects)
     return (
       <div>
         <SuspenseLoading />
       </div>
     );
 
-  if (!users || !initialData)
+  if (!userResponse || !initialData)
     return <div>Something went wrong, there is no data for form</div>;
 
   return (
@@ -133,148 +143,158 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
             <code>{JSON.stringify(form.formState.errors, null, 2)}</code>
           </pre>
         </div> */}
-        <div className=" w-[800px] text-sm">
+        <div className=" w-full max-w-[800px] text-sm">
           <div className="pb-5 space-y-2">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Johny"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last name</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Walker"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="BasaltCRM Inc."
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="jobTitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Title</FormLabel>
-                  <FormControl>
-                    <Input disabled={isLoading} placeholder="CTO" {...field} value={field.value ?? ""} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="johny@domain.com"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="+11 123 456 789"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First name</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Johny"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last name</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Walker"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            {/* Reordered Fields */}
-            <FormField
-              control={form.control}
-              name="refered_by"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Refered by</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Referral Name"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lead_source"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Website URL"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="BasaltCRM Inc."
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="jobTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Job Title</FormLabel>
+                    <FormControl>
+                      <Input disabled={isLoading} placeholder="CTO" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>E-mail</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="johny@domain.com"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="+11 123 456 789"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="refered_by"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Refered by</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Referral Name"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lead_source"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Website URL"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="description"
@@ -363,64 +383,77 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
                 />
               </div>
             </div>
-            <div className="flex w-full  space-x-5">
-              <div className="w-1/2">
+
+            <div className="flex w-full space-x-5 pt-4">
+              <div className="w-1/2 space-y-4">
                 <FormField
                   control={form.control}
                   name="assigned_to"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assigned to</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a user to assign the account" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="overflow-y-auto h-56">
-                          {Array.isArray(users) && users.map((user: any) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={users.map((user: any) => ({
+                            label: user.name || user.email,
+                            value: user.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a user"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="project"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Assign to Project</FormLabel>
+                      <FormControl>
+                        <Combobox
+                          options={projects.map((project: any) => ({
+                            label: project.title,
+                            value: project.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Choose a project"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="accountIDs"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assign an Account</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose assigned account " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Array.isArray(accounts) && accounts.map((account: any) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={Array.isArray(accounts) ? accounts.map((account: any) => ({
+                            label: account.name,
+                            value: account.id,
+                          })) : []}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Choose assigned account"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="w-1/2 space-y-3">
+
+              <div className="w-1/2 space-y-4">
                 <FormField
                   control={form.control}
                   name="status"

@@ -26,6 +26,8 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { UpdateLeadForm } from "../components/UpdateLeadForm";
 import RightViewModalNoTrigger from "@/components/modals/right-view-notrigger";
+import { SmartEmailModal } from "@/components/modals/SmartEmailModal";
+import { Mail } from "lucide-react";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -40,6 +42,7 @@ export function DataTableRowActions<TData>({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -81,6 +84,13 @@ export function DataTableRowActions<TData>({
       >
         <UpdateLeadForm initialData={row.original} setOpen={setUpdateOpen} />
       </RightViewModalNoTrigger>
+      <SmartEmailModal
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        recipientEmail={(row.original as any).email || ""}
+        recipientName={`${lead?.firstName} ${lead?.lastName}`}
+        leadId={lead?.id}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -99,6 +109,10 @@ export function DataTableRowActions<TData>({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setUpdateOpen(true)}>
             Update
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setEmailOpen(true)}>
+            <Mail className="mr-2 h-4 w-4" />
+            Send Email
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>

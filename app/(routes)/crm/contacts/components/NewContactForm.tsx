@@ -26,11 +26,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
+import { Combobox } from "@/components/ui/combobox";
 import { Switch } from "@/components/ui/switch";
-import useDebounce from "@/hooks/useDebounce";
 
-//TODO: fix all the types
 type NewTaskFormProps = {
   users: any[];
   accounts: any[];
@@ -44,46 +42,61 @@ export function NewContactForm({
 }: NewTaskFormProps) {
   const router = useRouter();
   const { toast } = useToast();
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const debounceSearchTerm = useDebounce(searchTerm, 1000);
-
-  const filteredData = users.filter((item) =>
-    item.name.toLowerCase().includes(debounceSearchTerm.toLowerCase())
-  );
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formSchema = z.object({
     birthday_year: z.string().optional().nullable(),
     birthday_month: z.string().optional().nullable(),
     birthday_day: z.string().optional().nullable(),
-    first_name: z.string().optional(),
-    last_name: z.string(),
-    description: z.string().optional(),
-    email: z.string(),
-    personal_email: z.string().optional(),
-    office_phone: z.string().optional(),
-    mobile_phone: z.string().optional(),
-    website: z.string().optional(),
-    position: z.string().optional(),
+    first_name: z.string().optional().nullable(),
+    last_name: z.string().min(1, "Last name is required"),
+    description: z.string().optional().nullable(),
+    email: z.string().email().optional().nullable(),
+    personal_email: z.string().optional().nullable(),
+    office_phone: z.string().optional().nullable(),
+    mobile_phone: z.string().optional().nullable(),
+    website: z.string().optional().nullable(),
+    position: z.string().optional().nullable(),
     status: z.boolean(),
-    type: z.string(),
-    assigned_to: z.string(),
-    assigned_account: z.string().optional(),
-    social_twitter: z.string().optional(),
-    social_facebook: z.string().optional(),
-    social_linkedin: z.string().optional(),
-    social_skype: z.string().optional(),
-    social_youtube: z.string().optional(),
-    social_tiktok: z.string().optional(),
+    type: z.string().optional().nullable(),
+    assigned_to: z.string().optional().nullable(),
+    assigned_account: z.string().optional().nullable(),
+    social_twitter: z.string().optional().nullable(),
+    social_facebook: z.string().optional().nullable(),
+    social_linkedin: z.string().optional().nullable(),
+    social_skype: z.string().optional().nullable(),
+    social_youtube: z.string().optional().nullable(),
+    social_tiktok: z.string().optional().nullable(),
   });
 
   type NewAccountFormValues = z.infer<typeof formSchema>;
 
   const form = useForm<NewAccountFormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      status: true,
+      first_name: "",
+      last_name: "",
+      description: "",
+      email: "",
+      personal_email: "",
+      office_phone: "",
+      mobile_phone: "",
+      website: "",
+      position: "",
+      type: null,
+      assigned_to: null,
+      assigned_account: null,
+      social_twitter: "",
+      social_facebook: "",
+      social_linkedin: "",
+      social_skype: "",
+      social_youtube: "",
+      social_tiktok: "",
+      birthday_year: null,
+      birthday_month: null,
+      birthday_day: null,
+    },
   });
 
   const contactType = [
@@ -93,7 +106,6 @@ export function NewContactForm({
   ];
 
   const yearArray = Array.from(
-    //start in 1923 and count to +100 years
     { length: 100 },
     (_, i) => i + 1923
   );
@@ -114,47 +126,15 @@ export function NewContactForm({
       });
     } finally {
       setIsLoading(false);
-      form.reset({
-        first_name: "",
-        last_name: "",
-        description: "",
-        email: "",
-        personal_email: "",
-        office_phone: "",
-        mobile_phone: "",
-        website: "",
-        position: "",
-        status: false,
-        type: "",
-        assigned_to: "",
-        assigned_account: "",
-        social_twitter: "",
-        social_facebook: "",
-        social_linkedin: "",
-        social_skype: "",
-        social_youtube: "",
-        social_tiktok: "",
-        birthday_year: "",
-        birthday_month: "",
-        birthday_day: "",
-      });
+      form.reset();
       router.refresh();
       onFinish();
     }
   };
 
-  //console.log(filteredData, "filteredData");
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="h-full px-10">
-        {/*        <div>
-          <pre>
-            <code>{JSON.stringify(form.formState, null, 2)}</code>
-            <code>{JSON.stringify(form.watch(), null, 2)}</code>
-            <code>{JSON.stringify(form.formState.errors, null, 2)}</code>
-          </pre>
-        </div> */}
         <div className=" w-[800px] text-sm">
           <div className="pb-5 space-y-2">
             <FormField
@@ -164,7 +144,7 @@ export function NewContactForm({
                 <FormItem>
                   <FormLabel>First name</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} placeholder="John" {...field} />
+                    <Input disabled={isLoading} placeholder="John" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,7 +157,7 @@ export function NewContactForm({
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} placeholder="Doe" {...field} />
+                    <Input disabled={isLoading} placeholder="Doe" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,6 +174,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="+11 1236 77 55"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -212,6 +193,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="+11 1236 77 55"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -229,6 +211,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="john@domain.com"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -246,6 +229,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="littlejohny@gmail.com"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -263,6 +247,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="https://www.domain.com"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -277,7 +262,7 @@ export function NewContactForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex space-x-2 w-32">
-                      <Select onValueChange={field.onChange}>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <SelectTrigger>Year</SelectTrigger>
                         <SelectContent>
                           {yearArray.map((yearOption) => (
@@ -301,10 +286,9 @@ export function NewContactForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex space-x-2 w-28">
-                      <Select onValueChange={field.onChange}>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <SelectTrigger>Month</SelectTrigger>
                         <SelectContent>
-                          {/* Replace this with the range of months you want to allow */}
                           {Array.from({ length: 12 }, (_, i) => i + 1).map(
                             (monthOption) => (
                               <SelectItem
@@ -328,10 +312,9 @@ export function NewContactForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <div className="flex space-x-2">
-                      <Select onValueChange={field.onChange}>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <SelectTrigger>Day</SelectTrigger>
                         <SelectContent>
-                          {/* Replace this with the range of months you want to allow */}
                           {Array.from({ length: 31 }, (_, i) => i + 1).map(
                             (dayOption) => (
                               <SelectItem
@@ -362,6 +345,7 @@ export function NewContactForm({
                       disabled={isLoading}
                       placeholder="Useful information about the contact"
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -374,30 +358,19 @@ export function NewContactForm({
                   control={form.control}
                   name="assigned_to"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assigned user</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose an user " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="h-96 overflow-y-auto">
-                          <Input
-                            type="text"
-                            placeholder="Search in users ..."
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                          />
-                          {filteredData.map((item, index) => (
-                            <SelectItem key={index} value={item.id}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={users.map((item: any) => ({
+                            label: item.name,
+                            value: item.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select assigned user"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -406,25 +379,19 @@ export function NewContactForm({
                   control={form.control}
                   name="assigned_account"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assign an Account</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose assigned account " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          {accounts.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={accounts.map((account: any) => ({
+                            label: account.name,
+                            value: account.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select assigned account"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -440,6 +407,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="CTO"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -469,25 +437,19 @@ export function NewContactForm({
                   control={form.control}
                   name="type"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Assigned user</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose contact type " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          {contactType.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
-                              {type.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Contact type</FormLabel>
+                      <FormControl>
+                        <Combobox
+                          options={contactType.map((type) => ({
+                            label: type.name,
+                            value: type.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Choose type"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -505,6 +467,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.twitter.com/john"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -522,6 +485,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.facebook.com/john"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -539,6 +503,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.linkedin.com/john"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -556,6 +521,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.skype.com/john"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -573,6 +539,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.youtube.com/@basalthq"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -590,6 +557,7 @@ export function NewContactForm({
                           disabled={isLoading}
                           placeholder="https://www.domain.com"
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />

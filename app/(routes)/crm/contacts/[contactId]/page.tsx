@@ -11,6 +11,8 @@ import { getAccountsByContactId } from "@/actions/crm/get-accounts-by-contactId"
 import AccountsView from "../../components/AccountsView";
 import OpportunitiesView from "../../components/OpportunitiesView";
 import DocumentsView from "../../components/DocumentsView";
+import { LeadTimeline } from "../../leads/[leadId]/components/LeadTimeline";
+import { History, Info } from "lucide-react";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -67,13 +69,34 @@ const ContactViewPage = async (props: any) => {
       title={`Contact detail view: ${contact?.first_name} ${contact?.last_name}`}
       description={"Everything you need to know about sales potential"}
     >
-      <div className="space-y-5">
-        {hasAccess('contacts.detail.info') && <BasicView data={contact} />}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start pb-20">
+        <div className="xl:col-span-5 space-y-6">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-6 w-6 rounded-lg bg-orange-500/10 flex items-center justify-center border border-orange-500/20 text-orange-400">
+              <Info size={14} />
+            </div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Contact Information</h3>
+          </div>
+          {hasAccess('contacts.detail.info') && <BasicView data={contact} />}
 
-        {hasAccess('accounts.view') && <AccountsView data={accounts} crmData={crmData} />}
+          {hasAccess('accounts.view') && <AccountsView data={accounts} crmData={crmData} />}
+          {hasAccess('contacts.detail.opportunities') && <OpportunitiesView data={opportunities} crmData={crmData} />}
+          {hasAccess('contacts.detail.documents') && <DocumentsView data={documents} />}
+        </div>
 
-        {hasAccess('contacts.detail.opportunities') && <OpportunitiesView data={opportunities} crmData={crmData} />}
-        {hasAccess('contacts.detail.documents') && <DocumentsView data={documents} />}
+        <div className="xl:col-span-7 space-y-6">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400">
+              <History size={14} />
+            </div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Communication History</h3>
+          </div>
+          <LeadTimeline
+            contactId={contactId}
+            leadEmail={contact?.email || ""}
+            leadName={`${contact?.first_name} ${contact?.last_name}`}
+          />
+        </div>
       </div>
     </Container>
   );

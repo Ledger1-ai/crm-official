@@ -88,7 +88,7 @@ export default function PoolDetailPage({ params }: { params: Promise<{ poolId: s
   );
 
   const { data: teamData } = useSWR<TeamMembersResponse>(
-    "/api/leads/team-members",
+    "/api/crm/leads/team-members",
     fetcher
   );
 

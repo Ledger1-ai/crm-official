@@ -10,6 +10,7 @@ import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
 import RightViewModal from "@/components/modals/right-view-modal";
 import { NewLeadForm } from "../../../leads/components/NewLeadForm";
+import { SmartEmailModal } from "@/components/modals/SmartEmailModal";
 
 interface Lead {
     id: string;
@@ -27,6 +28,8 @@ interface LeadsWidgetProps {
 
 export const LeadsWidget = ({ leads: initialLeads }: LeadsWidgetProps) => {
     const [searchTerm, setSearchTerm] = useState("");
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
     const filteredLeads = initialLeads.filter(lead => {
         const name = `${lead.firstName || ""} ${lead.lastName || ""}`.toLowerCase();
@@ -78,6 +81,13 @@ export const LeadsWidget = ({ leads: initialLeads }: LeadsWidgetProps) => {
             count={initialLeads.length}
             rightAction={rightAction}
         >
+            <SmartEmailModal
+                open={emailModalOpen}
+                onOpenChange={setEmailModalOpen}
+                recipientEmail={selectedLead?.email || ""}
+                recipientName={`${selectedLead?.firstName || ""} ${selectedLead?.lastName || ""}`}
+                leadId={selectedLead?.id}
+            />
             <div className="space-y-1 pb-4 mt-2">
                 {filteredLeads.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground/30">
@@ -117,15 +127,18 @@ export const LeadsWidget = ({ leads: initialLeads }: LeadsWidgetProps) => {
 
                             <div className="shrink-0 flex items-center gap-1 h-full pt-1">
                                 {lead.email && (
-                                    <a href={`mailto:${lead.email}`} title={`Email ${lead.email}`}>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all duration-300"
-                                        >
-                                            <Mail className="h-3.5 w-3.5" />
-                                        </Button>
-                                    </a>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all duration-300"
+                                        onClick={() => {
+                                            setSelectedLead(lead);
+                                            setEmailModalOpen(true);
+                                        }}
+                                        title={`Email ${lead.email}`}
+                                    >
+                                        <Mail className="h-3.5 w-3.5" />
+                                    </Button>
                                 )}
                                 {lead.phone && (
                                     <a href={`tel:${lead.phone}`} title={`Call ${lead.phone}`}>

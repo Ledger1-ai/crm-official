@@ -36,6 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Combobox } from "@/components/ui/combobox";
 import {
   crm_Accounts,
   crm_Contacts,
@@ -75,34 +76,6 @@ export function NewOpportunityForm({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [searchUserValue, setSearchUserValue] = useState<string>("");
-  const debouncedValue = useDebounce(searchUserValue, 1000);
-
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(debouncedValue.toLowerCase())
-  );
-
-  const [searchAccountValue, setSearchAccountValue] = useState<string>("");
-  const debouncedAccountValue = useDebounce(searchAccountValue, 1000);
-
-  const filteredAccounts = accounts.filter((account) =>
-    account.name.toLowerCase().includes(debouncedAccountValue.toLowerCase())
-  );
-
-  const [searchContactValue, setSearchContactValue] = useState<string>("");
-  const debouncedContactValue = useDebounce(searchContactValue, 1000);
-
-  const filteredContacts = contacts.filter(
-    (contact) =>
-      contact.last_name
-        .toLowerCase()
-        .includes(debouncedContactValue.toLowerCase()) ||
-      (contact.first_name &&
-        contact.first_name
-          .toLowerCase()
-          .includes(debouncedContactValue.toLowerCase()))
-  );
-
   const formSchema = z.object({
     name: z.string(),
     close_date: z.date({
@@ -115,10 +88,10 @@ export function NewOpportunityForm({
     currency: z.string(),
     expected_revenue: z.string(),
     next_step: z.string(),
-    assigned_to: z.string(),
-    account: z.string(),
-    contact: z.string(),
-    campaign: z.string(),
+    assigned_to: z.string().optional().nullable(),
+    account: z.string().optional().nullable(),
+    contact: z.string().optional().nullable(),
+    campaign: z.string().optional().nullable(),
   });
 
   type NewAccountFormValues = z.infer<typeof formSchema>;
@@ -135,10 +108,10 @@ export function NewOpportunityForm({
       currency: "",
       expected_revenue: "",
       next_step: "",
-      assigned_to: "",
-      account: accountId ? accountId : "",
-      contact: "",
-      campaign: "",
+      assigned_to: null,
+      account: accountId ? accountId : null,
+      contact: null,
+      campaign: null,
     },
   });
 
@@ -399,29 +372,19 @@ export function NewOpportunityForm({
                   control={form.control}
                   name="assigned_to"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assigned to</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a user to assign the account" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="overflow-y-auto h-56">
-                          <Input
-                            placeholder="Search user..."
-                            onChange={(e) => setSearchUserValue(e.target.value)}
-                          />
-                          {filteredUsers.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={users.map((user) => ({
+                            label: user.name,
+                            value: user.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a user"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -430,31 +393,19 @@ export function NewOpportunityForm({
                   control={form.control}
                   name="account"
                   render={({ field }) => (
-                    <FormItem hidden={accountId ? true : false}>
+                    <FormItem className="flex flex-col" hidden={accountId ? true : false}>
                       <FormLabel>Assigned Account</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose account " />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          <Input
-                            placeholder="Search account..."
-                            onChange={(e) =>
-                              setSearchAccountValue(e.target.value)
-                            }
-                          />
-                          {filteredAccounts.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={accounts.map((account) => ({
+                            label: account.name,
+                            value: account.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Choose account"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -463,31 +414,19 @@ export function NewOpportunityForm({
                   control={form.control}
                   name="contact"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Assigned Contact</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a user to assign the account" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          <Input
-                            placeholder="Search contact..."
-                            onChange={(e) =>
-                              setSearchContactValue(e.target.value)
-                            }
-                          />
-                          {filteredContacts.map((contact) => (
-                            <SelectItem key={contact.id} value={contact.id}>
-                              {contact.first_name + " " + contact.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={contacts.map((contact) => ({
+                            label: `${contact.first_name || ""} ${contact.last_name || ""}`.trim(),
+                            value: contact.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select contact"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -496,25 +435,19 @@ export function NewOpportunityForm({
                   control={form.control}
                   name="campaign"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>From campaign</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a campaign" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          {campaigns.map((campaign) => (
-                            <SelectItem key={campaign.id} value={campaign.id}>
-                              {campaign.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Combobox
+                          options={campaigns.map((campaign) => ({
+                            label: campaign.name,
+                            value: campaign.id,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a campaign"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
