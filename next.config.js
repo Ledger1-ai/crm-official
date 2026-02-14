@@ -1,10 +1,5 @@
-const withNextIntl = require("next-intl/plugin")("./i18n.ts");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  turbopack: {
-    root: __dirname,
-  },
   // TypeScript errors will now fail the build (safety net removed)
   // typescript: { ignoreBuildErrors: true },
   images: {
@@ -47,8 +42,23 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/:locale/campaigns/:path*",
-        destination: "/:locale/projects/:path*",
+        source: "/en/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/de/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/cz/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/uk/:path*",
+        destination: "/:path*",
         permanent: true,
       },
     ];
@@ -56,5 +66,5 @@ const nextConfig = {
   output: "standalone",
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = nextConfig;
 

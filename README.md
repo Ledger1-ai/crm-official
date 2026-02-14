@@ -5,7 +5,7 @@
 BasaltCRM is a premium open source CRM built on top of Next.js 16 using TypeScript, shadcn/ui, Prisma, and MongoDB. Feature-packed with AI-assisted workflows, intelligent automation, and a next-gen architecture.
 
 [![X (formerly Twitter) URL](https://img.shields.io/twitter/url?url=https%3A%2F%2Fx.com%2FBasaltHQ)](https://x.com/BasaltHQ)
-[![GitHub License](https://img.shields.io/github/license/Ledger1-ai/crm-official)](https://github.com/Ledger1-ai/crm-official/blob/main/LICENSE)
+[![GitHub License](https://img.shields.io/github/license/BasaltHQ/crm-official)](https://github.com/BasaltHQ/crm-official/blob/main/LICENSE)
 
 [Introduction](#introduction) · [Tech Stack + Features](#tech-stack--features) · [Roadmap](#roadmap) · [Installation](#installation) · [Repo activity](#repo-activity) · [License](#license) · [Discord](https://discord.gg/gcgNugyWkg)
 
@@ -98,7 +98,7 @@ Available at: [crm.basalthq.com/en/developers](https://crm.basalthq.com/en/devel
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/Ledger1-ai/crm-official.git
+   git clone https://github.com/BasaltHQ/crm-official.git
    cd crm-official
    ```
 
@@ -150,7 +150,7 @@ We welcome community contributions. Please open an issue for bugs or suggestions
 
 ### BasaltCRM Super Heroes
 
-[![Contributors](https://contrib.rocks/image?repo=Ledger1-ai/crm-official)](https://github.com/Ledger1-ai/crm-official/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=BasaltHQ/crm-official)](https://github.com/BasaltHQ/crm-official/graphs/contributors)
 
 ## Repo Activity
 
@@ -158,7 +158,7 @@ We welcome community contributions. Please open an issue for bugs or suggestions
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Ledger1-ai/crm-official&type=Timeline)](https://star-history.com/#Ledger1-ai/crm-official&Timeline)
+[![Star History Chart](https://api.star-history.com/svg?repos=BasaltHQ/crm-official&type=Timeline)](https://star-history.com/#BasaltHQ/crm-official&Timeline)
 
 ## Credits
 
@@ -169,4 +169,4 @@ Special thanks to the original developer:
 
 ## License
 
-Licensed under the [MIT license](https://github.com/Ledger1-ai/crm-official/blob/main/LICENSE).
+Licensed under the [MIT license](https://github.com/BasaltHQ/crm-official/blob/main/LICENSE).

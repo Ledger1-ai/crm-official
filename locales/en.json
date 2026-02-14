@@ -1,51 +1,14 @@
 {
-  "RootLayout": {
-    "title": "BasaltCRM",
-    "description": "BasaltCRM is an open source CRM build on top of NextJS."
-  },
-  "ModuleMenu": {
-    "dashboard": "Dashboard",
-    "crm": {
-      "title": "Sales",
-      "accounts": "Companies",
-      "opportunities": "Opportunities",
-      "contacts": "Contacts",
-      "leads": "Leads",
-      "contracts": "Contracts"
+    "RootLayout": {
+        "title": "BasaltCRM – AI Sales & Support Engine",
+        "description": "Automated prospecting, social intelligence, and 24/7 AI agents that never sleep."
     },
-    "projects": "Projects",
-    "emails": "E-mails",
-    "tasks": "Tasks",
-    "invoices": "Invoices",
-    "reports": "Reports",
-    "documents": "Documents",
-    "storage": "Storage",
-    "settings": "Administration"
-  },
-  "DashboardPage": {
-    "containerTitle": "Dashboard",
-    "totalRevenue": "Total revenue",
-    "containerDescription": "Welcome to BasaltCRM, here you can see all important information about your business.",
-    "expectedRevenue": "Expected revenue",
-    "activeUsers": "Active users",
-    "accounts": "Companies",
-    "opportunities": "Deals",
-    "contacts": "Contacts",
-    "leads": "Leads",
-    "projects": "Projects",
-    "tasks": "Tasks",
-    "myTasks": "My tasks",
-    "invoices": "Invoices",
-    "documents": "Documents",
-    "storage": "Storage"
-  },
-  "RegisterComponent": {
-    "cardTitle": "Create new account",
-    "cardDescription": "Create account by login with",
-    "label": "Language",
-    "locale": "{locale, select, de {German} en {English} cz {Czech} uk {Ukrainian} other {Unknown}}"
-  },
-  "CrmModuleMenuComponent": {
-    "menuTitle": "Sales"
-  }
+    "ModuleMenu": {
+        "dashboard": "Dashboard",
+        "projects": "Projects",
+        "invoices": "Invoices",
+        "reports": "Reports",
+        "settings": "Settings",
+        "emails": "Emails"
+    }
 }

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const docsDirectory = path.join(process.cwd(), "app/[locale]/docs/content");
+const docsDirectory = path.join(process.cwd(), "app/docs/content");
 
 export interface DocArticle {
     slug: string;

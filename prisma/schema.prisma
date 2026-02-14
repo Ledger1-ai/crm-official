@@ -56,7 +56,7 @@ model crm_Accounts {
   leads                crm_Leads[]
   industry_type        crm_Industry_Type?    @relation(fields: [industry], references: [id])
   opportunities        crm_Opportunities[]
-  assigned_to_user     Users?                @relation(fields: [assigned_to], references: [id])
+  assigned_to_user     Users?                @relation(fields: [assigned_to], references: [id], onDelete: SetNull)
   crm_accounts_tasks   crm_Accounts_Tasks[]
   contracts            crm_Contracts[]
   quotes               crm_Quotes[]
@@ -96,7 +96,7 @@ model crm_Leads {
   status             String?       @default("NEW")
   type               String?       @default("DEMO")
   assigned_to        String?       @db.ObjectId
-  assigned_to_user   Users?        @relation(fields: [assigned_to], references: [id])
+  assigned_to_user   Users?        @relation(fields: [assigned_to], references: [id], onDelete: SetNull)
   accountsIDs        String?       @db.ObjectId
   assigned_accounts  crm_Accounts? @relation(fields: [accountsIDs], references: [id])
   documentsIDs       String[]      @db.ObjectId
@@ -188,8 +188,8 @@ model crm_Opportunities {
   status               crm_Opportunity_Status?         @default(ACTIVE)
   assigned_type        crm_Opportunities_Type?         @relation(fields: [type], references: [id])
   assigned_sales_stage crm_Opportunities_Sales_Stages? @relation(name: "assinged_sales_stage", fields: [sales_stage], references: [id])
-  assigned_to_user     Users?                          @relation(name: "assigned_to_user_relation", fields: [assigned_to], references: [id])
-  created_by_user      Users?                          @relation(name: "created_by_user_relation", fields: [created_by], references: [id])
+  assigned_to_user     Users?                          @relation(name: "assigned_to_user_relation", fields: [assigned_to], references: [id], onDelete: SetNull)
+  created_by_user      Users?                          @relation(name: "created_by_user_relation", fields: [created_by], references: [id], onDelete: SetNull)
   assigned_account     crm_Accounts?                   @relation(fields: [account], references: [id])
   assigned_campaings   crm_campaigns?                  @relation(fields: [campaign], references: [id])
   connected_documents  String[]                        @db.ObjectId
@@ -247,7 +247,7 @@ model crm_Outreach_Campaigns {
   status      OutreachCampaignStatus @default(DRAFT)
 
   // Owner/Team
-  user    String  @db.ObjectId
+  user    String? @db.ObjectId
   team_id String? @db.ObjectId
 
   // Members assigned to work on this campaign (for collaboration)
@@ -284,7 +284,7 @@ model crm_Outreach_Campaigns {
 
   // Relations
   outreach_items   crm_Outreach_Items[]
-  assigned_user    Users?               @relation(name: "OutreachCampaignsUser", fields: [user], references: [id])
+  assigned_user    Users?               @relation(name: "OutreachCampaignsUser", fields: [user], references: [id], onDelete: SetNull)
   assigned_team    Team?                @relation(name: "OutreachCampaignsTeam", fields: [team_id], references: [id])
   assigned_project Boards?              @relation(name: "OutreachCampaignsProject", fields: [project], references: [id])
   assigned_pool    crm_Lead_Pools?      @relation(name: "OutreachCampaignsPools", fields: [pool], references: [id])
@@ -394,8 +394,8 @@ model crm_Contacts {
   type                   String?             @default("Customer")
   tags                   String[]
   notes                  String[]
-  assigned_to_user       Users?              @relation(name: "assigned_contacts", fields: [assigned_to], references: [id])
-  crate_by_user          Users?              @relation(name: "created_contacts", fields: [created_by], references: [id])
+  assigned_to_user       Users?              @relation(name: "assigned_contacts", fields: [assigned_to], references: [id], onDelete: SetNull)
+  crate_by_user          Users?              @relation(name: "created_contacts", fields: [created_by], references: [id], onDelete: SetNull)
   opportunitiesIDs       String[]            @db.ObjectId
   assigned_opportunities crm_Opportunities[] @relation(fields: [opportunitiesIDs], references: [id])
   accountsIDs            String?             @db.ObjectId
@@ -441,7 +441,7 @@ model crm_Contracts {
   status              crm_Contracts_Status @default(NOTSTARTED)
   type                String?
   assigned_account    crm_Accounts?        @relation(fields: [account], references: [id])
-  assigned_to_user    Users?               @relation(fields: [assigned_to], references: [id])
+  assigned_to_user    Users?               @relation(fields: [assigned_to], references: [id], onDelete: SetNull)
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
@@ -473,7 +473,7 @@ model Boards {
   icon              String?
   position          Int?
   title             String
-  user              String    @db.ObjectId
+  user              String?   @db.ObjectId
   visibility        String?
   sharedWith        String[]  @db.ObjectId
   createdAt         DateTime? @default(now()) @db.Date
@@ -501,7 +501,7 @@ model Boards {
 
   // Watchers
   watchers              String[]                 @db.ObjectId
-  assigned_user         Users?                   @relation(name: "assigned_user", fields: [user], references: [id])
+  assigned_user         Users?                   @relation(name: "assigned_user", fields: [user], references: [id], onDelete: SetNull)
   watchers_users        Users[]                  @relation(name: "watching_users", fields: [watchers], references: [id])
   button_sets           Project_Button_Sets[]    @relation(name: "BoardButtonSets")
   project_opportunities Project_Opportunities[]
@@ -517,13 +517,13 @@ model Boards {
 model ProjectMember {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   project    String   @db.ObjectId
-  user       String   @db.ObjectId
+  user       String?  @db.ObjectId
   role       String   @default("MEMBER") // LEAD, MEMBER
   assignedAt DateTime @default(now()) @db.Date
   assignedBy String   @db.ObjectId
 
   board  Boards @relation(name: "ProjectMembers", fields: [project], references: [id])
-  member Users  @relation(name: "ProjectMemberUser", fields: [user], references: [id])
+  member Users? @relation(name: "ProjectMemberUser", fields: [user], references: [id], onDelete: SetNull)
 }
 
 model Employees {
@@ -656,7 +656,7 @@ model Invoices {
   assigned_account_id           String?         @db.ObjectId
   visibility                    Boolean         @default(true)
   invoice_states                invoice_States? @relation(fields: [invoice_state_id], references: [id])
-  users                         Users?          @relation(fields: [assigned_user_id], references: [id])
+  users                         Users?          @relation(fields: [assigned_user_id], references: [id], onDelete: SetNull)
   accounts                      crm_Accounts?   @relation(fields: [assigned_account_id], references: [id])
   connected_documents           String[]        @db.ObjectId
   documents                     Documents[]     @relation(fields: [connected_documents], references: [id])
@@ -714,8 +714,8 @@ model Documents {
   crm_accounts_tasks     crm_Accounts_Tasks? @relation(fields: [crm_accounts_tasksIDs], references: [id])
   leads                  crm_Leads[]         @relation(fields: [leadsIDs], references: [id])
   accounts               crm_Accounts[]      @relation(fields: [accountsIDs], references: [id])
-  created_by             Users?              @relation(name: "created_by_user", fields: [created_by_user], references: [id])
-  assigned_to_user       Users?              @relation(name: "assigned_to_user", fields: [assigned_user], references: [id])
+  created_by             Users?              @relation(name: "created_by_user", fields: [created_by_user], references: [id], onDelete: SetNull)
+  assigned_to_user       Users?              @relation(name: "assigned_to_user", fields: [assigned_user], references: [id], onDelete: SetNull)
   documents_type         Documents_Types?    @relation(fields: [document_type], references: [id])
   document_system_type   DocumentSystemType? @default(OTHER)
 
@@ -780,7 +780,7 @@ model Tasks {
   documentIDs      String[]        @db.ObjectId
   comments         tasksComments[]
   documents        Documents[]     @relation(fields: [documentIDs], references: [id])
-  assigned_user    Users?          @relation(fields: [user], references: [id])
+  assigned_user    Users?          @relation(fields: [user], references: [id], onDelete: SetNull)
   assigned_section Sections?       @relation(fields: [section], references: [id])
 
   // CRM Linkages
@@ -811,7 +811,7 @@ model crm_Accounts_Tasks {
   user          String?         @db.ObjectId
   comments      tasksComments[]
   documents     Documents[]
-  assigned_user Users?          @relation(fields: [user], references: [id])
+  assigned_user Users?          @relation(fields: [user], references: [id], onDelete: SetNull)
   //CRM assigments
   account       String?         @db.ObjectId
   crm_accounts  crm_Accounts?   @relation(fields: [account], references: [id])
@@ -828,11 +828,11 @@ model tasksComments {
   comment                        String
   createdAt                      DateTime            @default(now()) @db.Date
   task                           String              @db.ObjectId
-  user                           String              @db.ObjectId
+  user                           String?             @db.ObjectId
   assigned_crm_account_task      String?             @db.ObjectId
   assigned_crm_account_task_task crm_Accounts_Tasks? @relation(fields: [assigned_crm_account_task], references: [id])
   assigned_task                  Tasks?              @relation(fields: [task], references: [id], onDelete: Cascade)
-  assigned_user                  Users?              @relation(fields: [user], references: [id])
+  assigned_user                  Users?              @relation(fields: [user], references: [id], onDelete: SetNull)
 }
 
 enum taskStatus {
@@ -1140,7 +1140,7 @@ model secondBrain_notions {
   user           String @db.ObjectId
   notion_api_key String
   notion_db_id   String
-  assigned_user  Users? @relation(fields: [user], references: [id])
+  assigned_user  Users? @relation(fields: [user], references: [id], onDelete: Cascade)
 }
 
 model openAi_keys {
@@ -1149,7 +1149,7 @@ model openAi_keys {
   user            String @db.ObjectId
   organization_id String
   api_key         String
-  assigned_user   Users? @relation(fields: [user], references: [id])
+  assigned_user   Users? @relation(fields: [user], references: [id], onDelete: Cascade)
 }
 
 model gmail_Tokens {
@@ -1164,7 +1164,7 @@ model gmail_Tokens {
   createdAt     DateTime? @default(now()) @db.Date
   updatedAt     DateTime? @updatedAt @db.Date
 
-  assigned_user Users? @relation(fields: [user], references: [id])
+  assigned_user Users? @relation(fields: [user], references: [id], onDelete: Cascade)
 }
 
 model microsoft_Tokens {
@@ -1179,7 +1179,7 @@ model microsoft_Tokens {
   createdAt     DateTime? @default(now()) @db.Date
   updatedAt     DateTime? @updatedAt @db.Date
 
-  assigned_user Users? @relation(fields: [user], references: [id])
+  assigned_user Users? @relation(fields: [user], references: [id], onDelete: Cascade)
 }
 
 enum EmailProvider {
@@ -1402,7 +1402,7 @@ model chat_Sessions {
   updatedAt   DateTime? @updatedAt @db.Date
 
   messages      chat_Messages[]
-  assigned_user Users?          @relation(fields: [user], references: [id])
+  assigned_user Users?          @relation(fields: [user], references: [id], onDelete: Cascade)
 }
 
 model chat_Messages {
@@ -1462,7 +1462,7 @@ model crm_Lead_Pools {
   candidates         crm_Lead_Candidates[]
   lead_maps          crm_Lead_Pools_Leads[]
   outreach_campaigns crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsPools")
-  assigned_user      Users?                   @relation(name: "LeadPoolsAssignedUser", fields: [user], references: [id])
+  assigned_user      Users?                   @relation(name: "LeadPoolsAssignedUser", fields: [user], references: [id], onDelete: Cascade)
 
   team_id       String? @db.ObjectId
   assigned_team Team?   @relation(fields: [team_id], references: [id])
@@ -1474,7 +1474,7 @@ model crm_Lead_Pools {
 model crm_Lead_Gen_Jobs {
   id             String            @id @default(auto()) @map("_id") @db.ObjectId
   v              Int?              @map("__v")
-  user           String            @db.ObjectId
+  user           String?           @db.ObjectId
   pool           String            @db.ObjectId
   status         LeadGenJobStatus? @default(QUEUED)
   startedAt      DateTime?         @db.Date
@@ -1486,7 +1486,7 @@ model crm_Lead_Gen_Jobs {
 
   // Relations
   sourceEvents  crm_Lead_Source_Events[]
-  assigned_user Users?                   @relation(name: "LeadGenJobsAssignedUser", fields: [user], references: [id])
+  assigned_user Users?                   @relation(name: "LeadGenJobsAssignedUser", fields: [user], references: [id], onDelete: SetNull)
   assigned_pool crm_Lead_Pools?          @relation(fields: [pool], references: [id])
 }
 
@@ -1644,7 +1644,7 @@ model crm_Lead_Activities {
   createdAt DateTime @default(now()) @db.Date
 
   assigned_lead crm_Leads? @relation(name: "LeadActivitiesToLead", fields: [lead], references: [id])
-  assigned_user Users?     @relation(name: "LeadActivitiesToUser", fields: [user], references: [id])
+  assigned_user Users?     @relation(name: "LeadActivitiesToUser", fields: [user], references: [id], onDelete: SetNull)
 }
 
 // Button set presets per project (Boards)
@@ -1660,7 +1660,7 @@ model Project_Button_Sets {
   updatedAt DateTime? @updatedAt @db.Date
 
   assigned_project Boards? @relation(name: "BoardButtonSets", fields: [project], references: [id])
-  assigned_owner   Users?  @relation(name: "UserButtonSets", fields: [owner], references: [id])
+  assigned_owner   Users?  @relation(name: "UserButtonSets", fields: [owner], references: [id], onDelete: SetNull)
 }
 
 // Project-scoped Opportunities posted by Sales for feature buildouts and commissioned work
@@ -1803,7 +1803,7 @@ model SocialSettings {
   facebookUrl       String?  @default("")
   youtubeUrl        String?  @default("")
   tiktokUrl         String?  @default("")
-  githubUrl         String?  @default("https://github.com/Ledger1-ai/crm-official")
+  githubUrl         String?  @default("https://github.com/BasaltHQ/crm-official")
   telegramUrl       String?  @default("")
   redditUrl         String?  @default("")
   threadsUrl        String?  @default("")
@@ -1837,13 +1837,13 @@ model SupportTicket {
 
 model SystemActivity {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
+  userId    String?  @db.ObjectId
   action    String
   resource  String
   details   String?
   createdAt DateTime @default(now()) @db.Date
 
-  user Users @relation(name: "UserSystemActivities", fields: [userId], references: [id])
+  user Users? @relation(name: "UserSystemActivities", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PageView {
@@ -2371,7 +2371,7 @@ model SavedReport {
   filters Json?
 
   userId String @db.ObjectId
-  user   Users  @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   teamId String? @db.ObjectId
   // Optional: team Team? @relation(fields: [teamId], references: [id])
@@ -2478,7 +2478,7 @@ model crm_Workflow {
 
   // Ownership
   team_id    String @db.ObjectId
-  created_by String @db.ObjectId
+  created_by String? @db.ObjectId
 
   createdAt DateTime @default(now()) @db.Date
   updatedAt DateTime @updatedAt @db.Date
@@ -2486,7 +2486,7 @@ model crm_Workflow {
   // Relations
   executions    crm_Workflow_Execution[]
   assigned_team Team?                    @relation(name: "WorkflowTeam", fields: [team_id], references: [id])
-  creator       Users?                   @relation(name: "WorkflowCreator", fields: [created_by], references: [id])
+  creator       Users?                   @relation(name: "WorkflowCreator", fields: [created_by], references: [id], onDelete: SetNull)
 }
 
 model crm_Workflow_Execution {
@@ -2715,7 +2715,7 @@ model crm_Cases {
   account_id    String?       @db.ObjectId
   account       crm_Accounts? @relation(fields: [account_id], references: [id])
   assigned_to   String?       @db.ObjectId
-  assigned_user Users?        @relation(name: "CaseAssignedUser", fields: [assigned_to], references: [id])
+  assigned_user Users?        @relation(name: "CaseAssignedUser", fields: [assigned_to], references: [id], onDelete: SetNull)
 
   // Parent case for case hierarchies
   parent_case_id String?     @db.ObjectId
@@ -2742,7 +2742,7 @@ model crm_Cases {
   // Timestamps
   createdAt  DateTime  @default(now()) @db.Date
   updatedAt  DateTime  @updatedAt @db.Date
-  createdBy  String    @db.ObjectId
+  createdBy  String?   @db.ObjectId
   updatedBy  String?   @db.ObjectId
   closedAt   DateTime? @db.Date
   resolvedAt DateTime? @db.Date
@@ -2763,7 +2763,7 @@ model crm_Cases {
   assigned_team          Team?   @relation(fields: [team_id], references: [id])
   assigned_department_id String? @db.ObjectId
 
-  creator Users @relation(name: "CaseCreator", fields: [createdBy], references: [id])
+  creator Users? @relation(name: "CaseCreator", fields: [createdBy], references: [id], onDelete: SetNull)
 
   @@index([team_id])
   @@index([status])
@@ -2788,8 +2788,8 @@ model crm_Case_Comments {
   email_message_id String?
 
   // Author
-  author_id String @db.ObjectId
-  author    Users  @relation(name: "CaseCommentAuthor", fields: [author_id], references: [id])
+  author_id String? @db.ObjectId
+  author    Users?  @relation(name: "CaseCommentAuthor", fields: [author_id], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @db.Date
   updatedAt DateTime @updatedAt @db.Date
@@ -3018,7 +3018,7 @@ model RoutingConfig {
 
   // Fallback: if no agent matches, assign to this user
   fallback_user_id String? @db.ObjectId
-  fallback_user    Users?  @relation(name: "RoutingFallbackUser", fields: [fallback_user_id], references: [id])
+  fallback_user    Users?  @relation(name: "RoutingFallbackUser", fields: [fallback_user_id], references: [id], onDelete: SetNull)
 
   // Auto-assignment settings
   auto_assign_enabled      Boolean @default(true)
@@ -3098,8 +3098,8 @@ model KnowledgeArticle {
   not_helpful_count Int @default(0) // "Was this article helpful?" — No
 
   // Authorship
-  author_id String @db.ObjectId
-  author    Users  @relation(name: "KBArticleAuthor", fields: [author_id], references: [id])
+  author_id String? @db.ObjectId
+  author    Users?  @relation(name: "KBArticleAuthor", fields: [author_id], references: [id], onDelete: SetNull)
 
   // Linked cases where this article was used
   article_links KnowledgeArticleLink[]
@@ -3278,7 +3278,7 @@ model ApprovalStep {
   // Who approves at this step?
   approver_type    String // SPECIFIC_USER | MANAGER | ROLE | QUEUE
   approver_user_id String? @db.ObjectId // If SPECIFIC_USER
-  approver_user    Users?  @relation(name: "ApprovalStepApprover", fields: [approver_user_id], references: [id])
+  approver_user    Users?  @relation(name: "ApprovalStepApprover", fields: [approver_user_id], references: [id], onDelete: SetNull)
   approver_role    String? // If ROLE: e.g., "SUPER_ADMIN", "ADMIN"
 
   // Unanimous vs first-response
@@ -3382,7 +3382,7 @@ model Notification {
   createdAt DateTime @default(now()) @db.Date
   team_id   String?  @db.ObjectId
 
-  user Users @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
   team Team? @relation(fields: [team_id], references: [id])
 }
 
@@ -3462,7 +3462,7 @@ model DashboardPreference {
   layout    Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      Users    @relation(fields: [userId], references: [id])
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model NavigationConfig {
@@ -3478,7 +3478,7 @@ model NavigationConfig {
   updatedAt DateTime @updatedAt
 
   assigned_team Team   @relation(fields: [team_id], references: [id])
-  assigned_user Users? @relation(fields: [user_id], references: [id])
+  assigned_user Users? @relation(fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([team_id, user_id])
 }

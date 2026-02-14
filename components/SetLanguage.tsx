@@ -38,9 +38,6 @@ import LoadingModal from "./modals/loading-modal";
 
 const languages = [
   { label: "English", value: "en" },
-  { label: "Czech", value: "cz" },
-  { label: "German", value: "de" },
-  { label: "Ukrainian", value: "uk" },
 ] as const;
 
 const FormSchema = z.object({

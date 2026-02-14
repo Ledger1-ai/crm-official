@@ -1,0 +1,311 @@
+"use client";
+import { z } from "zod";
+import axios from "axios";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { FingerprintIcon } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Icons } from "@/components/ui/icons";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+
+export function RegisterComponent({ availablePlans }: { availablePlans: any[] }) {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  //Local states
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [show, setShow] = React.useState<boolean>(false);
+
+  const formSchema = z.object({
+    companyName: z.string().min(2, "Company name is required").max(50),
+    planId: z.string().min(1, "Please select a plan"),
+    name: z.string().min(3).max(50),
+    username: z.string().min(3).max(50),
+    email: z.string().email(),
+    language: z.string().min(2).max(50),
+    password: z.string().min(8).max(50),
+    confirmPassword: z.string().min(8).max(50),
+  });
+
+  type BillboardFormValues = z.infer<typeof formSchema>;
+
+  const form = useForm<BillboardFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      companyName: "",
+      planId: "",
+      name: "",
+      username: "",
+      email: "",
+      language: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onSubmit = async (data: BillboardFormValues) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/api/user", data);
+      toast({
+        title: "Success",
+        description: "User created successfully, please login.",
+      });
+
+      if (response.status === 200) {
+        router.push("/");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error?.response?.data,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //Localizations
+  const languageLabels: Record<string, string> = {
+    en: "English"
+  };
+
+  return (
+    <Card className="shadow-lg my-5 w-full max-w-lg sm:max-w-xl mx-auto">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl">Create Account</CardTitle>
+        <CardDescription>Enter your information to create an account.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 overflow-auto">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} suppressHydrationWarning={true}>
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company / Team Name <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Acme Inc."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="planId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subscription Plan <span className="text-red-500">*</span></FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a plan" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availablePlans.map((plan) => (
+                          <SelectItem key={plan.id} value={plan.id}>
+                            {plan.name} - {plan.price === 0 ? "Free" : `${plan.price} ${plan.currency}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="John Doe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="jdoe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>E-mail <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="name@domain.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Choose your language <span className="text-red-500">*</span></FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a language" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="flex overflow-y-auto h-56">
+                        {["en"].map(
+                          (lng: string, index: number) => (
+                            <SelectItem key={index} value={lng}>
+                              {languageLabels[lng] || lng}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center w-full ">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Password <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          disabled={isLoading}
+                          placeholder="Password"
+                          type={show ? "text" : "password"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span
+                  className="flex px-4 pt-7 w-16"
+                  onClick={() => setShow(!show)}
+                >
+                  <FingerprintIcon size={25} className="text-gray-400" />
+                </span>
+              </div>
+              <div className="flex items-center w-full ">
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Confirm Password <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          disabled={isLoading}
+                          placeholder="Password"
+                          type={show ? "text" : "password"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span
+                  className="flex px-4 pt-7 w-16"
+                  onClick={() => setShow(!show)}
+                >
+                  <FingerprintIcon size={25} className="text-gray-400" />
+                </span>
+              </div>
+            </div>
+
+            <div className="grid gap-2 py-5">
+              <Button disabled={isLoading || !form.formState.isValid} type="submit">
+                Create Account
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-5">
+        <div className="text-sm text-gray-500">
+          Already have an account?{" "}
+          <Link href={"/sign-in"} className="text-primary">
+            sign-in
+          </Link>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}

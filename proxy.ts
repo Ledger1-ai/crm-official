@@ -9,7 +9,6 @@
  *   4. CSRF protection stub for mutating API requests
  */
 import { NextResponse, type NextRequest } from "next/server";
-import createMiddleware from "next-intl/middleware";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -44,12 +43,6 @@ const RATE_LIMIT_EXEMPT_PREFIXES = [
     "/_next",
     "/favicon.ico",
 ];
-
-// ─── Intl Config ─────────────────────────────────────────────────────────────
-const intlMiddleware = createMiddleware({
-    locales: ["en", "de", "cz", "uk"],
-    defaultLocale: "en",
-});
 
 // ─── In-memory rate-limit store (Edge-compatible) ────────────────────────────
 // NOTE: In a multi-instance deployment, use an external store (Redis/Upstash).
@@ -234,23 +227,9 @@ export function proxy(request: NextRequest) {
         return response;
     }
 
-    // ── Default / Non-API: apply intl, security headers and continue ──
+    // ── Default / Non-API: apply security headers and continue ──
 
-    let response: NextResponse;
-
-    // Check if this is a route that should be handled by next-intl
-    // mirroring the logic from proxy.ts matchers
-    const isIntlExempt =
-        pathname.startsWith("/echo") ||
-        pathname.startsWith("/portal") ||
-        // regex for file extensions (has a dot)
-        /.*\..*/.test(pathname);
-
-    if (!isApiRoute && !isIntlExempt) {
-        response = intlMiddleware(request);
-    } else {
-        response = NextResponse.next();
-    }
+    const response = NextResponse.next();
 
     applySecurityHeaders(response);
 

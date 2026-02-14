@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const API_ROOT = path.join(process.cwd(), 'app', '[locale]', 'api', 'v1', 'agent');
+const API_ROOT = path.join(process.cwd(), 'app', 'api', 'v1', 'agent');
 const DOCS_FILE = path.join(process.cwd(), 'AGENT_COMMERCE_GUIDE.md');
 
 /**

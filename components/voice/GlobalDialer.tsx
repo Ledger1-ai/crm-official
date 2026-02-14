@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "react-hot-toast";
 import { Phone, ChevronDown, ChevronUp, GripHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import DialerPanel from "@/app/[locale]/(routes)/crm/dialer/DialerPanel";
+import DialerPanel from "@/app/(routes)/crm/dialer/DialerPanel";
 
 /**
  * GlobalDialer

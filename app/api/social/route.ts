@@ -15,7 +15,7 @@ export async function GET() {
                 data: {
                     xTwitterUrl: "https://x.com/BasaltAI",
                     discordUrl: "https://discord.gg/gcgNugyWkg",
-                    githubUrl: "https://github.com/Ledger1-ai/crm-official",
+                    githubUrl: "https://github.com/BasaltHQ/crm-official",
                 }
             });
         }

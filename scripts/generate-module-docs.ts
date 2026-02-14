@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const CRM_ROOT = path.join(process.cwd(), 'app', '[locale]', '(routes)', 'crm');
+const CRM_ROOT = path.join(process.cwd(), 'app', '(routes)', 'crm');
 const FEATURES_FILE = path.join(process.cwd(), 'CRM_FEATURES_OVERVIEW.md');
 
 /**

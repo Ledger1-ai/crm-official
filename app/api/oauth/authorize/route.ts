@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     // Default: redirect to branded consent UI (valid URL path) preserving all query params (locale default: en)
     // Note: route groups like (authpopup) are not part of the URL; use a query flag to indicate popup behavior
     const origin = url.origin;
-    const ui = new URL(`${origin}/en/oauth/authorize`);
+    const ui = new URL(`${origin}/oauth/authorize`);
     // forward known params
     ui.searchParams.set("response_type", responseType!);
     ui.searchParams.set("client_id", clientId!);

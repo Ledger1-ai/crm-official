@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Checkout the Code/Github') {
       steps {
-        git(url: 'https://github.com/Ledger1-ai/crm-official', branch: 'main')
+        git(url: 'https://github.com/BasaltHQ/crm-official', branch: 'main')
       }
     }
 

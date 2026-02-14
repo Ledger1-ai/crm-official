@@ -20,7 +20,7 @@ import {
 import * as Motion from 'framer-motion/client';
 import BasaltNavbar from '@/components/basaltcrm-landing/BasaltNavbar';
 import BasaltFooter from '@/components/basaltcrm-landing/BasaltFooter';
-import GeometricBackground from '@/app/[locale]/components/GeometricBackground';
+import GeometricBackground from '@/app/components/GeometricBackground';
 
 export const metadata: Metadata = {
     title: 'BasaltEcho - Real-Time AI Voice Conversations',

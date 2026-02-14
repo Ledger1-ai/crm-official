@@ -6,13 +6,13 @@ import { CRM_MODULES } from '../lib/role-permissions';
 /**
  * permission-check.ts
  * 
- * This script ensures that every physical route in `app/[locale]/(routes)/crm`
+ * This script ensures that every physical route in `app/(routes)/crm`
  * has a corresponding entry in `lib/role-permissions.ts`.
  * 
  * It prevents "Shadow IT" pages that are reachable but ungated.
  */
 
-const CRM_ROUTES_ROOT = path.join(process.cwd(), 'app', '[locale]', '(routes)', 'crm');
+const CRM_ROUTES_ROOT = path.join(process.cwd(), 'app', '(routes)', 'crm');
 
 function getDirectories(source: string) {
     return fs.readdirSync(source, { withFileTypes: true })

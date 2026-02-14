@@ -22,7 +22,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import DialerPanel from "@/app/[locale]/(routes)/crm/dialer/DialerPanel";
+import DialerPanel from "@/app/(routes)/crm/dialer/DialerPanel";
 
 export default function UtilityBar() {
     const [isMinimized, setIsMinimized] = useState(false);

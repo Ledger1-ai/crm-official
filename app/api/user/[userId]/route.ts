@@ -36,6 +36,12 @@ export async function DELETE(req: Request, props: { params: Promise<{ userId: st
   }
 
   try {
+    // Manually handle common user relations to avoid P2014 constraint issues
+    await prismadb.projectMember.deleteMany({ where: { user: params.userId } });
+    await prismadb.systemActivity.deleteMany({ where: { userId: params.userId } });
+    await prismadb.notification.deleteMany({ where: { userId: params.userId } });
+    await prismadb.dashboardPreference.deleteMany({ where: { userId: params.userId } });
+
     const user = await prismadb.users.delete({
       where: {
         id: params.userId,
