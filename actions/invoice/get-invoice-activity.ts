@@ -26,7 +26,7 @@ export const getInvoiceActivity = async (invoiceId: string) => {
 
         return activities.map(a => ({
             id: a.id,
-            user: a.user.name || "System",
+            user: a.user?.name || "System",
             action: a.action,
             details: a.details,
             timestamp: a.createdAt,

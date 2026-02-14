@@ -4,9 +4,9 @@ import { format } from 'date-fns';
 import { requireApiAuth } from "@/lib/api-auth-guard";
 
 export async function GET() {
-  // ── Auth guard ──
-  const session = await requireApiAuth();
-  if (session instanceof Response) return session;
+    // ── Auth guard ──
+    const session = await requireApiAuth();
+    if (session instanceof Response) return session;
 
     try {
         // Fetch all activities (or last 2 weeks as per policy, but usually export implies full history or at least the view)
@@ -38,8 +38,8 @@ export async function GET() {
             format(activity.createdAt, 'yyyy-MM-dd HH:mm:ss'),
             activity.action,
             activity.resource,
-            activity.user.name || 'Unknown',
-            activity.user.email,
+            activity.user?.name || 'Unknown',
+            activity.user?.email || 'N/A',
             activity.details || ''
         ]);
 

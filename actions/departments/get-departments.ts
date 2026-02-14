@@ -36,11 +36,12 @@ export interface GetDepartmentsResult {
  * All team members can view departments (visibility not restricted)
  */
 export async function getDepartments(): Promise<GetDepartmentsResult> {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return { success: false, error: "Unauthorized" };
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return { success: false, error: "Unauthorized" };
-        }
 
         const user = await prismadb.users.findUnique({
             where: { id: session.user.id },
@@ -97,11 +98,12 @@ export async function getDepartments(): Promise<GetDepartmentsResult> {
  * Get a single department by ID
  */
 export async function getDepartment(departmentId: string): Promise<{ success: boolean; department?: Department; error?: string }> {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return { success: false, error: "Unauthorized" };
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return { success: false, error: "Unauthorized" };
-        }
 
         const user = await prismadb.users.findUnique({
             where: { id: session.user.id },
@@ -161,11 +163,12 @@ export async function getMembersByDepartment(): Promise<{
     }>;
     error?: string;
 }> {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return { success: false, unassigned: [], departments: [], error: "Unauthorized" };
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return { success: false, unassigned: [], departments: [], error: "Unauthorized" };
-        }
 
         const user = await prismadb.users.findUnique({
             where: { id: session.user.id },

@@ -1,6 +1,6 @@
 {
   "name": "basaltcrm-app",
-  "version": "1.1.7s",
+  "version": "1.1.8",
   "author": "Michael Milton (BasaltHQ)",
   "private": true,
   "scripts": {

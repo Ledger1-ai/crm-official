@@ -33,8 +33,8 @@ export const getTeamActivity = async () => {
 
         return activities.map(a => ({
             id: a.id,
-            user: a.user.name || "Unknown User",
-            avatar: a.user.avatar,
+            user: a.user?.name || "Unknown User",
+            avatar: a.user?.avatar,
             action: a.action,
             target: a.resource,
             time: formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })

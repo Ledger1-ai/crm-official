@@ -30,7 +30,7 @@ interface Activity {
         name: string | null;
         email: string;
         avatar: string | null;
-    };
+    } | null;
 }
 
 export default function Changelog() {
@@ -116,7 +116,7 @@ export default function Changelog() {
                                     <div key={activity.id} className="relative flex gap-4 group">
                                         {/* Avatar / Icon */}
                                         <div className="relative z-10 flex-shrink-0">
-                                            {activity.user.avatar ? (
+                                            {activity.user?.avatar ? (
                                                 <img
                                                     src={activity.user.avatar}
                                                     alt={activity.user.name || "User"}
@@ -125,7 +125,7 @@ export default function Changelog() {
                                             ) : (
                                                 <div className="h-10 w-10 rounded-full bg-slate-800 border-4 border-slate-950 ring-1 ring-white/10 flex items-center justify-center shadow-sm">
                                                     <span className="font-bold text-xs text-gray-500">
-                                                        {(activity.user.name?.[0] || "U").toUpperCase()}
+                                                        {(activity.user?.name?.[0] || "U").toUpperCase()}
                                                     </span>
                                                 </div>
                                             )}
@@ -143,7 +143,7 @@ export default function Changelog() {
                                                 <div className="flex-1 min-w-0 pt-1 cursor-pointer">
                                                     <div className="flex items-center justify-between gap-2 mb-0.5">
                                                         <p className="text-sm font-semibold text-gray-200 truncate">
-                                                            {activity.user.name || "Unknown User"}
+                                                            {activity.user?.name || "Unknown User"}
                                                         </p>
                                                         <span className="text-[10px] text-gray-400 whitespace-nowrap font-medium bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
                                                             {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
