@@ -221,7 +221,7 @@ export default function PortalSettingsPanel() {
                 }
 
                 // Load user's projects with logos
-                const projectsRes = await fetch("/api/projects/with-logos");
+                const projectsRes = await fetch("/api/campaigns/with-logos");
                 if (projectsRes.ok) {
                     const projectsData = await projectsRes.json();
                     setCampaigns(projectsData.all || []);

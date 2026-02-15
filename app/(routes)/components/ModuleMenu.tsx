@@ -101,8 +101,8 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
   const isCrmAccounts = isPath(/^\/([a-z]{2}\/)?crm\/accounts/);
   const isCrmContacts = isPath(/^\/([a-z]{2}\/)?crm\/contacts/);
   const isCrmContracts = isPath(/^\/([a-z]{2}\/)?crm\/contracts/);
-  const isCrmProjects = isPath(/^\/([a-z]{2}\/)?crm\/my-projects/) || isPath(/^\/([a-z]{2}\/)?campaigns/);
-  const isCrmTasks = isPath(/^\/([a-z]{2}\/)?projects\/tasks/);
+  const isCrmProjects = isPath(/^\/([a-z]{2}\/)?crm\/my-campaigns/) || isPath(/^\/([a-z]{2}\/)?campaigns/);
+  const isCrmTasks = isPath(/^\/([a-z]{2}\/)?campaigns\/tasks/);
   const isInvoice = isPath(/^\/([a-z]{2}\/)?invoice/);
   const isReports = isPath(/^\/([a-z]{2}\/)?reports/);
   const isEmployees = isPath(/^\/([a-z]{2}\/)?employees/);
@@ -317,7 +317,7 @@ const ModuleMenu = ({ modules, dict, features, isPartnerAdmin, teamRole = "MEMBE
                     <MenuItem
                       href="/campaigns"
                       icon={ServerIcon}
-                      title={dict.ModuleMenu.projects || "Projects"}
+                      title="Campaigns"
                       isOpen={open}
                       isActive={isCrmProjects}
                     />

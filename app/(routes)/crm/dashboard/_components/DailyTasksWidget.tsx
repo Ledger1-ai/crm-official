@@ -107,7 +107,7 @@ export default function DailyTasksWidget({ tasks }: DailyTasksWidgetProps) {
 
                                 <div className="shrink-0 pt-0.5">
                                     {task.assigned_section?.board ? (
-                                        <Link href={`/projects/boards/${task.assigned_section.board}`}>
+                                        <Link href={`/campaigns/boards/${task.assigned_section.board}`}>
                                             <Button size="icon" variant="ghost" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <ArrowRight className="h-4 w-4" />
                                             </Button>

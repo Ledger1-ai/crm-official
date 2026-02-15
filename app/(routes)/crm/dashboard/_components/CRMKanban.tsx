@@ -154,7 +154,6 @@ const CRMKanban = ({
             contacts={contacts}
             salesType={saleTypes}
             saleStages={saleStages}
-            campaigns={campaigns}
             selectedStage={selectedStage}
             onDialogClose={() => setIsDialogOpen(false)}
           />

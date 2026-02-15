@@ -35,7 +35,7 @@ export default function LeadsManagerTabs({ leads: initialLeads, crmData, default
     allPermissions: permissions
   });
 
-  const { data: projectResponse } = useSWR("/api/projects", fetcher);
+  const { data: projectResponse } = useSWR("/api/campaigns", fetcher);
 
   const leads = leadsData || [];
   const users = crmData?.users || [];

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { getFinancialsByMonth } from "@/actions/reports/get-financials";
 import { getOpportunitiesByMonth } from "@/actions/crm/get-opportunities";
-import { getTasksByMonth } from "@/actions/projects/get-tasks";
+import { getTasksByMonth } from "@/actions/campaigns/get-tasks";
 import { getLeadsByMonth } from "@/actions/crm/get-leads";
 import { AISummaryModal } from "@/components/reports/AISummaryModal";
 import { CustomReportsPanel } from "@/components/reports/CustomReportsPanel";

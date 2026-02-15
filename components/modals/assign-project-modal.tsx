@@ -23,7 +23,7 @@ export default function AssignProjectModal({ isOpen, onClose, documentId }: Prop
   useEffect(() => {
     if (!isOpen) return;
     setFetching(true);
-    fetch("/api/projects")
+    fetch("/api/campaigns")
       .then(async (res) => {
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
@@ -41,7 +41,7 @@ export default function AssignProjectModal({ isOpen, onClose, documentId }: Prop
     if (!selected) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/projects/${selected}/documents`, {
+      const res = await fetch(`/api/campaigns/${selected}/documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documentId }),
@@ -63,7 +63,7 @@ export default function AssignProjectModal({ isOpen, onClose, documentId }: Prop
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Assign to Project</DialogTitle>
+          <DialogTitle>Assign to Campaign</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           {fetching ? (

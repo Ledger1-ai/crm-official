@@ -17,7 +17,7 @@ export default function FileUploader({ endpoint = "documents", projectId }: { en
   const { toast } = useToast();
 
   const targetUrl = endpoint === "project" && projectId
-    ? `/api/projects/${projectId}/upload-document`
+    ? `/api/campaigns/${projectId}/upload-document`
     : endpoint === "generic"
       ? "/api/upload"
       : "/api/documents/upload";

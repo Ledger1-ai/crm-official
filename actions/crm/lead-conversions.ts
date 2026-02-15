@@ -110,7 +110,7 @@ export async function ensureContactForLead(leadId: string): Promise<string | nul
         mobile_phone: lead.phone || undefined,
         position: lead.jobTitle || undefined,
         description: lead.description || undefined,
-        type: "Customer",
+        type: "Prospect",
         tags,
       },
     });

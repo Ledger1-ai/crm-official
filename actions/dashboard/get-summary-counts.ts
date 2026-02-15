@@ -12,7 +12,8 @@ export type DashboardCounts = {
   documents: number;
   opportunities: number; // Combined: CRM + Project opportunities
   users: number; // active users
-  revenue: number; // expected revenue from ACTIVE opportunities (both CRM and Project opportunities)
+  revenue: number; // Projected Revenue (All Invoices)
+  actualRevenue: number; // Actual Revenue (Paid Invoices)
   storageMB: number; // total storage in MB (rounded to 2 decimals)
 };
 
@@ -112,7 +113,11 @@ export const getSummaryCounts = async (): Promise<DashboardCounts> => {
     prismadb.crm_Contacts.count({ where: getFilter("assigned_to") }),
     prismadb.crm_Accounts.count({ where: getAccountFilter() }),
     prismadb.crm_Contracts.count({ where: getFilter("assigned_to") }),
-    prismadb.invoices.count({ where: isGlobalAdmin ? {} : teamId ? { team_id: teamId } : { team_id: "no-team-fallback" } }), // Invoices stay team-level
+    // Fetch all invoices with amount and status for revenue calculation
+    prismadb.invoices.findMany({
+      where: isGlobalAdmin ? {} : teamId ? { team_id: teamId } : { team_id: "no-team-fallback" },
+      select: { invoice_amount: true, payment_status: true }
+    }),
     prismadb.documents.count({ where: getDocumentFilter() }), // Member-specific document filter
     // Count CRM Opportunities
     prismadb.crm_Opportunities.count({ where: getFilter("assigned_to") }),
@@ -146,8 +151,24 @@ export const getSummaryCounts = async (): Promise<DashboardCounts> => {
   const crmRevenue = Number((crmRevenueAgg as any)._sum?.expected_revenue ?? 0);
   const projectRevenue = Number((projectRevenueAgg as any)._sum?.valueEstimate ?? 0);
 
-  // Only count CRM Revenue for the dashboard
-  const revenue = crmRevenue;
+  // Calculate Invoice-based Revenue
+  let projectedRevenue = 0;
+  let actualRevenue = 0;
+
+  if (Array.isArray(invoices)) {
+    (invoices as any[]).forEach((inv) => {
+      const amount = parseFloat((inv.invoice_amount || "0").replace(/[^0-9.-]+/g, ""));
+      if (!isNaN(amount)) {
+        projectedRevenue += amount;
+        if (inv.payment_status === "PAID") {
+          actualRevenue += amount;
+        }
+      }
+    });
+  }
+
+  const revenue = projectedRevenue;
+  const invoicesCount = Array.isArray(invoices) ? invoices.length : 0;
 
   const storageBytes = Number((storageAgg as any)._sum?.size ?? 0);
   const storageMB = Math.round((storageBytes / 1_000_000) * 100) / 100;
@@ -159,11 +180,12 @@ export const getSummaryCounts = async (): Promise<DashboardCounts> => {
     contacts,
     accounts,
     contracts,
-    invoices,
+    invoices: invoicesCount,
     documents,
     opportunities,
     users,
-    revenue,
+    revenue, // Projected
+    actualRevenue, // Actual
     storageMB,
   };
 };

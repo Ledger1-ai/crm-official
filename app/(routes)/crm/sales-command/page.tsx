@@ -8,8 +8,8 @@ import { PermissionsProvider } from "@/components/providers/permissions-provider
 import { getUnifiedSalesData } from "@/actions/crm/get-unified-sales-data";
 import { getLeads } from "@/actions/crm/get-leads";
 import { getAllCrmData } from "@/actions/crm/get-crm-data";
-import { getBoards } from "@/actions/projects/get-boards";
-import { getTasks } from "@/actions/projects/get-tasks";
+import { getBoards } from "@/actions/campaigns/get-boards";
+import { getTasks } from "@/actions/campaigns/get-tasks";
 
 export default async function SalesCommandPage() {
     const session = await getServerSession(authOptions);

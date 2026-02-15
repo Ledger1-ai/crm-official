@@ -1,9 +1,9 @@
 
 import {
-    Home, Users, Target, Radio, FileText, Phone, Package, Headset, Megaphone, Wand2, FormInput, Building2, Contact, Folder, CheckSquare, FileCheck, FileBarChart, UserCog, Zap, Shield, CheckCircle2, Wrench, GraduationCap, Globe, Mail, ServerIcon, MessageSquare, Calendar
+    Home, Users, Target, Radio, FileText, Phone, Package, Headset, Megaphone, Wand2, FormInput, Building2, Contact, Folder, CheckSquare, FileCheck, FileBarChart, UserCog, Zap, Shield, CheckCircle2, Wrench, GraduationCap, Globe, Mail, ServerIcon, MessageSquare, Calendar, List, Settings, LayoutDashboard
 } from "lucide-react";
 
-export type NavItemType = "item" | "group";
+export type NavItemType = "item" | "group" | "separator";
 
 export interface NavPermission {
     module?: string;
@@ -48,7 +48,11 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 label: "Projects",
                 iconName: "ServerIcon",
                 href: "/campaigns",
-                permissions: { module: "projects", feature: "projects" }
+                permissions: { module: "projects", feature: "projects" },
+                children: [
+                    { id: "sub_projects_all", type: "item", label: "All Campaigns", href: "/campaigns", iconName: "Folder" },
+                    { id: "sub_projects_tasks", type: "item", label: "Tasks", href: "/campaigns/tasks", iconName: "CheckSquare" }
+                ]
             },
             {
                 id: "nav_leads",
@@ -60,7 +64,9 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 children: [
                     { id: "sub_leads_wizard", type: "item", label: "LeadGen Wizard", href: "/crm/lead-wizard", iconName: "Wand2" },
                     { id: "sub_leads_pools", type: "item", label: "Lead Pools", href: "/crm/lead-pools", iconName: "Target" },
-                    { id: "sub_leads_outreach", type: "item", label: "Outreach", href: "/crm/outreach", iconName: "Megaphone" }
+                    { id: "sub_leads_outreach", type: "item", label: "Outreach", href: "/crm/outreach", iconName: "Megaphone" },
+                    { id: "sub_leads_sequences", type: "item", label: "Sequences", href: "/crm/leads?tab=campaigns", iconName: "List" },
+                    { id: "sub_leads_settings", type: "item", label: "Settings", href: "/crm/leads?tab=settings", iconName: "Settings" }
                 ]
             },
             {
@@ -153,7 +159,11 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 label: "Messages",
                 iconName: "MessageSquare",
                 href: "/messages",
-                permissions: { module: "messages" }
+                permissions: { module: "messages" },
+                children: [
+                    { id: "sub_messages_inbox", type: "item", label: "Inbox", href: "/messages", iconName: "Mail" },
+                    { id: "sub_messages_forms", type: "item", label: "Forms", href: "/messages/forms", iconName: "FormInput" }
+                ]
             }
         ]
     },
@@ -171,7 +181,10 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 label: "Invoices",
                 iconName: "FileCheck",
                 href: "/invoice",
-                permissions: { module: "invoice", feature: "invoices" }
+                permissions: { module: "invoice", feature: "invoices" },
+                children: [
+                    { id: "sub_invoices_all", type: "item", label: "All Invoices", href: "/invoice", iconName: "FileCheck" }
+                ]
             },
             {
                 id: "nav_reports",
@@ -188,7 +201,10 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 label: "Staff",
                 iconName: "UserCog",
                 href: "/employees",
-                permissions: { module: "employee", feature: "employee" }
+                permissions: { module: "employee", feature: "employee" },
+                children: [
+                    { id: "sub_staff_all", type: "item", label: "All Staff", href: "/employees", iconName: "Users" }
+                ]
             }
         ]
     },
@@ -281,7 +297,12 @@ export const DEFAULT_NAV_STRUCTURE: NavItem[] = [
                 type: "item",
                 label: "Admin",
                 iconName: "Wrench",
-                href: "/admin"
+                href: "/admin",
+                children: [
+                    { id: "sub_admin_overview", type: "item", label: "Overview", href: "/admin?tab=overview", iconName: "LayoutDashboard" },
+                    { id: "sub_admin_depts", type: "item", label: "Departments", href: "/admin?tab=departments", iconName: "Building2" },
+                    { id: "sub_admin_users", type: "item", label: "Users", href: "/admin", iconName: "Users" }
+                ]
             },
             {
                 id: "nav_learn",

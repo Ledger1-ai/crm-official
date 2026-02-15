@@ -93,7 +93,7 @@ const NewTaskDialog = ({ users, boards, open, setOpen }: Props) => {
     const onSubmit = async (data: NewTaskFormValues) => {
         setIsLoading(true);
         try {
-            await axios.post(`/api/projects/tasks/create-task`, data);
+            await axios.post(`/api/campaigns/tasks/create-task`, data);
             toast({
                 title: "Success",
                 description: `New task: ${data.title}, created successfully`,

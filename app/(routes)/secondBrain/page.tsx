@@ -13,7 +13,7 @@ import { SecondBrainDataTable } from "./table-components/data-table";
 
 import { getNotions } from "@/actions/get-notions";
 import { getActiveUsers } from "@/actions/get-users";
-import { getBoards } from "@/actions/projects/get-boards";
+import { getBoards } from "@/actions/campaigns/get-boards";
 import { Button } from "@/components/ui/button";
 import Youtube from "./components/Youtube";
 

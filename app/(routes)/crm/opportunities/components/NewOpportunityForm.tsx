@@ -42,19 +42,18 @@ import {
   crm_Contacts,
   crm_Opportunities_Sales_Stages,
   crm_Opportunities_Type,
-  crm_campaigns,
 } from "@prisma/client";
 
 import useDebounce from "@/hooks/useDebounce";
 
 //TODO: fix all the types
-type NewTaskFormProps = {
+export type NewOpportunityFormProps = {
   users: any[];
   accounts: crm_Accounts[];
   contacts: crm_Contacts[];
   salesType: crm_Opportunities_Type[];
   saleStages: crm_Opportunities_Sales_Stages[];
-  campaigns: crm_campaigns[];
+  boards?: { id: string; title: string }[];
   selectedStage?: string;
   accountId?: string;
   onDialogClose: () => void;
@@ -66,11 +65,11 @@ export function NewOpportunityForm({
   contacts,
   salesType,
   saleStages,
-  campaigns,
+  boards = [],
   selectedStage,
   accountId,
   onDialogClose,
-}: NewTaskFormProps) {
+}: NewOpportunityFormProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -90,8 +89,9 @@ export function NewOpportunityForm({
     next_step: z.string(),
     assigned_to: z.string().optional().nullable(),
     account: z.string().optional().nullable(),
+    assign_to_project: z.string().optional().nullable(),
     contact: z.string().optional().nullable(),
-    campaign: z.string().optional().nullable(),
+    lead_source: z.string().optional().nullable(),
   });
 
   type NewAccountFormValues = z.infer<typeof formSchema>;
@@ -110,8 +110,9 @@ export function NewOpportunityForm({
       next_step: "",
       assigned_to: null,
       account: accountId ? accountId : null,
+      assign_to_project: null,
       contact: null,
-      campaign: null,
+      lead_source: null,
     },
   });
 
@@ -145,8 +146,9 @@ export function NewOpportunityForm({
         next_step: "",
         assigned_to: "",
         account: "",
+        assign_to_project: "",
         contact: "",
-        campaign: "",
+        lead_source: "",
       });
     }
   };
@@ -170,7 +172,7 @@ export function NewOpportunityForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Oportunity name</FormLabel>
+                  <FormLabel>Opportunity name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isLoading}
@@ -301,7 +303,7 @@ export function NewOpportunityForm({
                   name="budget"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bugdget</FormLabel>
+                      <FormLabel>Budget</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -391,25 +393,26 @@ export function NewOpportunityForm({
                 />
                 <FormField
                   control={form.control}
-                  name="account"
+                  name="assign_to_project"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col" hidden={accountId ? true : false}>
-                      <FormLabel>Assigned Account</FormLabel>
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Assigned Project</FormLabel>
                       <FormControl>
                         <Combobox
-                          options={accounts.map((account) => ({
-                            label: account.name,
-                            value: account.id,
+                          options={(boards || []).map((board) => ({
+                            label: board.title,
+                            value: board.id,
                           }))}
                           value={field.value}
                           onChange={field.onChange}
-                          placeholder="Choose account"
+                          placeholder="Select project"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="contact"
@@ -419,7 +422,9 @@ export function NewOpportunityForm({
                       <FormControl>
                         <Combobox
                           options={contacts.map((contact) => ({
-                            label: `${contact.first_name || ""} ${contact.last_name || ""}`.trim(),
+                            label: (contact.first_name || contact.last_name)
+                              ? `${contact.first_name || ""} ${contact.last_name || ""}`.trim()
+                              : contact.email || "Unknown Contact",
                             value: contact.id,
                           }))}
                           value={field.value}
@@ -433,21 +438,26 @@ export function NewOpportunityForm({
                 />
                 <FormField
                   control={form.control}
-                  name="campaign"
+                  name="lead_source"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>From campaign</FormLabel>
-                      <FormControl>
-                        <Combobox
-                          options={campaigns.map((campaign) => ({
-                            label: campaign.name,
-                            value: campaign.id,
-                          }))}
-                          value={field.value}
-                          onChange={field.onChange}
-                          placeholder="Select a campaign"
-                        />
-                      </FormControl>
+                      <FormLabel>Lead Source</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select (e.g. Website, Referral)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="website">Website</SelectItem>
+                          <SelectItem value="referral">Referral</SelectItem>
+                          <SelectItem value="social_media">Social Media</SelectItem>
+                          <SelectItem value="cold_call">Cold Call</SelectItem>
+                          <SelectItem value="advertisement">Advertisement</SelectItem>
+                          <SelectItem value="event">Event</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

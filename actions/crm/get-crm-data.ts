@@ -8,7 +8,7 @@ export const getAllCrmData = async () => {
   const session = await getServerSession(authOptions);
   const teamInfo = await getCurrentUserTeamId();
 
-  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return { users: [], accounts: [], opportunities: [], leads: [], contacts: [], contracts: [], saleTypes: [], saleStages: [], campaigns: [], industries: [] };
+  if (!session || (!teamInfo?.teamId && !teamInfo?.isGlobalAdmin)) return { users: [], accounts: [], opportunities: [], leads: [], contacts: [], contracts: [], saleTypes: [], saleStages: [], campaigns: [], industries: [], boards: [] };
 
   const whereClause: any = {};
   if (!teamInfo?.isGlobalAdmin) {
@@ -63,6 +63,9 @@ export const getAllCrmData = async () => {
   const saleStages = await prismadb.crm_Opportunities_Sales_Stages.findMany({});
   const campaigns = await prismadb.crm_campaigns.findMany({});
   const industries = await prismadb.crm_Industry_Type.findMany({});
+  const boards = await prismadb.boards.findMany({
+    select: { id: true, title: true }
+  });
 
   const data = {
     users,
@@ -75,6 +78,7 @@ export const getAllCrmData = async () => {
     saleStages,
     campaigns,
     industries,
+    boards,
   };
 
   return data;

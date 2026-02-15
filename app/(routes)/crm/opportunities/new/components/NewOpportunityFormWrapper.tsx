@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { NewOpportunityForm } from "../../components/NewOpportunityForm";
+import { NewOpportunityForm, NewOpportunityFormProps } from "../../components/NewOpportunityForm";
 
-export function NewOpportunityFormWrapper(props: any) {
+export function NewOpportunityFormWrapper(props: Omit<NewOpportunityFormProps, 'onDialogClose'>) {
     const router = useRouter();
 
     return (

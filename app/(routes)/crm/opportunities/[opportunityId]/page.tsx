@@ -11,6 +11,7 @@ import { getOpportunity } from "@/actions/crm/get-opportunity";
 import { getContactsByOpportunityId } from "@/actions/crm/get-contacts-by-opportunityId";
 import { getDocumentsByOpportunityId } from "@/actions/documents/get-documents-by-opportunityId";
 import { getAccountsByOpportunityId } from "@/actions/crm/get-accounts-by-opportunityId";
+import { OpportunityActions } from "./components/OpportunityActions";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -99,6 +100,7 @@ const OpportunityView = async (
     <Container
       title={`Opportunity ${opportunity.name} - detail view`}
       description={"Description - " + opportunity.description}
+      action={<OpportunityActions opportunityId={opportunity.id} status={opportunity.status} hasAccount={!!opportunity.account} />}
     >
       <div className="space-y-5">
         {hasAccess('opportunities.detail.info') && <BasicView data={opportunity} />}

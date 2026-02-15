@@ -37,9 +37,9 @@ export default function ProjectWorkflowGuide() {
             borderColor: "border-amber-500/30",
             iconColor: "text-amber-400",
             permissions: [
-                "View all projects across the entire platform",
-                "Create projects for any team",
-                "Assign admins to projects",
+                "View all campaigns across the entire platform",
+                "Create campaigns for any team",
+                "Assign admins to campaigns",
                 "Monitor all outreach platform-wide",
             ],
         },
@@ -50,11 +50,11 @@ export default function ProjectWorkflowGuide() {
             borderColor: "border-blue-500/30",
             iconColor: "text-blue-400",
             permissions: [
-                "View and manage projects within your team only",
-                "Create projects for your team",
+                "View and manage campaigns within your team only",
+                "Create campaigns for your team",
                 "Create and assign lead pools to members",
-                "Assign members to projects",
-                "Toggle outreach approval on/off per project",
+                "Assign members to campaigns",
+                "Toggle outreach approval on/off per campaign",
             ],
         },
         {
@@ -64,10 +64,10 @@ export default function ProjectWorkflowGuide() {
             borderColor: "border-emerald-500/30",
             iconColor: "text-emerald-400",
             permissions: [
-                "View only projects assigned to you",
+                "View only campaigns assigned to you",
                 "Execute outreach on assigned lead pools",
                 "Cannot create lead pools",
-                "Cannot modify project settings",
+                "Cannot modify campaign settings",
             ],
         },
     ];
@@ -75,17 +75,17 @@ export default function ProjectWorkflowGuide() {
     const workflowSteps = [
         {
             phase: "Phase 1",
-            title: "Project Setup",
+            title: "Campaign Setup",
             actor: "Admin",
             icon: FolderKanban,
             color: "bg-card border-blue-500/20",
             iconColor: "text-blue-400",
             steps: [
-                "Admin creates a new project with a clear name and description",
+                "Admin creates a new campaign with a clear name and description",
                 "Admin adds context: target industries, locations, job titles to reach",
                 "Admin sets the messaging tone and key talking points",
                 "Admin uploads brand assets (logo, colors) if needed",
-                "Project status starts as DRAFT until ready",
+                "Campaign status starts as DRAFT until ready",
             ],
         },
         {
@@ -99,7 +99,7 @@ export default function ProjectWorkflowGuide() {
                 "Admin creates a lead pool (collection of leads to contact)",
                 "Admin imports or generates leads into the pool",
                 "Admin assigns the lead pool to one or more members",
-                "Admin assigns members to the project",
+                "Admin assigns members to the campaign",
                 "Members receive a notification that they've been assigned",
             ],
         },
@@ -111,10 +111,10 @@ export default function ProjectWorkflowGuide() {
             color: "bg-card border-emerald-500/20",
             iconColor: "text-emerald-400",
             steps: [
-                "Member opens 'My Projects' dashboard",
-                "Member sees assigned projects and pools",
+                "Member opens 'My Campaigns' dashboard",
+                "Member sees assigned campaigns and pools",
                 "Member clicks 'Start Outreach' on an assigned pool",
-                "Outreach wizard opens with project context pre-filled",
+                "Outreach wizard opens with campaign context pre-filled",
                 "Member reviews, customizes, and launches the outreach",
             ],
         },
@@ -127,7 +127,7 @@ export default function ProjectWorkflowGuide() {
             iconColor: "text-amber-400",
             steps: [
                 "Admin can require approval before outreach goes live",
-                "This is a toggle in project settings (case by case)",
+                "This is a toggle in campaign settings (case by case)",
                 "If ON: member submits outreach for review",
                 "Admin approves or requests changes",
                 "If OFF: member can launch immediately",
@@ -161,8 +161,8 @@ export default function ProjectWorkflowGuide() {
             icon: ShieldCheck,
         },
         {
-            title: "Project Context Flows Down",
-            description: "When a member starts outreach, the project's context (ICP, messaging, etc.) is automatically applied.",
+            title: "Campaign Context Flows Down",
+            description: "When a member starts outreach, the campaign's context (ICP, messaging, etc.) is automatically applied.",
             icon: ArrowRight,
         },
     ];
@@ -183,11 +183,11 @@ export default function ProjectWorkflowGuide() {
                                 <FolderKanban className="w-4 h-4" />
                             </div>
                             <h2 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
-                                Project Workflow Guide
+                                Campaign Workflow Guide
                             </h2>
                         </div>
                         <p className="text-sm text-muted-foreground w-full">
-                            How projects, lead pools, and outreach flow from admin setup to member execution.
+                            How campaigns, lead pools, and outreach flow from admin setup to member execution.
                         </p>
                     </div>
                 </Card>
@@ -250,7 +250,7 @@ export default function ProjectWorkflowGuide() {
                         </h4>
                         <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-medium">
                             {[
-                                { label: "Admin creates Project", color: "border-blue-500 text-blue-500 hover:bg-blue-500" },
+                                { label: "Admin creates Campaign", color: "border-blue-500 text-blue-500 hover:bg-blue-500" },
                                 { label: "Admin creates Lead Pool", color: "border-violet-500 text-violet-500 hover:bg-violet-500" },
                                 { label: "Admin assigns to Member", color: "border-indigo-500 text-indigo-500 hover:bg-indigo-500" },
                                 { label: "Member runs Outreach", color: "border-emerald-500 text-emerald-500 hover:bg-emerald-500" },

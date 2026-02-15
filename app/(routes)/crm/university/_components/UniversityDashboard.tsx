@@ -456,10 +456,9 @@ export default function UniversityDashboard() {
                                     transition={{ delay: 0.3 }}
                                     className="p-4 rounded-lg bg-card border border-border"
                                 >
-                                    <h4 className="font-semibold text-sm text-blue-500">Lead → Contact</h4>
+                                    <h4 className="font-semibold text-sm text-blue-500">Lead → Contact & Opportunity</h4>
                                     <p className="text-sm text-muted-foreground mt-2">
-                                        When you send your first email or text message to a lead, they automatically become a <strong>Contact</strong>.
-                                        This means they've received your outreach!
+                                        When you click <strong>Convert</strong> on a qualified lead, it becomes an <strong>Opportunity</strong> (for your pipeline) and a <strong>Contact</strong> (for unique identity).
                                     </p>
                                 </motion.div>
                                 <motion.div
@@ -468,9 +467,9 @@ export default function UniversityDashboard() {
                                     transition={{ delay: 0.4 }}
                                     className="p-4 rounded-lg bg-card border border-border"
                                 >
-                                    <h4 className="font-semibold text-sm text-emerald-500">Lead → Account</h4>
+                                    <h4 className="font-semibold text-sm text-emerald-500">Opportunity → Account</h4>
                                     <p className="text-sm text-muted-foreground mt-2">
-                                        When you close a deal, the lead becomes an <strong>Account</strong>.
+                                        When you <strong>Close Won</strong> an Opportunity, it automatically creates an <strong>Account</strong>.
                                         Congratulations – they're now a customer!
                                     </p>
                                 </motion.div>

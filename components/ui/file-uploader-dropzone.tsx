@@ -17,7 +17,7 @@ export const FileUploaderDropzone = ({ uploader, onUploadSuccess, boardId }: Pro
 
   const endpoint = (() => {
     if (uploader === "profilePhotoUploader") return "/api/profile/upload-photo";
-    if (boardId) return `/api/projects/${boardId}/upload-document`;
+    if (boardId) return `/api/campaigns/${boardId}/upload-document`;
     return "/api/documents/upload"; // generic documents
   })();
 

@@ -76,7 +76,6 @@ export function UpdateOpportunityForm({
     assigned_to: z.string(),
     account: z.string(),
     contact: z.string(),
-    campaign: z.string().nullable().optional(),
   });
 
   type NewAccountFormValues = z.infer<typeof formSchema>;
@@ -119,7 +118,7 @@ export function UpdateOpportunityForm({
       </div>
     );
   //console.log(opportunities, "opportunities");
-  const { users, accounts, contacts, saleTypes, saleStages, campaigns } =
+  const { users, accounts, contacts, saleTypes, saleStages } =
     opportunities;
 
   if (!users || !accounts || !initialData)
@@ -148,7 +147,7 @@ export function UpdateOpportunityForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Oportunity name</FormLabel>
+                  <FormLabel>Opportunity name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isLoading}
@@ -279,7 +278,7 @@ export function UpdateOpportunityForm({
                   name="budget"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bugdget</FormLabel>
+                      <FormLabel>Budget</FormLabel>
                       <FormControl>
                         <Input
                           type={"number"}
@@ -427,33 +426,7 @@ export function UpdateOpportunityForm({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="campaign"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>From campaign</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a campaign" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="flex overflow-y-auto h-56">
-                          {campaigns.map((campaign: any) => (
-                            <SelectItem key={campaign.id} value={campaign.id}>
-                              {campaign.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
               </div>
             </div>
           </div>

@@ -155,6 +155,7 @@ enum crm_Lead_Status {
   CONTACTED
   QUALIFIED
   LOST
+  CONVERTED
 }
 
 enum crm_Lead_Type {
@@ -205,6 +206,12 @@ model crm_Opportunities {
 
   // Department assignment for scoped access
   assigned_department_id String? @db.ObjectId
+
+  // Project Linkage
+  project String? @db.ObjectId
+  assigned_project Boards? @relation(fields: [project], references: [id])
+
+  lead_source String?
 }
 
 enum crm_Opportunity_Status {
@@ -505,6 +512,7 @@ model Boards {
   watchers_users        Users[]                  @relation(name: "watching_users", fields: [watchers], references: [id])
   button_sets           Project_Button_Sets[]    @relation(name: "BoardButtonSets")
   project_opportunities Project_Opportunities[]
+  crm_opportunities     crm_Opportunities[]
   assigned_leads        crm_Leads[]              @relation(name: "LeadsAssignedProject")
   outreach_campaigns    crm_Outreach_Campaigns[] @relation(name: "OutreachCampaignsProject")
   message_portals       crm_Message_Portal[]     @relation(name: "PortalProject")

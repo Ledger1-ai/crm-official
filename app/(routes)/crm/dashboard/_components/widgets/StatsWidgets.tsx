@@ -23,9 +23,9 @@ export const RevenueWidget = ({ revenue }: { revenue: number }) => {
     return (
         <DashboardCard
             icon={DollarSign}
-            label="Expected Revenue"
+            label="Projected Revenue"
             count={revenue.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })}
-            description="From open opportunities"
+            description="From all invoices"
             variant="success"
             hideIcon={true}
             onClick={() => router.push("/crm/opportunities")}

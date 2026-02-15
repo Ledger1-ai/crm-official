@@ -69,12 +69,12 @@ export const NewTaskFromProject = ({
                 : `
               Podrobnosti najdete zde: `}
 
-              <strong>{`${process.env.NEXT_PUBLIC_APP_URL}/projects/tasks/viewtask/${taskData.id}`}</strong>
+              <strong>{`${process.env.NEXT_PUBLIC_APP_URL}/campaigns/tasks/viewtask/${taskData.id}`}</strong>
             </Text>
             <Section className="text-center mt-[32px] mb-[32px]">
               <Button
                 className="bg-slate-800 rounded-md text-white  py-3 px-4 text-[12px] font-semibold no-underline text-center"
-                href={`${process.env.NEXT_PUBLIC_APP_URL}/projects/tasks/viewtask/${taskData.id}`}
+                href={`${process.env.NEXT_PUBLIC_APP_URL}/campaigns/tasks/viewtask/${taskData.id}`}
               >
                 {userLanguage === "en" ? "View task detail" : "Zobrazit úkol"}
               </Button>

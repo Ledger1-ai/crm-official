@@ -1,6 +1,6 @@
 "use client";
 
-import { LeadsWidget, TasksWidget, ProjectsWidget, MessagesWidget } from "../widgets";
+import { LeadsWidget, TasksWidget, CampaignsWidget, MessagesWidget } from "../widgets";
 import DashboardCard from "../DashboardCard";
 import { Folder, Zap, Sparkles } from "lucide-react";
 import { useGreeting } from "@/app/hooks/use-greeting";
@@ -40,7 +40,7 @@ const MemberDashboard = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     <LeadsWidget leads={newLeads} />
                     <TasksWidget tasks={dailyTasks} userId={userId} />
-                    <ProjectsWidget projects={newProjects} />
+                    <CampaignsWidget projects={newProjects} />
                     <MessagesWidget messages={messages} />
                 </div>
             </div>

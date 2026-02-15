@@ -50,7 +50,7 @@ const ModalDropzone = ({ buttonLabel, fileType, customTrigger }: Props) => {
             setUploading(true);
             const fd = new FormData();
             fd.append("file", file);
-            const uploadUrl = boardId ? `/api/projects/${boardId}/upload-document` : "/api/documents/upload";
+            const uploadUrl = boardId ? `/api/campaigns/${boardId}/upload-document` : "/api/documents/upload";
             const res = await fetch(uploadUrl, { method: "POST", body: fd });
             if (res.ok) {
               setUploading(false);

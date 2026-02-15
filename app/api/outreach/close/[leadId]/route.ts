@@ -2,13 +2,16 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma";
-import { ensureAccountForLead } from "@/actions/crm/lead-conversions";
+import { convertLeadToOpportunity } from "@/actions/crm/convert-lead";
+import { closeDealAndCreateProject } from "@/actions/crm/close-deal-and-create-project";
 
 /**
  * POST /api/outreach/close/[leadId]
  * Body: { reason?: string }
  * Manually closes outreach for a lead (sets outreach_status = "CLOSED") and logs activity.
- * Only the assigned user or admins can close.
+ * UPDATED: Follows "Project > Lead > Opportunity > Project" flow.
+ * - Converts Lead to Opportunity
+ * - Closes Opportunity (creating Project)
  */
 type RequestBody = {
   reason?: string;
@@ -40,7 +43,7 @@ export async function POST(req: Request, { params }: Params) {
     // Load lead to verify assignment
     const lead = await prismadb.crm_Leads.findUnique({
       where: { id: leadId },
-      select: { id: true, assigned_to: true, outreach_status: true },
+      select: { id: true, assigned_to: true, outreach_status: true, status: true },
     });
     if (!lead) {
       return new NextResponse("Lead not found", { status: 404 });
@@ -51,17 +54,39 @@ export async function POST(req: Request, { params }: Params) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    // Update lead status to CLOSED and set pipeline stage to Closed
-    await prismadb.crm_Leads.update({
-      where: { id: lead.id },
-      data: {
-        outreach_status: "CLOSED" as any,
-        pipeline_stage: "Closed" as any,
-      },
-    });
+    // 1. Convert Lead to Opportunity
+    // We only convert if it's not already converted.
+    let opportunityId = "";
 
-    // Ensure an Account exists for this lead now that it's closed
-    await ensureAccountForLead(lead.id).catch(() => {});
+    // Check if already converted? 
+    // convertLeadToOpportunity handles this check internally but returns error if so.
+    // If it's already converted, we should try to find the opportunity logic? 
+    // For now, let's assume we proceed with conversion or catch "already converted"
+
+    const convertRes = await convertLeadToOpportunity(leadId);
+
+    if (convertRes.success && convertRes.data?.opportunityId) {
+      opportunityId = convertRes.data.opportunityId;
+    } else if (convertRes.error === "Lead is already converted") {
+      // If already converted, find the opportunity?
+      // This is tricky without a direct link on the Lead model (we have contact link).
+      // But for this "Automation Closure", let's assume valid conversion flow.
+      // If it fails, we fall back to just closing the lead? 
+      console.log("Lead already converted, creating account not supported without Opp ID.");
+      // We could search for an opp with this contact?
+      // For now, return error or success without account.
+      return new NextResponse("Lead already converted. Please manage via Opportunity.", { status: 400 });
+    } else {
+      return new NextResponse(convertRes.error || "Failed to convert lead", { status: 500 });
+    }
+
+    // 2. Close Opportunity & Create Project
+    if (opportunityId) {
+      const closeRes = await closeDealAndCreateProject(opportunityId);
+      if (!closeRes.success) {
+        return new NextResponse(closeRes.error || "Failed to close opportunity", { status: 500 });
+      }
+    }
 
     // Log activity
     await prismadb.crm_Lead_Activities.create({
@@ -69,13 +94,13 @@ export async function POST(req: Request, { params }: Params) {
         lead: lead.id,
         user: session.user.id,
         type: "status_changed",
-        metadata: { to: "CLOSED", reason } as any,
+        metadata: { to: "CLOSED_WON", reason, opportunityId } as any,
       },
     });
 
     return NextResponse.json({ status: "ok", leadId: lead.id }, { status: 200 });
   } catch (error) {
-     
+
     console.error("[OUTREACH_CLOSE_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }

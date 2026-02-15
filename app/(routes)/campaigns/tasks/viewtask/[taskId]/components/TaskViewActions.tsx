@@ -1,0 +1,136 @@
+"use client";
+
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { getTaskDone, undoTaskDone } from "@/app/(routes)/campaigns/actions/get-task-done";
+import { Badge } from "@/components/ui/badge";
+import { CheckSquare, Pencil, Undo2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import UpdateTaskDialog from "@/app/(routes)/campaigns/dialogs/UpdateTask";
+import { getActiveUsers } from "@/actions/get-users";
+import { useState } from "react";
+import { Icons } from "@/components/ui/icons";
+
+
+const TaskViewActions = ({
+  taskId,
+  users,
+  boards,
+  initialData,
+}: {
+  taskId: string;
+  users: any;
+  boards: any;
+  initialData: any;
+}) => {
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const [openEdit, setOpenEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  //console.log(initialData, "initialData");
+  //console.log(openEdit, "openEdit");
+
+  //Actions
+  const onDone = async () => {
+    setIsLoading(true);
+    try {
+      await getTaskDone(taskId);
+      toast({
+        title: "Success, task marked as done.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error, task not marked as done.",
+      });
+    } finally {
+      setIsLoading(false);
+      router.refresh();
+    }
+  };
+
+  const onUndo = async () => {
+    setIsLoading(true);
+    try {
+      await undoTaskDone(taskId);
+      toast({
+        title: "Success, task marked as active.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error, task not marked as active.",
+      });
+    } finally {
+      setIsLoading(false);
+      router.refresh();
+    }
+  };
+
+
+
+  return (
+    <div className="space-x-2 pb-2">
+      Task Actions:
+      <Separator className="mb-5" />
+      {initialData.taskStatus !== "COMPLETE" ? (
+        <Badge
+          variant={"outline"}
+          onClick={onDone}
+          className="cursor-pointer"
+          aria-disabled={isLoading}
+        >
+          <CheckSquare className="w-4 h-4 mr-2" />
+          {isLoading ? (
+            <Icons.spinner className="animate-spin w-4 h-4 mr-2" />
+          ) : (
+            "Mark as done"
+          )}
+        </Badge>
+      ) : (
+        <Badge
+          variant={"outline"}
+          onClick={onUndo}
+          className="cursor-pointer"
+          aria-disabled={isLoading}
+        >
+          <Undo2 className="w-4 h-4 mr-2" />
+          {isLoading ? (
+            <Icons.spinner className="animate-spin w-4 h-4 mr-2" />
+          ) : (
+            "Mark as Active"
+          )}
+        </Badge>
+      )}
+      <Badge
+        variant={"outline"}
+        className="cursor-pointer"
+        onClick={() => setOpenEdit(true)}
+      >
+        <Pencil className="w-4 h-4 mr-2" />
+        Edit
+      </Badge>
+      <Sheet open={openEdit} onOpenChange={(open) => setOpenEdit(open)}>
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto md:overflow-y-hidden">
+          <SheetHeader>
+            <SheetTitle>Edit Task</SheetTitle>
+          </SheetHeader>
+          <UpdateTaskDialog
+            users={users}
+            boards={boards}
+            initialData={initialData}
+            onDone={() => setOpenEdit(false)}
+          />
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+};
+
+export default TaskViewActions;

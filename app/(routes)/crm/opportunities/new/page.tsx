@@ -17,7 +17,7 @@ const NewOpportunityPage = async () => {
                     contacts={data.contacts}
                     salesType={data.saleTypes}
                     saleStages={data.saleStages}
-                    campaigns={data.campaigns}
+                    boards={data.boards}
                 />
             </div>
         </Container>

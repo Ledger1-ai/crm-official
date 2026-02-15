@@ -26,17 +26,17 @@ interface ConversionStep {
 }
 
 const leadToContactSteps: ConversionStep[] = [
-    { id: "lead", label: "Lead", subtitle: "Potential customer", icon: User, color: "text-amber-500", bgColor: "bg-amber-500/10" },
-    { id: "outreach", label: "Send Email or Text", subtitle: "First touchpoint", icon: Mail, color: "text-blue-500", bgColor: "bg-blue-500/10" },
-    { id: "contact", label: "Contact Created", subtitle: "Automatically", icon: Users, color: "text-indigo-500", bgColor: "bg-indigo-500/10" },
-    { id: "engage", label: "Keep Engaging", subtitle: "Build the relationship", icon: MessageCircle, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
+    { id: "lead", label: "Qualified Lead", subtitle: "Ready for next step", icon: User, color: "text-amber-500", bgColor: "bg-amber-500/10" },
+    { id: "convert", label: "Click Convert", subtitle: "Manual Action", icon: ArrowRight, color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { id: "opp_contact", label: "Opp & Contact", subtitle: "Created Instantly", icon: Users, color: "text-indigo-500", bgColor: "bg-indigo-500/10" },
+    { id: "engage", label: "Work Deal", subtitle: "Manage Pipeline", icon: TrendingUp, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
 ];
 
 const leadToAccountSteps: ConversionStep[] = [
-    { id: "lead", label: "Lead", subtitle: "In your pipeline", icon: User, color: "text-amber-500", bgColor: "bg-amber-500/10" },
-    { id: "close", label: "Close the Deal", subtitle: "Mark as won", icon: CheckCircle2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
-    { id: "account", label: "Account Created", subtitle: "Automatically", icon: Building2, color: "text-purple-500", bgColor: "bg-purple-500/10" },
-    { id: "opportunities", label: "Create Opportunities", subtitle: "Track new deals", icon: TrendingUp, color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { id: "opp", label: "Opportunity", subtitle: "In Pipeline", icon: TrendingUp, color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { id: "close", label: "Close Won", subtitle: "Mark as Won", icon: CheckCircle2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
+    { id: "account", label: "Account Created", subtitle: "New Customer", icon: Building2, color: "text-purple-500", bgColor: "bg-purple-500/10" },
+    { id: "growth", label: "Growth", subtitle: "Upsell & Retain", icon: Sparkles, color: "text-amber-500", bgColor: "bg-amber-500/10" },
 ];
 
 interface FlowRowProps {
@@ -106,15 +106,15 @@ export default function AutoConversionFlow() {
     return (
         <div className="space-y-3">
             <FlowRow
-                title="When You Send Your First Message"
-                description="The lead automatically becomes a Contact when you reach out."
+                title="When You Convert a Lead"
+                description="Converting a lead creates both a Contact and an Opportunity in your pipeline."
                 steps={leadToContactSteps}
                 delay={0}
                 accentColor="blue"
             />
             <FlowRow
-                title="When You Close a Deal"
-                description="The lead becomes an Account and you can create opportunities for them."
+                title="When You Close an Opportunity"
+                description="Closing a deal automatically creates a Customer Account record."
                 steps={leadToAccountSteps}
                 delay={0.15}
                 accentColor="emerald"

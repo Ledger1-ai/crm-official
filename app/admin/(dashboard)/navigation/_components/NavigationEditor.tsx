@@ -46,7 +46,64 @@ export function NavigationEditor({
     isPartnerAdmin,
     teamRole
 }: Props) {
-    const [structure, setStructure] = useState<NavItem[]>(initialStructure || DEFAULT_NAV_STRUCTURE);
+    // Helper to merge new defaults into stored config
+    const mergeDefaultItems = (current: NavItem[], defaults: NavItem[]): NavItem[] => {
+        try {
+            const merged = JSON.parse(JSON.stringify(current));
+            const existingIds = new Set<string>();
+            const idToNode = new Map<string, NavItem>();
+
+            const scan = (items: NavItem[]) => {
+                items.forEach(item => {
+                    existingIds.add(item.id);
+                    idToNode.set(item.id, item);
+                    if (item.children) scan(item.children);
+                });
+            };
+            scan(merged);
+
+            const scanDefaults = (items: NavItem[], parentId: string | null) => {
+                items.forEach(dItem => {
+                    if (!existingIds.has(dItem.id)) {
+                        // Missing item
+                        if (parentId && idToNode.has(parentId)) {
+                            const parent = idToNode.get(parentId)!;
+                            if (!parent.children) parent.children = [];
+                            parent.children.push(JSON.parse(JSON.stringify(dItem)));
+
+                            // Register newly added nodes
+                            const registerNew = (n: NavItem) => {
+                                existingIds.add(n.id);
+                                idToNode.set(n.id, n);
+                                if (n.children) n.children.forEach(registerNew);
+                            };
+                            registerNew(parent.children[parent.children.length - 1]);
+                        } else if (!parentId) {
+                            merged.push(JSON.parse(JSON.stringify(dItem)));
+                            const newNode = merged[merged.length - 1];
+                            existingIds.add(newNode.id);
+                            idToNode.set(newNode.id, newNode);
+                        }
+                    } else {
+                        // Exists, check children
+                        if (dItem.children) {
+                            scanDefaults(dItem.children, dItem.id);
+                        }
+                    }
+                });
+            };
+
+            scanDefaults(defaults, null);
+            return merged;
+        } catch (e) {
+            console.error("Failed to merge defaults", e);
+            return current;
+        }
+    };
+
+    const [structure, setStructure] = useState<NavItem[]>(() =>
+        mergeDefaultItems(initialStructure || DEFAULT_NAV_STRUCTURE, DEFAULT_NAV_STRUCTURE)
+    );
     const [activeId, setActiveId] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
     const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
@@ -187,20 +244,77 @@ export function NavigationEditor({
         });
     };
 
+    // Flatten the structure for DnD
+    const flatItems = React.useMemo(() => {
+        const flattened: (NavItem & { depth: number; parentId: string | null })[] = [];
+
+        const flattenRecursive = (items: NavItem[], depth: number, parentId: string | null) => {
+            items.forEach(item => {
+                flattened.push({ ...item, depth, parentId });
+                if (item.children) {
+                    flattenRecursive(item.children, depth + 1, item.id);
+                }
+            });
+        };
+
+        flattenRecursive(structure, 0, null);
+        return flattened;
+    }, [structure]);
+
+    const itemsIds = React.useMemo(() => flatItems.map(i => i.id), [flatItems]);
+
     const handleDragStart = (event: DragStartEvent) => {
         setActiveId(event.active.id as string);
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
-        if (over && active.id !== over.id) {
-            setStructure((items) => {
-                const oldIndex = items.findIndex((i) => i.id === active.id);
-                const newIndex = items.findIndex((i) => i.id === over.id);
-                return arrayMove(items, oldIndex, newIndex);
-            });
-        }
         setActiveId(null);
+
+        if (!over) return;
+        if (active.id === over.id) return;
+
+        const oldIndex = flatItems.findIndex(i => i.id === active.id);
+        const newIndex = flatItems.findIndex(i => i.id === over.id);
+
+        const newFlatOrder = arrayMove(flatItems, oldIndex, newIndex);
+
+        const rebuiltStructure: NavItem[] = [];
+
+        let currentGroup: NavItem | null = null;
+        let lastDepth1Item: NavItem | null = null;
+
+        newFlatOrder.forEach((item) => {
+            const { depth: oldDepth, parentId: oldParentId, ...cleanItemProps } = item;
+            // Ensure children array exists and is initially empty for rebuilt structure
+            const cleanItem = { ...cleanItemProps, children: [] };
+
+            // Logic:
+            // Group/Separator -> Depth 0
+            if (item.type === "group" || item.type === "separator") {
+                rebuiltStructure.push(cleanItem);
+                currentGroup = cleanItem;
+                lastDepth1Item = null; // Reset depth 1 context
+            } else {
+                // Determine hierarchy
+                // If it was a sub-item (Depth >= 2) and we have a valid parent item
+                if (oldDepth >= 2 && lastDepth1Item) {
+                    lastDepth1Item.children!.push(cleanItem);
+                } else {
+                    // Depth 1 (or fallback for orphaned sub-items)
+                    if (currentGroup) {
+                        currentGroup.children!.push(cleanItem);
+                    } else {
+                        // Orphan at root
+                        rebuiltStructure.push(cleanItem);
+                    }
+                    // Updates lastDepth1Item context for subsequent items
+                    lastDepth1Item = cleanItem;
+                }
+            }
+        });
+
+        setStructure(rebuiltStructure);
     };
 
     // ─── Render ───
@@ -279,38 +393,28 @@ export function NavigationEditor({
                             onDragEnd={handleDragEnd}
                         >
                             <SortableContext
-                                items={structure.map((i) => i.id)}
+                                items={itemsIds}
                                 strategy={verticalListSortingStrategy}
                             >
-                                {structure.map((item) => (
-                                    <div key={item.id} className="space-y-1">
+                                <div className="space-y-2">
+                                    {flatItems.map((item) => (
                                         <SortableNavItem
+                                            key={item.id}
                                             item={item}
+                                            depth={item.depth}
                                             onEdit={handleEdit}
                                             onDelete={handleDelete}
                                             onToggleVisibility={handleToggleVisibility}
                                             onAddChild={handleAddChild}
                                         />
-
-                                        {/* Render children - Simple flat list for reordering subs */}
-                                        {item.children?.map(child => (
-                                            <SortableNavItem
-                                                key={child.id}
-                                                item={child}
-                                                depth={1}
-                                                onEdit={handleEdit}
-                                                onDelete={handleDelete}
-                                                onToggleVisibility={handleToggleVisibility}
-                                            />
-                                        ))}
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </SortableContext>
 
                             <DragOverlay>
                                 {activeId ? (
                                     <div className="w-full opacity-80 backdrop-blur-md">
-                                        <SortableNavItem item={structure.find(i => i.id === activeId) || structure.flatMap(i => i.children || []).find(c => c.id === activeId)!} />
+                                        <SortableNavItem item={flatItems.find(i => i.id === activeId)!} />
                                     </div>
                                 ) : null}
                             </DragOverlay>

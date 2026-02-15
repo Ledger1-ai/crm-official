@@ -214,7 +214,9 @@ export const globalSearch = async (query: string): Promise<SearchResult[]> => {
         id: t.id,
         title: t.title,
         subtitle: "Task",
-        url: t.assigned_section?.board ? `/projects/boards/${t.assigned_section.board}?task=${t.id}` : "#",
+        url: t.assigned_section?.board
+            ? `/campaigns/boards/${t.assigned_section.board}?task=${t.id}`
+            : `/campaigns/tasks`,
     }));
 
     leads.forEach(l => results.push({
@@ -278,7 +280,7 @@ export const globalSearch = async (query: string): Promise<SearchResult[]> => {
         id: p.id,
         title: p.title,
         subtitle: "Project",
-        url: `/projects/boards/${p.id}`,
+        url: `/campaigns/boards/${p.id}`,
     }));
 
     return results;

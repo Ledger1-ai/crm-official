@@ -5,7 +5,7 @@ import Container from "../components/ui/Container";
 import ReportsDashboard from "./components/ReportsDashboard";
 import { getUsersByMonth } from "@/actions/get-users";
 import { getOpportunitiesByMonth } from "@/actions/crm/get-opportunities";
-import { getTasksByMonth } from "@/actions/projects/get-tasks";
+import { getTasksByMonth } from "@/actions/campaigns/get-tasks";
 import { getFinancialsByMonth } from "@/actions/reports/get-financials";
 
 import { getLeadsByMonth } from "@/actions/crm/get-leads";

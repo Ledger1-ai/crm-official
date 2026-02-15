@@ -11,12 +11,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { markTaskComplete } from "@/actions/dashboard/mark-task-complete";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { priorities } from "@/app/(routes)/projects/tasks/data/data";
+import { priorities } from "@/app/(routes)/campaigns/tasks/data/data";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import fetcher from "@/lib/fetcher";
-import NewTaskDialog from "@/app/(routes)/projects/dialogs/NewTask";
-import UpdateTaskDialog from "@/app/(routes)/projects/dialogs/UpdateTask";
+import NewTaskDialog from "@/app/(routes)/campaigns/dialogs/NewTask";
+import UpdateTaskDialog from "@/app/(routes)/campaigns/dialogs/UpdateTask";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import axios from "axios";
 
@@ -79,7 +79,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
         setIsLoadingTask(true);
         setIsEditOpen(true);
         try {
-            const res = await axios.get(`/api/projects/tasks/${taskId}`);
+            const res = await axios.get(`/api/campaigns/tasks/${taskId}`);
             setSelectedTask(res.data);
         } catch (error) {
             toast.error("Failed to load task details");
@@ -98,7 +98,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
     };
 
     const { data: teamData } = useSWR(searchTerm === "" ? "/api/team/members" : null, fetcher);
-    const { data: projectsData } = useSWR(searchTerm === "" ? "/api/projects" : null, fetcher);
+    const { data: projectsData } = useSWR(searchTerm === "" ? "/api/campaigns" : null, fetcher);
 
     const users = teamData?.members || [];
     const boards = projectsData?.projects || [];
@@ -156,7 +156,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
                 iconColor="text-emerald-400"
                 onSearch={setSearchTerm}
                 searchValue={searchTerm}
-                footerHref={`/projects/tasks/${userId}`}
+                footerHref={`/campaigns/tasks/${userId}`}
                 footerLabel="View All Tasks"
                 count={tasks.length}
                 rightAction={rightAction}
@@ -214,7 +214,7 @@ export const TasksWidget = ({ tasks: initialTasks, userId }: TasksWidgetProps) =
 
                                 <div className="shrink-0 pt-1">
                                     {task.assigned_section?.board && (
-                                        <Link href={`/projects/boards/${task.assigned_section.board}`}>
+                                        <Link href={`/campaigns/boards/${task.assigned_section.board}`}>
                                             <Button
                                                 size="icon"
                                                 variant="ghost"

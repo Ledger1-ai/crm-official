@@ -1,7 +1,7 @@
 
 import { Suspense } from "react";
 import Container from "../../components/ui/Container";
-import ProjectCalendarView from "@/app/(routes)/projects/calendar/components/ProjectCalendarView";
+import ProjectCalendarView from "@/app/(routes)/campaigns/calendar/components/ProjectCalendarView";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadb } from "@/lib/prisma";

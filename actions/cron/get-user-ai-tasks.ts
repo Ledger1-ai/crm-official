@@ -110,7 +110,7 @@ export async function getUserAiTasks(session: any) {
     
       \n\n
       Na konec napiš manažerské shrnutí a přidej odkaz ${
-        process.env.NEXT_PUBLIC_APP_URL + "/projects/dashboard"
+        process.env.NEXT_PUBLIC_APP_URL + "/campaigns/dashboard"
       } jako odkaz na detail k úkolům . Na konci manažerského shrnutí přidej. 1 tip na manažerskou dovednost z oblasti projektového řízení a timemanagementu, 2-3 věty s pozitivním naladěním a podporou, nakonec popřej hezký pracovní den a infomaci, že tato zpráva byla vygenerována pomocí umělé inteligence OpenAi.
       \n\n
       Finální výsledek musí být v MDX formátu.

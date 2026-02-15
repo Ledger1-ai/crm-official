@@ -125,7 +125,7 @@ export default function SignaturesResourcesPanel() {
         }
 
         // Campaigns (boards) accessible to the user
-        const projRes = await fetch('/api/projects', { method: 'GET' });
+        const projRes = await fetch('/api/campaigns', { method: 'GET' });
         if (projRes.ok) {
           const j = await projRes.json();
           const list = Array.isArray(j?.projects) ? j.projects : [];
@@ -297,7 +297,7 @@ export default function SignaturesResourcesPanel() {
                       if (!pid) return;
                       setPresetsLoading(true);
                       try {
-                        const res = await fetch(`/api/projects/${pid}/button-sets`);
+                        const res = await fetch(`/api/campaigns/${pid}/button-sets`);
                         if (!res.ok) throw new Error(await res.text());
                         const j = await res.json();
                         const sets = Array.isArray(j?.sets) ? j.sets : [];
@@ -327,7 +327,7 @@ export default function SignaturesResourcesPanel() {
                         if (!selectedCampaignId) { toast.error('Select a project'); return; }
                         setPresetsLoading(true);
                         try {
-                          const res = await fetch(`/api/projects/${selectedCampaignId}/button-sets`);
+                          const res = await fetch(`/api/campaigns/${selectedCampaignId}/button-sets`);
                           if (!res.ok) throw new Error(await res.text());
                           const j = await res.json();
                           const sets = Array.isArray(j?.sets) ? j.sets : [];
@@ -351,7 +351,7 @@ export default function SignaturesResourcesPanel() {
                       onClick={async () => {
                         if (!selectedCampaignId) { toast.error('Select a project'); return; }
                         try {
-                          const res = await fetch(`/api/projects/${selectedCampaignId}/button-sets`, {
+                          const res = await fetch(`/api/campaigns/${selectedCampaignId}/button-sets`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ name: 'Preset', config: {}, isDefault: false }),
@@ -377,7 +377,7 @@ export default function SignaturesResourcesPanel() {
                         const def = presetSets.find((s: any) => !!s.isDefault);
                         if (!def) { toast.error('No default preset found'); return; }
                         try {
-                          const res = await fetch(`/api/projects/${selectedCampaignId}/button-sets/${def.id}/duplicate`, { method: 'POST' });
+                          const res = await fetch(`/api/campaigns/${selectedCampaignId}/button-sets/${def.id}/duplicate`, { method: 'POST' });
                           if (!res.ok) throw new Error(await res.text());
                           const j = await res.json();
                           const created = j?.set;
@@ -424,7 +424,7 @@ export default function SignaturesResourcesPanel() {
                             try { payloadConfig = JSON.parse(txt); } catch { toast.error('Invalid JSON'); return; }
                           }
                           try {
-                            const res = await fetch(`/api/projects/${selectedCampaignId}/button-sets/${s.id}`, {
+                            const res = await fetch(`/api/campaigns/${selectedCampaignId}/button-sets/${s.id}`, {
                               method: 'PATCH',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ name: payloadName, config: payloadConfig })

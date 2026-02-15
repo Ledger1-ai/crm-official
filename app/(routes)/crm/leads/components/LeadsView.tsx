@@ -15,7 +15,8 @@ import StageProgressBar, { type StageDatum } from '@/components/StageProgressBar
 import FollowUpWizard from '@/components/modals/FollowUpWizard';
 import AIWriterModal from './modals/AIWriterModal';
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle';
-import { ExternalLink, Mail, TrendingUp, Target, X, User, Phone, FileText, Info, Activity, Calendar, Building2, Sparkles, Wand2, PenTool } from 'lucide-react';
+import { ExternalLink, Mail, TrendingUp, Target, X, User, Phone, FileText, Info, Activity, Calendar, Building2, Sparkles, Wand2, PenTool, ArrowRightCircle } from 'lucide-react';
+import { convertLeadToOpportunity } from "@/actions/crm/convert-lead";
 import {
   Dialog,
   DialogContent,
@@ -110,7 +111,7 @@ function ProgressBar({ value }: { value: number }) {
 
 export default function LeadsView({ data, isMember = false }: Props) {
   // Fetch active projects for assignment
-  const { data: campaignsData } = useSWR('/api/projects', fetcher);
+  const { data: campaignsData } = useSWR('/api/campaigns', fetcher);
   const campaigns = useMemo(() => campaignsData?.projects || [], [campaignsData]);
 
   async function assignPoolCampaign(campaignId: string) {
@@ -245,7 +246,7 @@ export default function LeadsView({ data, isMember = false }: Props) {
   }, [selectedPoolId, pools]);
 
   const { data: brandResponse } = useSWR(
-    selectedPoolCampaign ? `/api/projects/${encodeURIComponent(selectedPoolCampaign)}/brand` : null,
+    selectedPoolCampaign ? `/api/campaigns/${encodeURIComponent(selectedPoolCampaign)}/brand` : null,
     fetcher
   );
 
@@ -764,6 +765,22 @@ export default function LeadsView({ data, isMember = false }: Props) {
                             </Button>
                             <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-500 hover:text-indigo-600" onClick={(e) => { e.stopPropagation(); setFollowUpLeadId(lead.id); setFollowUpOpen(true); }} disabled={!canFollowup} title="Follow-up">
                               <TrendingUp className="h-3 w-3" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-600 hover:text-indigo-800" onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const res = await convertLeadToOpportunity(lead.id);
+                                if (res.success) {
+                                  toast.success("Converted!");
+                                  if (res.data?.opportunityId) {
+                                    window.location.href = `/crm/opportunities/${res.data.opportunityId}`;
+                                  }
+                                } else {
+                                  toast.error(res.error || "Failed");
+                                }
+                              } catch { toast.error("Error"); }
+                            }} title="Convert to Opportunity">
+                              <ArrowRightCircle className="h-3 w-3" />
                             </Button>
                             <Button size="icon" variant="ghost" className="h-6 w-6 text-amber-500 hover:text-amber-600" onClick={async (e) => { e.stopPropagation(); try { const res = await fetch(`/api/outreach/reset/${encodeURIComponent(lead.id)}`, { method: 'POST' }); if (res.ok) { toast.success('Lead reset'); } else { const t = await res.text(); toast.error(t || 'Failed to reset'); } } catch (err: any) { toast.error(err?.message || 'Failed to reset'); } }} title="Reset Lead">
                               <Target className="h-3 w-3" />

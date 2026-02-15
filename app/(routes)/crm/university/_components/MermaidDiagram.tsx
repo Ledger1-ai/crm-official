@@ -135,63 +135,54 @@ export function MermaidDiagram({ chart, mobileChart, compact, className }: Merma
 export const CRM_FLOW_DIAGRAM = `
 %%{init: {'theme': 'dark', 'themeVariables': { 'fontSize': '13px', 'clusterBkg': 'transparent', 'clusterBorder': '#334155' }}}%%
 graph LR
-    A["Web Form"] --> LEAD
-    B["CSV Import"] --> LEAD
-    C["AI Generated"] --> LEAD
-    D["Manual Entry"] --> LEAD
+    P["Project/Board"] --> LEAD
     
-    LEAD["NEW LEAD"] --> S1["1. Identify"]
-    S1 --> S2["2. AI Outreach"]
-    S2 --> S3["3. Your Turn"]
-    S3 --> S4["4. Offering"]
-    S4 --> S5["5. Finalizing"]
-    S5 --> S6["6. Closed"]
+    LEAD["Lead"] --> S1["1. Identify"]
+    S1 --> S2["2. Contacted"]
+    S2 --> S3["3. Qualified"]
+    S3 --> CONVERT{{"Convert"}}
     
-    S2 -.->|"Auto"| CONTACT["Contact"]
-    S6 -.->|"Auto"| ACCOUNT["Account"]
+    CONVERT --> OPP["Opportunity"]
+    CONVERT --> CONTACT["Contact"]
     
-    ACCOUNT --> OPP["Opportunity"]
-    ACCOUNT --> CONTRACT["Contract"]
+    OPP --> CLOSE{{"Close Won"}}
+    CLOSE --> ACCOUNT["Account"]
 
-    style A fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
-    style B fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
-    style C fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
-    style D fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
+    style P fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
     style LEAD fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
     style S1 fill:#0c4a6e,stroke:#0ea5e9,stroke-width:2px,color:#e0f2fe
     style S2 fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#dbeafe
     style S3 fill:#312e81,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
-    style S4 fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#e9d5ff
-    style S5 fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3
-    style S6 fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
+    style CONVERT fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3,rx:5,ry:5
     style CONTACT fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#dbeafe
-    style ACCOUNT fill:#312e81,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
     style OPP fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
-    style CONTRACT fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3
+    style CLOSE fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3,rx:5,ry:5
+    style ACCOUNT fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#e9d5ff
 `;
 
 // Desktop: Two HORIZONTAL rows stacked vertically
 export const CONVERSION_FLOW_DIAGRAM = `
 %%{init: {'theme': 'dark', 'themeVariables': { 'fontSize': '13px', 'clusterBkg': 'rgba(30, 41, 59, 0.5)', 'clusterBorder': '#334155' }}}%%
 graph TB
-    subgraph First[" First Message "]
+    subgraph Conversion[" Lead Conversion "]
         direction LR
-        L1["Lead"] --> MSG["Send Message"] --> C1["Contact"] --> E1["Engage"]
+        L1["Lead"] --> CONV{{"Convert"}} --> O1["Opportunity"]
+        CONV --> C1["Contact"]
     end
     
-    subgraph Second[" Deal Closed "]
+    subgraph Closing[" Deal Closing "]
         direction LR
-        L2["Lead"] --> WIN["Close Deal"] --> A1["Account"] --> O1["Create Opps"]
+        O2["Opportunity"] --> WIN{{"Close Won"}} --> A1["Account"]
     end
 
     style L1 fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
-    style L2 fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
-    style MSG fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#dbeafe
-    style WIN fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
-    style C1 fill:#312e81,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
+    style CONV fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3
+    style O1 fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
+    style C1 fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#dbeafe
+    
+    style O2 fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
+    style WIN fill:#831843,stroke:#ec4899,stroke-width:2px,color:#fce7f3
     style A1 fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#e9d5ff
-    style E1 fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#dcfce7
-    style O1 fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#dbeafe
 `;
 
 // ==========================================
@@ -201,58 +192,46 @@ graph TB
 export const CRM_FLOW_DIAGRAM_MOBILE = `
 %%{init: {'theme': 'dark', 'themeVariables': { 'fontSize': '12px' }}}%%
 graph TB
-    A["Web Form"] --> LEAD
-    B["CSV Import"] --> LEAD
-    C["AI Generated"] --> LEAD
-    D["Manual"] --> LEAD
+    P["Project"] --> LEAD
+    LEAD["Lead"] --> S1["Identify"]
+    S1 --> S2["Contacted"]
+    S2 --> S3["Qualified"]
+    S3 --> CONVERT{{"Convert"}}
     
-    LEAD["NEW LEAD"] --> S1["1. Identify"]
-    S1 --> S2["2. AI Outreach"]
-    S2 --> S3["3. Your Turn"]
-    S3 --> S4["4. Offering"]
-    S4 --> S5["5. Finalizing"]
-    S5 --> S6["6. Closed"]
+    CONVERT --> OPP["Opportunity"]
+    CONVERT --> CONTACT["Contact"]
     
-    S2 -.-> CONTACT["Contact"]
-    S6 -.-> ACCOUNT["Account"]
-    
-    ACCOUNT --> OPP["Opportunity"]
+    OPP --> CLOSE{{"Close Won"}}
+    CLOSE --> ACCOUNT["Account"]
 
-    style A fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
-    style B fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
-    style C fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
-    style D fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
+    style P fill:#1e3a5f,stroke:#3b82f6,color:#e2e8f0
     style LEAD fill:#78350f,stroke:#f59e0b,color:#fef3c7
     style S1 fill:#0c4a6e,stroke:#0ea5e9,color:#e0f2fe
     style S2 fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
     style S3 fill:#312e81,stroke:#6366f1,color:#c7d2fe
-    style S4 fill:#4c1d95,stroke:#8b5cf6,color:#e9d5ff
-    style S5 fill:#831843,stroke:#ec4899,color:#fce7f3
-    style S6 fill:#064e3b,stroke:#10b981,color:#dcfce7
+    style CONVERT fill:#831843,stroke:#ec4899,color:#fce7f3
     style CONTACT fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
-    style ACCOUNT fill:#312e81,stroke:#6366f1,color:#c7d2fe
     style OPP fill:#064e3b,stroke:#10b981,color:#dcfce7
+    style CLOSE fill:#831843,stroke:#ec4899,color:#fce7f3
+    style ACCOUNT fill:#4c1d95,stroke:#8b5cf6,color:#e9d5ff
 `;
 
 export const CONVERSION_FLOW_DIAGRAM_MOBILE = `
 %%{init: {'theme': 'dark', 'themeVariables': { 'fontSize': '12px' }}}%%
 graph TB
-    L1["Lead"] --> MSG["Send Message"]
-    MSG --> C1["Contact"]
-    C1 --> E1["Keep Engaging"]
+    L1["Lead"] --> CONV{{"Convert"}}
+    CONV --> O1["Opportunity"]
+    CONV --> C1["Contact"]
     
-    L2["Lead"] --> WIN["Close Deal"]
+    O1 --> WIN{{"Close"}}
     WIN --> A1["Account"]
-    A1 --> O1["Create Opps"]
 
     style L1 fill:#78350f,stroke:#f59e0b,color:#fef3c7
-    style L2 fill:#78350f,stroke:#f59e0b,color:#fef3c7
-    style MSG fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
-    style WIN fill:#064e3b,stroke:#10b981,color:#dcfce7
-    style C1 fill:#312e81,stroke:#6366f1,color:#c7d2fe
+    style CONV fill:#831843,stroke:#ec4899,color:#fce7f3
+    style O1 fill:#064e3b,stroke:#10b981,color:#dcfce7
+    style C1 fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
+    style WIN fill:#831843,stroke:#ec4899,color:#fce7f3
     style A1 fill:#4c1d95,stroke:#8b5cf6,color:#e9d5ff
-    style E1 fill:#064e3b,stroke:#10b981,color:#dcfce7
-    style O1 fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
 `;
 
 export default MermaidDiagram;

@@ -122,9 +122,9 @@ const DashboardRoleManager = async () => {
                 { id: "entity:leads_manager", name: "Leads Manager", value: counts.leads, href: "/crm/leads", iconName: "Users2", color: "emerald", tooltip: "View and manage all leads in one place. Filter, sort, and take action on your pipeline." }
             );
 
-            // Insert Projects here to match sidebar order
+            // Insert Campaigns here to match sidebar order
             if (projectsModule?.enabled) {
-                crmEntities.push({ id: "entity:projects", name: "Projects", value: counts.boards, href: "/campaigns", iconName: "FolderKanban", color: "cyan", tooltip: "Organize work into project boards. Track tasks, progress, and collaborate with your team." });
+                crmEntities.push({ id: "entity:projects", name: "Campaigns", value: counts.boards, href: "/campaigns", iconName: "FolderKanban", color: "cyan", tooltip: "Organize work into campaign boards. Track tasks, progress, and collaborate with your team." });
             }
 
             crmEntities.push(
@@ -161,6 +161,7 @@ const DashboardRoleManager = async () => {
                 userId={userId}
                 userName={session.user.name || "User"}
                 revenue={unifiedData?.summary?.revenue || 0}
+                actualRevenue={unifiedData?.summary?.actualRevenue || 0}
                 activePipelineCount={unifiedData?.summary?.activeDeals || 0}
                 totalLeads={unifiedData?.summary?.leadsCount || 0}
                 totalOpportunities={unifiedData?.summary?.opportunitiesCount || 0}

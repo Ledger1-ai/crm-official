@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import RightViewModal from "@/components/modals/right-view-modal";
 import { MyAccount } from "@prisma/client";
 import { getActiveUsers } from "@/actions/get-users";
-import { getBoards } from "@/actions/projects/get-boards";
+import { getBoards } from "@/actions/campaigns/get-boards";
 import NewTaskDialog from "./dialogs/NewTask";
 
 import { SyncInvoiceCard } from "./components/SyncInvoiceCard";

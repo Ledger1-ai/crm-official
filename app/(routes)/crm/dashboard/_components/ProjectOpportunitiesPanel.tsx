@@ -38,7 +38,7 @@ export default function ProjectOpportunitiesPanel() {
     // Fetch accessible projects
     (async () => {
       try {
-        const res = await fetch("/api/projects", { cache: "no-store" });
+        const res = await fetch("/api/campaigns", { cache: "no-store" });
         if (res.ok) {
           const j = await res.json();
           setProjects((j?.projects || []) as Project[]);
@@ -54,7 +54,7 @@ export default function ProjectOpportunitiesPanel() {
     setIsLoading(true);
     (async () => {
       try {
-        const res = await fetch(`/api/projects/${encodeURIComponent(selectedProjectId)}/opportunities`, { cache: "no-store" });
+        const res = await fetch(`/api/campaigns/${encodeURIComponent(selectedProjectId)}/opportunities`, { cache: "no-store" });
         if (res.ok) {
           const j = await res.json();
           setOpportunities(((j?.opportunities || []) as Opportunity[]).filter(o => o.status !== 'ARCHIVED'));
@@ -69,7 +69,7 @@ export default function ProjectOpportunitiesPanel() {
 
   async function onCreateOpportunity() {
     if (!selectedProjectId) {
-      toast({ title: "Select project", description: "Choose a project first" });
+      toast({ title: "Select campaign", description: "Choose a campaign first" });
       return;
     }
     if (!title.trim()) {
@@ -78,7 +78,7 @@ export default function ProjectOpportunitiesPanel() {
     }
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/projects/${encodeURIComponent(selectedProjectId)}/opportunities`, {
+      const res = await fetch(`/api/campaigns/${encodeURIComponent(selectedProjectId)}/opportunities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, category, description: description || null, valueEstimate: valueEstimate ? Number(valueEstimate) : undefined }),
@@ -90,7 +90,7 @@ export default function ProjectOpportunitiesPanel() {
       setDescription("");
       setValueEstimate("");
       // refresh
-      const res2 = await fetch(`/api/projects/${encodeURIComponent(selectedProjectId)}/opportunities`, { cache: "no-store" });
+      const res2 = await fetch(`/api/campaigns/${encodeURIComponent(selectedProjectId)}/opportunities`, { cache: "no-store" });
       const j2 = await res2.json();
       setOpportunities((j2?.opportunities || []) as Opportunity[]);
     } catch (e: any) {
@@ -104,10 +104,10 @@ export default function ProjectOpportunitiesPanel() {
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-end">
         <div className="w-full md:w-64">
-          <label className="text-sm">Project</label>
+          <label className="text-sm">Campaign</label>
           <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select project" />
+              <SelectValue placeholder="Select campaign" />
             </SelectTrigger>
             <SelectContent className="max-h-60 overflow-y-auto">
               {projects.map((p) => (
@@ -162,7 +162,7 @@ export default function ProjectOpportunitiesPanel() {
         </div>
         <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
           {(!selectedProjectId || opportunities.length === 0) && (
-            <div className="text-sm text-muted-foreground">{!selectedProjectId ? "Select a project to view its opportunities" : "No opportunities yet"}</div>
+            <div className="text-sm text-muted-foreground">{!selectedProjectId ? "Select a campaign to view its opportunities" : "No opportunities yet"}</div>
           )}
           {opportunities.map((o) => (
             <div key={o.id} className="p-3 rounded border bg-background">

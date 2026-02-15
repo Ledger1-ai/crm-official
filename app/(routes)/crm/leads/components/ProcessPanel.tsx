@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { STAGE_TEXT_CLASS, type PipelineStage } from "@/components/stageStyles";
 import { toast } from "react-hot-toast";
+import { convertLeadToOpportunity } from "@/actions/crm/convert-lead";
 
 // Minimal lead shape used by the panel
 type LeadLite = {
@@ -192,6 +193,25 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
     }
   }
 
+
+  async function onConvert() {
+    if (!selectedLeadId) return;
+    try {
+      const res = await convertLeadToOpportunity(selectedLeadId);
+      if (res.success) {
+        toast.success("Lead converted to Opportunity");
+        // Optionally redirect or reload
+        if (res.data?.opportunityId) {
+          window.location.href = `/crm/opportunities/${res.data.opportunityId}`;
+        }
+      } else {
+        toast.error(res.error || "Failed to convert");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  }
+
   // Build StageProgressBar data for a single lead: mark only current stage as count=1
   const stageData: StageDatum[] = useMemo(() => {
     const cur: PipelineStage = selectedLead?.pipeline_stage || "Identify";
@@ -252,6 +272,9 @@ export default function ProcessPanel({ leads: leadsProp, crmData: _crmData }: Pr
         <div className="flex items-center justify-between">
           <div className={`text-lg font-semibold ${STAGE_TEXT_CLASS[activeStage]}`}>{activeStage.replace("_", " ")}</div>
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="h-8 gap-2 text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700" onClick={onConvert}>
+              <span className="text-xs font-bold uppercase tracking-wider">Convert to Deal</span>
+            </Button>
             {brandPrimaryColor && (
               <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: brandPrimaryColor }} />
             )}

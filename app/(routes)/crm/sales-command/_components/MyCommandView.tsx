@@ -93,7 +93,7 @@ export default function MyCommandView() {
                             {activeTasks.map((task: any) => (
                                 <Link
                                     key={task.id}
-                                    href={`/projects/tasks/viewtask/${task.id}`}
+                                    href={`/campaigns/tasks/viewtask/${task.id}`}
                                     className="block"
                                 >
                                     <motion.div
@@ -128,7 +128,7 @@ export default function MyCommandView() {
                                 </Link>
                             ))}
                             {tasks.length > 5 && (
-                                <Link href="/projects/tasks" className="block text-center text-xs text-primary hover:underline py-2">
+                                <Link href="/campaigns/tasks" className="block text-center text-xs text-primary hover:underline py-2">
                                     View all {tasks.length} tasks →
                                 </Link>
                             )}

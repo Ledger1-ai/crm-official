@@ -2,8 +2,8 @@ import React from "react";
 import moment from "moment";
 
 import { getDocuments } from "@/actions/documents/get-documents";
-import { getTaskComments } from "@/actions/projects/get-task-comments";
-import { getTaskDocuments } from "@/actions/projects/get-task-documents";
+import { getTaskComments } from "@/actions/campaigns/get-task-comments";
+import { getTaskDocuments } from "@/actions/campaigns/get-task-documents";
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";

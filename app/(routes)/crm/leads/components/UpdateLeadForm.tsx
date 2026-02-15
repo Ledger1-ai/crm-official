@@ -59,7 +59,7 @@ export function UpdateLeadForm({ initialData, setOpen }: NewTaskFormProps) {
   );
 
   const { data: projectResponse, isLoading: isLoadingProjects } = useSWR(
-    "/api/projects",
+    "/api/campaigns",
     fetcher
   );
 

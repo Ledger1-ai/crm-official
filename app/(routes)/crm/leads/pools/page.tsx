@@ -77,7 +77,7 @@ export default function LeadPoolsPage() {
   const { data, error, isLoading, mutate } = useSWR<PoolsResponse>("/api/leads/pools", fetcher, {
     refreshInterval: 30000,
   });
-  const { data: projectsData } = useSWR<{ projects: { id: string; title: string }[] }>("/api/projects", fetcher, { refreshInterval: 120000 });
+  const { data: projectsData } = useSWR<{ projects: { id: string; title: string }[] }>("/api/campaigns", fetcher, { refreshInterval: 120000 });
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardLeadIds, setWizardLeadIds] = useState<string[]>([]);
   const [loadingOutreach, setLoadingOutreach] = useState<string | null>(null);
@@ -136,7 +136,7 @@ export default function LeadPoolsPage() {
           if (!pid) continue;
           // Skip if already loaded
           if (buttonSets[pool.id]?.sets?.length) continue;
-          const res = await fetch(`/api/projects/${pid}/button-sets`);
+          const res = await fetch(`/api/campaigns/${pid}/button-sets`);
           if (!res.ok) continue;
           const j = await res.json();
           const sets = Array.isArray(j?.sets) ? j.sets : [];
@@ -526,7 +526,7 @@ export default function LeadPoolsPage() {
 
                           // After assigning project, load its button sets and preselect default if none chosen
                           try {
-                            const resp = await fetch(`/api/projects/${projectId}/button-sets`);
+                            const resp = await fetch(`/api/campaigns/${projectId}/button-sets`);
                             if (resp.ok) {
                               const j = await resp.json();
                               const sets = Array.isArray(j?.sets) ? j.sets : [];
@@ -588,7 +588,7 @@ export default function LeadPoolsPage() {
                           const pid = pool.icpConfig?.assignedProjectId;
                           if (!pid) { alert("Select a project first"); return; }
                           try {
-                            const res = await fetch(`/api/projects/${pid}/button-sets`);
+                            const res = await fetch(`/api/campaigns/${pid}/button-sets`);
                             if (!res.ok) throw new Error(await res.text());
                             const j = await res.json();
                             const sets = Array.isArray(j?.sets) ? j.sets : [];

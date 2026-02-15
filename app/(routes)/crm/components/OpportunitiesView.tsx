@@ -82,7 +82,6 @@ const OpportunitiesView = ({
                     contacts={contacts}
                     salesType={saleTypes}
                     saleStages={saleStages}
-                    campaigns={campaigns}
                     accountId={accountId}
                     onDialogClose={() => setDialogOpen(false)}
                   />

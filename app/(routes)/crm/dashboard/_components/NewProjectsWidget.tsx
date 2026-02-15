@@ -42,9 +42,9 @@ export default function NewProjectsWidget({ projects }: NewProjectsWidgetProps) 
             <DialogTrigger asChild>
                 <DashboardCard
                     icon={Folder}
-                    label="New Projects"
+                    label="New Campaigns"
                     count={projects.length}
-                    description={projects.length > 0 ? "Projects assigned this week" : "No new projects"}
+                    description={projects.length > 0 ? "Campaigns assigned this week" : "No new campaigns"}
 
                     className="w-full"
                 />
@@ -53,12 +53,12 @@ export default function NewProjectsWidget({ projects }: NewProjectsWidgetProps) 
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-amber-500">
                         <Folder className="h-5 w-5" />
-                        New Projects This Week
+                        New Campaigns This Week
                     </DialogTitle>
                     <DialogDescription>
                         {projects.length > 0
-                            ? `You have been assigned to ${projects.length} new project${projects.length === 1 ? '' : 's'} this week.`
-                            : "No new project assignments this week."}
+                            ? `You have been assigned to ${projects.length} new campaign${projects.length === 1 ? '' : 's'} this week.`
+                            : "No new campaign assignments this week."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -67,7 +67,7 @@ export default function NewProjectsWidget({ projects }: NewProjectsWidgetProps) 
                         {projects.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground opacity-60">
                                 <Folder className="h-12 w-12 mb-3" />
-                                <p>No new projects</p>
+                                <p>No new campaigns</p>
                             </div>
                         )}
 
@@ -100,9 +100,9 @@ export default function NewProjectsWidget({ projects }: NewProjectsWidgetProps) 
                 </ScrollArea>
 
                 <div className="mt-4 pt-4 border-t flex justify-end">
-                    <Link href="/crm/my-projects">
+                    <Link href="/crm/my-campaigns">
                         <Button variant="ghost" className="text-amber-500 hover:text-amber-600 hover:bg-amber-500/10">
-                            View All My Projects <ArrowRight className="ml-2 h-4 w-4" />
+                            View All My Campaigns <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </Link>
                 </div>

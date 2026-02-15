@@ -26,7 +26,7 @@ import DashboardCard from "../DashboardCard";
 import {
     LeadsWidget,
     TasksWidget,
-    ProjectsWidget,
+    CampaignsWidget,
     MessagesWidget,
     TeamActivityWidget,
     RecentFilesWidget,
@@ -52,7 +52,9 @@ import {
     ArrowUpRight,
     Timer,
     CloudLightning,
-    Heart
+    Heart,
+    Activity,
+    FolderPlus
 } from "lucide-react";
 import {
     Tooltip,
@@ -77,10 +79,10 @@ const widgetTooltips: Record<string, string> = {
     customer_pulse: "Overall customer satisfaction based on recent interactions and feedback.",
     campaign_performance: "Return on investment for your active campaigns and marketing spend.",
     upcoming_meetings: "Today's scheduled meetings and upcoming appointments.",
-    collaboration_feed: "Recent mentions and activity in project threads you're part of.",
+    collaboration_feed: "Recent mentions and activity in campaign threads you're part of.",
     leads: "Newest leads added to your pipeline. Review and assign them quickly.",
     tasks: "Your daily task list. Stay productive and on track with your priorities.",
-    projects: "Recently created or updated projects. Jump straight into project work.",
+    projects: "Recently created or updated campaigns. Jump straight into campaign work.",
     messages: "Your latest messages and notifications. Stay in the loop with your team.",
     team_activity: "Recent actions taken by team members across the CRM.",
     recent_files: "Files recently uploaded or modified. Quick access to your documents.",
@@ -196,6 +198,7 @@ interface EditableWidgetGridProps {
     aiInsights?: any[];
     // Stats Props
     revenue?: number;
+    actualRevenue?: number;
     activePipelineCount?: number;
     totalLeads?: number;
     totalOpportunities?: number;
@@ -220,6 +223,7 @@ export const EditableWidgetGrid = ({
     intelligenceStats = null,
     aiInsights = [],
     revenue = 0,
+    actualRevenue = 0,
     activePipelineCount = 0,
     totalLeads = 0,
     totalOpportunities = 0,
@@ -246,6 +250,12 @@ export const EditableWidgetGrid = ({
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
+            // Prevent dragging between different sections (Small vs Large)
+            const isSmall = (id: string) => getWidgetSpanClass(id) === "col-span-1";
+            if (isSmall(active.id as string) !== isSmall(over.id as string)) {
+                return;
+            }
+
             const oldIndex = widgets.findIndex((w) => w.id === active.id);
             const newIndex = widgets.findIndex((w) => w.id === over.id);
             updateLayout(arrayMove(widgets, oldIndex, newIndex));
@@ -289,7 +299,7 @@ export const EditableWidgetGrid = ({
             case "tasks":
                 return <TasksWidget tasks={dailyTasks} userId={userId} />;
             case "projects":
-                return <ProjectsWidget projects={newProjects} />;
+                return <CampaignsWidget projects={newProjects} />;
             case "messages":
                 return <MessagesWidget messages={messages} />;
             case "team_activity":
@@ -406,14 +416,14 @@ export const EditableWidgetGrid = ({
                         icon={MessageCircle}
                         label="Collaboration"
                         count="12 Mentions"
-                        description="Active project threads"
+                        description="Active campaign threads"
                         variant="info"
                     />
                 );
             case "conversion_rate":
                 return <DashboardCard icon={ArrowUpRight} label="Conv. Rate" count={`${intelligenceStats?.conversionRate || 0}%`} description="Last 30 days" variant="success" />;
             case "avg_deal_size":
-                return <DashboardCard icon={Target} label="Avg Deal" count={`$${(intelligenceStats?.avgDealSize || 0).toLocaleString()}`} description="Active deals" variant="info" />;
+                return <DashboardCard icon={Target} label="Actual Revenue" count={`$${(actualRevenue || 0).toLocaleString()}`} description="From paid invoices" variant="info" hideIcon={true} />;
             case "response_time":
                 return <DashboardCard icon={Timer} label="Resp. Time" count={`${intelligenceStats?.responseTime || 1.2}h`} description="Goal: < 2.0h" variant="warning" />;
             case "system_uptime":
@@ -466,22 +476,65 @@ export const EditableWidgetGrid = ({
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
                 >
-                    <SortableContext items={sortableItems} strategy={rectSortingStrategy}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            {itemsToRender.map((widget) => (
-                                <SortableWidget
-                                    key={widget.id}
-                                    id={widget.id}
-                                    disabled={!isEditMode}
-                                    className={getWidgetSpanClass(widget.id)}
-                                >
-                                    <WidgetWithTooltip id={widget.id}>
-                                        {renderWidget(widget.id)}
-                                    </WidgetWithTooltip>
-                                </SortableWidget>
-                            ))}
-                        </div>
-                    </SortableContext>
+                    {/* SECTION 1: KEY METRICS (Small Widgets) */}
+                    <div className="mb-8">
+                        {isEditMode && itemsToRender.some(w => getWidgetSpanClass(w.id) === "col-span-1") && (
+                            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <Activity size={14} /> Key Metrics
+                            </h3>
+                        )}
+                        <SortableContext
+                            items={itemsToRender.filter(w => getWidgetSpanClass(w.id) === "col-span-1").map(w => w.id)}
+                            strategy={rectSortingStrategy}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                                {itemsToRender
+                                    .filter(w => getWidgetSpanClass(w.id) === "col-span-1")
+                                    .map((widget) => (
+                                        <SortableWidget
+                                            key={widget.id}
+                                            id={widget.id}
+                                            disabled={!isEditMode}
+                                            className={getWidgetSpanClass(widget.id)}
+                                        >
+                                            <WidgetWithTooltip id={widget.id}>
+                                                {renderWidget(widget.id)}
+                                            </WidgetWithTooltip>
+                                        </SortableWidget>
+                                    ))}
+                            </div>
+                        </SortableContext>
+                    </div>
+
+                    {/* SECTION 2: OPERATIONAL VIEWS (Large Widgets) */}
+                    <div>
+                        {isEditMode && itemsToRender.some(w => getWidgetSpanClass(w.id) !== "col-span-1") && (
+                            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <FolderPlus size={14} /> Operational Views
+                            </h3>
+                        )}
+                        <SortableContext
+                            items={itemsToRender.filter(w => getWidgetSpanClass(w.id) !== "col-span-1").map(w => w.id)}
+                            strategy={rectSortingStrategy}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                                {itemsToRender
+                                    .filter(w => getWidgetSpanClass(w.id) !== "col-span-1")
+                                    .map((widget) => (
+                                        <SortableWidget
+                                            key={widget.id}
+                                            id={widget.id}
+                                            disabled={!isEditMode}
+                                            className={getWidgetSpanClass(widget.id)}
+                                        >
+                                            <WidgetWithTooltip id={widget.id}>
+                                                {renderWidget(widget.id)}
+                                            </WidgetWithTooltip>
+                                        </SortableWidget>
+                                    ))}
+                            </div>
+                        </SortableContext>
+                    </div>
 
                     <DragOverlay>
                         {activeId ? (
@@ -493,30 +546,32 @@ export const EditableWidgetGrid = ({
                 </DndContext>
 
                 {/* Hidden Widgets Palette - Only in Edit Mode */}
-                {isEditMode && hiddenOperationalWidgets.length > 0 && (
-                    <div className="border-t border-white/10 pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <Plus size={14} /> Available Operation Widgets
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 opacity-60 hover:opacity-100 transition-opacity">
-                            {hiddenOperationalWidgets.map((widget) => (
-                                <div
-                                    key={widget.id}
-                                    className="relative group cursor-pointer border border-dashed border-white/20 rounded-xl p-4 hover:bg-white/5 hover:border-emerald-500/50 transition-all font-sans"
-                                    onClick={() => toggleWidgetVisibility(widget.id, true)}
-                                >
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-emerald-500 text-white rounded-full p-1">
-                                        <Plus size={12} />
+                {
+                    isEditMode && hiddenOperationalWidgets.length > 0 && (
+                        <div className="border-t border-white/10 pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <Plus size={14} /> Available Operation Widgets
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 opacity-60 hover:opacity-100 transition-opacity">
+                                {hiddenOperationalWidgets.map((widget) => (
+                                    <div
+                                        key={widget.id}
+                                        className="relative group cursor-pointer border border-dashed border-white/20 rounded-xl p-4 hover:bg-white/5 hover:border-emerald-500/50 transition-all font-sans"
+                                        onClick={() => toggleWidgetVisibility(widget.id, true)}
+                                    >
+                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-emerald-500 text-white rounded-full p-1">
+                                            <Plus size={12} />
+                                        </div>
+                                        <div className="pointer-events-none scale-[0.85] origin-top-left overflow-hidden">
+                                            {renderWidget(widget.id)}
+                                        </div>
                                     </div>
-                                    <div className="pointer-events-none scale-[0.85] origin-top-left overflow-hidden">
-                                        {renderWidget(widget.id)}
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
-        </TooltipProvider>
+                    )
+                }
+            </div >
+        </TooltipProvider >
     );
 };
