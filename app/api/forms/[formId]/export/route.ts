@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prismadb } from "@/lib/prisma";
 import { format } from "date-fns";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { requireApiAuth } from "@/lib/api-auth-guard";
 
 export async function POST(
@@ -71,15 +71,23 @@ export async function POST(
             }
         });
 
-        // 3. Create Workbook and Worksheet
-        const ws = XLSX.utils.json_to_sheet(rowData, { header: finalHeaders });
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Submissions");
+        // 3. Create Workbook and Worksheet using ExcelJS
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Submissions");
+
+        // Set columns (headers)
+        worksheet.columns = finalHeaders.map(header => ({
+            header,
+            key: header,
+        }));
+
+        // Add rows
+        worksheet.addRows(rowData);
 
         // 4. Generate Buffer
-        const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+        const buffer = await workbook.xlsx.writeBuffer();
 
-        return new NextResponse(buffer, {
+        return new NextResponse(buffer as any, {
             headers: {
                 "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "Content-Disposition": `attachment; filename="submissions-${formId}-${new Date().toISOString().split('T')[0]}.xlsx"`,

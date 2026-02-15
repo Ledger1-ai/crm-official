@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prismadbCrm } from "@/lib/prisma-crm";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 
@@ -90,12 +90,12 @@ function normalizeRow(row: Record<string, any>): { candidate?: CandidateNorm; co
   const techStack =
     typeof techStackRaw === "string"
       ? techStackRaw
-          .split(/[;,]/)
-          .map((s: string) => s.trim())
-          .filter(Boolean)
+        .split(/[;,]/)
+        .map((s: string) => s.trim())
+        .filter(Boolean)
       : Array.isArray(techStackRaw)
-      ? techStackRaw.map((s: any) => String(s).trim()).filter(Boolean)
-      : undefined;
+        ? techStackRaw.map((s: any) => String(s).trim()).filter(Boolean)
+        : undefined;
   if (techStack && techStack.length) usedCols.push("techStack");
 
   // dedupeKey for candidate: prefer domain; else companyName|homepageUrl; else companyName
@@ -107,14 +107,14 @@ function normalizeRow(row: Record<string, any>): { candidate?: CandidateNorm; co
   const candidate =
     candidateKey
       ? {
-          dedupeKey: candidateKey,
-          domain: domain || undefined,
-          companyName: companyName || undefined,
-          homepageUrl: homepageUrl || undefined,
-          description: description || undefined,
-          industry: industry || undefined,
-          techStack,
-        }
+        dedupeKey: candidateKey,
+        domain: domain || undefined,
+        companyName: companyName || undefined,
+        homepageUrl: homepageUrl || undefined,
+        description: description || undefined,
+        industry: industry || undefined,
+        techStack,
+      }
       : undefined;
 
   const fullName = lc(getFromRow(row, COLS.fullName));
@@ -137,26 +137,54 @@ function normalizeRow(row: Record<string, any>): { candidate?: CandidateNorm; co
   const contact =
     contactKey
       ? {
-          dedupeKey: contactKey,
-          candidateKey: candidateKey || undefined,
-          fullName: fullName || undefined,
-          title: title || undefined,
-          email: email || undefined,
-          phone: phone || undefined,
-          linkedinUrl: linkedinUrl || undefined,
-        }
+        dedupeKey: contactKey,
+        candidateKey: candidateKey || undefined,
+        fullName: fullName || undefined,
+        title: title || undefined,
+        email: email || undefined,
+        phone: phone || undefined,
+        linkedinUrl: linkedinUrl || undefined,
+      }
       : undefined;
 
   return { candidate, contact, usedCols };
 }
 
-function bufferToRows(fileName: string | undefined, buffer: Buffer): Record<string, any>[] {
+async function bufferToRows(fileName: string | undefined, buffer: Buffer): Promise<Record<string, any>[]> {
   const name = (fileName || "").toLowerCase();
   if (name.endsWith(".xlsx")) {
-    const wb = XLSX.read(buffer, { type: "buffer" });
-    const sheetName = wb.SheetNames[0];
-    const ws = wb.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(ws, { defval: "" }) as Record<string, any>[];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer as any);
+    const worksheet = workbook.getWorksheet(1);
+    if (!worksheet) return [];
+
+    const rows: Record<string, any>[] = [];
+    const headers: string[] = [];
+
+    // Get headers from first row
+    const firstRow = worksheet.getRow(1);
+    firstRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      const val = cell.value;
+      headers[colNumber] = (val === null || val === undefined) ? "" : val.toString();
+    });
+
+    // Get data rows
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header row
+      const rowData: Record<string, any> = {};
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const header = headers[colNumber];
+        if (header) {
+          let val = cell.value;
+          // Handle cases where value might be an object (like a formula result)
+          if (val && typeof val === 'object' && 'result' in (val as any)) {
+            val = (val as any).result;
+          }
+          rowData[header] = val === null || val === undefined ? "" : val;
+        }
+      });
+      rows.push(rowData);
+    });
     return rows;
   }
   // assume CSV
@@ -198,7 +226,7 @@ export async function POST(req: Request) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const rows = bufferToRows((file as any).name, buffer);
+    const rows = await bufferToRows((file as any).name, buffer);
 
     const usedColsSet = new Set<string>();
     const corruptRows: { index: number; errors: string[] }[] = [];
